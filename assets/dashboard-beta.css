@@ -1405,13 +1405,12 @@
     /* Fallback for browsers without :has() — target by container */
     #section-risk table,
     #section-rates table { min-width: unset !important; width: 100% !important; }
-    /* Seasonality (beta) windows table — never added to the exception list
-       above since #szn-panel didn't exist yet when it was written. Without
-       this, the blanket `table { min-width: 480px; }` rule (meant for the
-       FX Pairs table) forced this 5-column table to 480px inside a panel
-       with far less than that available on any phone-width viewport,
-       overflowing #szn-panel's own border. */
-    #szn-windows-table { min-width: unset !important; width: 100% !important; }
+    /* #szn-windows-table's mobile handling was reworked (see index-beta.html/
+       index.html v8.219.0): the table now carries its own inline
+       min-width:480px inside an overflow-x:auto wrapper div, same pattern as
+       its sibling Monthly Avg table (min-width:620px) — no CSS override
+       needed here; the old `min-width:unset !important` rule that used to
+       live here would fight that inline value and was removed. */
 
     /* Heatmap */
     #heatmap-wrap { overflow-x: auto !important; }

@@ -16728,3 +16728,923 @@ window.addEventListener('gi-theme-change', function() {
     try { drawLiquidityChart(); } catch(_) {}
   }
 });
+
+// ═══════════════════════════════════════════════════════════════════
+// SEASONALITY PANEL — button in the chart's Row 2 toolbar opens a
+// monthly seasonal-return panel for the currently active chart symbol.
+//
+// Data source: seasonality-data/{pair}.json, written by the private
+// scripts repo's compute_seasonality.py (server-side, off ohlc-data D1
+// bars — see that script's header for methodology and its explicit
+// monthly-not-daily scope note). FX pairs only — 32 majors/crosses match
+// compute_seasonality.py's PAIRS list; indices/metals/crypto/rates aren't
+// computed and the button shows a plain "not available for this symbol"
+// state rather than silently doing nothing.
+//
+// Chart: reuses the same Lightweight Charts library instance already
+// loaded for the Price Chart (_ensureLWLib()) rather than pulling in a
+// second charting dependency — an Area series plotted against synthetic
+// sequential dates (LWC requires a real increasing time axis; the axis
+// itself is hidden and real month labels are rendered in the #szn-months
+// row below it instead, same "hide the axis, label separately" approach
+// already used elsewhere in this file for non-time x-axes).
+// ═══════════════════════════════════════════════════════════════════
+(function () {
+  // Extended (v8.196.0) to match compute_seasonality.py's PAIRS list —
+  // that script was widened to every non-FX id fetch_ohlc.py populates
+  // with real 10y OHLC (metals, energy, equity indices, crypto, DXY,
+  // VIX/MOVE, us10y/us5y); this gate must stay in sync or a symbol with
+  // a real seasonality-data/{id}.json file would still show the "FX
+  // pairs only" message. hyoas/igoas (fetch_credit_spreads.py, different
+  // script) and us2y (no OHLC proxy exists) are excluded on both sides.
+  const SZN_PAIRS = new Set([
+    'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
+    'usdnok','usdsek','eurnok','eursek','eurgbp','eurjpy','eurchf',
+    'eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd',
+    'audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd',
+    'audcad','cadchf','nzdcad','nzdchf',
+    'gold','silver','wti','brent','btc','eth','dxy','vix','move',
+    'us10y','us5y','spx','nasdaq','nikkei','stoxx','dax','ftse',
+    'hsi','dji',
+  ]);
+
+  let _sznChart = null, _sznSeries = null, _sznOpen = false, _sznLoadedPair = null, _sznCrosshairHandler = null;
+  // v8.211.0 — actual pixel width LWC reserves for the right price scale
+  // (rightPriceScale: { minimumWidth: 50 } above, plus its border — comes
+  // out to ~56px live). #szn-months must exclude this from the width it
+  // distributes its 12 columns across; see _sznRenderMonthLabels() below
+  // for why.
+  let _sznRightScaleWidth = 0;
+
+  function _sznPairLabel(pair) {
+    return pair.length === 6 ? (pair.slice(0, 3) + '/' + pair.slice(3)).toUpperCase() : pair.toUpperCase();
+  }
+
+  function _sznDestroyChart() {
+    if (_sznChart) { try { _sznChart.remove(); } catch (_) {} }
+    _sznChart = null; _sznSeries = null; _sznCrosshairHandler = null;
+  }
+
+  async function _sznRenderChart(curve) {
+    const el = document.getElementById('szn-chart');
+    // LWC is not a global — every other chart in this file (Price Chart,
+    // etc.) pulls it from window.LightweightCharts locally. This IIFE
+    // never did, so `typeof LWC === 'undefined'` was always true and the
+    // chart silently no-op'd on every open. Same fix as the other call
+    // sites: resolve it from window, and ensure the library is actually
+    // loaded (Price Chart lazy-loads it via _ensureLWLib(); if this panel
+    // is opened before that resolves, load it here too).
+    if (typeof window._ensureLWLib === 'function') {
+      try { await window._ensureLWLib(); } catch (_) {}
+    }
+    const LWC = window.LightweightCharts;
+    if (!el || typeof LWC === 'undefined') return;
+    _sznDestroyChart();
+    el.innerHTML = '';
+
+    _sznChart = LWC.createChart(el, {
+      // Was `background: { color: 'transparent' }` — LWC's canvas paint
+      // doesn't reliably render a true transparent backdrop once the pane
+      // actually has content to draw (grid lines, series); in practice it
+      // fell back to a lighter internal default gray-blue, visible as a
+      // "gray box" filling the whole plot area regardless of hover (this
+      // was already there before any mouse interaction — confirmed against
+      // a screenshot with the cursor away from the chart). The main Price
+      // Chart never relies on 'transparent' for exactly this reason — it
+      // sets its background explicitly to the real backdrop color
+      // (`--bg`, the same color `body`/`#szn-panel` actually paint behind
+      // it). Matched that here instead of trusting 'transparent'.
+      layout: { background: { color: _themeColor('--bg') }, textColor: _themeColor('--text'), attributionLogo: false },
+      grid: { vertLines: { visible: false }, horzLines: { color: _themeColorAlpha('--border', 0.5) } },
+      rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 50 },
+      timeScale: { visible: false, borderVisible: false },
+      handleScroll: false, handleScale: false,
+      // Explicit crosshair theming — without vertLine/horzLine colors set,
+      // LWC falls back to its own library-default gray (line + label
+      // background), which reads as an out-of-place gray box against this
+      // theme on hover. The main Price Chart already themes this (see
+      // _lwChart's own `crosshair:` block above); this panel's chart is a
+      // separate LWC instance and needs the same treatment explicitly.
+      crosshair: {
+        mode: LWC.CrosshairMode.Normal,
+        // v8.210.0 fix — vertLine.labelVisible was never explicitly set,
+        // so it kept LWC's default `true`. That label draws into the
+        // time-scale pane, but this chart sets `timeScale: { visible:
+        // false }` (the real dates are shown by our own custom
+        // #szn-months row below instead, sized/positioned to match the
+        // day-of-year curve — see _sznRenderMonthLabels() above). With
+        // the pane hidden, LWC's own hover-date label had nowhere
+        // correct to paint and was spilling out below the chart in its
+        // un-themed library-default color, overlapping/miscolored
+        // against our custom month row — most visible as a stray blue
+        // "Dec" near the end of the strip on hover. This chart already
+        // has its own themed tooltip for date+value (#szn-chart-
+        // tooltip, driven by subscribeCrosshairMove() below), so the
+        // native vertLine label is fully redundant once disabled — not
+        // a workaround, an actual dupe. Every OTHER LWC chart in this
+        // file (Price Chart, Rates & Yield Curve, etc.) keeps its real
+        // timeScale visible and never hides it, so this leak is unique
+        // to this one chart's custom-axis pattern.
+        vertLine: { color: _themeColorAlpha('--text2', 0.5), labelVisible: false },
+        horzLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
+      },
+      localization: { priceFormatter: v => v.toFixed(2) + '%' },
+      width: el.clientWidth || 580,
+      height: 120,
+    });
+
+    // Line/fill color: was `--down` (red) — no basis for that on a chart
+    // that isn't showing a directional loss/decline; every other single-
+    // series chart in this file (Price Chart's Area mode, Rates & Yield
+    // Curve's 10Y chart, etc.) uses the dedicated `--chart-line` blue for
+    // a neutral historical series, which is also the industry-standard
+    // convention for a non-directional seasonal/statistical curve like
+    // this one (EquityClock, Seasonax). Switched to match.
+    const seriesOpts = {
+      lineColor: _themeColor('--chart-line'), lineWidth: 1.6,
+      topColor: _themeColorAlpha('--chart-line', 0.10), bottomColor: _themeColorAlpha('--chart-line', 0.01),
+      priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: true,
+    };
+    _sznSeries = (typeof LWC.AreaSeries !== 'undefined')
+      ? _sznChart.addSeries(LWC.AreaSeries, seriesOpts)
+      : _sznChart.addAreaSeries(seriesOpts);
+
+    // v8.195.0 — curve is now day-of-year (367 points: index 0 = pre-
+    // Jan-1 baseline, then a real {month,day} for every calendar day of
+    // a reference leap year — see compute_seasonality.py's
+    // _build_daily_curve()). Unlike the old 13-point synthetic-date
+    // scheme (spaced 14 days apart purely to satisfy LWC's strictly-
+    // ascending-time requirement), every point here already carries a
+    // REAL calendar date, so no synthetic spacing is needed — a genuine
+    // Date.UTC(refYear, month-1, day) walk is ascending by construction
+    // for every day of the year, including Feb 29 in the leap reference
+    // year used here (2024). The baseline point (month:0, day:0) is
+    // placed one day before Jan 1 of that same reference year so it
+    // still sorts strictly before the first real point.
+    const REF_YEAR = 2024; // leap year — accommodates the Feb 29 point
+    const pts = curve.map(pt => {
+      const d = (pt.month === 0)
+        ? new Date(Date.UTC(REF_YEAR - 1, 11, 31)) // baseline: Dec 31 of the prior year
+        : new Date(Date.UTC(REF_YEAR, pt.month - 1, pt.day));
+      return {
+        time: `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`,
+        value: pt.cum_pct,
+      };
+    });
+    _sznSeries.setData(pts);
+    _sznChart.timeScale().fitContent();
+
+    // v8.211.0 — capture the right price scale's real live pixel width
+    // (rightPriceScale: { minimumWidth: 50 } above is a floor LWC can
+    // exceed once real % values are laid out, e.g. "-1.00%" — must read
+    // the actual rendered width, not assume the minimum). This is the
+    // gutter #szn-months has to exclude from its own width below it —
+    // see _sznRenderMonthLabels() for the actual fix; this only captures
+    // the number. Guarded because priceScale().width() can legitimately
+    // return 0 before the chart's first paint.
+    try {
+      const w = _sznChart.priceScale('right').width();
+      if (w > 0) _sznRightScaleWidth = w;
+    } catch (_) { /* keep previous value rather than zeroing it out */ }
+
+    // v8.208.0 — hover tooltip (date + value). crosshairMarkerVisible:true
+    // (set in seriesOpts above) only draws the dot on the line itself; LWC
+    // does not render any text next to it on its own — a text readout needs
+    // a manually-positioned DOM element driven by subscribeCrosshairMove(),
+    // the same pattern the main Price Chart already uses for its own
+    // hover readout (see _lwChart's crosshair-move handler elsewhere in
+    // this file). REF_YEAR is a synthetic placeholder year (see comment
+    // above pts) so the tooltip formats {month, day} directly rather than
+    // showing that fake year to the user.
+    const pointByTime = {};
+    pts.forEach((p, i) => { pointByTime[p.time] = curve[i]; });
+    let tip = document.getElementById('szn-chart-tooltip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'szn-chart-tooltip';
+      tip.style.cssText = 'position:absolute;display:none;pointer-events:none;z-index:5;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 7px;font-size:10px;font-family:var(--font-mono,monospace);color:var(--text);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35);';
+      el.style.position = el.style.position || 'relative';
+      el.appendChild(tip);
+    }
+    // _sznChart is a fresh instance every call (see _sznDestroyChart() above),
+    // so there's no prior subscription on THIS chart to remove — no unsubscribe
+    // call needed here, unlike a chart instance that persists across renders.
+    const MONTH_FULL = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    _sznCrosshairHandler = param => {
+      if (!param.point || !param.time || param.point.x < 0 || param.point.y < 0) {
+        tip.style.display = 'none';
+        return;
+      }
+      const pt = pointByTime[param.time];
+      if (!pt) { tip.style.display = 'none'; return; }
+      const dateLabel = (pt.month === 0) ? 'Baseline' : `${MONTH_FULL[pt.month - 1]} ${pt.day}`;
+      const valTxt = (pt.cum_pct >= 0 ? '+' : '') + pt.cum_pct.toFixed(2) + '%';
+      tip.innerHTML = `${dateLabel} &middot; <span style="color:${pt.cum_pct >= 0 ? 'var(--up)' : 'var(--down)'};">${valTxt}</span>`;
+      tip.style.display = 'block';
+      // Clamp so the tooltip never spills past the container's right/top edge.
+      const maxLeft = el.clientWidth - tip.offsetWidth - 4;
+      const left = Math.max(4, Math.min(param.point.x + 10, maxLeft));
+      const top = Math.max(2, param.point.y - 28);
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    };
+    _sznChart.subscribeCrosshairMove(_sznCrosshairHandler);
+  }
+
+  const _SZN_MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  // v8.200.0: below each month label, show that month's own average
+  // cumulative move (end-of-month cum_pct minus start-of-month cum_pct,
+  // from the SAME additive day-of-year curve already fetched — no new
+  // backend field, no new request). This is deliberately descriptive-only
+  // (no win_rate, no p-value, no MIN_YEARS gate) — it does NOT feed or
+  // relax the windows table's t-test significance gate above; the two are
+  // independent, same "descriptive month-average alongside a stricter
+  // significance-gated table" pattern used by reference tools like
+  // EquityClock.
+  //
+  // v8.208.0 REVERT: the inline second line (month name + its own avg %
+  // stacked below it inside the same grid cell) reintroduced exactly the
+  // failure mode v8.203.0 had just closed for the month-name-only version —
+  // a grid cell's row height is fixed by `grid-template-rows:1fr` against
+  // the row container's own height, but that height was only ever sized
+  // (via #szn-months' `min-height:22px`) for a single line of text. Once a
+  // cell's content needs two stacked lines (name + value) taller than that
+  // fixed row box, the overflow doesn't reflow the grid — it just spills
+  // past the row's bottom edge, visually detached below the rest of the
+  // strip. December was the visible case Santiago hit, but the mechanism
+  // has nothing to do with December specifically (every month's two-line
+  // stack is equally taller than the box; December's simply happened to be
+  // the one whose overflow amount crossed into visibly separate territory
+  // at the widths tested — a real width/font-metrics coincidence, not a
+  // December-specific bug). Fixed at the root by reverting this row to
+  // month-name-only (one line, matches its `min-height:22px` box exactly)
+  // per Santiago's explicit instruction, rather than patching around it
+  // with a taller fixed row height or an invisible spacer — the average-
+  // move figures move to their own tab below instead (see
+  // `_sznRenderMonthlyTable()`), where a table row has no such fixed-height
+  // constraint to fight.
+  let _sznMonthlyCols = []; // shared with _sznRenderMonthlyTable() — same curve, computed once per load
+  function _sznRenderMonthLabels(curve) {
+    const row = document.getElementById('szn-months');
+    if (!row) return;
+    // v8.195.0 — curve is now 367 day-of-year points instead of 13
+    // monthly ones, so a label can no longer be emitted 1:1 per curve
+    // point (that would print 366 labels). Instead, derive one label
+    // per calendar month from the point where day===1 (every month has
+    // exactly one such point in the 367-point curve), and size each
+    // label's column width proportionally to how many days that month
+    // actually spans in the curve — so the label row still lines up
+    // approximately under the chart's real (non-uniform, since months
+    // have 28-31 days) time axis below, rather than 12 equal-width
+    // slots implying every month is the same length.
+    //
+    // v8.202.0 fix (incomplete — see v8.203.0 below): switched this row
+    // from display:flex (flex:{span} 0 0 per item, no guaranteed single-row
+    // fit) to CSS Grid with an explicit `grid-template-columns` built from
+    // the real per-month spans — a grid's column count/order are fixed by
+    // that declaration, unlike flex's content-dependent line-breaking.
+    //
+    // v8.203.0 fix: December kept dropping to its own row even after the
+    // v8.202.0 grid switch — root cause was a second bug introduced by that
+    // same fix: `grid-auto-flow: column` was set alongside the explicit
+    // 12-column `grid-template-columns`. `column` flow places items down
+    // the ROW axis first, wrapping to a new column only once the grid's row
+    // count is exhausted — and since no `grid-template-rows` is set here,
+    // that row count isn't reliably pinned to 1, so the auto-placement
+    // algorithm doesn't guarantee 12 items land one-per-column in a single
+    // row the way `row` flow (the CSS default) does for 12 items against
+    // 12 explicit columns. Fixed by removing the `column` override — plain
+    // `row` flow (left at its default, not set explicitly) fills the 12
+    // explicit column tracks left-to-right in exactly one row, which is
+    // the only behavior actually wanted here; there is no case where this
+    // row should ever wrap, so no grid-auto-flow value should try to.
+    const monthStarts = [];
+    curve.forEach((p, i) => { if (p.month >= 1 && p.day === 1) monthStarts.push({ month: p.month, idx: i }); });
+
+    const cols = monthStarts.map((m, i) => {
+      const nextIdx = (i + 1 < monthStarts.length) ? monthStarts[i + 1].idx : curve.length;
+      const span = nextIdx - m.idx; // days in this month, from the actual curve
+      const startPct = curve[m.idx].cum_pct;
+      const endPct = (nextIdx < curve.length) ? curve[nextIdx].cum_pct : curve[curve.length - 1].cum_pct;
+      const monthPct = endPct - startPct;
+      return { month: m.month, span, monthPct };
+    });
+
+    _sznMonthlyCols = cols; // stash for the Monthly Avg tab table — same data, no re-fetch/re-derive
+
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = cols.map(c => `${c.span}fr`).join(' ');
+    row.style.gridTemplateRows = '1fr'; // pin to exactly one row — belt-and-suspenders alongside removing the column auto-flow below
+    row.style.gridAutoFlow = 'row'; // explicit, not left to inherit — this must never be 'column' (see v8.203.0 comment above)
+    row.style.gap = '1px';
+    row.style.flexWrap = ''; // clear the stale flex-wrap inline value, if any, left over from this row's pre-v8.202.0 flex layout
+
+    // v8.211.0 fix — root cause of "December sits under the price-scale
+    // column" (confirmed via a live console diagnostic, not assumed):
+    // #szn-months previously defaulted to the full width of #szn-panel
+    // (same as the chart container, 404px in the diagnostic capture),
+    // but LWC's canvas only actually plots the series across
+    // (containerWidth - rightScaleWidth) — 348px in that same capture,
+    // a ~56px gutter reserved for the "1.00% / 0.00% / -1.00%" price
+    // labels. Distributing 12 grid columns across the full 404px put
+    // the later months (Nov/Dec) increasingly right of where the real
+    // curve ends, landing Dec visibly under the empty price-scale
+    // gutter instead of under the chart's actual right edge. Capping
+    // this row's own width to exclude that same gutter (measured live
+    // off the chart itself in _sznRenderChart(), not hardcoded) makes
+    // its 12 columns span the identical pixel range LWC uses for the
+    // curve, so the last column lines up with the real end of the data
+    // instead of the empty space beside it.
+    row.style.width = _sznRightScaleWidth > 0 ? `calc(100% - ${_sznRightScaleWidth}px)` : '100%';
+
+    // Month-name-only, single line — see v8.208.0 comment above for why the
+    // inline value line was reverted.
+    row.innerHTML = cols.map(c =>
+      `<span style="text-align:center;line-height:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_SZN_MONTH_LABELS[c.month - 1]}</span>`
+    ).join('');
+
+    _sznRenderMonthlyTable(cols);
+  }
+
+  // v8.209.0 — rebuilt as a horizontal table (months as columns, one
+  // Average row + a Yearly Return column), matching the Seasonax/
+  // EquityClock "Total Percent Returns" layout convention Santiago
+  // referenced — this is the industry-standard shape for a compact
+  // monthly-seasonality table, and uses far less vertical space than the
+  // v8.208.0 row-per-month version. Cell backgrounds use a light tint of
+  // the same --up/--down variables the rest of this app already uses for
+  // sign, rather than the reference image's light-mode green/red (which
+  // wouldn't read correctly against this dark theme).
+  function _sznRenderMonthlyTable(cols) {
+    const head = document.getElementById('szn-monthly-h-head');
+    const row = document.getElementById('szn-monthly-h-row');
+    if (!head || !row) return;
+    const cellStyle = 'padding:5px 4px;text-align:center;border-left:1px solid var(--border2);';
+    // v8.212.0 — every <th>/<td> here now carries an explicit
+    // background (transparent, same visual result as before) instead
+    // of none. Without it, the global `tr:hover td { background:
+    // var(--bg3); }` rule (dashboard.css) is the only background these
+    // cells have, so hovering the row darkened ONLY the ones lacking an
+    // inline background — "Average"/the header row — while the numeric
+    // cells below (which already set an inline background, even when
+    // it's 'transparent', and inline always wins over that CSS rule)
+    // stayed visually unchanged, reading as "Average turns gray on
+    // hover". Exact same root cause as the correlation matrix's row/
+    // corner-header hover artifact (GUIDELINES.md, v8.185.0) — a cell
+    // missing the same explicit background every sibling cell has,
+    // exposed specifically by :hover repaint rather than a real :hover
+    // rule targeting it.
+    head.innerHTML = '<th style="padding:5px 4px;text-align:left;font-weight:400;background:transparent;">Month</th>'
+      + cols.map(c => `<th style="${cellStyle}font-weight:400;background:transparent;">${_SZN_MONTH_LABELS[c.month - 1]}</th>`).join('')
+      + `<th style="${cellStyle}font-weight:400;border-left:2px solid var(--border);background:transparent;">Yearly</th>`;
+
+    const yearly = cols.reduce((sum, c) => sum + c.monthPct, 0);
+    const fmtCell = (v, wideDivider) => {
+      const flat = Math.abs(v) < 0.05;
+      const color = flat ? 'var(--text3)' : (v > 0 ? 'var(--up)' : 'var(--down)');
+      const bg = flat ? 'transparent' : (v > 0 ? 'rgba(38,166,154,0.14)' : 'rgba(239,83,80,0.14)');
+      const txt = (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+      const border = wideDivider ? 'border-left:2px solid var(--border);' : 'border-left:1px solid var(--border2);';
+      return `<td style="padding:5px 4px;text-align:center;${border}background:${bg};color:${color};">${txt}</td>`;
+    };
+    row.innerHTML = '<td style="padding:5px 4px;color:var(--text);text-align:left;background:transparent;">Average</td>'
+      + cols.map(c => fmtCell(c.monthPct)).join('')
+      + fmtCell(yearly, true);
+  }
+
+  // v3.0 (2026-08-21 industry-standard audit): win_rate demoted from primary
+  // gate/sort key to context-only column — Seasonax's own published
+  // methodology treats hit rate as the LEAST significant of its reported
+  // stats. The real gate is now a one-sample t-test p-value (computed
+  // server-side in compute_seasonality.py), and avg_return is now shown
+  // alongside std_dev rather than alone, since dispersion is part of the
+  // story. Windows are also now guaranteed non-overlapping (server-side
+  // dedup) so this table can no longer show the same pattern 2-3 times.
+  function _sznRenderWindows(windows) {
+    const tbody = document.getElementById('szn-windows-tbody');
+    if (!tbody) return;
+    if (!windows || !windows.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:4px 0;">No window reached statistical significance (p&lt;0.05) for this pair over the available history.</td></tr>';
+      return;
+    }
+    const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    tbody.innerHTML = windows.map(w => `
+      <tr style="color:var(--text);border-top:1px solid var(--border2);">
+        <td style="padding:3px 0;">${M[w.start_month - 1]} \u2192 ${M[w.end_month - 1]}</td>
+        <td style="text-align:right;color:${w.dir === 'Short' ? 'var(--down)' : 'var(--up)'};">${w.dir}</td>
+        <td style="text-align:right;color:${w.avg_return < 0 ? 'var(--down)' : 'var(--up)'};">${w.avg_return > 0 ? '+' : ''}${w.avg_return}% \u00b1 ${w.std_dev != null ? w.std_dev : '\u2014'}%</td>
+        <td style="text-align:right;color:var(--text3);">${w.win_rate}%</td>
+        <td style="text-align:right;">${w.p_value != null ? w.p_value : '\u2014'}</td>
+      </tr>`).join('');
+  }
+
+  function _sznRenderInsight(data, pair) {
+    const insight = document.getElementById('szn-insight');
+    if (!insight) return;
+    const top = data.windows && data.windows[0];
+    const label = _sznPairLabel(pair);
+    if (!top) {
+      insight.textContent = `${label} has ${data.years} years of history but no window reached statistical significance (p<0.05, one-sample t-test) over that period \u2014 no strong recurring seasonal pattern found.`;
+      return;
+    }
+    const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    const dirWord = top.dir === 'Short' ? 'weakness' : 'strength';
+    // Sample-size caveat is conditional on the pair's REAL data.years (not
+    // assumed) \u2014 fetch_ohlc.py v1.15 widened PERIOD 10y->20y specifically
+    // to close this gap, but real yfinance/CFD depth still varies per pair,
+    // so this must keep reading the live value rather than asserting a fixed
+    // "well short" claim now that some pairs can clear 15y+.
+    let sampleNote;
+    if (data.years < 15) {
+      sampleNote = `${data.years}y of history is well short of the 15-25y sample size seasonality research typically recommends`;
+    } else if (data.years <= 25) {
+      sampleNote = `${data.years}y of history is within the 15-25y sample size seasonality research typically recommends`;
+    } else {
+      sampleNote = `${data.years}y of history exceeds the 15-25y sample size seasonality research typically recommends`;
+    }
+    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
+  }
+
+  async function _sznLoad(pair) {
+    const insight = document.getElementById('szn-insight');
+    const title = document.getElementById('szn-title');
+    const tbody = document.getElementById('szn-windows-tbody');
+    const monthsRow = document.getElementById('szn-months');
+    const monthlyHead = document.getElementById('szn-monthly-h-head');
+    const monthlyRow = document.getElementById('szn-monthly-h-row');
+    const chartSection = document.getElementById('szn-chart-section');
+    const windowsSection = document.getElementById('szn-windows-section');
+
+    if (!pair || !SZN_PAIRS.has(pair)) {
+      if (title) title.textContent = 'Daily \u00b7 10y lookback';
+      if (insight) insight.textContent = 'Seasonality isn\u2019t available for this symbol \u2014 select an FX pair, metal, index, or other supported instrument on the Price Chart above.';
+      if (tbody) tbody.innerHTML = '';
+      if (monthsRow) monthsRow.innerHTML = '';
+      if (monthlyHead) monthlyHead.innerHTML = '';
+      if (monthlyRow) monthlyRow.innerHTML = '';
+      if (chartSection) chartSection.style.display = 'none';
+      if (windowsSection) windowsSection.style.display = 'none';
+      if (typeof window._sznSwitchTab === 'function') window._sznSwitchTab('chart');
+      _sznDestroyChart();
+      _sznLoadedPair = null;
+      return;
+    }
+    if (pair === _sznLoadedPair) return; // already showing this pair
+
+    if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Daily \u00b7 10y lookback`;
+    if (insight) insight.textContent = 'Loading seasonality data\u2026';
+    // Reset to visible before the fetch — a prior pair may have hit the
+    // catch branch below and hidden these; this pair might succeed.
+    if (chartSection) chartSection.style.display = '';
+    if (windowsSection) windowsSection.style.display = '';
+
+    try {
+      const res = await fetch(`./seasonality-data/${pair}.json`, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      await _sznRenderChart(data.curve);
+      _sznRenderMonthLabels(data.curve);
+      _sznRenderWindows(data.windows);
+      _sznRenderInsight(data, pair);
+      if (title) title.textContent = `${_sznPairLabel(pair)} \u00b7 Daily \u00b7 ${data.years}y lookback`;
+      _sznLoadedPair = pair;
+    } catch (e) {
+      // A missing file means the pair didn't clear MIN_YEARS in
+      // compute_seasonality.py (or hasn't run yet for this pair) — same
+      // "nothing to show" treatment as an unsupported symbol: hide the
+      // empty chart/table shell rather than leaving a blank black box
+      // and an empty table above the one line of real text.
+      if (insight) insight.textContent = `No seasonality data yet for ${_sznPairLabel(pair)} \u2014 needs at least 5 years of stored daily history.`;
+      if (tbody) tbody.innerHTML = '';
+      if (monthsRow) monthsRow.innerHTML = '';
+      if (monthlyHead) monthlyHead.innerHTML = '';
+      if (monthlyRow) monthlyRow.innerHTML = '';
+      if (chartSection) chartSection.style.display = 'none';
+      if (windowsSection) windowsSection.style.display = 'none';
+      if (typeof window._sznSwitchTab === 'function') window._sznSwitchTab('chart');
+      _sznDestroyChart();
+      _sznLoadedPair = null;
+    }
+  }
+
+  function _sznToggle(open) {
+    const panel = document.getElementById('szn-panel');
+    const btn = document.getElementById('szn-btn');
+    if (!panel) return;
+    _sznOpen = open != null ? open : panel.style.display === 'none';
+    panel.style.display = _sznOpen ? 'block' : 'none';
+    if (btn) btn.setAttribute('aria-expanded', String(_sznOpen));
+    if (btn) btn.classList.toggle('on', _sznOpen);
+    if (_sznOpen) _sznLoad(window._sznActiveOhlcId);
+    // Toggling this panel adds/removes a whole block of vertical space
+    // above the price chart (#tv-chart-wrap has flex:1 inside the fullscreen
+    // overlay's #lw-fullscreen-inner, so its CSS box does shrink/grow
+    // correctly) — but the LWC canvas itself was drawn at the OLD pixel
+    // height and never gets told to repaint at the new one, since neither
+    // display:block/none nor a flex-basis change fires a 'resize' event.
+    // Symptom Santiago saw: opening Seasonality inside the fullscreen chart
+    // overlay left the price chart candles rendered at their pre-toggle
+    // (taller) height, now overflowing/clipped by the shrunk container —
+    // reading as "the chart got cut in half", including its time axis at
+    // the bottom. Same forceRepaint:true + pane/drawing re-sync already
+    // used by _lwOpenFullscreen()/_lwCloseFullscreen() after their own
+    // DOM-lift resizes.
+    if (typeof window._lwResizeAfterLayoutChange === 'function') {
+      requestAnimationFrame(() => requestAnimationFrame(window._lwResizeAfterLayoutChange));
+    }
+  }
+
+  // Exposed so _renderLWChart's single call site can notify us of symbol
+  // changes without this IIFE needing to be defined before that function.
+  window._sznOnSymbolChange = function (ohlcId) {
+    if (_sznOpen) _sznLoad(ohlcId);
+  };
+
+  // Exposed so _lwOpenFullscreen()/_lwCloseFullscreen() can force this
+  // chart to re-measure its container after moving it in/out of the
+  // fullscreen overlay (a DOM move doesn't fire a window 'resize' event).
+  //
+  // Was `_sznChart.applyOptions({ width })` — this updates the chart's
+  // config but, unlike the main Price Chart's own fullscreen-resize path
+  // (_lwChart.resize(w, h, true)), doesn't reliably force the canvas
+  // itself to repaint at the new size, nor does it touch the time scale.
+  // Net effect matching what Santiago saw: entering fullscreen widened
+  // #szn-chart's container, but the chart kept rendering at its old
+  // (pre-fullscreen) pixel width — visible as the curve confined to a
+  // narrow strip instead of spanning the new, much wider panel. Switched
+  // to the same `.resize(width, height, forceRepaint)` call the Price
+  // Chart uses, plus `timeScale().fitContent()` to re-spread the 13-point
+  // curve across the full new width (resize() alone repaints the canvas
+  // at the new size but keeps the same visible logical range).
+  window._sznResizeChart = function () {
+    if (!_sznChart) return;
+    const el = document.getElementById('szn-chart');
+    if (!el) return;
+    const w = el.clientWidth || 580;
+    _sznChart.resize(w, 120, true);
+    _sznChart.timeScale().fitContent();
+  };
+
+  // v8.208.0 — Chart / Monthly Avg tab strip (same show/hide-by-id onclick
+  // pattern the Dollar Smile panel's tab bar used before it was reduced to
+  // a single Growth view in v8.213.0 — see the note near _growthdiffRenderTable()).
+  window._sznSwitchTab = function (tab) {
+    ['chart', 'monthly'].forEach(t => {
+      const btn = document.querySelector(`.szn-tab[data-szn-tab="${t}"]`);
+      const panel = document.getElementById(`szn-tab-${t}`);
+      const active = t === tab;
+      if (btn) {
+        btn.style.color = active ? 'var(--text)' : 'var(--text3)';
+        btn.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
+      }
+      if (panel) panel.style.display = active ? '' : 'none';
+    });
+    // Chart tab's LWC canvas was sized while display:none on this branch of
+    // the very first load (its container has 0 width then) — re-measure on
+    // every switch back into view, same reasoning as the fullscreen/toggle
+    // resize calls above.
+    if (tab === 'chart' && typeof window._sznResizeChart === 'function') {
+      requestAnimationFrame(() => requestAnimationFrame(window._sznResizeChart));
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const btn = document.getElementById('szn-btn');
+    const closeBtn = document.getElementById('szn-close');
+    if (btn) btn.addEventListener('click', () => _sznToggle());
+    if (closeBtn) closeBtn.addEventListener('click', () => _sznToggle(false));
+    window.addEventListener('resize', () => window._sznResizeChart());
+  });
+})();
+
+// ── Row 2 toolbar scroll arrows (promoted to production) — same prev/next pattern as
+//    #tv-ticker/#tv-pair-tabs (see the existing addWheelScroll IIFE above),
+//    added because the Seasonality button pushed Row 2 closer to overflow
+//    on narrower viewports. ─────────────────────────────────────────────
+(function () {
+  const row = document.getElementById('lw-tb-row2');
+  const btnPrev = document.getElementById('lw-tb-row2-prev');
+  const btnNext = document.getElementById('lw-tb-row2-next');
+  if (!row || !btnPrev || !btnNext) return;
+
+  row.addEventListener('wheel', function (e) {
+    if (e.deltaY === 0) return;
+    e.preventDefault();
+    row.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  function updateArrows() {
+    const atStart = row.scrollLeft <= 2;
+    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+    btnPrev.style.display = atStart ? 'none' : 'flex';
+    btnNext.style.display = atEnd ? 'none' : 'flex';
+  }
+  row.addEventListener('scroll', updateArrows, { passive: true });
+  window.addEventListener('resize', updateArrows);
+
+  // The single setTimeout(200) below isn't enough on its own: #lw-ind-pills
+  // (EMA 50/EMA 20 etc.) and #lw-ind-btn's own overlay pills get appended
+  // to this same row asynchronously, after the chart's indicator data has
+  // loaded — which can land well after 200ms and after this row's initial
+  // scrollWidth was already measured as "no overflow". Nothing was
+  // listening for that later width change, so the right arrow only ever
+  // appeared once the user manually scrolled (which fires 'scroll' and
+  // re-runs updateArrows for the first time). Fix: watch the row itself
+  // for content/size changes and re-check on every one of them.
+  const mo = new MutationObserver(() => updateArrows());
+  mo.observe(row, { childList: true, subtree: true, characterData: true });
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => updateArrows());
+    ro.observe(row);
+  }
+  // Belt-and-suspenders for browsers/timing where neither observer fires
+  // in time (e.g. font swap changing button widths after paint).
+  [0, 200, 800, 2000].forEach(ms => setTimeout(updateArrows, ms));
+
+  btnPrev.addEventListener('click', () => row.scrollBy({ left: -160, behavior: 'smooth' }));
+  btnNext.addEventListener('click', () => row.scrollBy({ left: 160, behavior: 'smooth' }));
+})();
+
+// ── Row 1 toolbar scroll arrows (promoted to production) — same gap as Row 2 had before its
+//    own fix: overflow-x:auto with zero affordance that it can scroll.
+//    Row 1 (TF/Range/+Compare/Fullscreen) is the one Santiago flagged —
+//    it's also the row that gets lifted (via #lw-range-bar) into the
+//    fullscreen chart overlay, where the narrower available width made
+//    +Compare/Fullscreen silently scroll out of reach. Identical
+//    prev/next pattern to the Row 2 IIFE directly above. ──────────────
+(function () {
+  const row = document.getElementById('lw-tb-row1');
+  const btnPrev = document.getElementById('lw-tb-row1-prev');
+  const btnNext = document.getElementById('lw-tb-row1-next');
+  if (!row || !btnPrev || !btnNext) return;
+
+  row.addEventListener('wheel', function (e) {
+    if (e.deltaY === 0) return;
+    e.preventDefault();
+    row.scrollLeft += e.deltaY;
+  }, { passive: false });
+
+  function updateArrows() {
+    const atStart = row.scrollLeft <= 2;
+    const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 2;
+    btnPrev.style.display = atStart ? 'none' : 'flex';
+    btnNext.style.display = atEnd ? 'none' : 'flex';
+  }
+  row.addEventListener('scroll', updateArrows, { passive: true });
+  window.addEventListener('resize', updateArrows);
+
+  // Same reasoning as Row 2's own comment: content here doesn't change
+  // asynchronously the way indicator pills do, but the row's available
+  // width DOES change the moment fullscreen opens/closes (DOM-lift into
+  // #lw-fullscreen-inner) — a ResizeObserver catches that without needing
+  // this IIFE to know anything about _lwOpenFullscreen().
+  const mo = new MutationObserver(() => updateArrows());
+  mo.observe(row, { childList: true, subtree: true, characterData: true });
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => updateArrows());
+    ro.observe(row);
+  }
+  [0, 200, 800, 2000].forEach(ms => setTimeout(updateArrows, ms));
+
+  btnPrev.addEventListener('click', () => row.scrollBy({ left: -160, behavior: 'smooth' }));
+  btnNext.addEventListener('click', () => row.scrollBy({ left: 160, behavior: 'smooth' }));
+})();
+
+// ═══════════════════════════════════════════════════════════════════
+// DOLLAR SMILE BLOCK (promoted to production, v8.219.0) — v3, 2026-08-22.
+//
+// Now Stephen Jen's ORIGINAL growth-differential framework only (US real
+// GDP YoY vs. the equal-weighted rest of the G10) — the market-stress-
+// regime proxy version this panel used through v8.201.0 (dollar-smile-
+// data/history.json, log_dollar_smile_inputs.py, 4 RISK-ON/CAUTION/MIXED/
+// RISK-OFF buckets keyed off VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS) has
+// been REMOVED from this panel per Santiago's explicit instruction: having
+// both a proxy version and the real version stacked in one panel read as
+// if one was needed to interpret the other, and it wasn't — each stood on
+// its own, so showing both was confusing, not additive. This panel now
+// shows only the real thing.
+//
+// (log_dollar_smile_inputs.py / dollar-smile-data/history.json / its daily
+// workflow are UNTOUCHED by this change — still logging real data server-
+// side — this is a frontend-only removal. Flag if you'd like that backend
+// job decommissioned too; leaving it running is harmless and reversible
+// either way, so it wasn't turned off as part of this fix.)
+//
+// Data: growth-differential-data/history.json, written by
+// fetch_growth_differential.py as a full idempotent recompute every run
+// (never a daily append — GDP data revises, so a cached differential
+// computed off a since-revised print would silently go stale/wrong).
+// Real GDP YoY, all 10 G10 currencies from FRED, 121 quarters back to
+// 1996-Q1 as of first backfill. Quarterly cadence — every historical
+// quarter already has a real value, so unlike the removed proxy axis
+// there is no "still accumulating" state to handle here.
+//
+// v2.0.0 (2026-08-22) — regime scheme changed from a pure growth-
+// differential 3-way split to a combined crisis+growth classification,
+// after Santiago flagged the chart didn't show a U-shape and a check
+// against Jen & Yilmaz's actual framework confirmed why: the smile's left
+// tail is a genuine global risk-off/crisis regime, not "the US grows a
+// bit slower than the G9 average" — those are different things, and a
+// pure growth-differential axis can never isolate the former (see
+// fetch_growth_differential.py's module docstring for the full
+// reasoning). GLOBAL-RISK-OFF now overrides the growth differential
+// whenever the quarter's max VIX close hit 40+, regardless of where the
+// US ranked that quarter; the old USD-UNDERPERFORMING bucket is folded
+// into CALM-MUDDLING-THROUGH, since — absent an actual crisis — modest
+// US underperformance is the theory's weak-dollar middle, not its left
+// tail.
+//
+// Note on shape: the insight text below states what regime_stats actually
+// show, not an assumed "classic smile" shape — this file was NOT changed
+// based on a live post-fix run (no network access to FRED in the
+// dev sandbox), only the classification logic. Verify against the next
+// live fetch_growth_differential.py run before claiming the shape itself
+// changed.
+// ═══════════════════════════════════════════════════════════════════
+const _GROWTHDIFF_LABELS = {
+  'GLOBAL-RISK-OFF': 'Global Risk-Off',
+  'CALM-MUDDLING-THROUGH': 'Calm / Muddling Through',
+  'USD-GROWTH-OUTPERFORMING': 'USD Growth Outperforming',
+};
+// Smile x-axis order: left = crisis/risk-off, middle = calm/muddling
+// through, right = US growth outperformance — the two ends are the
+// thesis's actual "smile" extremes (see fetch_growth_differential.py
+// v2.0.0 for why growth-differential alone previously mislabeled the
+// left tail).
+const _GROWTHDIFF_SMILE_ORDER = ['GLOBAL-RISK-OFF', 'CALM-MUDDLING-THROUGH', 'USD-GROWTH-OUTPERFORMING'];
+const GROWTHDIFF_MIN_SAMPLES = 5; // defensive floor, matches compute_seasonality.py's MIN_YEARS spirit
+
+async function renderDollarSmile() {
+  const chartEl = document.getElementById('dsmile-chart');
+  const insightEl = document.getElementById('dsmile-insight');
+  const currentEl = document.getElementById('dsmile-current');
+  const tbody = document.getElementById('growthdiff-tbody');
+  if (!chartEl) return; // beta-only element, not present outside index-beta.html
+
+  let doc;
+  try {
+    const res = await fetch('./growth-differential-data/history.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    doc = await res.json();
+    if (!doc || !Array.isArray(doc.quarters) || !doc.quarters.length) throw new Error('malformed history.json');
+  } catch (e) {
+    if (insightEl) insightEl.textContent = 'Dollar Smile data unavailable right now.';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="padding:4px;color:var(--text3);">No data yet.</td></tr>';
+    if (currentEl) currentEl.textContent = '';
+    return;
+  }
+
+  const cur = doc.current;
+  const rawStats = doc.regime_stats || {};
+  const stats = {};
+  _GROWTHDIFF_SMILE_ORDER.forEach(r => {
+    const s = rawStats[r] || { n: 0, n_dxy: 0, avg_dxy_qret: null };
+    stats[r] = {
+      n: s.n_dxy || 0,
+      avg: s.avg_dxy_qret,
+      ready: (s.n_dxy || 0) >= GROWTHDIFF_MIN_SAMPLES && s.avg_dxy_qret !== null,
+    };
+  });
+
+  if (currentEl && cur) {
+    const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
+    // "Latest available" rather than implying this is the current calendar
+    // quarter — real GDP prints ~1 quarter after quarter-end. When the
+    // regime is crisis-driven, show the VIX read too — the diff alone
+    // isn't why this quarter landed in Global Risk-Off.
+    const vixTxt = cur.regime === 'GLOBAL-RISK-OFF' && cur.vix_max != null ? `, VIX max ${cur.vix_max.toFixed(1)}` : '';
+    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt}${vixTxt})`;
+  }
+
+  // Earliest quarter carrying a dxy_qret, not hardcoded — so this label
+  // stays correct if dxy.json's history is ever backfilled further back
+  // than 2006 (see GUIDELINES: two different "n" values in one row must
+  // each be labeled with what they actually cover, not left ambiguous).
+  const dxyFirstQ = doc.quarters.find(q => q.dxy_qret !== undefined && q.dxy_qret !== null);
+  const dxyStartYear = dxyFirstQ ? dxyFirstQ.quarter.slice(0, 4) : null;
+
+  _dsmileRenderSVG(chartEl, _GROWTHDIFF_SMILE_ORDER, stats, cur ? cur.regime : null);
+  _dsmileRenderInsight(insightEl, doc, cur, stats);
+  _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear);
+}
+
+// fmtOpts lets a caller override how point-label values are displayed
+// without touching the curve's actual plotting math (yFor()/maxAbs still
+// operate on the raw stats[r].avg value in its native unit regardless).
+// Left generic (was previously shared with the now-removed Stress tab,
+// which needed mult:100/unit:'bps' for its much smaller daily-return
+// values) — only renderDollarSmile() calls this today, always with
+// defaults, but the signature is harmless to keep general.
+function _dsmileRenderSVG(el, regimes, stats, currentRegime, fmtOpts) {
+  const fmt = Object.assign({ decimals: 2, mult: 1, unit: '%' }, fmtOpts || {});
+  // Layout: fixed bands so the value labels can never collide with the
+  // regime-name row, regardless of how extreme an average is. curveTop/
+  // curveBottom bound where a point may ever be plotted; rowLabelY
+  // (regime names) sits safely below that band with a fixed gap, and the
+  // value label is placed at a fixed offset above its own point — both
+  // quantities are independent of amplitude.
+  const W = 620, H = 130, padL = 60, padR = 60;
+  const curveTop = 22, curveBottom = 78, midY = (curveTop + curveBottom) / 2, ampY = (curveBottom - curveTop) / 2;
+  const rowLabelY = 108, valueLabelGap = 12;
+  const xs = regimes.map((_, i) => padL + i * ((W - padL - padR) / (regimes.length - 1)));
+
+  // Only buckets clearing GROWTHDIFF_MIN_SAMPLES drive the curve's shape
+  // and its scale. Real production data today clears this for all 3
+  // buckets (n_dxy 15/31/32); this stays as a defensive floor in case a
+  // future recompute ever narrows the historical window.
+  const readyVals = regimes.map(r => stats[r].ready ? stats[r].avg : null).filter(v => v !== null);
+  const maxAbs = readyVals.length ? Math.max(0.05, ...readyVals.map(Math.abs)) : 0.3;
+  function yFor(r) {
+    if (!stats[r].ready || stats[r].avg === null) return midY;
+    const raw = midY - (stats[r].avg / maxAbs) * ampY;
+    return Math.min(curveBottom, Math.max(curveTop, raw)); // hard clamp — belt and suspenders
+  }
+
+  const pts = regimes.map((r, i) => ({ x: xs[i], y: yFor(r), r, isCurrent: r === currentRegime }));
+  const pathD = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1)).join(' ');
+
+  const up = _themeColor('--up'), text3 = _themeColor('--text3'),
+        accent = _themeColor('--accent'), bg = _themeColor('--bg');
+
+  const circles = pts.map(p => {
+    const ready = stats[p.r].ready;
+    const color = !ready ? text3 : (p.isCurrent ? up : text3);
+    const r = p.isCurrent ? 4.5 : 3;
+    const hollow = !ready ? ` fill="${bg}" stroke="${text3}" stroke-width="1.3"` : ` fill="${color}"${p.isCurrent ? ` stroke="${bg}" stroke-width="2"` : ''}`;
+    return `<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}"${hollow}></circle>`;
+  }).join('');
+
+  const labels = pts.map(p => {
+    const ready = stats[p.r].ready;
+    const dispVal = ready ? stats[p.r].avg * fmt.mult : null;
+    const valTxt = ready ? `${dispVal >= 0 ? '+' : ''}${dispVal.toFixed(fmt.decimals)}${fmt.unit}` : `n=${stats[p.r].n}`;
+    const valColor = !ready ? text3 : (p.isCurrent ? up : text3);
+    const currentTag = p.isCurrent ? ' \u25cf latest' : '';
+    const rowLabel = _GROWTHDIFF_LABELS[p.r] || p.r;
+    // Fixed offset above the point, not above wherever the point landed —
+    // p.y is already clamped to [curveTop, curveBottom], so this label
+    // never gets closer than (curveTop - valueLabelGap) to the top edge
+    // or crosses into the rowLabelY row below.
+    const valueY = Math.max(12, p.y - valueLabelGap);
+    return `
+      <text x="${p.x.toFixed(1)}" y="${rowLabelY}" font-size="9.5" fill="${text3}" text-anchor="middle">${rowLabel}${currentTag}</text>
+      <text x="${p.x.toFixed(1)}" y="${valueY.toFixed(1)}" font-size="9.5" fill="${valColor}" text-anchor="middle">${valTxt}</text>`;
+  }).join('');
+
+  el.innerHTML = `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%;height:120px;display:block;">
+      <line x1="${padL}" y1="${midY}" x2="${W - padR}" y2="${midY}" stroke="${_themeColorAlpha('--border', 0.9)}" stroke-width="1"></line>
+      <path d="${pathD}" fill="none" stroke="${accent}" stroke-width="1.8"></path>
+      ${circles}
+      ${labels}
+    </svg>`;
+}
+
+// One-line status + short hover tooltip (methodology in brief, then what
+// it means for a trader) — v8.216.0 shortened from a 4-sentence paragraph
+// per Santiago's feedback that it read too long for a tooltip; the fuller
+// methodology disclosure lives in the static line above the chart
+// (index-beta.html) and the panel-title tooltip, so this one only needs
+// to orient a reader who hasn't seen those.
+function _dsmileRenderInsight(el, doc, cur, stats) {
+  if (!el) return;
+  const regimeLabel = cur ? (_GROWTHDIFF_LABELS[cur.regime] || cur.regime) : '\u2014';
+  const curTxt = cur
+    ? `USD ${cur.usd_yoy >= 0 ? '+' : ''}${cur.usd_yoy.toFixed(1)}% vs G9 ${cur.g9_avg_yoy >= 0 ? '+' : ''}${cur.g9_avg_yoy.toFixed(1)}% YoY (${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp)`
+    : 'no current reading';
+
+  el.innerHTML = `${cur ? cur.quarter : '\u2014'}: ${curTxt} \u00b7 <span style="color:var(--up);">${regimeLabel}</span>`;
+
+  el.title = `Regime = real GDP YoY differential (USD vs G9, FRED) with a VIX\u226540 crisis override \u2014 a genuine panic quarter is Global Risk-Off regardless of growth. ` +
+    `Table below shows DXY's historical q/q return by regime, same quarter as the GDP reading (which lags ~1 quarter on release): context on dollar behavior by macro backdrop, not a trade signal.`;
+}
+
+function _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear) {
+  if (!tbody) return;
+  // n (GDP, full 1996- history) and n_dxy (subset with a matched same-
+  // quarter DXY return, limited by dxy.json's own history) are genuinely
+  // different denominators. Santiago flagged that showing both as bare
+  // "n" in the same row reads as an inconsistency rather than two
+  // disclosed sample sizes — so each gets its own coverage tag, per the
+  // same "n designates a subsample, N the full population" convention
+  // used in academic/clinical table reporting (JMIR stats guidelines).
+  const dxyTag = dxyStartYear ? `, DXY ${dxyStartYear}\u2013` : '';
+  tbody.innerHTML = _GROWTHDIFF_SMILE_ORDER.map(r => {
+    const s = rawStats[r] || { n: 0, avg_dxy_qret: null, n_dxy: 0 };
+    const isCurrent = cur && cur.regime === r;
+    const avgTxt = s.avg_dxy_qret === null
+      ? `\u2014 (n=${s.n_dxy || 0}${dxyTag})`
+      : `${s.avg_dxy_qret >= 0 ? '+' : ''}${s.avg_dxy_qret.toFixed(2)}% (n=${s.n_dxy}${dxyTag})`;
+    const rowStyle = isCurrent ? ` style="color:var(--up);"` : '';
+    return `<tr${rowStyle}><td style="padding:2px 4px;">${_GROWTHDIFF_LABELS[r] || r}${isCurrent ? ' \u25cf' : ''}</td>` +
+           `<td style="padding:2px 4px;">${s.n}</td>` +
+           `<td style="padding:2px 4px;">${avgTxt}</td></tr>`;
+  }).join('');
+}
+
+// (v8.205.0 added a Stress(VIX) tab and a Rate Diff placeholder tab
+// alongside Growth here; both removed in v8.213.0 per Santiago's explicit
+// instruction — this panel shows Jen's original growth-differential lens
+// only, no tab chrome. renderDollarSmileStress()/_dsmileSwitchTab()/
+// _dsmileStressRegimeFor()/_DSMILE_STRESS_REGIMES all deleted with it.)
