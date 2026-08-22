@@ -1162,8 +1162,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
            momentum scrolling. Scrollbar hidden via CSS (see dashboard.css lw-range-bar rule). -->
       <!-- Chart toolbar — two rows: (1) TF + Range + Compare + Fullscreen, (2) Type + Overlays -->
       <div id="lw-range-bar" style="display:none;flex-direction:column;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-        <!-- Row 1: Timeframe · Range · Compare · Fullscreen -->
-        <div style="display:flex;align-items:center;gap:2px;padding:2px 6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <!-- Row 1: Timeframe · Range · Compare · Fullscreen — scroll arrows added
+             (beta): this row already had overflow-x:auto with no visible affordance
+             that it can be scrolled, unlike Row 2 which got lw-tb-row2-prev/next in
+             a prior session. On narrow widths (notably inside the fullscreen chart
+             overlay, where this row is lifted via _lwOpenFullscreen()'s chartHdr/
+             rangeBar move) +Compare and the fullscreen toggle button silently
+             scrolled out of reach with nothing telling the user more existed —
+             same prev/next pattern as lw-tb-row2, wired in _sznToggle's sibling
+             IIFE below. -->
+        <div style="display:flex;align-items:stretch;overflow:hidden;">
+          <button class="lw-tb-btn" id="lw-tb-row1-prev" aria-label="Scroll toolbar left" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-right:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8249;</button>
+          <div id="lw-tb-row1" style="display:flex;align-items:center;gap:2px;padding:2px 6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;min-width:0;">
           <span style="font-size:9px;color:var(--text3);margin-right:2px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TF</span>
           <button class="lw-tf-btn"     data-tf="H1" aria-label="1 hour"  title="1 Hour"  style="flex-shrink:0;">H1</button>
           <button class="lw-tf-btn"     data-tf="H4" aria-label="4 hours" title="4 Hours" style="flex-shrink:0;margin-left:2px;">H4</button>
@@ -1218,6 +1228,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
           <!-- Fullscreen -->
           <button class="lw-tb-btn" id="lw-fs-btn" aria-label="Toggle fullscreen chart" title="Fullscreen (Esc to exit)" style="margin-left:4px;flex-shrink:0;">&#x26F6;</button>
+          </div>
+          <button class="lw-tb-btn" id="lw-tb-row1-next" aria-label="Scroll toolbar right" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-left:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8250;</button>
         </div>
         <!-- Row 2: Chart type + Overlays — scroll arrows added (beta): same prev/next
              pattern as #tv-ticker/#tv-pair-tabs (see addWheelScroll() in dashboard-beta.js),
@@ -1544,7 +1556,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
                   <tr style="color:var(--text3);text-align:left;">
                     <th style="font-weight:400;padding:2px 4px;">Regime</th>
                     <th style="font-weight:400;padding:2px 4px;">Days (n)</th>
-                    <th style="font-weight:400;padding:2px 4px;">Avg DXY daily return</th>
+                    <th style="font-weight:400;padding:2px 4px;">Avg DXY daily return (bps)</th>
                   </tr>
                 </thead>
                 <tbody id="dsmile-stress-tbody">
@@ -2429,7 +2441,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.205.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.207.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
