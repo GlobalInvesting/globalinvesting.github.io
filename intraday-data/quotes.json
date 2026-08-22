@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-22T03:11:38Z",
+  "updated": "2026-08-22T03:15:31Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,10 +35,10 @@
       "pct1w_date": "2026-08-14"
     },
     "gold": {
-      "close": 4608.1677,
+      "close": 4608.1083,
       "prev_close": 4603.9213,
-      "chg": 4.2464,
-      "pct": 0.0922,
+      "chg": 4.187,
+      "pct": 0.0909,
       "source": "twelve_data",
       "high": 4690.3,
       "low": 4565.5,
@@ -111,19 +111,19 @@
       "pct1w_date": "2026-08-14"
     },
     "dxy": {
-      "close": 98.839,
-      "prev_close": 98.8,
-      "chg": 0.039,
-      "pct": 0.0395,
+      "close": 98.8,
+      "prev_close": 98.9,
+      "chg": -0.1,
+      "pct": -0.1011,
       "high": 98.911,
       "low": 98.562,
       "open": 98.798,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787345999,
+      "market_time": 1787284740,
       "source": "yfinance",
-      "pct1w": -0.8337,
+      "pct1w": -0.8729,
       "pct1w_date": "2026-08-14"
     },
     "us3m": {
@@ -184,51 +184,51 @@
       "pct1w_date": "2026-08-14"
     },
     "move": {
-      "close": 73.4,
+      "close": 73.3988,
       "prev_close": 73.18,
-      "chg": 0.22,
-      "pct": 0.3006,
+      "chg": 0.2188,
+      "pct": 0.299,
       "high": 73.3988,
       "low": 73.177,
       "open": 73.177,
       "bid": null,
       "ask": null,
       "market_state": "POSTPOST",
-      "market_time": 1787342400,
+      "market_time": 1787344215,
       "source": "yfinance",
-      "pct1w": 5.4901,
+      "pct1w": 5.4884,
       "pct1w_date": "2026-08-14"
     },
     "btc": {
-      "close": 78437.99,
+      "close": 78377.58,
       "prev_close": 78326.97,
-      "chg": 111.02,
-      "pct": 0.1417,
-      "high": 78619.625,
+      "chg": 50.61,
+      "pct": 0.0646,
+      "high": 78580.0,
       "low": 77818.71,
       "open": 78326.97,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787368302,
+      "market_time": 1787368533,
       "source": "yfinance",
-      "pct1w": 24.553,
+      "pct1w": 24.4571,
       "pct1w_date": "2026-08-14"
     },
     "eth": {
-      "close": 2513.58,
+      "close": 2513.98,
       "prev_close": 2515.2744,
-      "chg": -1.6944,
-      "pct": -0.0674,
+      "chg": -1.2944,
+      "pct": -0.0515,
       "high": 2526.1865,
       "low": 2498.5571,
       "open": 2515.2744,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787368305,
+      "market_time": 1787368530,
       "source": "yfinance",
-      "pct1w": 33.6549,
+      "pct1w": 33.6761,
       "pct1w_date": "2026-08-14"
     },
     "nasdaq": {
@@ -248,19 +248,19 @@
       "pct1w_date": "2026-08-14"
     },
     "ftse": {
-      "close": 10816.6,
+      "close": 10816.56,
       "prev_close": 10748.2,
-      "chg": 68.4,
-      "pct": 0.6364,
+      "chg": 68.36,
+      "pct": 0.636,
       "high": 10831.64,
       "low": 10734.92,
       "open": 10748.07,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1787326200,
+      "market_time": 1787326530,
       "source": "yfinance",
-      "pct1w": 0.6186,
+      "pct1w": 0.6182,
       "pct1w_date": "2026-08-14"
     },
     "asx": {
@@ -274,7 +274,7 @@
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1787292720,
+      "market_time": 1787296454,
       "source": "yfinance",
       "pct1w": -0.6177,
       "pct1w_date": "2026-08-14"
@@ -1291,19 +1291,19 @@
       }
     },
     "hsi": {
-      "close": 26009.5,
+      "close": 26009.46,
       "prev_close": 25698.5,
-      "chg": 311.0,
-      "pct": 1.2102,
+      "chg": 310.96,
+      "pct": 1.21,
       "high": 26009.46,
       "low": 25807.61,
       "open": 25807.61,
       "bid": null,
       "ask": null,
       "market_state": "CLOSED",
-      "market_time": 1787299800,
+      "market_time": 1787299710,
       "source": "yfinance",
-      "pct1w": 3.554,
+      "pct1w": 3.5538,
       "pct1w_date": "2026-08-14",
       "prev_bar": {
         "time": "2026-08-21",
@@ -1375,15 +1375,15 @@
     {
       "a": "EUR/USD",
       "b": "DXY",
-      "corr30": -0.938,
+      "corr30": -0.939,
       "n30": 30,
       "corr": -0.931,
       "n": 60,
       "corr90": -0.961,
       "n90": 90,
       "norm": -0.884,
-      "z_score": -1.14,
-      "std": 0.2892,
+      "z_score": -1.16,
+      "std": 0.2893,
       "n_indep": 8,
       "band15hi": -0.744,
       "band15lo": -0.949,
@@ -1612,7 +1612,7 @@
         -0.931,
         -0.927,
         -0.932,
-        -0.938
+        -0.939
       ],
       "hist_dates": [
         "2025-10-02",
@@ -1839,7 +1839,7 @@
         "2026-08-20",
         "2026-08-21"
       ],
-      "spread_z": 2.02,
+      "spread_z": 2.0,
       "signal": "short_a_long_b",
       "beta": -0.261,
       "coint_p": 0.0
@@ -6087,7 +6087,7 @@
     {
       "a": "DXY",
       "b": "SPX",
-      "corr30": -0.749,
+      "corr30": -0.748,
       "n30": 30,
       "corr": -0.561,
       "n": 60,
@@ -6323,7 +6323,7 @@
         -0.798,
         -0.782,
         -0.755,
-        -0.749
+        -0.748
       ],
       "hist_dates": [
         "2025-10-03",
@@ -6552,16 +6552,16 @@
       "spread_z": null,
       "signal": null,
       "beta": null,
-      "coint_p": 0.3653
+      "coint_p": 0.3791
     },
     {
       "a": "Gold",
       "b": "DXY",
-      "corr30": -0.812,
+      "corr30": -0.814,
       "n30": 30,
-      "corr": -0.836,
+      "corr": -0.837,
       "n": 60,
-      "corr90": -0.928,
+      "corr90": -0.929,
       "n90": 90,
       "norm": -0.503,
       "z_score": -0.92,
@@ -6794,7 +6794,7 @@
         -0.714,
         -0.755,
         -0.788,
-        -0.812
+        -0.814
       ],
       "hist_dates": [
         "2025-10-02",
@@ -7024,7 +7024,7 @@
       "spread_z": null,
       "signal": null,
       "beta": null,
-      "coint_p": 0.1558
+      "coint_p": 0.1465
     }
   ],
   "fx_etf_iv": {
