@@ -16764,6 +16764,12 @@ window.addEventListener('gi-theme-change', function() {
   ]);
 
   let _sznChart = null, _sznSeries = null, _sznOpen = false, _sznLoadedPair = null, _sznCrosshairHandler = null;
+  // v8.211.0 — actual pixel width LWC reserves for the right price scale
+  // (rightPriceScale: { minimumWidth: 50 } above, plus its border — comes
+  // out to ~56px live). #szn-months must exclude this from the width it
+  // distributes its 12 columns across; see _sznRenderMonthLabels() below
+  // for why.
+  let _sznRightScaleWidth = 0;
 
   function _sznPairLabel(pair) {
     return pair.length === 6 ? (pair.slice(0, 3) + '/' + pair.slice(3)).toUpperCase() : pair.toUpperCase();
@@ -16882,6 +16888,19 @@ window.addEventListener('gi-theme-change', function() {
     });
     _sznSeries.setData(pts);
     _sznChart.timeScale().fitContent();
+
+    // v8.211.0 — capture the right price scale's real live pixel width
+    // (rightPriceScale: { minimumWidth: 50 } above is a floor LWC can
+    // exceed once real % values are laid out, e.g. "-1.00%" — must read
+    // the actual rendered width, not assume the minimum). This is the
+    // gutter #szn-months has to exclude from its own width below it —
+    // see _sznRenderMonthLabels() for the actual fix; this only captures
+    // the number. Guarded because priceScale().width() can legitimately
+    // return 0 before the chart's first paint.
+    try {
+      const w = _sznChart.priceScale('right').width();
+      if (w > 0) _sznRightScaleWidth = w;
+    } catch (_) { /* keep previous value rather than zeroing it out */ }
 
     // v8.208.0 — hover tooltip (date + value). crosshairMarkerVisible:true
     // (set in seriesOpts above) only draws the dot on the line itself; LWC
@@ -17015,6 +17034,24 @@ window.addEventListener('gi-theme-change', function() {
     row.style.gridAutoFlow = 'row'; // explicit, not left to inherit — this must never be 'column' (see v8.203.0 comment above)
     row.style.gap = '1px';
     row.style.flexWrap = ''; // clear the stale flex-wrap inline value, if any, left over from this row's pre-v8.202.0 flex layout
+
+    // v8.211.0 fix — root cause of "December sits under the price-scale
+    // column" (confirmed via a live console diagnostic, not assumed):
+    // #szn-months previously defaulted to the full width of #szn-panel
+    // (same as the chart container, 404px in the diagnostic capture),
+    // but LWC's canvas only actually plots the series across
+    // (containerWidth - rightScaleWidth) — 348px in that same capture,
+    // a ~56px gutter reserved for the "1.00% / 0.00% / -1.00%" price
+    // labels. Distributing 12 grid columns across the full 404px put
+    // the later months (Nov/Dec) increasingly right of where the real
+    // curve ends, landing Dec visibly under the empty price-scale
+    // gutter instead of under the chart's actual right edge. Capping
+    // this row's own width to exclude that same gutter (measured live
+    // off the chart itself in _sznRenderChart(), not hardcoded) makes
+    // its 12 columns span the identical pixel range LWC uses for the
+    // curve, so the last column lines up with the real end of the data
+    // instead of the empty space beside it.
+    row.style.width = _sznRightScaleWidth > 0 ? `calc(100% - ${_sznRightScaleWidth}px)` : '100%';
 
     // Month-name-only, single line — see v8.208.0 comment above for why the
     // inline value line was reverted.
