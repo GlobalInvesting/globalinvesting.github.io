@@ -16316,19 +16316,28 @@ function _lwOpenFullscreen() {
   const overlay   = document.getElementById('lw-fullscreen-overlay');
   const inner     = document.getElementById('lw-fullscreen-inner');
   const rangeBar  = document.getElementById('lw-range-bar');
+  const sznPanel  = document.getElementById('szn-panel');
   const chartHdr  = document.getElementById('lw-chart-header');
   const chartWrap = document.getElementById('tv-chart-wrap');
   if (!overlay || !inner || !chartWrap || _chartMode !== 'lw') return;
   if (overlay.classList.contains('lw-fs-active')) return;
 
   // Store anchor: the element immediately BEFORE rangeBar so we can
-  // restore the full block (rangeBar→chartHdr→chartWrap) in one shot.
+  // restore the full block (rangeBar→sznPanel→chartHdr→chartWrap) in one shot.
   _lwFsOriginalParent = rangeBar ? rangeBar.parentNode : chartWrap.parentNode;
   _lwFsOriginalNext   = chartWrap.nextSibling;     // element AFTER chartWrap
   _lwFsOriginalHeight = chartWrap.style.height;
 
-  // Lift all three elements into the fullscreen inner container
+  // Lift all four elements into the fullscreen inner container. v8.221.0 —
+  // sznPanel (#szn-panel, its natural DOM position is between rangeBar and
+  // chartHdr) was missing from this lift entirely: the Seasonality button
+  // itself lives inside chartHdr/rangeBar's toolbar and DID get lifted (so
+  // it showed as active/highlighted inside fullscreen), but the panel body
+  // was left behind in the page's normal flow, invisible underneath the
+  // opaque full-viewport overlay (#lw-fullscreen-overlay is position:fixed;
+  // inset:0). Reported by Santiago via screenshot: button on, no panel.
   if (rangeBar)  inner.appendChild(rangeBar);
+  if (sznPanel)  inner.appendChild(sznPanel);
   if (chartHdr)  inner.appendChild(chartHdr);
   inner.appendChild(chartWrap);
 
@@ -16360,6 +16369,7 @@ function _lwCloseFullscreen() {
   const overlay   = document.getElementById('lw-fullscreen-overlay');
   const inner     = document.getElementById('lw-fullscreen-inner');
   const rangeBar  = document.getElementById('lw-range-bar');
+  const sznPanel  = document.getElementById('szn-panel');
   const chartHdr  = document.getElementById('lw-chart-header');
   const chartWrap = document.getElementById('tv-chart-wrap');
   if (!overlay || !overlay.classList.contains('lw-fs-active')) return;
@@ -16367,12 +16377,23 @@ function _lwCloseFullscreen() {
   overlay.classList.remove('lw-fs-active');
   document.body.style.overflow = '';
 
-  // Restore all three elements before the stored next-sibling reference.
+  // Restore all four elements before the stored next-sibling reference.
   // insertBefore with a null ref appends to end, which is also correct.
+  // v8.221.0 — restoring back-to-front (chartWrap first, then each
+  // preceding element inserted before the one just placed) instead of all
+  // four sharing the single _lwFsOriginalNext anchor: with sznPanel now
+  // part of the lift, insertBefore requires its reference node to already
+  // be a child of _lwFsOriginalParent, which chartWrap/chartHdr/rangeBar
+  // aren't yet if inserted in forward order against one fixed anchor — and
+  // even where it wouldn't throw, a single shared anchor silently collapses
+  // relative order (rangeBar→sznPanel→chartHdr→chartWrap) into insertion
+  // order instead of original DOM order. Chaining the anchor forward keeps
+  // every insert's reference node already correctly parented.
   if (_lwFsOriginalParent) {
-    if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  _lwFsOriginalNext);
-    if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  _lwFsOriginalNext);
     if (chartWrap) _lwFsOriginalParent.insertBefore(chartWrap, _lwFsOriginalNext);
+    if (chartHdr)  _lwFsOriginalParent.insertBefore(chartHdr,  chartWrap || _lwFsOriginalNext);
+    if (sznPanel)  _lwFsOriginalParent.insertBefore(sznPanel,  chartHdr || chartWrap || _lwFsOriginalNext);
+    if (rangeBar)  _lwFsOriginalParent.insertBefore(rangeBar,  sznPanel || chartHdr || chartWrap || _lwFsOriginalNext);
   }
 
   if (chartWrap) {
