@@ -1533,7 +1533,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <!-- Dollar Smile Panel (beta) — full width, below VaR/CVaR.
            v5 (2026-08-22): regime scheme changed from a pure growth-
            differential 3-way split to growth differential + a genuine
-           crisis/risk-off check (max quarterly VIX close >= 30 overrides
+           crisis/risk-off check (max quarterly VIX close >= 40 overrides
            the growth differential, matching Jen's own left-tail logic —
            see fetch_growth_differential.py v2.0.0 module docstring for
            the full reasoning; Santiago caught that the old scheme's chart
@@ -1553,7 +1553,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div style="padding:10px 12px;">
 
-          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007) &middot; real GDP YoY (FRED, quarterly, all 10 G10 currencies) + VIX-based crisis check (max daily close per quarter &ge; 30)</div>
+          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007) &middot; real GDP YoY (FRED, quarterly, all 10 G10 currencies) + VIX-based crisis check (max daily close per quarter &ge; 40, industry &quot;crisis&quot; language, not merely &quot;elevated&quot;)</div>
           <div id="dsmile-chart" style="width:100%;height:120px;"></div>
           <div id="dsmile-insight" style="font-size:10.5px;color:var(--text2);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;" title="Hover for the full methodology note">Loading Dollar Smile data&hellip;</div>
           <div style="border-top:1px solid var(--border2);margin-top:10px;padding-top:8px;">
@@ -2440,7 +2440,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.214.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.215.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
