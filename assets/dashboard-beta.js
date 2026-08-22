@@ -90,20 +90,22 @@ const PAIRS = [
 
 // ── FX Fair Value (v8.191.0, regression added v8.197.0, generalized to a
 // 5-variable BEER model v8.200.0) ──────────────────────────────────────────
-// Reads fair-value-data/{pair}.json (written daily by log_fair_value_inputs.py
-// in globalinvesting-scripts — see log-fair-value-inputs.yml). Each file is an
-// array of real {date, spot, rate_diff, stress, ca_diff, tb_diff} rows,
-// oldest → newest, one per day the workflow has run. No client-side
-// estimation of missing days: below FV_MIN_ROWS the panel shows an
-// accumulation progress bar instead of a z-score, per Santiago's explicit
-// "don't fabricate regression history" decision (2026-08-20) — see
-// GUIDELINES.md § Data integrity.
+// Reads fair-value-data/{pair}.json (written on business days only by
+// log_fair_value_inputs.py in globalinvesting-scripts — see
+// log-fair-value-inputs.yml, v1.2: skips Sat/Sun so every logged row is a
+// genuinely distinct market observation). Each file is an array of real
+// {date, spot, rate_diff, stress, ca_diff, tb_diff} rows, oldest → newest,
+// one per business day the workflow has run. No client-side estimation of
+// missing days: below FV_MIN_ROWS the panel shows an accumulation progress
+// bar instead of a z-score, per Santiago's explicit "don't fabricate
+// regression history" decision (2026-08-20) — see GUIDELINES.md § Data
+// integrity.
 //
 // This file duplicates dashboard.js's PAIRS/renderFairValue/_fvRegress
 // (same "no shared-module pattern in this repo" reasoning documented
 // elsewhere — dashboard-beta.js is a full fork, not an include) — keep
 // both in sync whenever one changes, per the standing pattern for this file.
-const FV_MIN_ROWS = 60;
+const FV_MIN_ROWS = 60; // 60 business days (~12 weeks) — not 60 calendar days
 const FV_ROLLING_WINDOW = 60;
 
 // Feature columns beyond the intercept — see dashboard.js's FV_FEATURE_KEYS
@@ -111,10 +113,18 @@ const FV_ROLLING_WINDOW = 60;
 // Account / Trade Balance differentials, added v8.200.0).
 const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff'];
 
+// A row is "usable" for the regression only if spot AND every one of
+// FV_FEATURE_KEYS is non-null — see dashboard.js's _fvUsableRows() for the
+// full explanation (v8.217.0: the FV_MIN_ROWS gate must count this exact
+// population, not raw rows.length).
+function _fvUsableRows(rows) {
+  return rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
+}
+
 // OLS regression: spot ~ intercept + Σ βᵢ·featureᵢ — see dashboard.js's
 // _fvRegress()/_solveLinearSystem() for the full explanatory comment.
 function _fvRegress(rows) {
-  const usable = rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
+  const usable = _fvUsableRows(rows);
   const k = FV_FEATURE_KEYS.length + 1; // +1 for the intercept
   if (usable.length < k * 2) return null;
 
@@ -178,7 +188,9 @@ async function renderFairValue() {
     }
   }));
 
-  const maxRows = results.reduce((m, x) => Math.max(m, x.rows.length), 0);
+  // v8.217.0: gate on USABLE rows (spot + all 5 features present), not raw
+  // rows.length — see dashboard.js's identical fix for the full reasoning.
+  const maxRows = results.reduce((m, x) => Math.max(m, _fvUsableRows(x.rows).length), 0);
 
   if (maxRows < FV_MIN_ROWS) {
     accWrap.style.display = '';
@@ -191,8 +203,8 @@ async function renderFairValue() {
   }
 
   // Enough history exists for a real rolling regression (v8.197.0) — see
-  // _fvRegress() above. Each pair independently gates on its OWN row count
-  // and its OWN regression succeeding (not singular).
+  // _fvRegress() above. Each pair independently gates on its OWN usable-row
+  // count and its OWN regression succeeding (not singular).
   accWrap.style.display = 'none';
   tblWrap.style.display = '';
 
@@ -206,8 +218,9 @@ async function renderFairValue() {
     const stTxt   = last.stress != null ? last.stress.toFixed(0) : '—';
 
     let fvTxt = '—', zTxt = '—', zColor = 'var(--text3)';
-    if (rows.length >= FV_MIN_ROWS) {
-      const windowRows = rows.slice(-FV_ROLLING_WINDOW);
+    const usableForPair = _fvUsableRows(rows);
+    if (usableForPair.length >= FV_MIN_ROWS) {
+      const windowRows = usableForPair.slice(-FV_ROLLING_WINDOW);
       const reg = _fvRegress(windowRows);
       const lastHasAllFeatures = FV_FEATURE_KEYS.every(k => last[k] != null);
       if (reg && reg.residStd > 0 && lastHasAllFeatures) {
