@@ -17076,9 +17076,23 @@ window.addEventListener('gi-theme-change', function() {
     const row = document.getElementById('szn-monthly-h-row');
     if (!head || !row) return;
     const cellStyle = 'padding:5px 4px;text-align:center;border-left:1px solid var(--border2);';
-    head.innerHTML = '<th style="padding:5px 4px;text-align:left;font-weight:400;">Month</th>'
-      + cols.map(c => `<th style="${cellStyle}font-weight:400;">${_SZN_MONTH_LABELS[c.month - 1]}</th>`).join('')
-      + `<th style="${cellStyle}font-weight:400;border-left:2px solid var(--border);">Yearly</th>`;
+    // v8.212.0 — every <th>/<td> here now carries an explicit
+    // background (transparent, same visual result as before) instead
+    // of none. Without it, the global `tr:hover td { background:
+    // var(--bg3); }` rule (dashboard.css) is the only background these
+    // cells have, so hovering the row darkened ONLY the ones lacking an
+    // inline background — "Average"/the header row — while the numeric
+    // cells below (which already set an inline background, even when
+    // it's 'transparent', and inline always wins over that CSS rule)
+    // stayed visually unchanged, reading as "Average turns gray on
+    // hover". Exact same root cause as the correlation matrix's row/
+    // corner-header hover artifact (GUIDELINES.md, v8.185.0) — a cell
+    // missing the same explicit background every sibling cell has,
+    // exposed specifically by :hover repaint rather than a real :hover
+    // rule targeting it.
+    head.innerHTML = '<th style="padding:5px 4px;text-align:left;font-weight:400;background:transparent;">Month</th>'
+      + cols.map(c => `<th style="${cellStyle}font-weight:400;background:transparent;">${_SZN_MONTH_LABELS[c.month - 1]}</th>`).join('')
+      + `<th style="${cellStyle}font-weight:400;border-left:2px solid var(--border);background:transparent;">Yearly</th>`;
 
     const yearly = cols.reduce((sum, c) => sum + c.monthPct, 0);
     const fmtCell = (v, wideDivider) => {
@@ -17089,7 +17103,7 @@ window.addEventListener('gi-theme-change', function() {
       const border = wideDivider ? 'border-left:2px solid var(--border);' : 'border-left:1px solid var(--border2);';
       return `<td style="padding:5px 4px;text-align:center;${border}background:${bg};color:${color};">${txt}</td>`;
     };
-    row.innerHTML = '<td style="padding:5px 4px;color:var(--text);text-align:left;">Average</td>'
+    row.innerHTML = '<td style="padding:5px 4px;color:var(--text);text-align:left;background:transparent;">Average</td>'
       + cols.map(c => fmtCell(c.monthPct)).join('')
       + fmtCell(yearly, true);
   }
