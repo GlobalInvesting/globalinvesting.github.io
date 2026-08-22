@@ -16642,12 +16642,22 @@ window.addEventListener('gi-theme-change', function() {
 // already used elsewhere in this file for non-time x-axes).
 // ═══════════════════════════════════════════════════════════════════
 (function () {
+  // Extended (v8.196.0) to match compute_seasonality.py's PAIRS list —
+  // that script was widened to every non-FX id fetch_ohlc.py populates
+  // with real 10y OHLC (metals, energy, equity indices, crypto, DXY,
+  // VIX/MOVE, us10y/us5y); this gate must stay in sync or a symbol with
+  // a real seasonality-data/{id}.json file would still show the "FX
+  // pairs only" message. hyoas/igoas (fetch_credit_spreads.py, different
+  // script) and us2y (no OHLC proxy exists) are excluded on both sides.
   const SZN_PAIRS = new Set([
     'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
     'usdnok','usdsek','eurnok','eursek','eurgbp','eurjpy','eurchf',
     'eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd',
     'audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd',
     'audcad','cadchf','nzdcad','nzdchf',
+    'gold','silver','wti','brent','btc','eth','dxy','vix','move',
+    'us10y','us5y','spx','nasdaq','nikkei','stoxx','dax','ftse',
+    'hsi','dji',
   ]);
 
   let _sznChart = null, _sznSeries = null, _sznOpen = false, _sznLoadedPair = null;
@@ -16817,7 +16827,7 @@ window.addEventListener('gi-theme-change', function() {
 
     if (!pair || !SZN_PAIRS.has(pair)) {
       if (title) title.textContent = 'Daily \u00b7 10y lookback';
-      if (insight) insight.textContent = 'Seasonality is available for FX pairs only \u2014 select one on the Price Chart above.';
+      if (insight) insight.textContent = 'Seasonality isn\u2019t available for this symbol \u2014 select an FX pair, metal, index, or other supported instrument on the Price Chart above.';
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
       _sznDestroyChart();
