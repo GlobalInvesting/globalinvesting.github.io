@@ -17512,9 +17512,16 @@ async function renderDollarSmile() {
     currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt}${vixTxt})`;
   }
 
+  // Earliest quarter carrying a dxy_qret, not hardcoded — so this label
+  // stays correct if dxy.json's history is ever backfilled further back
+  // than 2006 (see GUIDELINES: two different "n" values in one row must
+  // each be labeled with what they actually cover, not left ambiguous).
+  const dxyFirstQ = doc.quarters.find(q => q.dxy_qret !== undefined && q.dxy_qret !== null);
+  const dxyStartYear = dxyFirstQ ? dxyFirstQ.quarter.slice(0, 4) : null;
+
   _dsmileRenderSVG(chartEl, _GROWTHDIFF_SMILE_ORDER, stats, cur ? cur.regime : null);
   _dsmileRenderInsight(insightEl, doc, cur, stats);
-  _growthdiffRenderTable(tbody, rawStats, cur);
+  _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear);
 }
 
 // fmtOpts lets a caller override how point-label values are displayed
@@ -17610,14 +17617,22 @@ function _dsmileRenderInsight(el, doc, cur, stats) {
     `Regime = growth differential AND a genuine crisis check: Global Risk-Off overrides the other two whenever that quarter's max VIX close hit 40+ (independent sources' own \u201ccrisis\u201d language, not merely \u201celevated\u201d), regardless of where US growth ranked that quarter \u2014 not merely "US grew slower than the G9 average", which is Calm/Muddling Through instead. See growthdiff-tbody below for the actual avg DXY q/q return per bucket \u2014 stated as observed, not assumed to form a textbook U shape.`;
 }
 
-function _growthdiffRenderTable(tbody, rawStats, cur) {
+function _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear) {
   if (!tbody) return;
+  // n (GDP, full 1996- history) and n_dxy (subset with a matched same-
+  // quarter DXY return, limited by dxy.json's own history) are genuinely
+  // different denominators. Santiago flagged that showing both as bare
+  // "n" in the same row reads as an inconsistency rather than two
+  // disclosed sample sizes — so each gets its own coverage tag, per the
+  // same "n designates a subsample, N the full population" convention
+  // used in academic/clinical table reporting (JMIR stats guidelines).
+  const dxyTag = dxyStartYear ? `, DXY ${dxyStartYear}\u2013` : '';
   tbody.innerHTML = _GROWTHDIFF_SMILE_ORDER.map(r => {
     const s = rawStats[r] || { n: 0, avg_dxy_qret: null, n_dxy: 0 };
     const isCurrent = cur && cur.regime === r;
     const avgTxt = s.avg_dxy_qret === null
-      ? `\u2014 (n=${s.n_dxy || 0})`
-      : `${s.avg_dxy_qret >= 0 ? '+' : ''}${s.avg_dxy_qret.toFixed(2)}% (n=${s.n_dxy})`;
+      ? `\u2014 (n=${s.n_dxy || 0}${dxyTag})`
+      : `${s.avg_dxy_qret >= 0 ? '+' : ''}${s.avg_dxy_qret.toFixed(2)}% (n=${s.n_dxy}${dxyTag})`;
     const rowStyle = isCurrent ? ` style="color:var(--up);"` : '';
     return `<tr${rowStyle}><td style="padding:2px 4px;">${_GROWTHDIFF_LABELS[r] || r}${isCurrent ? ' \u25cf' : ''}</td>` +
            `<td style="padding:2px 4px;">${s.n}</td>` +
