@@ -11313,8 +11313,7 @@ async function boot() {
   fetchCrossAssetData();
   fetchCommodityQuotes();
   renderFairValue();
-  renderDollarSmile(); // beta — see dollar-smile-data/history.json + log_dollar_smile_inputs.py
-  renderGrowthDifferential(); // beta v2 — see growth-differential-data/history.json + fetch_growth_differential.py
+  renderDollarSmile(); // beta v3 — Jen's real growth-differential axis only; see growth-differential-data/history.json + fetch_growth_differential.py
   // AI narrative full build (non-blocking, fills narrative text).
   // Chain a post-resolve scroll reset: injecting the full narrative text expands
   // #narrative's height, which can cause the browser to scroll #main down to
@@ -16865,24 +16864,47 @@ window.addEventListener('gi-theme-change', function() {
     // point (that would print 366 labels). Instead, derive one label
     // per calendar month from the point where day===1 (every month has
     // exactly one such point in the 367-point curve), and size each
-    // label's flex-basis proportionally to how many days that month
+    // label's column width proportionally to how many days that month
     // actually spans in the curve — so the label row still lines up
     // approximately under the chart's real (non-uniform, since months
     // have 28-31 days) time axis below, rather than 12 equal-width
     // slots implying every month is the same length.
+    //
+    // v8.202.0 fix: this row used to be display:flex with flex:{span} 0 0
+    // per item — Santiago repeatedly saw December (the last item) drop
+    // below the rest of the row instead of staying inline. Root cause:
+    // flex's nowrap default doesn't guarantee 12 items fit the container's
+    // actual rendered width; when they don't, a flex row can overflow in
+    // ways that are sensitive to font-load timing and rounding, and here
+    // consistently pushed the last item out. Switched to CSS Grid with an
+    // explicit `grid-template-columns` built from the real per-month spans
+    // (one column per month, widths proportional to days-in-month) — a
+    // grid's column count and order are fixed by that declaration, so
+    // there's no overflow/wrap failure mode left for a 12-column row to
+    // fall into, unlike flex's content-dependent line-breaking.
     const monthStarts = [];
     curve.forEach((p, i) => { if (p.month >= 1 && p.day === 1) monthStarts.push({ month: p.month, idx: i }); });
-    row.innerHTML = monthStarts.map((m, i) => {
+
+    const cols = monthStarts.map((m, i) => {
       const nextIdx = (i + 1 < monthStarts.length) ? monthStarts[i + 1].idx : curve.length;
       const span = nextIdx - m.idx; // days in this month, from the actual curve
       const startPct = curve[m.idx].cum_pct;
       const endPct = (nextIdx < curve.length) ? curve[nextIdx].cum_pct : curve[curve.length - 1].cum_pct;
       const monthPct = endPct - startPct;
-      const color = Math.abs(monthPct) < 0.05 ? 'var(--text3)' : (monthPct > 0 ? 'var(--up)' : 'var(--down)');
-      const valTxt = (monthPct >= 0 ? '+' : '') + monthPct.toFixed(1) + '%';
-      return `<span style="flex:${span} 0 0;text-align:center;display:flex;flex-direction:column;line-height:1.3;">
-        <span>${_SZN_MONTH_LABELS[m.month - 1]}</span>
-        <span style="font-size:8px;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[m.month - 1]} across the full lookback \u2014 not significance-tested, unlike the windows table below.">${valTxt}</span>
+      return { month: m.month, span, monthPct };
+    });
+
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = cols.map(c => `${c.span}fr`).join(' ');
+    row.style.gridAutoFlow = 'column';
+    row.style.gap = '1px';
+
+    row.innerHTML = cols.map(c => {
+      const color = Math.abs(c.monthPct) < 0.05 ? 'var(--text3)' : (c.monthPct > 0 ? 'var(--up)' : 'var(--down)');
+      const valTxt = (c.monthPct >= 0 ? '+' : '') + c.monthPct.toFixed(1) + '%';
+      return `<span style="text-align:center;line-height:1.3;min-width:0;">
+        <span style="display:block;">${_SZN_MONTH_LABELS[c.month - 1]}</span>
+        <span style="display:block;font-size:8px;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[c.month - 1]} across the full lookback \u2014 not significance-tested, unlike the windows table below.">${valTxt}</span>
       </span>`;
     }).join('');
   }
@@ -17094,79 +17116,116 @@ window.addEventListener('gi-theme-change', function() {
 })();
 
 // ═══════════════════════════════════════════════════════════════════
-// DOLLAR SMILE BLOCK (beta) — USD (DXY) daily return bucketed by the
-// live risk regime (Stephen Jen's 2007 thesis: USD strengthens at both
-// risk-cycle extremes, underperforms in the calm middle).
+// DOLLAR SMILE BLOCK (beta) — v3, 2026-08-22.
 //
-// Data: dollar-smile-data/history.json, appended to once daily by
-// log_dollar_smile_inputs.py. No published dataset exists for this (per
-// Santiago's reply to Dool, 2026-08-21) — it's derived from data the
-// terminal already computes, so this is a labeled research/beta block,
-// not a signal. Follows the same "accumulate real rows, don't fabricate
-// the history" rule as renderFairValue() — each of the 4 regime buckets
-// shows its own accumulation progress until it has MIN_SAMPLES real
-// observations, since a 1-row average would be meaningless noise
-// presented as a stat.
+// Now Stephen Jen's ORIGINAL growth-differential framework only (US real
+// GDP YoY vs. the equal-weighted rest of the G10) — the market-stress-
+// regime proxy version this panel used through v8.201.0 (dollar-smile-
+// data/history.json, log_dollar_smile_inputs.py, 4 RISK-ON/CAUTION/MIXED/
+// RISK-OFF buckets keyed off VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS) has
+// been REMOVED from this panel per Santiago's explicit instruction: having
+// both a proxy version and the real version stacked in one panel read as
+// if one was needed to interpret the other, and it wasn't — each stood on
+// its own, so showing both was confusing, not additive. This panel now
+// shows only the real thing.
+//
+// (log_dollar_smile_inputs.py / dollar-smile-data/history.json / its daily
+// workflow are UNTOUCHED by this change — still logging real data server-
+// side — this is a frontend-only removal. Flag if you'd like that backend
+// job decommissioned too; leaving it running is harmless and reversible
+// either way, so it wasn't turned off as part of this fix.)
+//
+// Data: growth-differential-data/history.json, written by
+// fetch_growth_differential.py as a full idempotent recompute every run
+// (never a daily append — GDP data revises, so a cached differential
+// computed off a since-revised print would silently go stale/wrong).
+// Real GDP YoY, all 10 G10 currencies from FRED, 121 quarters back to
+// 1996-Q1 as of first backfill. Quarterly cadence — every historical
+// quarter already has a real value, so unlike the removed proxy axis
+// there is no "still accumulating" state to handle here.
+//
+// 3 buckets (not 4): USD Underperforming / Inline / USD Outperforming,
+// at the existing ±0.5pp threshold already used by
+// fetch_growth_differential.py's regime classification — reusing that
+// threshold rather than introducing a second one client-side.
+//
+// Note on shape: the real data does NOT currently show a textbook U-shaped
+// smile (avg DXY q/q return is roughly monotonic across the three buckets,
+// not higher at both extremes than in the middle) — the insight text below
+// states what the data actually shows, not an assumed "classic smile"
+// shape, since asserting a pattern the numbers don't currently support
+// would be the same kind of overclaim GUIDELINES already flags elsewhere.
 // ═══════════════════════════════════════════════════════════════════
+const _GROWTHDIFF_LABELS = {
+  'USD-OUTPERFORMING': 'USD Outperforming',
+  'INLINE': 'Inline',
+  'USD-UNDERPERFORMING': 'USD Underperforming',
+};
+// Smile x-axis order: left = underperforming, middle = inline, right =
+// outperforming — the two ends are the thesis's "smile" extremes.
+const _GROWTHDIFF_SMILE_ORDER = ['USD-UNDERPERFORMING', 'INLINE', 'USD-OUTPERFORMING'];
+const GROWTHDIFF_MIN_SAMPLES = 5; // defensive floor, matches compute_seasonality.py's MIN_YEARS spirit — real data today (n_dxy 15/31/32) clears this comfortably
+
 async function renderDollarSmile() {
   const chartEl = document.getElementById('dsmile-chart');
   const insightEl = document.getElementById('dsmile-insight');
+  const currentEl = document.getElementById('dsmile-current');
+  const tbody = document.getElementById('growthdiff-tbody');
   if (!chartEl) return; // beta-only element, not present outside index-beta.html
 
-  const REGIMES = ['RISK-OFF', 'CAUTION', 'MIXED', 'RISK-ON'];
-  const MIN_SAMPLES = 10; // below this, a bucket's average is noise, not a stat — show progress instead
-
-  let history;
+  let doc;
   try {
-    const res = await fetch('./dollar-smile-data/history.json', { cache: 'no-store' });
+    const res = await fetch('./growth-differential-data/history.json', { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    history = await res.json();
-    if (!Array.isArray(history)) throw new Error('malformed history.json');
+    doc = await res.json();
+    if (!doc || !Array.isArray(doc.quarters) || !doc.quarters.length) throw new Error('malformed history.json');
   } catch (e) {
-    if (insightEl) insightEl.textContent = 'Dollar Smile data unavailable right now \u2014 log_dollar_smile_inputs.py may not have run yet.';
+    if (insightEl) insightEl.textContent = 'Dollar Smile data unavailable right now.';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="padding:4px;color:var(--text3);">No data yet.</td></tr>';
+    if (currentEl) currentEl.textContent = '';
     return;
   }
 
-  const byRegime = {};
-  REGIMES.forEach(r => byRegime[r] = []);
-  history.forEach(row => { if (byRegime[row.regime]) byRegime[row.regime].push(row.dxy_pct); });
-
+  const cur = doc.current;
+  const rawStats = doc.regime_stats || {};
   const stats = {};
-  REGIMES.forEach(r => {
-    const vals = byRegime[r];
+  _GROWTHDIFF_SMILE_ORDER.forEach(r => {
+    const s = rawStats[r] || { n: 0, n_dxy: 0, avg_dxy_qret: null };
     stats[r] = {
-      n: vals.length,
-      avg: vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null,
-      ready: vals.length >= MIN_SAMPLES,
+      n: s.n_dxy || 0,
+      avg: s.avg_dxy_qret,
+      ready: (s.n_dxy || 0) >= GROWTHDIFF_MIN_SAMPLES && s.avg_dxy_qret !== null,
     };
   });
 
-  const currentRegimeEl = document.getElementById('risk-regime');
-  const currentRegime = (currentRegimeEl && currentRegimeEl.textContent.trim()) || (history.length ? history[history.length - 1].regime : 'MIXED');
+  if (currentEl && cur) {
+    const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
+    // "Latest available" rather than implying this is the current calendar
+    // quarter — real GDP prints ~1 quarter after quarter-end.
+    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt})`;
+  }
 
-  _dsmileRenderSVG(chartEl, REGIMES, stats, currentRegime);
-  _dsmileRenderInsight(insightEl, REGIMES, stats, currentRegime, history.length);
+  _dsmileRenderSVG(chartEl, _GROWTHDIFF_SMILE_ORDER, stats, cur ? cur.regime : null);
+  _dsmileRenderInsight(insightEl, doc, cur, stats);
+  _growthdiffRenderTable(tbody, rawStats, cur);
 }
 
 function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
   // Layout: fixed bands so the value labels can never collide with the
-  // regime-name row, regardless of how extreme a single-sample average
-  // is. curveTop/curveBottom bound where a point may ever be plotted;
-  // rowLabelY (regime names) sits safely below that band with a fixed
-  // gap, and the value label is placed at a fixed offset above its own
-  // point — both quantities are now independent of amplitude.
-  const W = 620, H = 130, padL = 40, padR = 40;
+  // regime-name row, regardless of how extreme an average is. curveTop/
+  // curveBottom bound where a point may ever be plotted; rowLabelY
+  // (regime names) sits safely below that band with a fixed gap, and the
+  // value label is placed at a fixed offset above its own point — both
+  // quantities are independent of amplitude.
+  const W = 620, H = 130, padL = 60, padR = 60;
   const curveTop = 22, curveBottom = 78, midY = (curveTop + curveBottom) / 2, ampY = (curveBottom - curveTop) / 2;
   const rowLabelY = 108, valueLabelGap = 12;
   const xs = regimes.map((_, i) => padL + i * ((W - padL - padR) / (regimes.length - 1)));
 
-  // Only buckets with enough real samples (stats[r].ready) drive the
-  // curve's shape and its scale — a 1- or 2-day average is noise, not a
-  // stat, per MIN_SAMPLES above. Buckets that aren't ready yet are always
-  // plotted flat at the midline with a hollow marker, exactly like
-  // buckets with zero samples, so a single early data point can never
-  // amplify the curve or push a point/label out of its band (this is
-  // what the original comment intended but the code didn't enforce).
+  // Only buckets clearing GROWTHDIFF_MIN_SAMPLES drive the curve's shape
+  // and its scale. Real production data today clears this for all 3
+  // buckets (n_dxy 15/31/32); this stays as a defensive floor in case a
+  // future recompute ever narrows the historical window.
   const readyVals = regimes.map(r => stats[r].ready ? stats[r].avg : null).filter(v => v !== null);
   const maxAbs = readyVals.length ? Math.max(0.05, ...readyVals.map(Math.abs)) : 0.3;
   function yFor(r) {
@@ -17193,14 +17252,15 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
     const ready = stats[p.r].ready;
     const valTxt = ready ? `${stats[p.r].avg >= 0 ? '+' : ''}${stats[p.r].avg.toFixed(2)}%` : `n=${stats[p.r].n}`;
     const valColor = !ready ? text3 : (p.isCurrent ? up : text3);
-    const currentTag = p.isCurrent ? ' \u25cf actual' : '';
+    const currentTag = p.isCurrent ? ' \u25cf latest' : '';
+    const rowLabel = _GROWTHDIFF_LABELS[p.r] || p.r;
     // Fixed offset above the point, not above wherever the point landed —
     // p.y is already clamped to [curveTop, curveBottom], so this label
     // never gets closer than (curveTop - valueLabelGap) to the top edge
     // or crosses into the rowLabelY row below.
     const valueY = Math.max(12, p.y - valueLabelGap);
     return `
-      <text x="${p.x.toFixed(1)}" y="${rowLabelY}" font-size="9.5" fill="${text3}" text-anchor="middle">${p.r}${currentTag}</text>
+      <text x="${p.x.toFixed(1)}" y="${rowLabelY}" font-size="9.5" fill="${text3}" text-anchor="middle">${rowLabel}${currentTag}</text>
       <text x="${p.x.toFixed(1)}" y="${valueY.toFixed(1)}" font-size="9.5" fill="${valColor}" text-anchor="middle">${valTxt}</text>`;
   }).join('');
 
@@ -17213,92 +17273,32 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime) {
     </svg>`;
 }
 
-// v8.200.0: this insight was a 3-4 sentence paragraph that pushed the
-// panel's vertical footprint well past the chart above it (Santiago
-// feedback, 2026-08-22) — compacted to one line, with the full
-// methodology/caveat text moved to a hover tooltip (title attribute) on
-// the same element rather than dropped, so the disclosure the v2.0
-// industry-standard audit added is still one hover away, not deleted.
-function _dsmileRenderInsight(el, regimes, stats, currentRegime, totalRows) {
+// One-line status + hover tooltip for the full methodology note (same
+// compaction pattern used elsewhere in this file — Santiago feedback,
+// 2026-08-22, on the prior 3-4 sentence paragraph).
+function _dsmileRenderInsight(el, doc, cur, stats) {
   if (!el) return;
-  const readyCount = regimes.filter(r => stats[r].ready).length;
-  const cur = stats[currentRegime];
-  const curTxt = cur && cur.avg !== null
-    ? `${cur.avg >= 0 ? '+' : ''}${cur.avg.toFixed(2)}% avg (n=${cur.n})`
-    : `accumulating \u2014 ${cur ? cur.n : 0}/10d`;
+  const regimeLabel = cur ? (_GROWTHDIFF_LABELS[cur.regime] || cur.regime) : '\u2014';
+  const curTxt = cur
+    ? `USD ${cur.usd_yoy >= 0 ? '+' : ''}${cur.usd_yoy.toFixed(1)}% vs G9 ${cur.g9_avg_yoy >= 0 ? '+' : ''}${cur.g9_avg_yoy.toFixed(1)}% YoY (${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp)`
+    : 'no current reading';
 
-  // Full methodology/proxy-caveat text — unchanged content from v2.0, now
-  // living in the title tooltip instead of always-visible body text.
-  const proxyCaveat = 'Uses a market-stress regime proxy (VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS), not Stephen Jen\u2019s original growth-differential framework \u2014 the two can disagree, e.g. in a globally-synchronized growth upswing with no US outperformance.';
-  const fullTitle = readyCount === regimes.length
-    ? `Historically DXY tends toward a positive average daily return at both risk-cycle extremes (RISK-OFF and RISK-ON) and weaker in the intermediate regimes \u2014 the classic "smile" pattern. Sample accumulated since the regime classifier went into production (${totalRows} day${totalRows === 1 ? '' : 's'} logged); not a long-run backtest. ${proxyCaveat}`
-    : `Still accumulating history \u2014 ${readyCount} of ${regimes.length} regime buckets have enough logged days (10+) to show a real average; the rest need more days at that regime before the smile curve is meaningful. Logged once daily, starting from when this feature shipped \u2014 not a backtest. ${proxyCaveat}`;
+  el.innerHTML = `${cur ? cur.quarter : '\u2014'}: ${curTxt} \u00b7 <span style="color:var(--up);">${regimeLabel}</span>`;
 
-  const shortStatus = readyCount === regimes.length ? 'smile curve ready' : `accumulating \u2014 ${readyCount}/${regimes.length} buckets ready`;
-  el.innerHTML = `Current regime: <span style="color:var(--up);">${currentRegime}</span> (${curTxt}) \u00b7 ${shortStatus}`;
-  el.title = fullTitle;
+  const totalQ = doc.quarters.length;
+  const first = doc.quarters[0].quarter, last = doc.quarters[doc.quarters.length - 1].quarter;
+  el.title = `Latest quarter with published GDP (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 ${regimeLabel}. ` +
+    `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED. ` +
+    `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a disclosed simplification, same spirit as the Fair Value panel's simplified-BEER caveat. ` +
+    `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading: a historical tendency, not a lagged trading signal. ` +
+    `Note: the buckets' avg DXY q/q returns below are not currently a textbook U-shaped smile (roughly monotonic across Underperforming\u2192Inline\u2192Outperforming rather than higher at both extremes) \u2014 stated as observed, not assumed.`;
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// GROWTH-REGIME AXIS (v2) — Stephen Jen's ORIGINAL Dollar Smile axis:
-// USD real GDP YoY vs. the equal-weighted rest of the G10, not the
-// market-stress proxy the block above uses. Data: growth-differential-
-// data/history.json, fully rebuilt each run (idempotent full recompute,
-// not a daily append — GDP data revises, so a stale cached differential
-// computed from a since-revised print would silently go wrong). Quarterly
-// cadence — every quarter in the backfilled history already has a real
-// value, so there is no "accumulating" state here the way the daily
-// stress axis needs one.
-//
-// v8.201.0: regime keys (USD-OUTPERFORMING/INLINE/USD-UNDERPERFORMING)
-// are internal identifiers only now — display uses _GROWTHDIFF_LABELS
-// below (Title Case, not ALL CAPS) since this is prose-context data, not
-// a short state badge like the Dollar Smile's RISK-ON/OFF (Santiago
-// feedback, 2026-08-22: reads as shouting in a table cell). Also
-// compacted the insight from a 4-sentence paragraph to one line + hover
-// tooltip (same pattern as the Dollar Smile fix above), and stripped an
-// internal repo filename that had leaked into a user-facing tooltip.
-// ═══════════════════════════════════════════════════════════════════
-const _GROWTHDIFF_LABELS = {
-  'USD-OUTPERFORMING': 'USD Outperforming',
-  'INLINE': 'Inline',
-  'USD-UNDERPERFORMING': 'USD Underperforming',
-};
-
-async function renderGrowthDifferential() {
-  const tbody = document.getElementById('growthdiff-tbody');
-  const insightEl = document.getElementById('growthdiff-insight');
-  const currentEl = document.getElementById('growthdiff-current');
-  if (!tbody) return; // beta-only element, not present outside index-beta.html
-
-  let doc;
-  try {
-    const res = await fetch('./growth-differential-data/history.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    doc = await res.json();
-    if (!doc || !Array.isArray(doc.quarters) || !doc.quarters.length) throw new Error('malformed history.json');
-  } catch (e) {
-    if (insightEl) insightEl.textContent = 'Growth differential data unavailable right now.';
-    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="padding:4px;color:var(--text3);">No data yet.</td></tr>';
-    if (currentEl) currentEl.textContent = '';
-    return;
-  }
-
+function _growthdiffRenderTable(tbody, rawStats, cur) {
+  if (!tbody) return;
   const REGIMES = ['USD-OUTPERFORMING', 'INLINE', 'USD-UNDERPERFORMING'];
-  const cur = doc.current;
-  const stats = doc.regime_stats || {};
-
-  if (currentEl && cur) {
-    const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
-    // "Latest available" rather than implying this is the current calendar
-    // quarter — real GDP prints ~1 quarter after quarter-end, so the most
-    // recent reading is necessarily a quarter or more behind today's date.
-    // Full explanation lives in the panel-title tooltip, not repeated here.
-    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt})`;
-  }
-
   tbody.innerHTML = REGIMES.map(r => {
-    const s = stats[r] || { n: 0, avg_dxy_qret: null, n_dxy: 0 };
+    const s = rawStats[r] || { n: 0, avg_dxy_qret: null, n_dxy: 0 };
     const isCurrent = cur && cur.regime === r;
     const avgTxt = s.avg_dxy_qret === null
       ? `\u2014 (n=${s.n_dxy || 0})`
@@ -17308,18 +17308,4 @@ async function renderGrowthDifferential() {
            `<td style="padding:2px 4px;">${s.n}</td>` +
            `<td style="padding:2px 4px;">${avgTxt}</td></tr>`;
   }).join('');
-
-  if (insightEl) {
-    const totalQ = doc.quarters.length;
-    const first = doc.quarters[0].quarter, last = doc.quarters[doc.quarters.length - 1].quarter;
-    const regimeLabel = cur ? (_GROWTHDIFF_LABELS[cur.regime] || cur.regime) : '';
-    const curTxt = cur
-      ? `USD ${cur.usd_yoy >= 0 ? '+' : ''}${cur.usd_yoy.toFixed(1)}% vs G9 ${cur.g9_avg_yoy >= 0 ? '+' : ''}${cur.g9_avg_yoy.toFixed(1)}% YoY (${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp)`
-      : 'no current reading';
-    insightEl.innerHTML = `${last}: ${curTxt} \u00b7 <span style="color:var(--up);">${regimeLabel}</span>`;
-    insightEl.title = `Latest quarter with published GDP (${cur ? cur.quarter : '\u2014'}): ${curTxt} \u2014 ${regimeLabel}. ` +
-      `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED \u2014 not a market-stress proxy like the smile above. ` +
-      `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a simplification, same spirit as the Fair Value panel's disclosed simplified-BEER caveat. ` +
-      `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading, a historical tendency, not a lagged trading signal.`;
-  }
 }
