@@ -16763,7 +16763,7 @@ window.addEventListener('gi-theme-change', function() {
     'hsi','dji',
   ]);
 
-  let _sznChart = null, _sznSeries = null, _sznOpen = false, _sznLoadedPair = null;
+  let _sznChart = null, _sznSeries = null, _sznOpen = false, _sznLoadedPair = null, _sznCrosshairHandler = null;
 
   function _sznPairLabel(pair) {
     return pair.length === 6 ? (pair.slice(0, 3) + '/' + pair.slice(3)).toUpperCase() : pair.toUpperCase();
@@ -16771,7 +16771,7 @@ window.addEventListener('gi-theme-change', function() {
 
   function _sznDestroyChart() {
     if (_sznChart) { try { _sznChart.remove(); } catch (_) {} }
-    _sznChart = null; _sznSeries = null;
+    _sznChart = null; _sznSeries = null; _sznCrosshairHandler = null;
   }
 
   async function _sznRenderChart(curve) {
@@ -16864,6 +16864,49 @@ window.addEventListener('gi-theme-change', function() {
     });
     _sznSeries.setData(pts);
     _sznChart.timeScale().fitContent();
+
+    // v8.208.0 — hover tooltip (date + value). crosshairMarkerVisible:true
+    // (set in seriesOpts above) only draws the dot on the line itself; LWC
+    // does not render any text next to it on its own — a text readout needs
+    // a manually-positioned DOM element driven by subscribeCrosshairMove(),
+    // the same pattern the main Price Chart already uses for its own
+    // hover readout (see _lwChart's crosshair-move handler elsewhere in
+    // this file). REF_YEAR is a synthetic placeholder year (see comment
+    // above pts) so the tooltip formats {month, day} directly rather than
+    // showing that fake year to the user.
+    const pointByTime = {};
+    pts.forEach((p, i) => { pointByTime[p.time] = curve[i]; });
+    let tip = document.getElementById('szn-chart-tooltip');
+    if (!tip) {
+      tip = document.createElement('div');
+      tip.id = 'szn-chart-tooltip';
+      tip.style.cssText = 'position:absolute;display:none;pointer-events:none;z-index:5;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:3px 7px;font-size:10px;font-family:var(--font-mono,monospace);color:var(--text);white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35);';
+      el.style.position = el.style.position || 'relative';
+      el.appendChild(tip);
+    }
+    // _sznChart is a fresh instance every call (see _sznDestroyChart() above),
+    // so there's no prior subscription on THIS chart to remove — no unsubscribe
+    // call needed here, unlike a chart instance that persists across renders.
+    const MONTH_FULL = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    _sznCrosshairHandler = param => {
+      if (!param.point || !param.time || param.point.x < 0 || param.point.y < 0) {
+        tip.style.display = 'none';
+        return;
+      }
+      const pt = pointByTime[param.time];
+      if (!pt) { tip.style.display = 'none'; return; }
+      const dateLabel = (pt.month === 0) ? 'Baseline' : `${MONTH_FULL[pt.month - 1]} ${pt.day}`;
+      const valTxt = (pt.cum_pct >= 0 ? '+' : '') + pt.cum_pct.toFixed(2) + '%';
+      tip.innerHTML = `${dateLabel} &middot; <span style="color:${pt.cum_pct >= 0 ? 'var(--up)' : 'var(--down)'};">${valTxt}</span>`;
+      tip.style.display = 'block';
+      // Clamp so the tooltip never spills past the container's right/top edge.
+      const maxLeft = el.clientWidth - tip.offsetWidth - 4;
+      const left = Math.max(4, Math.min(param.point.x + 10, maxLeft));
+      const top = Math.max(2, param.point.y - 28);
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+    };
+    _sznChart.subscribeCrosshairMove(_sznCrosshairHandler);
   }
 
   const _SZN_MONTH_LABELS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -16876,10 +16919,30 @@ window.addEventListener('gi-theme-change', function() {
   // relax the windows table's t-test significance gate above; the two are
   // independent, same "descriptive month-average alongside a stricter
   // significance-gated table" pattern used by reference tools like
-  // EquityClock, just rendered as a compact strip instead of a second full
-  // table (Santiago: a second table would take too much vertical space —
-  // 2026-08-22 session). Colored red/green by sign so the density reads at
-  // a glance without needing to parse numbers.
+  // EquityClock.
+  //
+  // v8.208.0 REVERT: the inline second line (month name + its own avg %
+  // stacked below it inside the same grid cell) reintroduced exactly the
+  // failure mode v8.203.0 had just closed for the month-name-only version —
+  // a grid cell's row height is fixed by `grid-template-rows:1fr` against
+  // the row container's own height, but that height was only ever sized
+  // (via #szn-months' `min-height:22px`) for a single line of text. Once a
+  // cell's content needs two stacked lines (name + value) taller than that
+  // fixed row box, the overflow doesn't reflow the grid — it just spills
+  // past the row's bottom edge, visually detached below the rest of the
+  // strip. December was the visible case Santiago hit, but the mechanism
+  // has nothing to do with December specifically (every month's two-line
+  // stack is equally taller than the box; December's simply happened to be
+  // the one whose overflow amount crossed into visibly separate territory
+  // at the widths tested — a real width/font-metrics coincidence, not a
+  // December-specific bug). Fixed at the root by reverting this row to
+  // month-name-only (one line, matches its `min-height:22px` box exactly)
+  // per Santiago's explicit instruction, rather than patching around it
+  // with a taller fixed row height or an invisible spacer — the average-
+  // move figures move to their own tab below instead (see
+  // `_sznRenderMonthlyTable()`), where a table row has no such fixed-height
+  // constraint to fight.
+  let _sznMonthlyCols = []; // shared with _sznRenderMonthlyTable() — same curve, computed once per load
   function _sznRenderMonthLabels(curve) {
     const row = document.getElementById('szn-months');
     if (!row) return;
@@ -16926,6 +16989,8 @@ window.addEventListener('gi-theme-change', function() {
       return { month: m.month, span, monthPct };
     });
 
+    _sznMonthlyCols = cols; // stash for the Monthly Avg tab table — same data, no re-fetch/re-derive
+
     row.style.display = 'grid';
     row.style.gridTemplateColumns = cols.map(c => `${c.span}fr`).join(' ');
     row.style.gridTemplateRows = '1fr'; // pin to exactly one row — belt-and-suspenders alongside removing the column auto-flow below
@@ -16933,13 +16998,30 @@ window.addEventListener('gi-theme-change', function() {
     row.style.gap = '1px';
     row.style.flexWrap = ''; // clear the stale flex-wrap inline value, if any, left over from this row's pre-v8.202.0 flex layout
 
-    row.innerHTML = cols.map(c => {
+    // Month-name-only, single line — see v8.208.0 comment above for why the
+    // inline value line was reverted.
+    row.innerHTML = cols.map(c =>
+      `<span style="text-align:center;line-height:22px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${_SZN_MONTH_LABELS[c.month - 1]}</span>`
+    ).join('');
+
+    _sznRenderMonthlyTable(cols);
+  }
+
+  // v8.208.0 — new "Monthly Avg" tab, replacing the removed inline per-month
+  // value line (see _sznRenderMonthLabels() comment above). Same descriptive-
+  // only framing (no win_rate, no p-value, no MIN_YEARS gate) and the exact
+  // same title/tooltip text that line used to carry — this is a display
+  // relocation, not a new stat.
+  function _sznRenderMonthlyTable(cols) {
+    const tbody = document.getElementById('szn-monthly-tbody');
+    if (!tbody) return;
+    tbody.innerHTML = cols.map(c => {
       const color = Math.abs(c.monthPct) < 0.05 ? 'var(--text3)' : (c.monthPct > 0 ? 'var(--up)' : 'var(--down)');
-      const valTxt = (c.monthPct >= 0 ? '+' : '') + c.monthPct.toFixed(1) + '%';
-      return `<span style="text-align:center;line-height:1.3;min-width:0;">
-        <span style="display:block;">${_SZN_MONTH_LABELS[c.month - 1]}</span>
-        <span style="display:block;font-size:8px;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[c.month - 1]} across the full lookback \u2014 not significance-tested, unlike the windows table below.">${valTxt}</span>
-      </span>`;
+      const valTxt = (c.monthPct >= 0 ? '+' : '') + c.monthPct.toFixed(2) + '%';
+      return `<tr style="border-top:1px solid var(--border2);">
+        <td style="padding:3px 0;color:var(--text);">${_SZN_MONTH_LABELS[c.month - 1]}</td>
+        <td style="text-align:right;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[c.month - 1]} across the full lookback \u2014 not significance-tested, unlike the Chart tab's windows table.">${valTxt}</td>
+      </tr>`;
     }).join('');
   }
 
@@ -17001,6 +17083,7 @@ window.addEventListener('gi-theme-change', function() {
     const title = document.getElementById('szn-title');
     const tbody = document.getElementById('szn-windows-tbody');
     const monthsRow = document.getElementById('szn-months');
+    const monthlyTbody = document.getElementById('szn-monthly-tbody');
     const chartSection = document.getElementById('szn-chart-section');
     const windowsSection = document.getElementById('szn-windows-section');
 
@@ -17009,8 +17092,10 @@ window.addEventListener('gi-theme-change', function() {
       if (insight) insight.textContent = 'Seasonality isn\u2019t available for this symbol \u2014 select an FX pair, metal, index, or other supported instrument on the Price Chart above.';
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
+      if (monthlyTbody) monthlyTbody.innerHTML = '';
       if (chartSection) chartSection.style.display = 'none';
       if (windowsSection) windowsSection.style.display = 'none';
+      if (typeof window._sznSwitchTab === 'function') window._sznSwitchTab('chart');
       _sznDestroyChart();
       _sznLoadedPair = null;
       return;
@@ -17043,8 +17128,10 @@ window.addEventListener('gi-theme-change', function() {
       if (insight) insight.textContent = `No seasonality data yet for ${_sznPairLabel(pair)} \u2014 needs at least 5 years of stored daily history.`;
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
+      if (monthlyTbody) monthlyTbody.innerHTML = '';
       if (chartSection) chartSection.style.display = 'none';
       if (windowsSection) windowsSection.style.display = 'none';
+      if (typeof window._sznSwitchTab === 'function') window._sznSwitchTab('chart');
       _sznDestroyChart();
       _sznLoadedPair = null;
     }
@@ -17106,6 +17193,28 @@ window.addEventListener('gi-theme-change', function() {
     const w = el.clientWidth || 580;
     _sznChart.resize(w, 120, true);
     _sznChart.timeScale().fitContent();
+  };
+
+  // v8.208.0 — Chart / Monthly Avg tab strip, same onclick pattern as the
+  // Dollar Smile panel's _dsmileSwitchTab() directly below in this file.
+  window._sznSwitchTab = function (tab) {
+    ['chart', 'monthly'].forEach(t => {
+      const btn = document.querySelector(`.szn-tab[data-szn-tab="${t}"]`);
+      const panel = document.getElementById(`szn-tab-${t}`);
+      const active = t === tab;
+      if (btn) {
+        btn.style.color = active ? 'var(--text)' : 'var(--text3)';
+        btn.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
+      }
+      if (panel) panel.style.display = active ? '' : 'none';
+    });
+    // Chart tab's LWC canvas was sized while display:none on this branch of
+    // the very first load (its container has 0 width then) — re-measure on
+    // every switch back into view, same reasoning as the fullscreen/toggle
+    // resize calls above.
+    if (tab === 'chart' && typeof window._sznResizeChart === 'function') {
+      requestAnimationFrame(() => requestAnimationFrame(window._sznResizeChart));
+    }
   };
 
   document.addEventListener('DOMContentLoaded', function () {
