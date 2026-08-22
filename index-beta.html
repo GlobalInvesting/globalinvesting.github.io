@@ -1274,22 +1274,48 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </span>
           <button id="szn-close" aria-label="Close Seasonality panel" style="background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px;flex-shrink:0;">&times;</button>
         </div>
+        <!-- Tab strip added v8.208.0: the per-month avg-% figures used to live
+             inline below each month name in #szn-months, which caused a real
+             layout bug (see _sznRenderMonthLabels()'s v8.208.0 comment in
+             dashboard-beta.js — a two-line cell overflowing a fixed-height
+             grid row). Moved to their own table here instead, same
+             chart-then-tabs pattern as the Dollar Smile panel above. -->
+        <div style="display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--border2);">
+          <button type="button" class="szn-tab" data-szn-tab="chart" onclick="_sznSwitchTab('chart')" style="background:none;border:none;color:var(--text);font-size:10px;padding:6px 10px 5px;cursor:pointer;border-bottom:2px solid var(--accent);">Chart</button>
+          <button type="button" class="szn-tab" data-szn-tab="monthly" onclick="_sznSwitchTab('monthly')" style="background:none;border:none;color:var(--text3);font-size:10px;padding:6px 10px 5px;cursor:pointer;border-bottom:2px solid transparent;">Monthly Avg</button>
+        </div>
         <div style="padding:10px 12px;">
-          <div id="szn-chart-section">
-            <div id="szn-chart" style="width:100%;height:130px;"></div>
-            <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;min-height:22px;" title="Small values below each month are descriptive averages, not significance-tested"></div>
+
+          <!-- CHART TAB -->
+          <div id="szn-tab-chart" class="szn-tab-panel">
+            <div id="szn-chart-section">
+              <div id="szn-chart" style="width:100%;height:130px;position:relative;"></div>
+              <div id="szn-months" style="display:flex;gap:1px;font-size:9px;color:var(--text3);margin:2px 0 10px;min-height:22px;"></div>
+            </div>
+            <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
+              <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
+                <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero">p-value</td></tr></thead>
+                <tbody id="szn-windows-tbody"></tbody>
+              </table>
+            </div>
+            <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;">
+              <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
+              <div id="szn-insight" style="font-size:10.5px;color:var(--text2);line-height:1.5;">Loading seasonality data&hellip;</div>
+            </div>
           </div>
-          <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
-            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
-            <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
-              <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero">p-value</td></tr></thead>
-              <tbody id="szn-windows-tbody"></tbody>
+
+          <!-- MONTHLY AVG TAB — same descriptive-only figures previously
+               shown inline below each month name; not significance-tested,
+               unlike the Chart tab's windows table above. -->
+          <div id="szn-tab-monthly" class="szn-tab-panel" style="display:none;">
+            <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Descriptive average net move per calendar month across the full lookback &mdash; not significance-tested (see the Chart tab's windows table for the p&lt;0.05 gate).</div>
+            <table style="width:100%;border-collapse:collapse;font-size:11px;">
+              <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Month</td><td style="text-align:right;">Avg move</td></tr></thead>
+              <tbody id="szn-monthly-tbody"></tbody>
             </table>
           </div>
-          <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;">
-            <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
-            <div id="szn-insight" style="font-size:10.5px;color:var(--text2);line-height:1.5;">Loading seasonality data&hellip;</div>
-          </div>
+
         </div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active -->
@@ -2441,7 +2467,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.207.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.208.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
