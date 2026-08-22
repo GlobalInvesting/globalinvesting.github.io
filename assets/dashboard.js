@@ -5357,6 +5357,14 @@ async function _renderLWChart(ohlcId, label) {
   _lwCandleSeries = candleSeries;
   _lwActiveOhlcId = ohlcId;
 
+  // v8.220.0 — notify the Seasonality module of the symbol now on screen.
+  // window._sznOnSymbolChange existed since the beta promotion but was never
+  // called from here, so it never fired; separately, window._sznActiveOhlcId
+  // (read by _sznToggle() on panel open) was never assigned anywhere. Both
+  // gaps fixed together: this call both re-renders an already-open panel and
+  // persists the id for the next time the panel is opened.
+  if (typeof window._sznOnSymbolChange === 'function') window._sznOnSymbolChange(ohlcId);
+
   // Inject today's live bar immediately (STOOQ_RT_CACHE may already be populated).
   // For D1/W1/MN: _lwBuildTodayBar() constructs the bar.
   // For H1/H4: _lwUpdateTodayBar() handles the live partial-bar injection directly
@@ -11358,6 +11366,10 @@ async function boot() {
   fetchCrossAssetData();
   fetchCommodityQuotes();
   renderFairValue();
+  renderDollarSmile(); // v8.219.0 promotion left this uncalled — the 920-line tail block
+                       // ported the function definitions but this boot-sequence call site
+                       // (dashboard-beta.js:11329, right after renderFairValue()) lived far
+                       // earlier in the file and was missed. See CHANGELOG.md v8.220.0.
   // AI narrative full build (non-blocking, fills narrative text).
   // Chain a post-resolve scroll reset: injecting the full narrative text expands
   // #narrative's height, which can cause the browser to scroll #main down to
@@ -17257,7 +17269,12 @@ window.addEventListener('gi-theme-change', function() {
 
   // Exposed so _renderLWChart's single call site can notify us of symbol
   // changes without this IIFE needing to be defined before that function.
+  // v8.220.0 — must persist ohlcId to window._sznActiveOhlcId (read by
+  // _sznToggle() below on every panel open) regardless of _sznOpen, since a
+  // symbol change while the panel is closed must still be reflected the
+  // next time it's opened; previously nothing ever set this global at all.
   window._sznOnSymbolChange = function (ohlcId) {
+    window._sznActiveOhlcId = ohlcId;
     if (_sznOpen) _sznLoad(ohlcId);
   };
 
@@ -17480,7 +17497,7 @@ async function renderDollarSmile() {
   const insightEl = document.getElementById('dsmile-insight');
   const currentEl = document.getElementById('dsmile-current');
   const tbody = document.getElementById('growthdiff-tbody');
-  if (!chartEl) return; // beta-only element, not present outside index-beta.html
+  if (!chartEl) return; // defensive guard — element ships in production index.html since v8.219.0
 
   let doc;
   try {
@@ -17605,7 +17622,7 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime, fmtOpts) {
 // it means for a trader) — v8.216.0 shortened from a 4-sentence paragraph
 // per Santiago's feedback that it read too long for a tooltip; the fuller
 // methodology disclosure lives in the static line above the chart
-// (index-beta.html) and the panel-title tooltip, so this one only needs
+// (index.html, promoted from beta in v8.219.0) and the panel-title tooltip, so this one only needs
 // to orient a reader who hasn't seen those.
 function _dsmileRenderInsight(el, doc, cur, stats) {
   if (!el) return;
