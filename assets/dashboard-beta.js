@@ -17444,7 +17444,7 @@ window.addEventListener('gi-theme-change', function() {
 // pure growth-differential axis can never isolate the former (see
 // fetch_growth_differential.py's module docstring for the full
 // reasoning). GLOBAL-RISK-OFF now overrides the growth differential
-// whenever the quarter's max VIX close hit 30+, regardless of where the
+// whenever the quarter's max VIX close hit 40+, regardless of where the
 // US ranked that quarter; the old USD-UNDERPERFORMING bucket is folded
 // into CALM-MUDDLING-THROUGH, since — absent an actual crisis — modest
 // US underperformance is the theory's weak-dollar middle, not its left
@@ -17607,7 +17607,7 @@ function _dsmileRenderInsight(el, doc, cur, stats) {
     `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED. ` +
     `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a disclosed simplification. ` +
     `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading: a historical tendency, not a lagged trading signal. ` +
-    `Regime = growth differential AND a genuine crisis check: Global Risk-Off overrides the other two whenever that quarter's max VIX close hit 30+ (a real panic level), regardless of where US growth ranked that quarter \u2014 not merely "US grew slower than the G9 average", which is Calm/Muddling Through instead. See growthdiff-tbody below for the actual avg DXY q/q return per bucket \u2014 stated as observed, not assumed to form a textbook U shape.`;
+    `Regime = growth differential AND a genuine crisis check: Global Risk-Off overrides the other two whenever that quarter's max VIX close hit 40+ (independent sources' own \u201ccrisis\u201d language, not merely \u201celevated\u201d), regardless of where US growth ranked that quarter \u2014 not merely "US grew slower than the G9 average", which is Calm/Muddling Through instead. See growthdiff-tbody below for the actual avg DXY q/q return per bucket \u2014 stated as observed, not assumed to form a textbook U shape.`;
 }
 
 function _growthdiffRenderTable(tbody, rawStats, cur) {
