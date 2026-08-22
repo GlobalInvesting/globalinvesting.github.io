@@ -365,6 +365,7 @@ a { color: inherit; text-decoration: none; }
     <a class="toc-item" href="#flows">Asset Flow Logic</a>
     <a class="toc-item" href="#divergence">Divergence Signals</a>
     <a class="toc-item" href="#var-cvar">Historical VaR / CVaR</a>
+    <a class="toc-item" href="#dollar-smile">Dollar Smile</a>
     <a class="toc-item" href="#regime-episodes">Regime Episodes</a>
     <a class="toc-item" href="#crypto-risk">Crypto as Risk Indicator</a>
     <div class="toc-divider"></div>
@@ -744,6 +745,28 @@ a { color: inherit; text-decoration: none; }
       <div class="callout">
         <div class="callout-label">Note</div>
         <strong>Data source:</strong> VaR and CVaR are computed daily using historical price data. The table reflects end-of-day data from the most recent daily update — it does not update intraday. Hover over any instrument name in the terminal for a tooltip describing its specific risk context.
+      </div>
+    </div>
+
+    <div class="guide-section" id="dollar-smile">
+      <h2>Dollar Smile</h2>
+      <p>Below the VaR/CVaR table, the Dollar Smile panel classifies USD performance by market regime, following Stephen Jen &amp; Fatih Yilmaz's original 2001 framework (Morgan Stanley): the dollar tends to <strong>strengthen</strong> in a genuine global risk-off/crisis regime (safe-haven flows — the left tail) and when US growth significantly outperforms the rest of the G10 (yield/growth appeal — the right tail), and <strong>underperform</strong> in the calm middle, where capital drifts toward higher-yielding markets elsewhere. There is no official published Dollar Smile dataset — this panel is the terminal's own from-scratch implementation of the framework, with the full methodology disclosed rather than treated as a black box.</p>
+      <p>The regime axis is the real US-vs-G9 GDP YoY growth differential, computed from FRED data across all G10 currencies — not a proxy or a single-country comparison. Critically, the left tail (genuine crisis) is <strong>not</strong> simply "the US grew a bit slower than its peers": an independent VIX-based crisis check (max quarterly VIX close ≥ 40) overrides the growth-differential classification for that tail. This matters because in a real synchronized global crisis, the rest of the G9 typically contracts as much as or more than the US — a pure growth-differential split would never actually populate the "crisis" bucket correctly without this override.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-dollar-smile.png" alt="Dollar Smile panel showing USD performance bucketed by regime — Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming — each with sample size and average DXY quarter-over-quarter return" width="658" height="331" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Dollar Smile panel.</strong> USD bucketed into three regimes, with sample size and average DXY q/q return per bucket.</p>
+      </div>
+      <p>Three regime buckets are shown, each with its own sample size (quarters classified, full history since 1996) and average DXY quarter-over-quarter return:</p>
+      <ul>
+        <li><strong style="color:var(--text);">Global Risk-Off</strong> — the left tail: a genuine crisis quarter per the VIX≥40 override, regardless of what the growth differential alone would suggest. USD typically strengthens here on safe-haven demand.</li>
+        <li><strong style="color:var(--text);">Calm/Muddling Through</strong> — the middle of the smile: no crisis override triggered, and the US-vs-G9 growth differential is not strongly skewed either direction. USD typically underperforms here as capital seeks yield elsewhere.</li>
+        <li><strong style="color:var(--text);">USD Growth Outperforming</strong> — the right tail: the US is growing meaningfully faster than the G9 average, with no crisis override. USD typically strengthens here on relative growth and yield appeal.</li>
+      </ul>
+      <div class="callout">
+        <div class="callout-label">Note</div>
+        <strong>Data source:</strong> US-vs-G9 real GDP growth differential (FRED, all G10 currencies, quarterly) with a VIX-based crisis override for the left tail. GDP data revises historically, so the underlying dataset is fully recomputed on every run rather than appended to daily — unlike most other panels in this terminal, which log an append-only daily history.
       </div>
     </div>
 

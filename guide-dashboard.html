@@ -486,6 +486,7 @@ a { color: inherit; text-decoration: none; }
     <a class="toc-item" href="#topbar-guide">Topbar &amp; Quote Bar</a>
     <a class="toc-item" href="#narrative">AI Narrative &amp; Regime</a>
     <a class="toc-item" href="#price-chart">Price Chart</a>
+    <a class="toc-item" href="#seasonality">Seasonality</a>
     <a class="toc-item" href="#fx-pairs">FX Pairs Table</a>
     <a class="toc-item" href="#heatmap">Currency Strength Heatmap</a>
     <a class="toc-item" href="#sidebar">Left Sidebar</a>
@@ -613,6 +614,19 @@ a { color: inherit; text-decoration: none; }
       <p>The <strong>Indicators</strong> menu adds any of 29 overlays and oscillators, grouped Moving Averages (SMA/EMA/WMA/HMA/DEMA/TEMA/VWMA), Overlays (VWAP, Bollinger Bands, Keltner Channel, Donchian Channel, Parabolic SAR, Ichimoku Cloud, Supertrend, Pivot Points Daily/Weekly/Monthly), Oscillators (RSI, Stochastic, MACD, CCI, Williams %R, ROC, Momentum, MFI, Awesome Oscillator, TRIX, DPO, Ultimate Oscillator), Volatility (ATR, ADX/DMI, Aroon, Choppiness Index), and Volume (OBV, Chaikin Money Flow). Each is independently configurable (period, colors, and other parameters where applicable) and oscillators render in their own sub-pane below the main chart. Settings persist per-browser across symbol switches.</p>
       <h3>Drawing Tools</h3>
       <p>The <strong>Draw</strong> menu offers trend lines, rectangles, and Fibonacci retracements — click to place the first anchor, click again to complete. Selecting a drawing shows resize/move handles and a small floating toolbar (color, delete); <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">Ctrl</kbd>+<kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">C</kbd> / <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">Ctrl</kbd>+<kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">V</kbd> (<kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">Cmd</kbd> on Mac) copies and pastes the selected object with a small offset, matching standard chart-object conventions. Drawings can be placed and dragged freely into forward time, past the last candle — useful for projecting trend lines or marking a forward target — and stay pinned to their price/time coordinates as new bars arrive or the chart is resized. Drawings tuck under the price-scale ribbon and time axis rather than rendering on top of them.</p>
+      <h3 id="seasonality">Seasonality</h3>
+      <p>A <strong>Seasonality</strong> button in the chart toolbar opens a panel showing recurring, calendar-based return patterns for the active pair — fiscal year-end repatriation flows, commodity cycles, tax-payment flows, and similar tendencies that repeat at roughly the same point in the year. It runs entirely on the daily OHLC history the terminal already stores, so no new data source is involved.</p>
+      <p>Two tabs are available. The <strong>Chart</strong> tab plots a day-of-year seasonal curve (average cumulative return by calendar day across the full lookback, additive rather than compounded) with a month-label row beneath it, followed by a table of <strong>statistically significant recurring windows</strong> — monthly-resolution periods that clear a one-sample t-test at p&lt;0.05 (H0: the true mean window return is zero) against qualifying years, showing direction, average return ± standard deviation, win rate for context, and the p-value itself. The <strong>Monthly Avg</strong> tab shows a simpler, purely descriptive table: average net move per calendar month across the full lookback, laid out with months as columns — this tab is not significance-tested, unlike the Chart tab's windows table.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-seasonality.png" alt="Seasonality panel showing a pair's day-of-year seasonal curve, Chart and Monthly Avg tabs, and a table of statistically significant recurring windows with direction, average return, win rate, and p-value" width="720" height="476" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Seasonality panel.</strong> Day-of-year curve on the Chart tab, with a p&lt;0.05-gated table of recurring windows below it.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-label">Note</div>
+        <strong>Significance vs. description:</strong> only the Chart tab's windows table is significance-tested. The seasonal curve itself and the Monthly Avg tab are both descriptive averages — useful for spotting a pattern, but not evidence on their own that the pattern is statistically real. Treat a window without a matching low p-value as an observation, not a signal.
+      </div>
     </div>
 
 

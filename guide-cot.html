@@ -372,6 +372,7 @@ a { color: inherit; text-decoration: none; }
       <a class="toc-item" href="#open-interest">Open Interest</a>
       <a class="toc-item" href="#cot-modal">COT Detail Modal</a>
       <a class="toc-item" href="#categories">Trader Categories</a>
+      <a class="toc-item" href="#other-assets">Indices &amp; Commodities</a>
       <a class="toc-item" href="#signal-logic">Signal Logic</a>
       <a class="toc-item" href="#extremes">Positioning Extremes</a>
       <a class="toc-item" href="#lag">The Lag Problem</a>
@@ -624,6 +625,22 @@ a { color: inherit; text-decoration: none; }
         <li><strong style="color:var(--text);">Dealers / Intermediaries</strong> — banks and swap dealers that mostly warehouse risk from client flow rather than expressing directional views. Because dealers are largely reactive, a dealer book positioned opposite to LF at an extreme often reflects dealers absorbing the other side of a crowded trade — see the Dealer divergence callout under the Participants tab.</li>
       </ul>
       <p>All three categories are visible together in the COT modal's Participants tab and Participants section of the Overview tab, and as columns (AM Net, Dealer Net) in the History tab table.</p>
+    </div>
+
+    <div class="guide-section" id="other-assets">
+      <h2>Indices &amp; Commodities</h2>
+      <p>Above the FX rows, the COT panel header carries three asset-class tabs: <strong>FX</strong> (the 7 currencies covered above), <strong>Indices</strong> (S&amp;P 500, Nasdaq 100, Dow Jones 30), and <strong>Commodities</strong> (Gold, Silver, Copper, WTI Crude). Indices and Commodities are supplementary context to the terminal's core FX identity, not additional core inventory — useful for cross-referencing a currency's positioning against related asset flows (e.g. AUD vs. Copper, CAD vs. WTI, safe-haven flows into Gold vs. JPY/CHF).</p>
+      <div class="callout">
+        <div class="callout-label">Important</div>
+        <strong>Indices use the same TFF report and categories as FX</strong> (Leveraged Funds / Asset Managers / Dealers). <strong>Commodities use a different CFTC report entirely — the Disaggregated report</strong>, whose primary and secondary categories are not LF/AM. Reading a commodity row with FX category labels in mind will misinterpret the data.
+      </div>
+      <p>The Disaggregated report's three tracked categories, in place of TFF's LF/AM/Dealers:</p>
+      <ul>
+        <li><strong style="color:var(--text);">Managed Money (MM)</strong> — hedge funds and CTAs. This is the Disaggregated report's primary speculative category and the direct commodity analog of TFF's Leveraged Funds; the terminal treats it as the main signal for Commodities-tab rows the same way LF is the main signal for FX/Indices rows.</li>
+        <li><strong style="color:var(--text);">Swap Dealers (SD)</strong> — banks and swap dealers hedging OTC and index exposure. This is the secondary category, analogous to TFF's Asset Managers in that it provides a second, differently-motivated read: when Managed Money and Swap Dealers move in the same direction, it reinforces the signal.</li>
+        <li><strong style="color:var(--text);">Producer/Merchant (PM)</strong> — commercial hedgers: producers, processors, and end users of the physical commodity. Typically positioned contrary to speculators, since they hedge production or input costs rather than speculate on price direction — a useful contrarian signal, the commodity equivalent of watching Dealer positioning on the FX side.</li>
+      </ul>
+      <p>The panel header, row layout, click-through to the detail modal, and every tab inside that modal (Overview, Net Position, Long/Short, Participants, History) work identically across all three asset classes — only the category labels and the underlying CFTC report change. A Commodities-tab row's header reads <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">CFTC Disaggregated &middot; Options+Futures Combined</code> where an FX or Indices row reads <code style="font-family:var(--font-mono);font-size:11px;color:var(--blue);">CFTC TFF</code>, so the report family is always visible at a glance.</p>
     </div>
 
     <div class="guide-section" id="signal-logic">
