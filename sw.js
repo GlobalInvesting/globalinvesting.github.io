@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.215.1';
+const CACHE_VERSION = 'gi-v8.216.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 

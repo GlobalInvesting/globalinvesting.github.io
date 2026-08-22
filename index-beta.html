@@ -1530,7 +1530,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </tbody>
         </table>
       </div>
-      <!-- Dollar Smile Panel (beta) — full width, below VaR/CVaR.
+      <!-- Dollar Smile Panel — full width, below VaR/CVaR.
+           v8.216.0: panel copy/labels moved off "beta" wording (Santiago:
+           panel itself is done, wants it read as the final production
+           view) — "beta" removed from panel-sub and the methodology
+           disclaimer line; hover tooltip shortened from a 4-sentence
+           paragraph to methodology-in-brief + what it means for a trader.
+           NOTE: the top-of-file banner (search "BETA BUILD") still lists
+           Dollar Smile as under review — that's a page-level flag about
+           this file (index-beta.html) not yet being merged into
+           index.html, separate from the panel's own copy; flagged to
+           Santiago rather than changed unilaterally.
            v5 (2026-08-22): regime scheme changed from a pure growth-
            differential 3-way split to growth differential + a genuine
            crisis/risk-off check (max quarterly VIX close >= 40 overrides
@@ -1547,13 +1557,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="panel-head">
           <span style="display:flex;align-items:baseline;min-width:0;overflow:hidden;">
             <span class="panel-title" style="flex-shrink:0;" title="Dollar Smile (Stephen Jen &amp; Fatih Yilmaz, 2001): USD tends to strengthen in a genuine global risk-off/crisis regime (safe-haven flows, left tail) and when US growth significantly outperforms the rest of the G10 (yield/growth appeal, right tail), and underperform in the calm middle where capital drifts to higher-yielding markets elsewhere. Regime below = growth differential (FRED, quarterly) with a real VIX-based crisis check overriding it for the left tail — not a blended score, and not the same as merely 'US grew slower than the G9 average'.">Dollar Smile</span>
-            <span class="panel-sub">USD vs regime &middot; beta</span>
+            <span class="panel-sub">USD vs regime</span>
           </span>
           <span class="panel-sub" id="dsmile-current" style="margin-left:8px;">&mdash;</span>
         </div>
         <div style="padding:10px 12px;">
 
-          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007) &middot; real GDP YoY (FRED, quarterly, all 10 G10 currencies) + VIX-based crisis check (max daily close per quarter &ge; 40, industry &quot;crisis&quot; language, not merely &quot;elevated&quot;)</div>
+          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research view &mdash; no official reference methodology (Stephen Jen, 2007) &middot; real GDP YoY (FRED, quarterly, all 10 G10 currencies) + VIX-based crisis check (max daily close per quarter &ge; 40, industry &quot;crisis&quot; language, not merely &quot;elevated&quot;)</div>
           <div id="dsmile-chart" style="width:100%;height:120px;"></div>
           <div id="dsmile-insight" style="font-size:10.5px;color:var(--text2);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;" title="Hover for the full methodology note">Loading Dollar Smile data&hellip;</div>
           <div style="border-top:1px solid var(--border2);margin-top:10px;padding-top:8px;">
@@ -2440,7 +2450,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.215.1" defer></script>
+<script src="assets/dashboard-beta.js?v=8.216.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
