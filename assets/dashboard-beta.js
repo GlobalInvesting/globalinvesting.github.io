@@ -17007,22 +17007,36 @@ window.addEventListener('gi-theme-change', function() {
     _sznRenderMonthlyTable(cols);
   }
 
-  // v8.208.0 — new "Monthly Avg" tab, replacing the removed inline per-month
-  // value line (see _sznRenderMonthLabels() comment above). Same descriptive-
-  // only framing (no win_rate, no p-value, no MIN_YEARS gate) and the exact
-  // same title/tooltip text that line used to carry — this is a display
-  // relocation, not a new stat.
+  // v8.209.0 — rebuilt as a horizontal table (months as columns, one
+  // Average row + a Yearly Return column), matching the Seasonax/
+  // EquityClock "Total Percent Returns" layout convention Santiago
+  // referenced — this is the industry-standard shape for a compact
+  // monthly-seasonality table, and uses far less vertical space than the
+  // v8.208.0 row-per-month version. Cell backgrounds use a light tint of
+  // the same --up/--down variables the rest of this app already uses for
+  // sign, rather than the reference image's light-mode green/red (which
+  // wouldn't read correctly against this dark theme).
   function _sznRenderMonthlyTable(cols) {
-    const tbody = document.getElementById('szn-monthly-tbody');
-    if (!tbody) return;
-    tbody.innerHTML = cols.map(c => {
-      const color = Math.abs(c.monthPct) < 0.05 ? 'var(--text3)' : (c.monthPct > 0 ? 'var(--up)' : 'var(--down)');
-      const valTxt = (c.monthPct >= 0 ? '+' : '') + c.monthPct.toFixed(2) + '%';
-      return `<tr style="border-top:1px solid var(--border2);">
-        <td style="padding:3px 0;color:var(--text);">${_SZN_MONTH_LABELS[c.month - 1]}</td>
-        <td style="text-align:right;color:${color};" title="Descriptive average net move in ${_SZN_MONTH_LABELS[c.month - 1]} across the full lookback \u2014 not significance-tested, unlike the Chart tab's windows table.">${valTxt}</td>
-      </tr>`;
-    }).join('');
+    const head = document.getElementById('szn-monthly-h-head');
+    const row = document.getElementById('szn-monthly-h-row');
+    if (!head || !row) return;
+    const cellStyle = 'padding:5px 4px;text-align:center;border-left:1px solid var(--border2);';
+    head.innerHTML = '<th style="padding:5px 4px;text-align:left;font-weight:400;">Month</th>'
+      + cols.map(c => `<th style="${cellStyle}font-weight:400;">${_SZN_MONTH_LABELS[c.month - 1]}</th>`).join('')
+      + `<th style="${cellStyle}font-weight:400;border-left:2px solid var(--border);">Yearly</th>`;
+
+    const yearly = cols.reduce((sum, c) => sum + c.monthPct, 0);
+    const fmtCell = (v, wideDivider) => {
+      const flat = Math.abs(v) < 0.05;
+      const color = flat ? 'var(--text3)' : (v > 0 ? 'var(--up)' : 'var(--down)');
+      const bg = flat ? 'transparent' : (v > 0 ? 'rgba(38,166,154,0.14)' : 'rgba(239,83,80,0.14)');
+      const txt = (v >= 0 ? '+' : '') + v.toFixed(2) + '%';
+      const border = wideDivider ? 'border-left:2px solid var(--border);' : 'border-left:1px solid var(--border2);';
+      return `<td style="padding:5px 4px;text-align:center;${border}background:${bg};color:${color};">${txt}</td>`;
+    };
+    row.innerHTML = '<td style="padding:5px 4px;color:var(--text);text-align:left;">Average</td>'
+      + cols.map(c => fmtCell(c.monthPct)).join('')
+      + fmtCell(yearly, true);
   }
 
   // v3.0 (2026-08-21 industry-standard audit): win_rate demoted from primary
@@ -17083,7 +17097,8 @@ window.addEventListener('gi-theme-change', function() {
     const title = document.getElementById('szn-title');
     const tbody = document.getElementById('szn-windows-tbody');
     const monthsRow = document.getElementById('szn-months');
-    const monthlyTbody = document.getElementById('szn-monthly-tbody');
+    const monthlyHead = document.getElementById('szn-monthly-h-head');
+    const monthlyRow = document.getElementById('szn-monthly-h-row');
     const chartSection = document.getElementById('szn-chart-section');
     const windowsSection = document.getElementById('szn-windows-section');
 
@@ -17092,7 +17107,8 @@ window.addEventListener('gi-theme-change', function() {
       if (insight) insight.textContent = 'Seasonality isn\u2019t available for this symbol \u2014 select an FX pair, metal, index, or other supported instrument on the Price Chart above.';
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
-      if (monthlyTbody) monthlyTbody.innerHTML = '';
+      if (monthlyHead) monthlyHead.innerHTML = '';
+      if (monthlyRow) monthlyRow.innerHTML = '';
       if (chartSection) chartSection.style.display = 'none';
       if (windowsSection) windowsSection.style.display = 'none';
       if (typeof window._sznSwitchTab === 'function') window._sznSwitchTab('chart');
@@ -17128,7 +17144,8 @@ window.addEventListener('gi-theme-change', function() {
       if (insight) insight.textContent = `No seasonality data yet for ${_sznPairLabel(pair)} \u2014 needs at least 5 years of stored daily history.`;
       if (tbody) tbody.innerHTML = '';
       if (monthsRow) monthsRow.innerHTML = '';
-      if (monthlyTbody) monthlyTbody.innerHTML = '';
+      if (monthlyHead) monthlyHead.innerHTML = '';
+      if (monthlyRow) monthlyRow.innerHTML = '';
       if (chartSection) chartSection.style.display = 'none';
       if (windowsSection) windowsSection.style.display = 'none';
       if (typeof window._sznSwitchTab === 'function') window._sznSwitchTab('chart');
