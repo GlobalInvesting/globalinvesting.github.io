@@ -1305,15 +1305,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </div>
           </div>
 
-          <!-- MONTHLY AVG TAB — same descriptive-only figures previously
-               shown inline below each month name; not significance-tested,
-               unlike the Chart tab's windows table above. -->
+          <!-- MONTHLY AVG TAB — v8.209.0: horizontal layout (months as
+               columns, one Average row + Yearly Return), matching the
+               industry-standard Seasonax/EquityClock "Total Percent
+               Returns" table format Santiago referenced, instead of the
+               v8.208.0 vertical row-per-month table (which read fine but
+               cost far more vertical space than this panel should spend
+               on a secondary tab). Same descriptive-only figures as
+               before — not significance-tested, unlike the Chart tab's
+               windows table. -->
           <div id="szn-tab-monthly" class="szn-tab-panel" style="display:none;">
             <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Descriptive average net move per calendar month across the full lookback &mdash; not significance-tested (see the Chart tab's windows table for the p&lt;0.05 gate).</div>
-            <table style="width:100%;border-collapse:collapse;font-size:11px;">
-              <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Month</td><td style="text-align:right;">Avg move</td></tr></thead>
-              <tbody id="szn-monthly-tbody"></tbody>
-            </table>
+            <div style="overflow-x:auto;">
+              <table style="border-collapse:collapse;font-size:10px;width:100%;min-width:620px;">
+                <thead><tr id="szn-monthly-h-head" style="color:var(--text3);"></tr></thead>
+                <tbody><tr id="szn-monthly-h-row"></tr></tbody>
+              </table>
+            </div>
           </div>
 
         </div>
@@ -2467,7 +2475,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.208.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.209.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
