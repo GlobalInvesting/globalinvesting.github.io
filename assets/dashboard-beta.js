@@ -17281,8 +17281,9 @@ window.addEventListener('gi-theme-change', function() {
     _sznChart.timeScale().fitContent();
   };
 
-  // v8.208.0 — Chart / Monthly Avg tab strip, same onclick pattern as the
-  // Dollar Smile panel's _dsmileSwitchTab() directly below in this file.
+  // v8.208.0 — Chart / Monthly Avg tab strip (same show/hide-by-id onclick
+  // pattern the Dollar Smile panel's tab bar used before it was reduced to
+  // a single Growth view in v8.213.0 — see the note near _growthdiffRenderTable()).
   window._sznSwitchTab = function (tab) {
     ['chart', 'monthly'].forEach(t => {
       const btn = document.querySelector(`.szn-tab[data-szn-tab="${t}"]`);
@@ -17500,16 +17501,13 @@ async function renderDollarSmile() {
   _growthdiffRenderTable(tbody, rawStats, cur);
 }
 
-// fmtOpts lets callers override how point-label values are displayed
+// fmtOpts lets a caller override how point-label values are displayed
 // without touching the curve's actual plotting math (yFor()/maxAbs still
 // operate on the raw stats[r].avg value in its native unit regardless).
-// Needed because this renderer is shared by the Growth tab (quarterly GDP
-// differences, ~0.3-0.5%, where 2-decimal % reads fine) and the Stress
-// tab (daily DXY returns, ~0.0008-0.0166%) — at the Growth tab's default
-// 2-decimal % precision, two of Stress's three buckets rounded to a flat
-// "+0.00%", silently erasing the real (rising-with-VIX) signal the whole
-// tab exists to show. Stress now calls this with mult:100/unit:'bps',
-// the unit a desk would actually use for return differences this small.
+// Left generic (was previously shared with the now-removed Stress tab,
+// which needed mult:100/unit:'bps' for its much smaller daily-return
+// values) — only renderDollarSmile() calls this today, always with
+// defaults, but the signature is harmless to keep general.
 function _dsmileRenderSVG(el, regimes, stats, currentRegime, fmtOpts) {
   const fmt = Object.assign({ decimals: 2, mult: 1, unit: '%' }, fmtOpts || {});
   // Layout: fixed bands so the value labels can never collide with the
@@ -17612,137 +17610,8 @@ function _growthdiffRenderTable(tbody, rawStats, cur) {
   }).join('');
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// DOLLAR SMILE TABS (v8.205.0) — Growth (above) was the only lens; added
-// two more so each independently-sourced regime view gets its own space
-// instead of forcing a single blended metric with no published formula
-// (Santiago, 2026-08-22: "no combinamos todo en un número, cada lente
-// aparte"). Growth tab's DOM ids/logic are unchanged from before this
-// session — only the tab chrome around it is new.
-// ═══════════════════════════════════════════════════════════════════
-let _dsmileStressLoaded = false;
-
-function _dsmileSwitchTab(tab) {
-  ['growth', 'stress', 'ratediff'].forEach(t => {
-    const btn = document.querySelector(`.dsmile-tab[data-dsmile-tab="${t}"]`);
-    const panel = document.getElementById(`dsmile-tab-${t}`);
-    const active = t === tab;
-    if (btn) {
-      btn.style.color = active ? 'var(--text)' : 'var(--text3)';
-      btn.style.borderBottomColor = active ? 'var(--accent)' : 'transparent';
-    }
-    if (panel) panel.style.display = active ? '' : 'none';
-  });
-  // Lazy-load: Stress tab's VIX/DXY history fetch only runs once, the
-  // first time the tab is actually opened — no point fetching ~20y of
-  // daily bars for a tab the user may never click.
-  if (tab === 'stress' && !_dsmileStressLoaded) {
-    _dsmileStressLoaded = true;
-    renderDollarSmileStress();
-  }
-}
-
-// VIX thresholds reused from dashboard.js's own renderRiskData() stress-
-// score convention (18 = long-run VIX average / "elevated" line, 25 =
-// this terminal's own "high stress" threshold) — not a new invented cut,
-// consistent with what the rest of the app already calls "elevated"/
-// "high" so a VIX=27 day reads the same way here as it does in the Risk
-// Monitor panel.
-const _DSMILE_STRESS_REGIMES = ['Low (VIX<18)', 'Elevated (18-25)', 'High (VIX>25)'];
-function _dsmileStressRegimeFor(vix) {
-  if (vix > 25) return 'High (VIX>25)';
-  if (vix >= 18) return 'Elevated (18-25)';
-  return 'Low (VIX<18)';
-}
-
-async function renderDollarSmileStress() {
-  const chartEl = document.getElementById('dsmile-stress-chart');
-  const insightEl = document.getElementById('dsmile-stress-insight');
-  const tbody = document.getElementById('dsmile-stress-tbody');
-  if (!chartEl) return;
-
-  let vixBars, dxyBars;
-  try {
-    const [vRes, dRes] = await Promise.all([
-      _fetchWithRetry('./ohlc-data/vix.json'),
-      _fetchWithRetry('./ohlc-data/dxy.json'),
-    ]);
-    if (!vRes || !vRes.ok || !dRes || !dRes.ok) throw new Error('HTTP error');
-    vixBars = await vRes.json();
-    dxyBars = await dRes.json();
-    if (!Array.isArray(vixBars) || !Array.isArray(dxyBars) || !vixBars.length || !dxyBars.length) {
-      throw new Error('malformed ohlc data');
-    }
-  } catch (e) {
-    if (insightEl) insightEl.textContent = 'VIX/DXY history unavailable right now.';
-    if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="padding:4px;color:var(--text3);">No data yet.</td></tr>';
-    return;
-  }
-
-  // Date-align (same requirement already established for fetch_correlations()
-  // in the engine repo — never join two series by trailing array position,
-  // always by actual calendar date, since each series can have its own
-  // gaps/holidays). DXY's return for date D uses D's close vs. the
-  // immediately-preceding DXY bar's close (chronological, whatever bar
-  // actually precedes it) — same convention as compute_seasonality.py's
-  // daily-return definition.
-  const dxyByDate = {};
-  dxyBars.forEach(b => { dxyByDate[b.time] = b.close; });
-  const vixByDate = {};
-  vixBars.forEach(b => { vixByDate[b.time] = b.close; });
-  const dxySorted = dxyBars.map(b => b.time).sort();
-
-  const buckets = {};
-  _DSMILE_STRESS_REGIMES.forEach(r => buckets[r] = []);
-
-  let prevDxy = null;
-  dxySorted.forEach(date => {
-    const dxyClose = dxyByDate[date];
-    const vixClose = vixByDate[date];
-    if (prevDxy != null && vixClose != null && dxyClose != null) {
-      const dxyRet = ((dxyClose - prevDxy) / prevDxy) * 100;
-      const regime = _dsmileStressRegimeFor(vixClose);
-      buckets[regime].push(dxyRet);
-    }
-    prevDxy = dxyClose != null ? dxyClose : prevDxy;
-  });
-
-  const stats = {};
-  _DSMILE_STRESS_REGIMES.forEach(r => {
-    const vals = buckets[r];
-    stats[r] = {
-      n: vals.length,
-      avg: vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : null,
-      ready: vals.length >= 30, // daily data — 30 obs is a low bar vs. the quarterly GROWTHDIFF_MIN_SAMPLES=5, real counts here run in the hundreds/thousands
-    };
-  });
-
-  const currentVix = vixBars[vixBars.length - 1];
-  const currentRegimeKey = currentVix && currentVix.close != null ? _dsmileStressRegimeFor(currentVix.close) : null;
-
-  _dsmileRenderSVG(chartEl, _DSMILE_STRESS_REGIMES, stats, currentRegimeKey, { decimals: 2, mult: 100, unit: 'bps' });
-
-  if (insightEl) {
-    const totalDays = _DSMILE_STRESS_REGIMES.reduce((s, r) => s + stats[r].n, 0);
-    const curTxt = currentVix ? `VIX ${currentVix.close.toFixed(1)} \u2014 ${currentRegimeKey}` : '\u2014';
-    insightEl.textContent = `${curTxt} \u00b7 DXY daily return by VIX regime, ${totalDays} trading days (${dxySorted[0]} \u2192 ${dxySorted[dxySorted.length - 1]})`;
-    insightEl.title = `VIX-only stress proxy \u2014 not the same 7-factor composite score (VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS) used elsewhere in this terminal's Risk Monitor. VIX alone was chosen for this tab specifically because it has ~20 real years of daily history (ohlc-data/vix.json); MOVE only has real data back to 2020 and the other factors aren't stored as daily time series, so a composite score here could only be backtested over the last ~6 years \u2014 VIX-only trades some completeness for a real multi-decade sample. Thresholds (18/25) match the Low/Elevated/High language already used in the Risk Monitor panel's own stress score, not a newly-invented cut.`;
-  }
-
-  if (tbody) {
-    tbody.innerHTML = _DSMILE_STRESS_REGIMES.map(r => {
-      const s = stats[r];
-      const isCurrent = r === currentRegimeKey;
-      // Same unit fix as the chart above (bps, not %) — 3-decimal % here
-      // technically had the real precision, but "+0.001%" reads as
-      // effectively zero at a glance; bps is the unit a desk would use
-      // for daily return differences this small.
-      const avgBps = s.avg === null ? null : s.avg * 100;
-      const avgTxt = avgBps === null ? `\u2014 (n=${s.n})` : `${avgBps >= 0 ? '+' : ''}${avgBps.toFixed(2)}bps (n=${s.n})`;
-      const rowStyle = isCurrent ? ` style="color:var(--up);"` : '';
-      return `<tr${rowStyle}><td style="padding:2px 4px;">${r}${isCurrent ? ' \u25cf' : ''}</td>` +
-             `<td style="padding:2px 4px;">${s.n}</td>` +
-             `<td style="padding:2px 4px;">${avgTxt}</td></tr>`;
-    }).join('');
-  }
-}
+// (v8.205.0 added a Stress(VIX) tab and a Rate Diff placeholder tab
+// alongside Growth here; both removed in v8.213.0 per Santiago's explicit
+// instruction — this panel shows Jen's original growth-differential lens
+// only, no tab chrome. renderDollarSmileStress()/_dsmileSwitchTab()/
+// _dsmileStressRegimeFor()/_DSMILE_STRESS_REGIMES all deleted with it.)
