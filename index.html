@@ -1157,8 +1157,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
            momentum scrolling. Scrollbar hidden via CSS (see dashboard.css lw-range-bar rule). -->
       <!-- Chart toolbar — two rows: (1) TF + Range + Compare + Fullscreen, (2) Type + Overlays -->
       <div id="lw-range-bar" style="display:none;flex-direction:column;background:var(--head-bg);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
-        <!-- Row 1: Timeframe · Range · Compare · Fullscreen -->
-        <div style="display:flex;align-items:center;gap:2px;padding:2px 6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;">
+        <!-- Row 1: Timeframe · Range · Compare · Fullscreen — scroll arrows added
+             (beta): this row already had overflow-x:auto with no visible affordance
+             that it can be scrolled, unlike Row 2 which got lw-tb-row2-prev/next in
+             a prior session. On narrow widths (notably inside the fullscreen chart
+             overlay, where this row is lifted via _lwOpenFullscreen()'s chartHdr/
+             rangeBar move) +Compare and the fullscreen toggle button silently
+             scrolled out of reach with nothing telling the user more existed —
+             same prev/next pattern as lw-tb-row2, wired in _sznToggle's sibling
+             IIFE below. -->
+        <div style="display:flex;align-items:stretch;overflow:hidden;">
+          <button class="lw-tb-btn" id="lw-tb-row1-prev" aria-label="Scroll toolbar left" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-right:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8249;</button>
+          <div id="lw-tb-row1" style="display:flex;align-items:center;gap:2px;padding:2px 6px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;min-width:0;">
           <span style="font-size:9px;color:var(--text3);margin-right:2px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TF</span>
           <button class="lw-tf-btn"     data-tf="H1" aria-label="1 hour"  title="1 Hour"  style="flex-shrink:0;">H1</button>
           <button class="lw-tf-btn"     data-tf="H4" aria-label="4 hours" title="4 Hours" style="flex-shrink:0;margin-left:2px;">H4</button>
@@ -1213,9 +1223,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </div>
           <!-- Fullscreen -->
           <button class="lw-tb-btn" id="lw-fs-btn" aria-label="Toggle fullscreen chart" title="Fullscreen (Esc to exit)" style="margin-left:4px;flex-shrink:0;">&#x26F6;</button>
+          </div>
+          <button class="lw-tb-btn" id="lw-tb-row1-next" aria-label="Scroll toolbar right" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-left:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8250;</button>
         </div>
-        <!-- Row 2: Chart type + Overlays -->
-        <div style="display:flex;align-items:center;gap:2px;padding:1px 6px 2px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-top:1px solid var(--border2,#2a2e39);">
+        <!-- Row 2: Chart type + Overlays — scroll arrows added (beta): same prev/next
+             pattern as #tv-ticker/#tv-pair-tabs (see addWheelScroll() in dashboard.js),
+             since this row can now overflow with the Seasonality button added. -->
+        <div style="display:flex;align-items:center;gap:2px;border-top:1px solid var(--border2,#2a2e39);overflow:hidden;">
+          <button class="lw-tb-btn" id="lw-tb-row2-prev" aria-label="Scroll toolbar left" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-right:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8249;</button>
+          <div id="lw-tb-row2" style="display:flex;align-items:center;gap:2px;padding:1px 6px 2px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex:1;min-width:0;">
           <span style="font-size:9px;color:var(--text3);margin-right:4px;font-family:var(--font-ui,sans-serif);letter-spacing:.04em;flex-shrink:0;">TYPE</span>
           <button class="lw-tb-btn sel" id="lw-type-candle" data-chart-type="candle" aria-label="Candlestick chart" title="Candlestick" style="flex-shrink:0;">Candle</button>
           <button class="lw-tb-btn"    id="lw-type-bar"    data-chart-type="bar"    aria-label="Bar (OHLC) chart"   title="Bar (OHLC)"  style="margin-left:2px;flex-shrink:0;">Bar</button>
@@ -1231,7 +1247,81 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <span class="lw-tb-sep" style="flex-shrink:0;"></span>
           <button class="lw-tb-btn" id="lw-ind-btn" aria-label="Open indicators menu" aria-haspopup="true" aria-expanded="false" title="Add indicator" style="flex-shrink:0;padding:1px 8px;">Indicators &#9662;</button>
           <button class="lw-tb-btn" id="lw-draw-btn" aria-label="Open drawing tools menu" aria-haspopup="true" aria-expanded="false" title="Drawing tools" style="flex-shrink:0;padding:1px 8px;margin-left:2px;">Draw &#9662;</button>
+          <button class="lw-tb-btn" id="szn-btn" aria-label="Open Seasonality panel" aria-haspopup="true" aria-expanded="false" title="Seasonality — monthly recurring return patterns, 10y history" style="flex-shrink:0;padding:1px 8px;margin-left:2px;display:flex;align-items:center;gap:4px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="flex-shrink:0;"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>Seasonality
+          </button>
           <div id="lw-ind-pills" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0;flex-wrap:nowrap;"></div>
+          </div>
+          <button class="lw-tb-btn" id="lw-tb-row2-next" aria-label="Scroll toolbar right" style="display:none;flex-shrink:0;width:18px;height:20px;border:none;border-left:1px solid var(--border2,#2a2e39);border-radius:0;padding:0;background:var(--bg2);align-items:center;justify-content:center;font-size:12px;color:var(--text2);">&#8250;</button>
+        </div>
+      </div>
+
+      <!-- Seasonality panel — promoted from index-beta.html to production
+           (v8.219.0). Hidden until #szn-btn is clicked. See
+           _sznInit()/_sznOpen() in dashboard.js and compute_seasonality.py
+           for the data pipeline. Chart is day-of-year granularity (v8.195.0);
+           the "Strongest recurring windows" table below stays monthly — see
+           that script's header for why the two use different resolutions. -->
+      <div id="szn-panel" style="display:none;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+        <div class="panel-head">
+          <span style="display:flex;align-items:baseline;min-width:0;overflow:hidden;">
+            <span class="panel-title" style="flex-shrink:0;">Seasonality</span>
+            <span class="panel-sub" id="szn-title">Daily &middot; 10y lookback</span>
+          </span>
+          <button id="szn-close" aria-label="Close Seasonality panel" style="background:none;border:none;color:var(--text3);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px;flex-shrink:0;">&times;</button>
+        </div>
+        <!-- Tab strip added v8.208.0: the per-month avg-% figures used to live
+             inline below each month name in #szn-months, which caused a real
+             layout bug (see _sznRenderMonthLabels()'s v8.208.0 comment in
+             dashboard.js — a two-line cell overflowing a fixed-height
+             grid row). Moved to their own table here instead, same
+             chart-then-tabs pattern as the Dollar Smile panel above. -->
+        <div style="display:flex;gap:2px;padding:0 12px;border-bottom:1px solid var(--border2);">
+          <button type="button" class="szn-tab" data-szn-tab="chart" onclick="_sznSwitchTab('chart')" style="background:none;border:none;color:var(--text);font-size:10px;padding:6px 10px 5px;cursor:pointer;border-bottom:2px solid var(--accent);">Chart</button>
+          <button type="button" class="szn-tab" data-szn-tab="monthly" onclick="_sznSwitchTab('monthly')" style="background:none;border:none;color:var(--text3);font-size:10px;padding:6px 10px 5px;cursor:pointer;border-bottom:2px solid transparent;">Monthly Avg</button>
+        </div>
+        <div style="padding:10px 12px;">
+
+          <!-- CHART TAB -->
+          <div id="szn-tab-chart" class="szn-tab-panel">
+            <div id="szn-chart-section">
+              <div id="szn-chart" style="width:100%;height:130px;position:relative;"></div>
+              <div id="szn-months" style="display:flex;gap:1px;font-size:9px;color:var(--text3);margin:2px 0 10px;min-height:22px;"></div>
+            </div>
+            <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
+              <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
+              <div style="overflow-x:auto;">
+              <table id="szn-windows-table" style="width:100%;min-width:480px;border-collapse:collapse;font-size:10.5px;">
+                <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero">p-value</td></tr></thead>
+                <tbody id="szn-windows-tbody"></tbody>
+              </table>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;">
+              <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
+              <div id="szn-insight" style="font-size:10.5px;color:var(--text2);line-height:1.5;">Loading seasonality data&hellip;</div>
+            </div>
+          </div>
+
+          <!-- MONTHLY AVG TAB — v8.209.0: horizontal layout (months as
+               columns, one Average row + Yearly Return), matching the
+               industry-standard Seasonax/EquityClock "Total Percent
+               Returns" table format Santiago referenced, instead of the
+               v8.208.0 vertical row-per-month table (which read fine but
+               cost far more vertical space than this panel should spend
+               on a secondary tab). Same descriptive-only figures as
+               before — not significance-tested, unlike the Chart tab's
+               windows table. -->
+          <div id="szn-tab-monthly" class="szn-tab-panel" style="display:none;">
+            <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Descriptive average net move per calendar month across the full lookback &mdash; not significance-tested (see the Chart tab's windows table for the p&lt;0.05 gate).</div>
+            <div style="overflow-x:auto;">
+              <table style="border-collapse:collapse;font-size:10px;width:100%;min-width:620px;">
+                <thead><tr id="szn-monthly-h-head" style="color:var(--text3);"></tr></thead>
+                <tbody><tr id="szn-monthly-h-row"></tr></tbody>
+              </table>
+            </div>
+          </div>
+
         </div>
       </div>
       <!-- Symbol legend bar — shown only when LW chart is active -->
@@ -1438,6 +1528,56 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </tbody>
         </table>
       </div>
+      <!-- Dollar Smile Panel — full width, below VaR/CVaR.
+           Promoted from index-beta.html to production (v8.219.0) — panel
+           copy/labels were already off "beta" wording since v8.216.0
+           (Santiago: panel itself is done, reads as the final production
+           view); hover tooltip is methodology-in-brief + what it means
+           for a trader.
+           v5 (2026-08-22): regime scheme changed from a pure growth-
+           differential 3-way split to growth differential + a genuine
+           crisis/risk-off check (max quarterly VIX close >= 40 overrides
+           the growth differential, matching Jen's own left-tail logic —
+           see fetch_growth_differential.py v2.0.0 module docstring for
+           the full reasoning; Santiago caught that the old scheme's chart
+           didn't show a U-shape and this is the root-cause fix, not a
+           second independent tab like the removed v8.205.0 Stress tab).
+           Still one lens, no tab chrome. Data:
+           growth-differential-data/history.json (fetch_growth_differential.py,
+           full idempotent recompute each run — GDP revises, so this is never
+           a daily append). See renderDollarSmile() in dashboard-beta.js. -->
+      <div style="border-top:1px solid var(--border);">
+        <div class="panel-head">
+          <span style="display:flex;align-items:baseline;min-width:0;overflow:hidden;">
+            <span class="panel-title" style="flex-shrink:0;" title="Dollar Smile (Stephen Jen &amp; Fatih Yilmaz, 2001): USD tends to strengthen in a genuine global risk-off/crisis regime (safe-haven flows, left tail) and when US growth significantly outperforms the rest of the G10 (yield/growth appeal, right tail), and underperform in the calm middle where capital drifts to higher-yielding markets elsewhere. Regime below = growth differential (FRED, quarterly) with a real VIX-based crisis check overriding it for the left tail — not a blended score, and not the same as merely 'US grew slower than the G9 average'.">Dollar Smile</span>
+            <span class="panel-sub">USD vs regime</span>
+          </span>
+          <span class="panel-sub" id="dsmile-current" style="margin-left:8px;">&mdash;</span>
+        </div>
+        <div style="padding:10px 12px;">
+
+          <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">USD tends to strengthen in genuine crises and when the US outgrows the G9 &mdash; and underperform in between (Jen &amp; Yilmaz, Morgan Stanley 2001; no official reference methodology) &middot; GDP YoY differential (FRED, all G10) + VIX&ge;40 crisis override</div>
+          <div id="dsmile-chart" style="width:100%;height:120px;"></div>
+          <div id="dsmile-insight" style="font-size:10.5px;color:var(--text2);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:6px;" title="Hover for the full methodology note">Loading Dollar Smile data&hellip;</div>
+          <div style="border-top:1px solid var(--border2);margin-top:10px;padding-top:8px;">
+            <div style="font-size:9px;color:var(--text3);margin-bottom:4px;">By regime bucket</div>
+            <table style="width:100%;font-size:10px;border-collapse:collapse;" id="growthdiff-table">
+              <thead>
+                <tr style="color:var(--text3);text-align:left;">
+                  <th style="font-weight:400;padding:2px 4px;">Regime</th>
+                  <th style="font-weight:400;padding:2px 4px;" title="Quarters classified by GDP growth differential, full history since 1996">N (GDP, 1996&ndash;)</th>
+                  <th style="font-weight:400;padding:2px 4px;">Avg DXY q/q return</th>
+                </tr>
+              </thead>
+              <tbody id="growthdiff-tbody">
+                <tr><td colspan="3" style="padding:4px;color:var(--text3);">Loading&hellip;</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+
     </div>
 
     <!-- RATES & YIELD CURVE — G10 multi-country -->
@@ -2310,7 +2450,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.217.0" defer></script>
+<script src="assets/dashboard.js?v=8.219.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL

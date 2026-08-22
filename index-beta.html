@@ -777,10 +777,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </head>
 <body>
 <!-- BETA BUILD — internal review only, not linked from production nav, noindex'd.
-     Ships Seasonality (button + panel on the Price Chart toolbar) and a
-     Dollar Smile block (below Cross-Asset/Risk Monitor) for review before
-     merging into index.html/dashboard.js. See CHANGELOG.md v8.194.0. -->
-<div style="background:#4f2f0a;color:#ffcf8f;font-size:11px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:center;padding:4px 8px;letter-spacing:.03em;">BETA BUILD — Seasonality &amp; Dollar Smile under review, not production data policy final</div>
+     Seasonality and Dollar Smile were promoted to index.html/dashboard.js in
+     v8.219.0 (see CHANGELOG.md). As of this version, index-beta.html carries
+     no feature that isn't also in production — flagged to Santiago to decide
+     whether to retire this file or keep it staged for the next beta panel. -->
+<div style="background:#4f2f0a;color:#ffcf8f;font-size:11px;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-align:center;padding:4px 8px;letter-spacing:.03em;">BETA BUILD — no features currently exclusive to this build; mirrors production as of v8.219.0</div>
 
 <a href="#main" class="skip-link">Skip to main content</a>
 <div id="gdpr-banner" role="dialog" aria-modal="true" aria-labelledby="gdpr-title" aria-describedby="gdpr-desc" hidden>
@@ -1294,10 +1295,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             </div>
             <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
               <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
-              <table id="szn-windows-table" style="width:100%;border-collapse:collapse;font-size:10.5px;">
+              <div style="overflow-x:auto;">
+              <table id="szn-windows-table" style="width:100%;min-width:480px;border-collapse:collapse;font-size:10.5px;">
                 <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero">p-value</td></tr></thead>
                 <tbody id="szn-windows-tbody"></tbody>
               </table>
+              </div>
             </div>
             <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;">
               <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
