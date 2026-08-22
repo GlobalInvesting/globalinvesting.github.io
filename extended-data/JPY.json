@@ -1,1 +1,15 @@
-{"data":{"bond10y":2.88,"bond2y":1.67,"inflationExpectations":1.7,"inflationExpectationsSource":"Economic calendar \u2014 Inflation Rate YoY (national stats office release, via calendar-data/calendar.json)"},"dates":{"bond10y":"2026-08-21","bond2y":"2026-08-21","inflationExpectations":"2026-07-23"}}
+{
+  "lastUpdate": "2026-08-22",
+  "source": "FX/VIX/OAS: Frankfurter, FRED \u2014 v14.3 (bond10y/bond2y/bond5y AND inflationExpectations preserved from disk, not fetched \u2014 bonds owned by globalinvesting-scripts/fetch_bond_yields.py, inflationExpectations by the private-scripts weekly job)",
+  "data": {
+    "bond10y": 2.88,
+    "bond2y": 1.67,
+    "inflationExpectations": 1.7,
+    "inflationExpectationsSource": "Economic calendar \u2014 Inflation Rate YoY (national stats office release, via calendar-data/calendar.json)"
+  },
+  "dates": {
+    "bond10y": "2026-08-21",
+    "bond2y": "2026-08-21",
+    "inflationExpectations": "2026-07-23"
+  }
+}
