@@ -16816,7 +16816,25 @@ window.addEventListener('gi-theme-change', function() {
       // separate LWC instance and needs the same treatment explicitly.
       crosshair: {
         mode: LWC.CrosshairMode.Normal,
-        vertLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
+        // v8.210.0 fix — vertLine.labelVisible was never explicitly set,
+        // so it kept LWC's default `true`. That label draws into the
+        // time-scale pane, but this chart sets `timeScale: { visible:
+        // false }` (the real dates are shown by our own custom
+        // #szn-months row below instead, sized/positioned to match the
+        // day-of-year curve — see _sznRenderMonthLabels() above). With
+        // the pane hidden, LWC's own hover-date label had nowhere
+        // correct to paint and was spilling out below the chart in its
+        // un-themed library-default color, overlapping/miscolored
+        // against our custom month row — most visible as a stray blue
+        // "Dec" near the end of the strip on hover. This chart already
+        // has its own themed tooltip for date+value (#szn-chart-
+        // tooltip, driven by subscribeCrosshairMove() below), so the
+        // native vertLine label is fully redundant once disabled — not
+        // a workaround, an actual dupe. Every OTHER LWC chart in this
+        // file (Price Chart, Rates & Yield Curve, etc.) keeps its real
+        // timeScale visible and never hides it, so this leak is unique
+        // to this one chart's custom-axis pattern.
+        vertLine: { color: _themeColorAlpha('--text2', 0.5), labelVisible: false },
         horzLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
       },
       localization: { priceFormatter: v => v.toFixed(2) + '%' },
