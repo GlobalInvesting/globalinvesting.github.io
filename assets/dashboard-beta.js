@@ -17435,27 +17435,40 @@ window.addEventListener('gi-theme-change', function() {
 // quarter already has a real value, so unlike the removed proxy axis
 // there is no "still accumulating" state to handle here.
 //
-// 3 buckets (not 4): USD Underperforming / Inline / USD Outperforming,
-// at the existing ±0.5pp threshold already used by
-// fetch_growth_differential.py's regime classification — reusing that
-// threshold rather than introducing a second one client-side.
+// v2.0.0 (2026-08-22) — regime scheme changed from a pure growth-
+// differential 3-way split to a combined crisis+growth classification,
+// after Santiago flagged the chart didn't show a U-shape and a check
+// against Jen & Yilmaz's actual framework confirmed why: the smile's left
+// tail is a genuine global risk-off/crisis regime, not "the US grows a
+// bit slower than the G9 average" — those are different things, and a
+// pure growth-differential axis can never isolate the former (see
+// fetch_growth_differential.py's module docstring for the full
+// reasoning). GLOBAL-RISK-OFF now overrides the growth differential
+// whenever the quarter's max VIX close hit 30+, regardless of where the
+// US ranked that quarter; the old USD-UNDERPERFORMING bucket is folded
+// into CALM-MUDDLING-THROUGH, since — absent an actual crisis — modest
+// US underperformance is the theory's weak-dollar middle, not its left
+// tail.
 //
-// Note on shape: the real data does NOT currently show a textbook U-shaped
-// smile (avg DXY q/q return is roughly monotonic across the three buckets,
-// not higher at both extremes than in the middle) — the insight text below
-// states what the data actually shows, not an assumed "classic smile"
-// shape, since asserting a pattern the numbers don't currently support
-// would be the same kind of overclaim GUIDELINES already flags elsewhere.
+// Note on shape: the insight text below states what regime_stats actually
+// show, not an assumed "classic smile" shape — this file was NOT changed
+// based on a live post-fix run (no network access to FRED in the
+// dev sandbox), only the classification logic. Verify against the next
+// live fetch_growth_differential.py run before claiming the shape itself
+// changed.
 // ═══════════════════════════════════════════════════════════════════
 const _GROWTHDIFF_LABELS = {
-  'USD-OUTPERFORMING': 'USD Outperforming',
-  'INLINE': 'Inline',
-  'USD-UNDERPERFORMING': 'USD Underperforming',
+  'GLOBAL-RISK-OFF': 'Global Risk-Off',
+  'CALM-MUDDLING-THROUGH': 'Calm / Muddling Through',
+  'USD-GROWTH-OUTPERFORMING': 'USD Growth Outperforming',
 };
-// Smile x-axis order: left = underperforming, middle = inline, right =
-// outperforming — the two ends are the thesis's "smile" extremes.
-const _GROWTHDIFF_SMILE_ORDER = ['USD-UNDERPERFORMING', 'INLINE', 'USD-OUTPERFORMING'];
-const GROWTHDIFF_MIN_SAMPLES = 5; // defensive floor, matches compute_seasonality.py's MIN_YEARS spirit — real data today (n_dxy 15/31/32) clears this comfortably
+// Smile x-axis order: left = crisis/risk-off, middle = calm/muddling
+// through, right = US growth outperformance — the two ends are the
+// thesis's actual "smile" extremes (see fetch_growth_differential.py
+// v2.0.0 for why growth-differential alone previously mislabeled the
+// left tail).
+const _GROWTHDIFF_SMILE_ORDER = ['GLOBAL-RISK-OFF', 'CALM-MUDDLING-THROUGH', 'USD-GROWTH-OUTPERFORMING'];
+const GROWTHDIFF_MIN_SAMPLES = 5; // defensive floor, matches compute_seasonality.py's MIN_YEARS spirit
 
 async function renderDollarSmile() {
   const chartEl = document.getElementById('dsmile-chart');
@@ -17492,8 +17505,11 @@ async function renderDollarSmile() {
   if (currentEl && cur) {
     const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
     // "Latest available" rather than implying this is the current calendar
-    // quarter — real GDP prints ~1 quarter after quarter-end.
-    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt})`;
+    // quarter — real GDP prints ~1 quarter after quarter-end. When the
+    // regime is crisis-driven, show the VIX read too — the diff alone
+    // isn't why this quarter landed in Global Risk-Off.
+    const vixTxt = cur.regime === 'GLOBAL-RISK-OFF' && cur.vix_max != null ? `, VIX max ${cur.vix_max.toFixed(1)}` : '';
+    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt}${vixTxt})`;
   }
 
   _dsmileRenderSVG(chartEl, _GROWTHDIFF_SMILE_ORDER, stats, cur ? cur.regime : null);
@@ -17591,13 +17607,12 @@ function _dsmileRenderInsight(el, doc, cur, stats) {
     `Real GDP YoY, ${totalQ} quarters (${first} \u2192 ${last}), all 10 G10 currencies from FRED. ` +
     `G9 comparison is equal-weighted, not BIS-turnover-weighted \u2014 a disclosed simplification. ` +
     `Real GDP prints ~1 quarter after quarter-end, so a live regime reading lags by construction \u2014 this shows what DXY did in the SAME quarter as the growth reading: a historical tendency, not a lagged trading signal. ` +
-    `Note: the buckets' avg DXY q/q returns below are not currently a textbook U-shaped smile (roughly monotonic across Underperforming\u2192Inline\u2192Outperforming rather than higher at both extremes) \u2014 stated as observed, not assumed.`;
+    `Regime = growth differential AND a genuine crisis check: Global Risk-Off overrides the other two whenever that quarter's max VIX close hit 30+ (a real panic level), regardless of where US growth ranked that quarter \u2014 not merely "US grew slower than the G9 average", which is Calm/Muddling Through instead. See growthdiff-tbody below for the actual avg DXY q/q return per bucket \u2014 stated as observed, not assumed to form a textbook U shape.`;
 }
 
 function _growthdiffRenderTable(tbody, rawStats, cur) {
   if (!tbody) return;
-  const REGIMES = ['USD-OUTPERFORMING', 'INLINE', 'USD-UNDERPERFORMING'];
-  tbody.innerHTML = REGIMES.map(r => {
+  tbody.innerHTML = _GROWTHDIFF_SMILE_ORDER.map(r => {
     const s = rawStats[r] || { n: 0, avg_dxy_qret: null, n_dxy: 0 };
     const isCurrent = cur && cur.regime === r;
     const avgTxt = s.avg_dxy_qret === null
