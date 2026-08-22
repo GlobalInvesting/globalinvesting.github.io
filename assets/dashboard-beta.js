@@ -16870,18 +16870,26 @@ window.addEventListener('gi-theme-change', function() {
     // have 28-31 days) time axis below, rather than 12 equal-width
     // slots implying every month is the same length.
     //
-    // v8.202.0 fix: this row used to be display:flex with flex:{span} 0 0
-    // per item — Santiago repeatedly saw December (the last item) drop
-    // below the rest of the row instead of staying inline. Root cause:
-    // flex's nowrap default doesn't guarantee 12 items fit the container's
-    // actual rendered width; when they don't, a flex row can overflow in
-    // ways that are sensitive to font-load timing and rounding, and here
-    // consistently pushed the last item out. Switched to CSS Grid with an
-    // explicit `grid-template-columns` built from the real per-month spans
-    // (one column per month, widths proportional to days-in-month) — a
-    // grid's column count and order are fixed by that declaration, so
-    // there's no overflow/wrap failure mode left for a 12-column row to
-    // fall into, unlike flex's content-dependent line-breaking.
+    // v8.202.0 fix (incomplete — see v8.203.0 below): switched this row
+    // from display:flex (flex:{span} 0 0 per item, no guaranteed single-row
+    // fit) to CSS Grid with an explicit `grid-template-columns` built from
+    // the real per-month spans — a grid's column count/order are fixed by
+    // that declaration, unlike flex's content-dependent line-breaking.
+    //
+    // v8.203.0 fix: December kept dropping to its own row even after the
+    // v8.202.0 grid switch — root cause was a second bug introduced by that
+    // same fix: `grid-auto-flow: column` was set alongside the explicit
+    // 12-column `grid-template-columns`. `column` flow places items down
+    // the ROW axis first, wrapping to a new column only once the grid's row
+    // count is exhausted — and since no `grid-template-rows` is set here,
+    // that row count isn't reliably pinned to 1, so the auto-placement
+    // algorithm doesn't guarantee 12 items land one-per-column in a single
+    // row the way `row` flow (the CSS default) does for 12 items against
+    // 12 explicit columns. Fixed by removing the `column` override — plain
+    // `row` flow (left at its default, not set explicitly) fills the 12
+    // explicit column tracks left-to-right in exactly one row, which is
+    // the only behavior actually wanted here; there is no case where this
+    // row should ever wrap, so no grid-auto-flow value should try to.
     const monthStarts = [];
     curve.forEach((p, i) => { if (p.month >= 1 && p.day === 1) monthStarts.push({ month: p.month, idx: i }); });
 
@@ -16896,8 +16904,10 @@ window.addEventListener('gi-theme-change', function() {
 
     row.style.display = 'grid';
     row.style.gridTemplateColumns = cols.map(c => `${c.span}fr`).join(' ');
-    row.style.gridAutoFlow = 'column';
+    row.style.gridTemplateRows = '1fr'; // pin to exactly one row — belt-and-suspenders alongside removing the column auto-flow below
+    row.style.gridAutoFlow = 'row'; // explicit, not left to inherit — this must never be 'column' (see v8.203.0 comment above)
     row.style.gap = '1px';
+    row.style.flexWrap = ''; // clear the stale flex-wrap inline value, if any, left over from this row's pre-v8.202.0 flex layout
 
     row.innerHTML = cols.map(c => {
       const color = Math.abs(c.monthPct) < 0.05 ? 'var(--text3)' : (c.monthPct > 0 ? 'var(--up)' : 'var(--down)');
