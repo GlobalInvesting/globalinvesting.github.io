@@ -410,10 +410,17 @@ a { color: inherit; text-decoration: none; }
     },
     {
       "@type": "ImageObject",
-      "url": "https://globalinvesting.github.io/assets/screenshot-derivatives.png",
-      "width": 1360,
-      "height": 649,
-      "caption": "Derivatives suite in the Global Investing FX terminal — 25-delta risk reversal term structure, CIP-implied forwards, and realized volatility vs skew"
+      "url": "https://globalinvesting.github.io/assets/screenshot-seasonality.png",
+      "width": 720,
+      "height": 476,
+      "caption": "Seasonality panel in the Global Investing web terminal, showing GBP/USD's day-of-year seasonal curve and a table of statistically significant recurring windows (p<0.05) with direction, avg return, win rate, and p-value"
+    },
+    {
+      "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-dollar-smile.png",
+      "width": 658,
+      "height": 331,
+      "caption": "Dollar Smile panel in the Global Investing web terminal, showing USD performance bucketed by regime — Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming — with average DXY quarter-over-quarter return and sample size per bucket"
     },
     {
       "@type": "ImageObject",
@@ -786,11 +793,11 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <div class="scr-grid" style="margin-top:20px;">
-        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: Derivatives suite">
+        <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: AI Alerts & Market Signals">
           <div class="scr-item-frame">
-            <img src="assets/screenshot-derivatives.png" data-src="assets/screenshot-derivatives.png" alt="Derivatives section — 25-delta risk reversal term structure" width="1360" height="649" loading="eager">
+            <img src="assets/screenshot-alerts-signals.png" data-src="assets/screenshot-alerts-signals.png" alt="AI Alerts & Market Signals panel showing AI-generated entries combining COT positioning, OIS-implied central bank bias, carry, and options skew, each with a priority dot, timestamp, title, and supporting data chips" width="729" height="477" loading="eager">
           </div>
-          <p class="scr-item-meta"><strong>Derivatives suite.</strong> 25-delta RR term structure (1W–1Y), CIP-implied forwards, realized vol vs RR skew, ECB official fixings, and DTCC OTC notional volume.</p>
+          <p class="scr-item-meta"><strong>AI Alerts &amp; Market Signals.</strong> AI-generated entries combining COT positioning, OIS-implied CB bias, carry, and options skew — trade bias, catalyst, and risk laid out for every flagged pair.</p>
         </div>
         <div class="scr-item" role="button" tabindex="0" aria-label="Enlarge: CFTC COT positioning">
           <div class="scr-item-frame">
@@ -859,6 +866,36 @@ a { color: inherit; text-decoration: none; }
           <div class="mobile-feature-eyebrow">Charting</div>
           <div class="mobile-feature-title">Interactive Price Chart</div>
           <p class="panel-feature-desc">Native OHLC chart across <strong>49 instruments</strong> — every G10 FX pair and cross, Gold, Silver, WTI, Brent, DXY, major equity indices, BTC/USD, ETH/USD, VIX, and MOVE — with a full indicator library (MA, RSI, MACD, and more) and a chart-object drawing toolkit — trend lines, rectangles, Fibonacci — with copy-paste, free placement into forward time, and a dedicated fullscreen mode.</p>
+        </div>
+      </div>
+
+      <div class="panel-feature-row wide-img">
+        <div class="panel-feature-text">
+          <div class="mobile-feature-eyebrow">Seasonal Analysis</div>
+          <div class="mobile-feature-title">Seasonality</div>
+          <p class="panel-feature-desc">A day-of-year seasonal curve per instrument, backed by a table of <strong>statistically significant recurring windows</strong> (p&lt;0.05, non-overlapping) &mdash; direction, avg return &plusmn; std dev, win rate, and p-value, not just a raw average. A second <strong>Monthly Avg</strong> tab lays out the same history as a compact month-by-month table. Opens in fullscreen alongside the price chart, with lookback depth varying by instrument's real available history.</p>
+        </div>
+        <div class="panel-feature-img">
+          <div class="scr-hero-wrap">
+            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Seasonality panel in the Global Investing web terminal, showing GBP/USD's day-of-year seasonal curve and a table of statistically significant recurring windows with p-values">
+              <img src="assets/screenshot-seasonality.png" data-src="assets/screenshot-seasonality.png" alt="Seasonality panel in the Global Investing web terminal, showing GBP/USD's day-of-year seasonal curve, Chart and Monthly Avg tabs, and a table of statistically significant recurring windows (p&lt;0.05) with direction, avg return, win rate, and p-value" width="720" height="476" loading="lazy">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-feature-row wide-img reverse">
+        <div class="panel-feature-img">
+          <div class="scr-hero-wrap">
+            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Dollar Smile panel in the Global Investing web terminal, showing USD performance bucketed by regime — Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming">
+              <img src="assets/screenshot-dollar-smile.png" data-src="assets/screenshot-dollar-smile.png" alt="Dollar Smile panel in the Global Investing web terminal, showing USD vs regime with Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming buckets, each with average DXY quarter-over-quarter return and sample size" width="658" height="331" loading="lazy">
+            </div>
+          </div>
+        </div>
+        <div class="panel-feature-text">
+          <div class="mobile-feature-eyebrow">Global Macro</div>
+          <div class="mobile-feature-title">Dollar Smile</div>
+          <p class="panel-feature-desc">USD performance bucketed by regime &mdash; Global Risk-Off, Calm/Muddling Through, USD Growth Outperforming &mdash; following <strong>Jen &amp; Yilmaz's original framework</strong> (Morgan Stanley, 2001). Regime axis is the real US-vs-G9 GDP YoY growth differential (FRED, all G10), with an independent <strong>VIX&ge;40 crisis check</strong> to isolate genuine global risk-off from the US simply growing a bit slower than its peers. No official Dollar Smile dataset exists anywhere &mdash; every bucket shows its own sample size and avg DXY return, methodology fully disclosed in the panel itself.</p>
         </div>
       </div>
 
