@@ -1265,7 +1265,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="padding:10px 12px;">
           <div id="szn-chart-section">
             <div id="szn-chart" style="width:100%;height:130px;"></div>
-            <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;"></div>
+            <div id="szn-months" style="display:flex;gap:1px;font-size:8.5px;color:var(--text3);margin:2px 0 10px;min-height:22px;" title="Small values below each month are descriptive averages, not significance-tested"></div>
           </div>
           <div id="szn-windows-section" style="border-top:1px solid var(--border2);padding-top:8px;margin-bottom:8px;">
             <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
@@ -1500,9 +1500,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="padding:10px 12px;">
           <div style="font-size:9px;color:var(--text3);margin-bottom:8px;">Research / beta view &mdash; no official reference methodology (Stephen Jen, 2007)</div>
           <div id="dsmile-chart" style="width:100%;height:120px;"></div>
-          <div style="display:flex;gap:6px;align-items:flex-start;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:6px 8px;margin-top:6px;">
-            <span style="font-size:13px;color:var(--accent);flex-shrink:0;line-height:1.1;" aria-hidden="true">&#9432;</span>
-            <div id="dsmile-insight" style="font-size:10.5px;color:var(--text2);line-height:1.5;">Loading Dollar Smile data&hellip;</div>
+          <div style="display:flex;gap:6px;align-items:center;background:var(--bg);border:1px solid var(--border2);border-radius:3px;padding:4px 8px;margin-top:6px;cursor:help;" title="Hover for the full methodology note">
+            <span style="font-size:12px;color:var(--accent);flex-shrink:0;line-height:1;" aria-hidden="true">&#9432;</span>
+            <div id="dsmile-insight" style="font-size:10.5px;color:var(--text2);line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Loading Dollar Smile data&hellip;</div>
           </div>
 
           <!-- Growth-regime axis (v2) — Jen's original growth-differential
@@ -1823,7 +1823,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <tbody id="fv-tbody"></tbody>
         </table>
       </div>
-      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">Simplified BEER-style model (rate differential + risk score only — not the full set of variables an academic BEER model uses, e.g. terms of trade, NFA, productivity differentials) · statistical deviation, not investment advice</div>
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);">BEER-style model: rate differential, risk score, GDP-normalized Current Account (NFA proxy) &amp; Trade Balance (ToT direction proxy) — productivity differential not yet included (known gap) · statistical deviation, not investment advice</div>
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
@@ -2399,7 +2399,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.198.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.200.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
