@@ -4393,8 +4393,31 @@ function _lwBuildTodayBar(ohlcId) {
       l = Math.min(o, c);
     }
   } else {
-    h = q.high != null && q.high > 0 ? parseFloat(q.high.toFixed(dec)) : Math.max(o, c);
-    l = q.low  != null && q.low  > 0 ? parseFloat(q.low.toFixed(dec))  : Math.min(o, c);
+    // Non-FX: prefer session_high/session_low when available (BTC/ETH — FIX-43,
+    // fetch_intraday_quotes.py v3.25's fetch_crypto_session_hl(), a rolling 24h
+    // range independently computed from 1H bars). Same rationale as FX above:
+    // Yahoo's dayHigh/dayLow uses a UTC-midnight cutoff that isn't a real
+    // session boundary — an even worse fit for BTC/ETH, which trade 24/7 with
+    // no session boundary at all. Live incident: a BTC D1 candle's Low pinned
+    // to a stale multi-day-old value from Yahoo's dayLow over a weekend,
+    // self-correcting once Monday's Sydney reopen brought fresh ticks — with
+    // zero independent cross-check to catch it in between. Other non-FX
+    // instruments (SPX, Nasdaq, Gold, etc.) don't have session_high/low wired
+    // and fall through to the existing dayHigh/dayLow path unchanged.
+    // Plausibility-guarded the same way as FX's own anchors — a Yahoo
+    // dayHigh/dayLow more than 2% from the live close is treated as unusable
+    // rather than trusted at face value, so a bad single-field read (crypto
+    // or otherwise) can't reproduce this same deformed-wick symptom silently.
+    if (_isPlausibleAnchor(q.session_high) && _isPlausibleAnchor(q.session_low)) {
+      h = parseFloat(q.session_high.toFixed(dec));
+      l = parseFloat(q.session_low.toFixed(dec));
+    } else if (_isPlausibleAnchor(q.high) && _isPlausibleAnchor(q.low)) {
+      h = parseFloat(q.high.toFixed(dec));
+      l = parseFloat(q.low.toFixed(dec));
+    } else {
+      h = Math.max(o, c);
+      l = Math.min(o, c);
+    }
   }
   // ── W1/MN: override O/H/L with period-wide accumulated values ─────────────
   // For W1/MN, o/h/l computed above from prev_close/session_high/session_low are
