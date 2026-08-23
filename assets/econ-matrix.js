@@ -1,5 +1,16 @@
 /**
- * econ-matrix.js v2.5.1 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.2 — Native Economic Matrix panel
+ *
+ * ── v2.5.2 (2026-08-22) — NZD Ind Prod cell: repointed CATS.NZD.prod from
+ *    the dead 'Manufacturing Sales YoY' mapping (comment falsely claimed it
+ *    was "injected by fetch_supplementary_indicators.py" — that script does
+ *    not exist in any repo; the intended replacement never matched a live
+ *    NZD event in a full year of calendar.json, audited this session) to
+ *    'Industrial Production YoY', fed by new fetch_te_nzd_ind_prod.py
+ *    (Trading Economics scrape). Also corrected the header doc block's
+ *    "Ind Prod: AUD, NZD, CAD — none of the three..." bullet, stale for
+ *    AUD/CAD which were already wired via their own proxies. See
+ *    GUIDELINES.md v8.231.0 for the full incident. No other change.
  *
  * ── v2.5.1 (2026-08-19) — ECONMX_POLL_MS 3min → 90s. Backend latency audit
  *    (this session) found the client-side poll was the single heaviest link
@@ -464,8 +475,17 @@
  * Cells are intentionally left blank ("—") where the underlying release does
  * not exist in the current source for that currency, or where the source
  * data cannot be reliably attributed to a single named release:
- *   - Ind Prod: AUD, NZD, CAD — none of the three publishes a standalone
- *     industrial production series in this feed.
+ *   - Ind Prod: none of AUD/NZD/CAD have a standalone Ind Prod release on
+ *     Myfxbook (this feed's primary source), but all three are populated
+ *     via proxies/direct fetches, none of them blank in current production:
+ *     AUD via Ai Group Industry Index (Myfxbook), CAD via Manufacturing
+ *     Sales MoM (Myfxbook), NZD via Trading Economics' own "Industrial
+ *     Production" series (fetch_te_nzd_ind_prod.py — Myfxbook's RSS feed
+ *     never surfaces NZD's equivalent release despite a live page existing
+ *     for it; see that script's module docstring for the full incident).
+ *     This bullet previously (through v2.4.x) claimed all three were
+ *     genuine gaps — stale even for AUD/CAD, which had already been wired;
+ *     corrected here per the same-session NZD audit (GUIDELINES.md v8.231.0).
  *   - Rtl Sales: AUD — not currently tracked in the source feed (a feed gap,
  *     the ABS does publish retail trade figures).
  *   - Cur Acct: EUR, AUD — not currently tracked in the source feed for
@@ -744,7 +764,17 @@
       // the output/producer-price concept, not an input-cost index.
       ppi:   ['PPI Output QoQ'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Manufacturing Sales YoY'], // OECD MEI / Stats NZ \u2014 injected by fetch_supplementary_indicators.py
+      // v2.5.0: was ['Manufacturing Sales YoY'], commented as "injected by
+      // fetch_supplementary_indicators.py" \u2014 that script does not exist in
+      // any repo (dead reference; the actual intended replacement,
+      // fetch_ff_calendar.py's "manufacturing sales" _IMPACT_UPGRADES entry,
+      // never once matched a live NZD event across a full year of
+      // calendar.json, confirmed by audit). Repointed to Trading Economics'
+      // "Industrial Production" series (fetch_te_nzd_ind_prod.py), which is
+      // both live and the genuinely correctly-named series for this column
+      // \u2014 not a proxy substitution like AUD/CAD's mappings. See
+      // GUIDELINES.md v8.231.0 for the full incident.
+      prod:  ['Industrial Production YoY'],
       conf:  ['Business NZ PMI'],
       rtl:   ['Retail Sales QoQ'],
       ca:    ['Current Account'],
