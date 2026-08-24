@@ -1,10 +1,10 @@
 {
-  "lastUpdate": "2026-08-24T10:08:57Z",
-  "generatedAt": "2026-08-24T10:08:57Z",
-  "fetchMode": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable) via ff_calendar.json",
+  "lastUpdate": "2026-08-24T12:30:54Z",
+  "generatedAt": "2026-08-24T12:30:54Z",
+  "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
-  "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
+  "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-08-24",
@@ -34,9 +34,9 @@
       "std": 17.153717
     },
     "USD/chicago fed national activity index": {
-      "n": 4,
-      "mean": -0.04,
-      "std": 0.321248
+      "n": 5,
+      "mean": -0.068,
+      "std": 0.285167
     },
     "USD/cb consumer confidence": {
       "n": 3,
@@ -47328,9 +47328,9 @@
       "flag": "🇺🇸",
       "event": "United States Chicago Fed National Activity Index",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.08",
       "forecast": "0.1",
-      "previous": "-0.02"
+      "previous": "0.06"
     },
     {
       "date": "24 Aug",
