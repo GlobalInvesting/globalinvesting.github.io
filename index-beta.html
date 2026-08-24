@@ -480,13 +480,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cot-rank-chart{display:flex;gap:10px;margin-top:8px;width:100%;height:210px}
 #cot-rank-axis{display:flex;flex-direction:column;justify-content:space-between;width:30px;flex-shrink:0;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-mono);padding-bottom:22px}
 #cot-rank-plot{position:relative;flex:1;min-width:0}
+/* Fixed reference zone at each end of the 0-100% axis (matches the
+   reference chart's "Range highs"/"Range lows" shaded bands) — shares
+   #cot-rank-gridlines' own inset so the bands' 90%/10% offsets are read
+   against the same 0-100% plot area the bars and gridlines use, not the
+   full element height (which also includes the 22px ccy-label strip). */
+#cot-rank-bands{position:absolute;inset:0 0 22px 0;pointer-events:none}
+.cot-rank-band{position:absolute;left:0;right:0}
+/* Labels sit in their own top layer (after #cot-rank-cols in the DOM,
+   see the code comment there) with a solid chip background so a bar
+   reaching into the band's zone passes visually behind the label
+   instead of covering it. */
+#cot-rank-band-labels{position:absolute;inset:0 0 22px 0;pointer-events:none}
+.cot-rank-band-label{position:absolute;left:6px;font-size:9px;font-style:italic;font-weight:600;background:var(--head-bg);padding:1px 5px;border-radius:3px}
+.cot-rank-band-label-hi{top:3px}
+.cot-rank-band-label-lo{bottom:3px}
 #cot-rank-gridlines{position:absolute;inset:0 0 22px 0}
 .cot-rank-gridline{position:absolute;left:0;right:0;border-top:1px solid var(--border2)}
 #cot-rank-cols{position:relative;display:flex;align-items:flex-end;gap:10px;height:100%;padding-bottom:22px}
 .cot-rank-col{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;position:relative}
-.cot-rank-col-val{font-size:10px;font-weight:700;font-family:var(--font-mono);margin-bottom:3px}
 /* Bar area is an invisible full-height hit-target (no track fill, no
-   border) so the floating bar reads as the single value it is.
+   border) so the floating bar reads as the single value it is. The exact
+   reading is available on hover (title attribute) rather than printed
+   above the bar — matching the reference chart, which carries no
+   per-column percentage label either.
    .cot-rank-col-bar floats FROM the 50% (neutral) baseline TO the current
    reading's percentile — reproducing the reference chart's own model
    directly (see the code comment above _cotNetExposureRankChartHtml()). */
