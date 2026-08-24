@@ -56,7 +56,7 @@
   </url>
   <url>
     <loc>https://globalinvesting.github.io/access.html</loc>
-    <lastmod>2026-08-22</lastmod>
+    <lastmod>2026-08-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
     <image:image>
@@ -120,6 +120,14 @@
       <image:caption>News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary</image:caption>
     </image:image>
     <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-correlation-matrix-full.png</image:loc>
+      <image:caption>Pair by pair FX correlation matrix in fullscreen, Daily tab selected, showing a full grid of Pearson correlation values between every tracked currency pair, rows and columns ordered by spectral clustering so strongly correlated pairs group at the two edges</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cot-full-breakdown.png</image:loc>
+      <image:caption>COT Full Breakdown view in fullscreen, showing the CFTC TFF Leveraged Funds table with open interest, long and short positions and value, net positions and percent, and net value in base currency and USD, followed by a Currency Pairs LF Strength Index grid and a Net Exposure percent Rank bar chart</image:caption>
+    </image:image>
+    <image:image>
       <image:loc>https://globalinvesting.github.io/assets/screenshot-mobile-overview-top-framed.png</image:loc>
       <image:caption>Global Investing FX Terminal on mobile, top of the scrollable single-column view, showing FX Pairs — Majors table, Currency Strength Heatmap, and Economic Calendar</image:caption>
     </image:image>
@@ -145,6 +153,10 @@
     <lastmod>2026-08-24</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-cot-full-breakdown.png</image:loc>
+      <image:caption>COT Full Breakdown view in fullscreen, showing a combined CFTC TFF Leveraged Funds table covering FX currencies, equity indices, and commodities together, with open interest, long and short positions and value, net positions and percent, and net value in base currency and USD, followed by a Currency Pairs LF Strength Index grid and a Net Exposure percent Rank bar chart</image:caption>
+    </image:image>
     <image:image>
       <image:loc>https://globalinvesting.github.io/assets/screenshot-cot-modal-overview.png</image:loc>
       <image:caption>COT detail modal, Overview tab, showing the Positioning Gauge with z-score and percentile, the Long/Short Split, Key Metrics (Net%OI, Week-on-Week Change, Crowd Alignment, Trend Pattern), the Participants breakdown by category, the 52-Week Range, and the 12-Week Net Trend sparkline</image:caption>
@@ -246,6 +258,10 @@
     <image:image>
       <image:loc>https://globalinvesting.github.io/assets/screenshot-correlations.png</image:loc>
       <image:caption>Key Correlations table showing rolling 60-day Pearson correlation between FX pairs and reference assets, with a vs-norm z-score column flagging stretched or broken correlations</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://globalinvesting.github.io/assets/screenshot-correlation-matrix-full.png</image:loc>
+      <image:caption>Pair by pair FX correlation matrix in fullscreen, Daily tab selected, showing a full grid of Pearson correlation values between every tracked currency pair, rows and columns ordered by spectral clustering so strongly correlated pairs group at the two edges</image:caption>
     </image:image>
     <image:image>
       <image:loc>https://globalinvesting.github.io/assets/screenshot-cb-rate-expectations.png</image:loc>
