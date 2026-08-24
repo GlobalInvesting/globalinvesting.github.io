@@ -2294,9 +2294,13 @@ function _cotRankBarStyle(rank) {
 // heatmap-fill rule), just with --blue/--up as the two target hues
 // instead of --up/--down, and a fixed low magnitude since these bands
 // mark a static zone of the 0-100% axis, not a per-currency data value.
+// Per Santiago's Option B pick (v8.248.0-beta): magnitude 0.10, well
+// below the Strength Index grid's own values — this band is a passive
+// reference zone the bars sit on top of, not a data reading in its own
+// right, so it should read as quieter than anything that IS a value.
 const _COT_RANK_BAND_BLUE = [79, 127, 255]; // var(--blue) #4f7fff
 function _cotRankBandColor(target) {
-  const t = 0.22;
+  const t = 0.10;
   const r = Math.round(_COT_HEAT_BASE[0] + (target[0] - _COT_HEAT_BASE[0]) * t);
   const g = Math.round(_COT_HEAT_BASE[1] + (target[1] - _COT_HEAT_BASE[1]) * t);
   const b = Math.round(_COT_HEAT_BASE[2] + (target[2] - _COT_HEAT_BASE[2]) * t);
@@ -2313,6 +2317,14 @@ function _cotRankBandColor(target) {
 // lean) — same continuous _cotHeatColor() scale as the Strength Index
 // grid above, keyed off distance from the 50% midpoint. Full panel width,
 // no fixed max-width, columns fill the available space evenly.
+//
+// Range highs/lows framing (v8.248.0-beta, Santiago's Option B pick): the
+// label lives entirely OUTSIDE the plot area, as a dot+text legend row
+// above the chart — reusing the exact `.cot-strength-legend`/`-swatch`
+// pattern the Strength Index grid's own legend already uses just above
+// this chart, rather than a label competing for space with the bars
+// inside the plot (the badge/chip treatment from the prior session was
+// explicitly rejected). The band fill alone still marks the zone.
 function _cotNetExposureRankChartHtml(store) {
   const rows = COT_BREAKDOWN_CCYS.map(ccy => {
     const d = store.ccys[ccy];
@@ -2328,7 +2340,11 @@ function _cotNetExposureRankChartHtml(store) {
   // same place for every symbol).
   const bandHi = _cotRankBandColor(_COT_RANK_BAND_BLUE);
   const bandLo = _cotRankBandColor(_COT_HEAT_UP);
-  let html = '<div id="cot-rank-chart">'
+  let html = '<div class="cot-rank-legend">'
+    + `<span><span class="cot-strength-swatch" style="background:${bandHi};"></span>Range highs</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${bandLo};"></span>Range lows</span>`
+    + '</div>';
+  html += '<div id="cot-rank-chart">'
     + '<div id="cot-rank-axis">' + gridlines.map(v => `<div class="cot-rank-axis-tick">${v}%</div>`).join('') + '</div>'
     + '<div id="cot-rank-plot">'
     + '<div id="cot-rank-bands">'
@@ -2360,16 +2376,6 @@ function _cotNetExposureRankChartHtml(store) {
       + '</div>';
   });
   html += '</div>'
-    // Band text labels render as their own layer ON TOP of the bars
-    // (after #cot-rank-cols in the DOM, so they always paint over a bar
-    // that happens to reach into the band's zone — e.g. a currency
-    // sitting at a 100% or 0% rank fills the band's own space) rather
-    // than living inside #cot-rank-bands underneath the bars, where a
-    // tall bar would silently cover the label text.
-    + '<div id="cot-rank-band-labels">'
-    + '<span class="cot-rank-band-label cot-rank-band-label-hi" style="color:var(--blue);">Range highs</span>'
-    + '<span class="cot-rank-band-label cot-rank-band-label-lo" style="color:var(--up);">Range lows</span>'
-    + '</div>'
     + '</div></div>';
   html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores) · shaded bands mark the top/bottom 10% of the 0-100% range · hover a bar for its exact reading</div>';
   return html;
