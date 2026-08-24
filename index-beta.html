@@ -451,6 +451,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    stray inline style never fights the JS-driven open/close toggle). */
 #cot-breakdown-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #cot-breakdown-fullscreen-overlay.cot-breakdown-fs-active{display:flex}
+/* v8.169.0-class bug avoided here: #cot-breakdown-fs-close needs its own
+   explicit rule (mirroring #corr-mtx-fs-close/#cal-fs-close/#lw-fs-close)
+   or it falls back to browser-default white button chrome — exactly what
+   happened to #intel-fs-close before that fix. */
+#cot-breakdown-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+#cot-breakdown-fs-close:hover{border-color:var(--down);color:var(--down)}
 #cot-breakdown-fs-table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-ui)}
 #cot-breakdown-fs-table th,#cot-breakdown-fs-table td{padding:4px 6px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border2)}
 #cot-breakdown-fs-table th:first-child,#cot-breakdown-fs-table td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);font-weight:600}
@@ -2465,7 +2471,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard-beta.js?v=8.237.0" defer></script>
+<script src="assets/dashboard-beta.js?v=8.239.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
