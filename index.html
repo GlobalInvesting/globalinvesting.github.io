@@ -465,6 +465,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cot-strength-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border2);margin-top:6px}
 #cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:border-color .1s}
 #cot-strength-grid>div:hover{border-color:var(--border2)}
+.cot-strength-empty{background:var(--bg)!important;border:none!important;cursor:default}
+.cot-strength-empty:hover{border-color:transparent!important}
 .cot-strength-pair{font-size:10px;color:#fff;font-weight:700}
 .cot-strength-val{font-size:12px;margin-top:2px;font-family:var(--font-mono)}
 .cot-strength-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);align-items:center}
@@ -2515,7 +2517,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.249.0" defer></script>
+<script src="assets/dashboard.js?v=8.251.2" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
