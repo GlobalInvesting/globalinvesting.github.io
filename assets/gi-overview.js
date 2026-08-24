@@ -4,7 +4,7 @@
  *
  * v1.4.1 (2026-08-15): Reverted renderBiasRow()'s v1.4.0 template change
  *   (three-child flex-row card, built for the v8.155.0 Desk Briefing hero)
- *   back to the original two-row card markup — Santiago reverted the
+ *   back to the original two-row card markup — the client reverted the
  *   Desk Briefing layout in index.html back to the original stacked
  *   layout, keeping only the "Read full note" link. See CHANGELOG.md
  *   v8.156.0.
@@ -32,7 +32,7 @@
  *   reintroducing the "closing the modal without activating leaves the
  *   full terminal open" bug fixed in v1.2.0/v1.7.0.
  *
- * v1.3.1 (2026-08-13): Reported by Santiago — every currency in the
+ * v1.3.1 (2026-08-13): Reported by the client — every currency in the
  *   Overview's "Currency Strength — G10 Snapshot" strip rendering flat gray
  *   since the prior day, while the Currency Strength Heatmap panel (same
  *   underlying window._hmStrengths) showed a normal green/red spread.
@@ -54,7 +54,7 @@
  *   Neutral text labels) is untouched — that threshold is a legitimate,
  *   separate design choice, not the bug.
  *
- * v1.3.0 (2026-08-12): Three items reported by Santiago against the live
+ * v1.3.0 (2026-08-12): Three items reported by the client against the live
  *   Overview:
  *   1. Bias-card/CSI values visibly changed a few seconds after page load.
  *      Root cause: dashboard.js's populateHeatmap() only uses the real
@@ -80,7 +80,7 @@
  * v1.2.0 (2026-08-12): Closing the activation modal (gi-auth.js v1.6.0's new
  *   close button / Escape / backdrop click) without activating left the
  *   visitor standing inside a fully interactive terminal — reported by
- *   Santiago as a serious bug: "si cierro el modal queda con la terminal
+ *   The client as a serious bug: "si cierro el modal queda con la terminal
  *   completa funcional. Eso no puede pasar." Root cause: "Open full
  *   terminal" was always calling showTerminal() unconditionally — the
  *   modal was never an actual gate on #gi-terminal-view, just a blurred
@@ -88,7 +88,7 @@
  *   (with only the pre-existing PREMIUM_SECTIONS individually locked, the
  *   v8.128.0 "some panels open" model). As long as the modal had no close
  *   affordance this was invisible — v1.6.0's close button exposed it.
- *   Fix, matching Santiago's own suggested direction ("volver a overview
+ *   Fix, matching the client's own suggested direction ("volver a overview
  *   si se cierra"): exposed window.giShowOverview(), which re-hides
  *   #gi-terminal-view and resumes the Overview's live bias/CSI/narrative
  *   sync. gi-auth.js's hideModal() (v1.7.0) now calls it whenever the
@@ -104,7 +104,7 @@
  *   yet, on the very same click. Reordered to showModal() then
  *   showTerminal().
  *
- * v1.1.0 (2026-08-12): Four fixes reported by Santiago against the live
+ * v1.1.0 (2026-08-12): Four fixes reported by the client against the live
  * v1.0.0 build (screenshots + reload comparisons):
  *   1. Bias cards / CSI strip looked "wrong" and changed to unrelated
  *      numbers on every reload. Root cause: pollHeatmapStrengths() stopped
@@ -128,7 +128,7 @@
  *      now gate their init on this instead of raw DOMContentLoaded.
  *   3. "Open full terminal" called showTerminal() directly, revealing
  *      #gi-terminal-view with only PREMIUM_SECTIONS individually locked
- *      (the v8.128.0 "some panels open" model) — Santiago wants this
+ *      (the v8.128.0 "some panels open" model) — the client wants this
  *      specific entry point to behave like the pre-v8.128.0 flow instead:
  *      terminal revealed *behind* the full-page activation modal (blurred),
  *      not freely browsable first. Fixed: the click handler now also calls
@@ -246,7 +246,7 @@
     }
 
     document.getElementById('gi-ov-open-terminal')?.addEventListener('click', () => {
-      // Santiago: this specific entry point should behave like the
+      // the client: this specific entry point should behave like the
       // pre-v8.128.0 flow — terminal revealed *behind* the full-page
       // activation modal (blurred backdrop), not freely browsable first.
       // A visitor who is already active never reaches this branch (handled
@@ -312,7 +312,7 @@
   // h-down/h-s-down) with only the ±0.05% band itself rendering flat — and
   // this module had never been aligned to it, a second silently-diverged
   // "methodology" for the same feed (GUIDELINES.md: two independent
-  // parsers/methodologies of one feed drift). Reported by Santiago:
+  // parsers/methodologies of one feed drift). Reported by the client:
   // Overview showing every currency gray since the prior day.
   // Fix: mirror dashboard.js's exact ±0.05/±0.15 breakpoints (single source
   // of truth, not a third invented scheme), with the ±0.05-0.15% "mild"
@@ -385,7 +385,7 @@
       // cruder ECB-daily-rates fallback instead. Rendering that fallback
       // immediately, then swapping to the live numbers a few seconds later,
       // is exactly the "values look wrong, then change to the real ones"
-      // flash Santiago reported. Once genuinely live (gotFirst), keep
+      // flash the client reported. Once genuinely live (gotFirst), keep
       // re-rendering on every tick regardless — rtAvailable does not flip
       // back to false once the composite has enough pairs cached.
       if (haveData && (gotFirst || window._hmStrengthsLive === true)) {

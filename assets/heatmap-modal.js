@@ -1,5 +1,5 @@
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.4 — Market Commentary follow-up
-//   (Santiago, screenshot): the 2-line clamp from v2.6.3 was wrong — he never
+//   (the client, screenshot): the 2-line clamp from v2.6.3 was wrong — he never
 //   wanted the article text cut, just fewer visible at once with a scroll to
 //   reach the older ones (same idea as cb-rates-modal.js's .cbr-ps-wrap).
 //   Reverted -webkit-line-clamp on .hm-news-art-body (full text again, still
@@ -9,7 +9,7 @@
 //   shows ~2 articles and scrolls to reveal the 3rd (older) one. Article
 //   fetch cap unchanged at 3 (v2.6.0).
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.3 — Currency switcher: arrows flanking
-//   the chip (Santiago, session request, referencing the original ‹ NZD ▾ ›
+//   the chip (the client, session request, referencing the original ‹ NZD ▾ ›
 //   spec): reverted from v2.6.1/v2.6.2's grouped-arrow layouts back to one
 //   arrow on each side of the chip — [flag] — text ‹ [chip] ›. #hm-ccy-arrows
 //   wrapper removed; #hm-ccy-prev now sits directly before #hm-ccy-switch and
@@ -18,7 +18,7 @@
 //   unchanged, hmCycleCcy/hmToggleCcyDropdown/hmPivotCcy/_hmUpdateCcySwitcher
 //   all look up #hm-ccy-prev/#hm-ccy-next/#hm-ccy-chip/#hm-ccy-dd by ID.
 //   Also: Session tab Market Commentary article body now clamped to 2 lines
-//   (`-webkit-line-clamp:2` on .hm-news-art-body, matching Santiago's "dos
+//   (`-webkit-line-clamp:2` on .hm-news-art-body, matching the client's "dos
 //   líneas máximo" request) — the existing 400-char/sentence-boundary cut in
 //   _hmLoadSessionNews() is a length safeguard, not a line-count one, so long
 //   paragraphs were still running 4-5 visual lines. .hm-news-wrap was already
@@ -26,14 +26,14 @@
 //   .cbr-ps-wrap); with bodies now clamped to 2 lines, ~2 articles fit in the
 //   .hm-cw's existing 140px min-height before the 3rd needs that scroll.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.6.2 — Currency switcher layout fix #2
-//   (Santiago, screenshot): v2.6.1 moved the arrows next to the chip but kept
+//   (the client, screenshot): v2.6.1 moved the arrows next to the chip but kept
 //   the chip immediately after the flag, ahead of the full-name text — still
 //   not what was asked for. Correct order: [flag] — full name text [‹›] [chip].
 //   Reordered #hm-title-row's children (title text, then arrows, then the
 //   switcher) so the flag+name reads first as the primary label, with the
 //   picker (arrows + chip) trailing it as a secondary control. Pure DOM-order
 //   change again — no logic touched, all lookups are by ID.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.1 — Currency switcher layout fix (Santiago,
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.1 — Currency switcher layout fix (the client,
 //   screenshot): the ‹/› arrows previously flanked the chip (‹ [USD▾] ›), so the
 //   left arrow sat immediately after the flag, ahead of the currency chip itself —
 //   read oddly, like it belonged to the flag rather than to the switcher. Reordered
@@ -41,7 +41,7 @@
 //   now grouped together to its right as a single control. Purely a DOM-order/CSS
 //   change (#hm-ccy-arrows wraps the two buttons with a tight 1px gap) — no change
 //   to hmCycleCcy/hmToggleCcyDropdown/hmPivotCcy logic, ID lookups unaffected.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.0 — Session tab follow-up (Santiago,
+// CURRENCY STRENGTH HEATMAP MODAL  v2.6.0 — Session tab follow-up (the client,
 //   screenshots): (1) fixed the Market Commentary block flickering — it was
 //   re-fetching and re-rendering (loading spinner → articles) on every
 //   Finnhub RT tick via _hmRefreshIfOpen's populateSession() call, even
@@ -56,7 +56,7 @@
 // CURRENCY STRENGTH HEATMAP MODAL  v2.5.0 — Session tab: added a Market Commentary
 //   fill block below Session Context, same shape/source as cb-rates-modal.js's
 //   _cbrLoadPolicySummary() (news-data/news.json, filtered to the modal's active
-//   currency via `cur`, up to 6 articles). Reported by Santiago (screenshots):
+//   currency via `cur`, up to 6 articles). Reported by the client (screenshots):
 //   on tall/large screens the Session tab left visible empty space below Session
 //   Context, since neither of its two .hm-cw cards grow to fill .hm-panel.on's
 //   flex column. Third .hm-cw card takes flex:1 (same pattern already used by
@@ -65,7 +65,7 @@
 //   by CB_KW like the CB modal's version — this tab covers the currency generally.
 // CURRENCY STRENGTH HEATMAP MODAL  v2.4.0 — CSI chart: replaced the two-row Interval+Range control (added earlier this session) with a single industry-standard range selector (1D/1W/1M/3M/6M/1Y/All), each mapping internally to both a lookback and an auto-selected OHLC resolution — confirmed against TradingView's own docs and CSM-specific tools (FXSSI, MarketMilk), which all expose exactly one range control, never two. Also: added chart.timeScale().fitContent() after loading series data, which was missing entirely — without it LWC used a fixed bar-spacing default instead of stretching the loaded range to fill the chart width, so ranges with few bars left visible empty space and chart width looked inconsistent across timeframes
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.4 — CSI chart: normalize each currency's daily return by ACTUAL per-date pair coverage instead of a fixed pair count, so a legitimately-missing bar for one pair (e.g. fetch_ohlc.py's flat-bar guard dropping a degenerate O=H=L=C bar) no longer systematically understates that currency's move for that one bar
-// CURRENCY STRENGTH HEATMAP MODAL  v2.3.3 — CSI chart: added "Interval" / "Range" group labels above the TF and period button rows (Santiago's pick, Bloomberg-style) so the two rows read as distinct controls instead of duplicate-looking buttons (both rows can show "1D"/"1W" text since they answer different questions — interval vs. lookback)
+// CURRENCY STRENGTH HEATMAP MODAL  v2.3.3 — CSI chart: added "Interval" / "Range" group labels above the TF and period button rows (the client's pick, Bloomberg-style) so the two rows read as distinct controls instead of duplicate-looking buttons (both rows can show "1D"/"1W" text since they answer different questions — interval vs. lookback)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.2 — CSI chart: fixed _updateCSILiveBar() still rebasing the live RT point against a bar-count cutoff (missed in v2.3.1's calendar-day migration), which snapped every currency's most recent point to a wildly different baseline than the rest of the series on every RT tick — visible as all CSI lines jumping/converging together at the chart's right edge
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.1 — CSI chart: TF+period controls merged into one row with uniform button sizing; TF buttons moved off the shared .lw-tf-btn class onto their own .hm-csi-btn (was cross-contaminating with the main chart's global TF-button selector); period presets switched from an assumed bar-count to real calendar-day cutoffs (bar-count drifted for H1/H4/W1 depending on incidental weekend placement in the trailing window)
 // CURRENCY STRENGTH HEATMAP MODAL  v2.3.0 — CSI chart: added H1/H4/1D/1W timeframe selector (reuses main chart's intraday ohlc-data/h1|h4 sources; 1W is a telescoping downsample of the daily series, no new data source needed); fixed tooltip showing raw unix seconds for intraday TFs
@@ -590,7 +590,7 @@
   // ── CSI range selector — single control, industry-standard (2026-08-07) ───
   // Earlier same-day iterations of this panel exposed TWO controls: an
   // "Interval" row (H1/H4/1D/1W bar granularity) and a "Range" row
-  // (lookback period). Santiago flagged that this doesn't match how range
+  // (lookback period). The client flagged that this doesn't match how range
   // selectors actually work anywhere in the industry — confirmed against
   // TradingView's own docs: "When users switch a time frame... The chart
   // resolution changes. The bars scale horizontally to cover the entire
@@ -600,7 +600,7 @@
   // and picks bar resolution automatically underneath so the chart stays
   // readable. Two independent controls that can both show "1D"/"1W" text
   // for two different questions (candle interval vs. lookback) is not a
-  // pattern used anywhere Santiago or I could find.
+  // pattern used anywhere the client or I could find.
   //
   // Fix: back to a single #hm-csi-controls row. Each range button maps to
   // BOTH a lookback (`days`, calendar days via _csiCutoffDate — unchanged
@@ -1243,7 +1243,7 @@
   // tick while the Session tab is active (intentionally — see that function's
   // own "flash-free" comment), which previously called this function on every
   // tick too, replacing the wrap's innerHTML with a loading spinner and then
-  // the same articles over and over — the visible flicker Santiago reported.
+  // the same articles over and over — the visible flicker the client reported.
   // News doesn't change tick-to-tick, so this now only fetches/re-renders when
   // the currency actually changes (tracked via _hmNewsCcy); repeat calls for
   // the same currency are a no-op.

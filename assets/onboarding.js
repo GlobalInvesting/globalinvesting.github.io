@@ -777,7 +777,7 @@
   // has a valid license already or clicks "Open full terminal". The old
   // DOMContentLoaded+DELAY_MS trigger fired regardless, so first-time
   // visitors saw the tour pointing at a hidden terminal while still on the
-  // Overview page (reported by Santiago with a screenshot). giOnTerminalShown
+  // Overview page (reported by the client with a screenshot). giOnTerminalShown
   // resolves immediately for returning active users (terminal visible from
   // load) and otherwise waits for the actual Overview→terminal transition,
   // whenever that happens.

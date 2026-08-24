@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // CB RATES MODAL  v2.6 — Fix: Rate Chart grew oversized after the v2.5 fix
-// v2.6 (2026-08-02): Santiago reported the chart taking up far more room than
+// v2.6 (2026-08-02): The client reported the chart taking up far more room than
 //   before, right after v2.5. Root cause: v2.5's #cbr-bd{flex:1;min-height:0}
 //   fix worked as intended — #cbr-bd now genuinely stretches inside
 //   inline-panel.js's flex-column body — but that gave #cbr-modal's inline

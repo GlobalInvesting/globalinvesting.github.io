@@ -2,7 +2,7 @@
  * GlobalInvesting FX Terminal — License Auth Module  v1.7.5
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
  *
- * v1.7.5 (2026-08-14): Reported by Santiago (screenshot) — the free Overview
+ * v1.7.5 (2026-08-14): Reported by the client (screenshot) — the free Overview
  *   snapshot briefly flashed before the full terminal appeared, for every
  *   visitor including ones with a fully-valid, already-active license.
  *   Root cause: gi-overview.js's initToggle() decides overview-vs-terminal
@@ -28,7 +28,7 @@
  *   v1.7.0/gi-overview.js v1.2.0. See index.html's guard-script comment and
  *   gi-overview.js's showOverview() for the matching defensive clear.
  *
- * v1.7.4 (2026-08-13): Reported by Santiago — on mobile the activation modal
+ * v1.7.4 (2026-08-13): Reported by the client — on mobile the activation modal
  *   "ocupa toda la pantalla y no se ve el botón X para cerrarlo." Root cause:
  *   #gi-auth-modal (the backdrop) had no height cap or overflow handling and
  *   simply vertically-centered #gi-auth-box regardless of viewport height —
@@ -43,7 +43,7 @@
  *   remaining content scrolls via the backdrop. Desktop layout (≥640px)
  *   unchanged.
  *
- * v1.7.3 (2026-08-12): Reverted per Santiago's explicit instruction — the
+ * v1.7.3 (2026-08-12): Reverted per the client's explicit instruction — the
  *   "See the full walkthrough & pricing" modal link now points at plain
  *   `access.html` (no anchor), not `access.html#broker-access` as landed in
  *   v1.7.2. v1.7.2's own intent (skip past the featured EA card straight to
@@ -51,11 +51,11 @@
  *   at the top of access.html like a normal page link. No JS behavior
  *   change, plain href fix. NOTE: index.html's own "Broker access" Overview
  *   pill still points at `access.html#broker-access` (fixed in v8.133.2,
- *   untouched here) — not in scope for this change, flag to Santiago if the
+ *   untouched here) — not in scope for this change, flag to the client if the
  *   same reversion should apply there too.
  *
  * v1.7.2 (2026-08-12): Follow-up to v1.7.1's incomplete broker-access
- *   scroll-target fix. Santiago's original v1.4.0 fix already documented
+ *   scroll-target fix. The client's original v1.4.0 fix already documented
  *   the intent — point "See the full walkthrough & pricing" at the
  *   Vantage/TMGM broker cards, not the page top — but both this link and
  *   a same-named "Broker access" pill on the Overview (index.html) still
@@ -73,7 +73,7 @@
  *   (index.html's Overview pill fixed in the same pass — see its own
  *   inline history). No JS behavior change, plain href fix.
  *
- * v1.7.1 (2026-08-12): GUIDELINES.md compliance fix reported by Santiago —
+ * v1.7.1 (2026-08-12): GUIDELINES.md compliance fix reported by the client —
  *   the PREMIUM_SECTIONS gate overlay's lock icon (.gi-gate-icon) was
  *   rendering the literal 🔒 emoji (&#128274;), which read as an odd
  *   orange/yellow glyph rather than a neutral lock and violates
@@ -90,7 +90,7 @@
  *   panel — the locked-preview card was describing the Cross-Asset Risk
  *   panel and had no business naming an unrelated EA product there).
  *
- * v1.7.0 (2026-08-12): Serious bug reported by Santiago the same day v1.6.0
+ * v1.7.0 (2026-08-12): Serious bug reported by the client the same day v1.6.0
  *   shipped its close button: "si cierro el modal queda con la terminal
  *   completa funcional. Eso no puede pasar." Root cause: the "Open full
  *   terminal" entry point (gi-overview.js) always called showTerminal()
@@ -99,11 +99,11 @@
  *   that was already fully revealed underneath (with only the pre-existing
  *   PREMIUM_SECTIONS individually locked — the v8.128.0 "some panels open"
  *   model, intentional for OTHER entry paths but not for this one, per
- *   Santiago's v8.130.0-session request). As long as the modal had no way
+ *   The client's v8.130.0-session request). As long as the modal had no way
  *   to close except reloading, this was invisible; v1.6.0's close button
  *   exposed it — closing without activating simply revealed the terminal
  *   that had already been sitting there the whole time.
- *   Fix, matching Santiago's own suggested direction ("volver a overview
+ *   Fix, matching the client's own suggested direction ("volver a overview
  *   si se cierra"): hideModal() now calls window.giShowOverview() (new in
  *   gi-overview.js v1.2.0) whenever it runs while GI_AUTH.isActive is
  *   still false — re-hiding the terminal and returning to the free
@@ -119,7 +119,7 @@
  * v1.6.0 (2026-08-12): The activation modal had no way to close except
  *   reloading the page — no close button, no backdrop click, no Escape key;
  *   hideModal() was only ever called from activate()'s success path.
- *   Reported by Santiago against the new Overview snapshot (v8.129.0): a
+ *   Reported by the client against the new Overview snapshot (v8.129.0): a
  *   visitor clicking a locked-preview card sees the modal with no way back
  *   short of a hard refresh. Added an "×" close button in the modal header,
  *   plus click-on-backdrop and Escape-key handlers, all calling the
@@ -139,7 +139,7 @@
  *   FX Pairs, CSI, charts) were never in PREMIUM_SECTIONS and were only
  *   ever blocked by the full-page modal — they are now interactive
  *   immediately, matching the "some panels open, some locked" model
- *   agreed with Santiago over showing nothing until activation. The
+ *   agreed with the client over showing nothing until activation. The
  *   full-page showModal() is UNCHANGED for two other call sites, both
  *   intentional: (1) handleRevocation() — a previously-active session
  *   being cut off should get a clear, unmissable message, not a quiet
@@ -434,7 +434,7 @@
    visibly, the box's own top (where #gi-auth-close lives, position:absolute
    top:10px *within the box*, not the viewport) got centered above the top
    edge of the screen, so the close button was invisible and unreachable.
-   Reported by Santiago: "en mobile ocupa toda la pantalla y no se ve el
+   Reported by the client: "en mobile ocupa toda la pantalla y no se ve el
    botón X para cerrarlo." Fix: below 640px, switch the backdrop from
    vertically-centered to top-anchored + scrollable, so the box always
    starts flush with the top of the viewport (close button immediately

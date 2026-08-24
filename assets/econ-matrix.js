@@ -35,7 +35,7 @@
  *    `extended-data/{CCY}.json` bond10y is written daily by
  *    `fetch_bond_yields.py`, so any tab left open across that daily update
  *    (or open when a fix like the AUD/CAD orphaned-bond10y-field one landed)
- *    kept showing the pre-fix value indefinitely — confirmed live: Santiago's
+ *    kept showing the pre-fix value indefinitely — confirmed live: The client's
  *    screenshot showed AUD 4.83%/CAD 3.59%/NOK 4.20% while the underlying
  *    `extended-data/*.json` already had fresh AUD 5.05% (18 Aug)/CAD 3.72%
  *    (17 Aug)/NOK 4.40% (17 Aug) from the v2.10.2 fix — the panel simply
@@ -54,7 +54,7 @@
  *    cached 10Y/CB values — see GUIDELINES.md/CHANGELOG.md v8.163.0.
  * ── v2.3.0 (2026-08-15) — CB Rate subtext date fixed (was always "01 Aug"
  *    for every currency); Unemp column colored as an inverted indicator ──
- * Two issues Santiago flagged after reviewing a live screenshot:
+ * Two issues the client flagged after reviewing a live screenshot:
  *
  * (1) CB RATE subtext showed the same day-of-month ("Aug 01") for every
  *     single currency, every session — not a rendering bug (fmtDateShort()
@@ -100,7 +100,7 @@
  *
  * ── v2.2.9 (2026-08-15) — dropped redundant "10Y"/"Policy" prefix from the
  *    10Y Yld / CB Rate subtext ─────────────────────────────────────────────
- * Santiago flagged two things about v2.2.8's fix: (1) the "Policy" word in
+ * The client flagged two things about v2.2.8's fix: (1) the "Policy" word in
  * the CB Rate subtext is unnecessary — the column header already says
  * "CB RATE"; (2) "10Y · 30 Jul" repeats "10Y", which the column header
  * ("10Y YLD") already states, unlike the calendar-driven columns where the
@@ -111,7 +111,7 @@
  *
  * ── v2.2.8 (2026-08-15) — 10Y Yld / CB Rate cells given the same
  *    value+subtext structure as every other column ──────────────────────
- * Santiago flagged that 10Y Yld and CB Rate were the only two columns
+ * The client flagged that 10Y Yld and CB Rate were the only two columns
  * without a date/period line under the value, breaking the pattern every
  * other column follows. Root cause: rowHTML() built those two cells with
  * a bare '<td>{value}%</td>' (date only in the title tooltip) instead of
@@ -163,7 +163,7 @@
  * SEK core (CPIF ex Energy) investigated in the same pass \u2014 no equivalent
  * Trading Economics indicator found either, left unwired, still a
  * documented genuine gap (v2.2.4 finding stands).
- * AUD rtl investigated per Santiago's report of a still-blank cell despite
+ * AUD rtl investigated per the client's report of a still-blank cell despite
  * v2.2.3's fix \u2014 confirmed NOT a wiring bug: the live Myfxbook page itself
  * (australia/retail-sales-mom) has no observation newer than 2025-07-31.
 
@@ -184,7 +184,7 @@
  *    (v3.43) had already covered it but econ-matrix.js's CATS list was never
  *    updated to match. SEK core (CPIF ex Energy) re-confirmed as a genuine
  *    gap ──────────────────────────────────────────────────────────────────
- * Continues the gap sweep started in v2.2.3, per Santiago's request to chase
+ * Continues the gap sweep started in v2.2.3, per the client's request to chase
  * the two items that pass explicitly deferred (NZD ppi, SEK core).
  *   - NZD ppi: re-checked live against myfxbook.com/forex-economic-calendar/
  *     new-zealand — found a live page for "PPI Output QoQ" (Low impact,
@@ -211,7 +211,7 @@
  *
  * ── v2.2.3 (2026-08-14) — Full gap sweep: CHF PPI, JPY CPI MoM, AUD Retail
  *    Sales were the same pipeline bug as v2.2.2's PPI fix, not source gaps ──
- * Prompted by Santiago asking for a complete sweep of every "—" cell in the
+ * Prompted by the client asking for a complete sweep of every "—" cell in the
  * matrix after the v2.2.2 PPI fix shipped. Rather than trust each field's
  * existing "confirmed gap" comment, every one was re-verified against LIVE
  * Myfxbook pages (not calendar.json — see the GUIDELINES.md rule from
@@ -242,7 +242,7 @@
  * SCB actively publish it, confirmed via search), but no Myfxbook calendar
  * page could be located for it in this pass; left as a documented gap
  * rather than wiring an unverified title. Flagged for a follow-up pass with
- * direct Myfxbook access if Santiago wants it chased further.
+ * direct Myfxbook access if the client wants it chased further.
  *
  * ── v2.2.2 (2026-08-14) — GBP/JPY/CAD PPI: fixed pipeline bug misdiagnosed
  *    as a source gap in v2.2.0 ──────────────────────────────────────────
@@ -276,7 +276,7 @@
  * PCE data appeared under the "10Y Yld" header (confirmed by a client
  * screenshot showing a "United States PCE Price Index YoY" tooltip on that
  * cell), the real 10Y yield appeared under "CB Rate", and CB Rate itself was
- * pushed off the end of the table. Reported by Santiago from a live
+ * pushed off the end of the table. Reported by the client from a live
  * screenshot. Fixed in index.html only (no logic in this file was wrong) —
  * see CHANGELOG.md v8.143.0 for the full incident and the new GUIDELINES.md
  * rule requiring COLUMNS-array changes and index.html's thead/skeleton rows
@@ -284,7 +284,7 @@
  *
  * ── v2.2.0 (2026-08-14) — closing out remaining industry-standard gaps:
  *    CHF GDP dead title, EUR Bus Cond gap resolved, new PPI column ────────
- * Prompted by Santiago asking to close out every remaining item after
+ * Prompted by the client asking to close out every remaining item after
  * v2.1.0, rather than leave anything flagged-but-unfixed. Three changes:
  *   (1) CHF gdp had the same class of bug as v2.1.0's GBP fix, inverted:
  *       'GDP Growth Rate QoQ Flash' matched ZERO events in the feed (the
@@ -326,7 +326,7 @@
  *
  * ── v2.1.0 (2026-08-14) — GDP column: fixed GBP QoQ omission, tagged USD's
  *    SAAR convention ──────────────────────────────────────────────────────
- * Prompted by a follow-up question from Santiago after v2.0.0 shipped: is it
+ * Prompted by a follow-up question from the client after v2.0.0 shipped: is it
  * industry-standard for the GDP column to show different periodicities
  * (QoQ/MoM/YoY) across different currency rows? Investigation found three
  * distinct things bundled under that one question:
@@ -373,7 +373,7 @@
  * elsewhere — no new backend script or workflow required.
  *
  * ── v2.0.0 (2026-08-14) — institutional-user data-accuracy audit ──────────
- * Prompted by a client (Dimitrius, via Santiago) flagging: (1) USD CPI YoY
+ * Prompted by a client (Dimitrius, via the operator) flagging: (1) USD CPI YoY
  * showing a stale 4.2% print instead of the then-current 3.4%; (2) AUD CPI
  * showing "102.03" — an index level in points, not a %-rate; (3) no MoM
  * alongside YoY, and no visible reference date per cell; (4) no core/PCE
