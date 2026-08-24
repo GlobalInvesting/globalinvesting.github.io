@@ -2288,6 +2288,21 @@ function _cotRankBarStyle(rank) {
   return { bg: _cotHeatColor(magnitude, rank >= 50), color: '#f2f5f8' };
 }
 
+// Fixed reference-zone tint for the top/bottom "Range highs"/"Range lows"
+// bands on the Net Exposure Rank chart — same opaque base-to-target
+// interpolation as _cotHeatColor() (never an rgba blend, per the shared
+// heatmap-fill rule), just with --blue/--up as the two target hues
+// instead of --up/--down, and a fixed low magnitude since these bands
+// mark a static zone of the 0-100% axis, not a per-currency data value.
+const _COT_RANK_BAND_BLUE = [79, 127, 255]; // var(--blue) #4f7fff
+function _cotRankBandColor(target) {
+  const t = 0.22;
+  const r = Math.round(_COT_HEAT_BASE[0] + (target[0] - _COT_HEAT_BASE[0]) * t);
+  const g = Math.round(_COT_HEAT_BASE[1] + (target[1] - _COT_HEAT_BASE[1]) * t);
+  const b = Math.round(_COT_HEAT_BASE[2] + (target[2] - _COT_HEAT_BASE[2]) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
 // Diverging/floating-column chart — currencies along the horizontal axis
 // (fixed BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the
 // breakdown table above it — not re-sorted by value). Each column is a
@@ -2306,17 +2321,27 @@ function _cotNetExposureRankChartHtml(store) {
   });
 
   const gridlines = [100, 75, 50, 25, 0];
+  // Fixed top/bottom reference bands, matching the reference chart's
+  // "Range highs" / "Range lows" framing: a static 10%-deep zone at each
+  // end of the 0-100% axis, not a per-currency computed value (the rank
+  // itself is already normalized 0-100, so the extreme zone sits in the
+  // same place for every symbol).
+  const bandHi = _cotRankBandColor(_COT_RANK_BAND_BLUE);
+  const bandLo = _cotRankBandColor(_COT_HEAT_UP);
   let html = '<div id="cot-rank-chart">'
     + '<div id="cot-rank-axis">' + gridlines.map(v => `<div class="cot-rank-axis-tick">${v}%</div>`).join('') + '</div>'
     + '<div id="cot-rank-plot">'
+    + '<div id="cot-rank-bands">'
+    + `<div class="cot-rank-band cot-rank-band-hi" style="bottom:90%;height:10%;background:${bandHi};"></div>`
+    + `<div class="cot-rank-band cot-rank-band-lo" style="bottom:0;height:10%;background:${bandLo};"></div>`
+    + '</div>'
     + '<div id="cot-rank-gridlines">' + gridlines.map(v => `<div class="cot-rank-gridline" style="bottom:${v}%;${v === 50 ? 'border-top-style:dashed;' : ''}"></div>`).join('') + '</div>'
     + '<div id="cot-rank-cols">';
   rows.forEach(({ ccy, detail }) => {
     const label = COT_BREAKDOWN_CCY_DISPLAY[ccy] || ccy;
     if (!detail) {
       html += '<div class="cot-rank-col">'
-        + '<div class="cot-rank-col-val" style="color:var(--text3);">—</div>'
-        + '<div class="cot-rank-col-bararea"></div>'
+        + `<div class="cot-rank-col-bararea" title="${ccy}: not enough history yet for a range"></div>`
         + `<div class="cot-rank-col-ccy">${label}</div>`
         + '</div>';
       return;
@@ -2328,15 +2353,25 @@ function _cotNetExposureRankChartHtml(store) {
     const barHeight = Math.max(Math.abs(r - 50), 1.5);
     const label3s = currentRank.toFixed(0) + '%';
     html += '<div class="cot-rank-col">'
-      + `<div class="cot-rank-col-val" style="color:${s.color};">${label3s}</div>`
       + `<div class="cot-rank-col-bararea" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
       + `<div class="cot-rank-col-bar" style="bottom:${barBottom}%;height:${barHeight}%;background:${s.bg};"></div>`
       + '</div>'
       + `<div class="cot-rank-col-ccy">${label}</div>`
       + '</div>';
   });
-  html += '</div></div></div>';
-  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores)</div>';
+  html += '</div>'
+    // Band text labels render as their own layer ON TOP of the bars
+    // (after #cot-rank-cols in the DOM, so they always paint over a bar
+    // that happens to reach into the band's zone — e.g. a currency
+    // sitting at a 100% or 0% rank fills the band's own space) rather
+    // than living inside #cot-rank-bands underneath the bars, where a
+    // tall bar would silently cover the label text.
+    + '<div id="cot-rank-band-labels">'
+    + '<span class="cot-rank-band-label cot-rank-band-label-hi" style="color:var(--blue);">Range highs</span>'
+    + '<span class="cot-rank-band-label cot-rank-band-label-lo" style="color:var(--up);">Range lows</span>'
+    + '</div>'
+    + '</div></div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores) · shaded bands mark the top/bottom 10% of the 0-100% range · hover a bar for its exact reading</div>';
   return html;
 }
 
