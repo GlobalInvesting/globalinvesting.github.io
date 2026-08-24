@@ -1969,16 +1969,27 @@ function _cotContractValueUSD(ccy, contracts, contractMultiplier) {
   return baseValue / rate;
 }
 
-// Same red/green intensity scale as _corrMtxCellStyle(), just working on a
-// -100..+100 percent scale instead of a -1..+1 correlation — the two never
-// share a call site so a separate helper keeps each one's scale explicit
-// rather than smuggling a ×100/÷100 conversion into a shared function.
+// FIX (2026-08-23): Santiago flagged the grid reading as if "a light layer
+// sits on top" — the cells were using _corrMtxCellStyle()'s 0.35 max-alpha
+// cap, which is correctly subtle for a dense 32×32 correlation matrix (where
+// full saturation everywhere would be visually overwhelming) but reads as a
+// washed-out translucent veil over the dark theme background on a sparse,
+// intentionally-punchy 28-cell grid whose whole purpose (matching Dool's own
+// conditional-formatted spreadsheet) is to make extreme positioning pop at a
+// glance. Not a shared function with _corrMtxCellStyle() for exactly this
+// reason — the two grids call for different visual weight even though both
+// happen to scale a value to ±1. Raised max alpha 0.35 → 0.82 and switched
+// text color to a fixed light/dark pair for contrast against the now much
+// more saturated fill (var(--up)/var(--down) text was tuned to sit on top of
+// the old pale fill and goes low-contrast once the fill itself is this
+// dark/saturated).
 function _cotStrengthCellStyle(pct) {
   if (pct == null) return { bg: 'var(--bg2)', color: 'var(--text3)', txt: '—' };
   const a = Math.min(Math.abs(pct) / 100, 1);
   const txt = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
-  if (pct >= 0) return { bg: `rgba(38,166,154,${(a * 0.35).toFixed(2)})`, color: 'var(--up)', txt };
-  return { bg: `rgba(239,83,80,${(a * 0.35).toFixed(2)})`, color: 'var(--down)', txt };
+  const alpha = (0.16 + a * 0.66).toFixed(2); // floor of 0.16 so even small values read as colored, not blank
+  if (pct >= 0) return { bg: `rgba(38,166,154,${alpha})`, color: '#eafaf7', txt };
+  return { bg: `rgba(239,83,80,${alpha})`, color: '#fdecec', txt };
 }
 
 let _cotBreakdownData = null; // cache: { ccys: {ccy: data}, indices: {sym: data} }
@@ -2150,6 +2161,70 @@ function _cotStrengthGridHtml(store) {
   return html;
 }
 
+// Net Exposure % Rank — classic "COT Index" formula: where today's net
+// leveraged-funds position sits within its own trailing range, on a 0-100%
+// scale (0 = most net-short in the lookback window, 100 = most net-long).
+// `history` already caps at 52 entries (save()'s `existing_history[-52:]`,
+// engine repo) — the max lookback the data actually has, per Santiago's own
+// note. Needs >=2 points to have a range at all; a flat range (max==min,
+// only possible with a brand-new symbol that has just 1-2 identical prints)
+// returns null rather than a fabricated 50%.
+function _cotNetExposureRank(d) {
+  const hist = (d && d.history) || [];
+  if (hist.length < 2) return null;
+  const nets = hist.map(h => h.levNet).filter(n => n != null);
+  if (nets.length < 2) return null;
+  const lo = Math.min(...nets), hi = Math.max(...nets);
+  if (hi === lo) return null;
+  const current = nets[nets.length - 1];
+  return ((current - lo) / (hi - lo)) * 100;
+}
+
+// Same fill logic as _cotStrengthCellStyle() (0.16 floor + 0.66 range, fixed
+// light text) but keyed off distance from the 50% (neutral) midpoint of a
+// 0-100 rank rather than distance from 0 on a ±100% scale — a rank pinned at
+// either extreme (0 or 100) is the "crowded" signal here, not a rank of 100
+// itself being inherently more extreme than a rank of 0.
+function _cotRankBarStyle(rank) {
+  if (rank == null) return { bg: 'var(--bg2)', color: 'var(--text3)' };
+  const a = Math.abs(rank - 50) / 50; // 0 at midpoint, 1 at either extreme
+  const alpha = (0.16 + a * 0.66).toFixed(2);
+  if (rank >= 50) return { bg: `rgba(38,166,154,${alpha})`, color: '#eafaf7' };
+  return { bg: `rgba(239,83,80,${alpha})`, color: '#fdecec' };
+}
+
+function _cotNetExposureRankChartHtml(store) {
+  const rows = COT_BREAKDOWN_CCYS.map(ccy => {
+    const d = store.ccys[ccy];
+    const rank = d ? _cotNetExposureRank(d) : null;
+    const weeks = d && d.history ? d.history.length : 0;
+    return { ccy, rank, weeks };
+  });
+  // Descending by rank (most net-long positioning first), nulls last —
+  // consistent with the Strength Index grid's own sort convention above.
+  rows.sort((a, b) => {
+    if (a.rank == null && b.rank == null) return 0;
+    if (a.rank == null) return 1;
+    if (b.rank == null) return -1;
+    return b.rank - a.rank;
+  });
+
+  let html = '<div id="cot-rank-chart">';
+  rows.forEach(({ ccy, rank, weeks }) => {
+    const s = _cotRankBarStyle(rank);
+    const pctW = rank == null ? 0 : Math.max(rank, 2); // floor so a near-0 rank still shows a sliver of bar
+    const label = rank == null ? '—' : rank.toFixed(0) + '%';
+    html += '<div class="cot-rank-row">'
+      + `<div class="cot-rank-ccy">${ccy}</div>`
+      + `<div class="cot-rank-track"><div class="cot-rank-fill" style="width:${pctW}%;background:${s.bg};"></div>`
+      + `<div class="cot-rank-mid"></div></div>`
+      + `<div class="cot-rank-label" style="color:${rank == null ? 'var(--text3)' : s.color};">${label}</div>`
+      + '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
 async function renderCotBreakdown() {
   const inner = document.getElementById('cot-breakdown-fullscreen-inner');
   if (!inner) return;
@@ -2167,7 +2242,10 @@ async function renderCotBreakdown() {
   let html = '<div style="overflow-x:auto;">' + _cotBreakdownTableHtml(store) + '</div>';
   html += '<div style="margin-top:14px;font-size:11px;color:var(--text3);font-weight:600;">Currency Pairs — LF Strength Index</div>';
   html += _cotStrengthGridHtml(store);
-  html += '<div style="padding:10px 0 0;font-size:9px;color:var(--text3);">Strength Index = (Net%LF(base) − Net%LF(quote)) / 2, on a ±100% scale · Dool\'s filter threshold: |value| &gt; 25% · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX, Disaggregated for commodities) — not published for equity indices, shown as "—" there · beta, not yet in production</div>';
+  html += '<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Strength Index = (Net%LF(base) − Net%LF(quote)) / 2, on a ±100% scale · Dool\'s filter threshold: |value| &gt; 25%</div>';
+  html += '<div style="margin-top:16px;font-size:11px;color:var(--text3);font-weight:600;">Net Exposure % Rank — where current LF net position sits in its own trailing range (up to 52wk history)</div>';
+  html += _cotNetExposureRankChartHtml(store);
+  html += '<div style="padding:8px 0 14px;font-size:9px;color:var(--text3);">0% = most net-short leveraged-funds positioning in the lookback window, 100% = most net-long · lookback is whatever history exists per symbol, capped at 52 weeks (the full depth this data stores) · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX and equity indices, Disaggregated for commodities) · beta, not yet in production</div>';
   inner.innerHTML = html;
 }
 
