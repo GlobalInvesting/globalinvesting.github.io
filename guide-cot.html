@@ -405,96 +405,11 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="the-panel">
       <h2>Reading the COT Panel</h2>
       <p>The terminal displays COT data for AUD, CAD, CHF, EUR, GBP, JPY, and NZD futures (all quoted vs. USD — the CFTC does not publish a standalone USD futures contract directly comparable to the others, so USD does not appear as its own row). Each row shows the long/short bar, Long%, net contracts, the week-over-week net change (WoW Δ), an LF/AM alignment dot, net as % of LF open interest (Net%OI), and total LF open interest (OI):</p>
-      <!-- MOCK: Full COT panel — current layout (8 columns: CCY, bar, Long%, Net, WoW Δ, dot, Net%OI, OI) -->
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:18px 0;">
-        <div style="background:var(--head-bg);border-bottom:1px solid var(--border);padding:6px 12px;display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:10.5px;font-weight:700;color:var(--text);letter-spacing:.04em;">CFTC Positioning (COT)</span>
-          <span style="font-size:9.5px;color:var(--text3);">TFF · Leveraged Funds · week ending 2026-04-07 · updated Sat 11 Apr · loaded 22:25 GMT-3 · <span style="color:var(--up);">● 4d lag</span></span>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-cot.png" alt="CFTC Positioning — Leveraged Funds panel in the Global Investing web terminal, FX tab, showing AUD, GBP, EUR, JPY, CHF, CAD, and NZD with long/short bar, Long%, Net, WoW change, LF/AM alignment dot, Net%OI, and total open interest" width="988" height="461" loading="lazy">
         </div>
-        <div style="padding:6px 12px;">
-          <!-- Header row — 8 columns -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;font-size:9.5px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;padding-bottom:5px;border-bottom:1px solid var(--border2);margin-bottom:4px;">
-            <span>CCY</span><span>Long / Short</span><span>Long%</span><span style="text-align:right">Net</span><span style="text-align:right">WoW Δ</span><span title="LF/AM alignment">&#x25CF;</span><span style="text-align:right">Net%OI</span><span style="text-align:right">OI</span>
-          </div>
-          <!-- AUD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">AUD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:71%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:29%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">71%</span>
-            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right">+41,458</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--up);" title="LF + AM aligned — both net long">●</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 98k</span>
-          </div>
-          <!-- GBP -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">GBP</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:65%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:35%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">65%</span>
-            <span style="font-size:10px;color:var(--up);font-family:var(--font-mono);text-align:right">+25,864</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF long · AM short">○</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 84k</span>
-          </div>
-          <!-- CHF -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">CHF</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:47%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:53%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">47%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-1,225</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--down);" title="LF + AM aligned — both net short">●</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 19k</span>
-          </div>
-          <!-- EUR -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">EUR</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:42%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:58%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">42%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-31,777</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM long">○</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▼ 198k</span>
-          </div>
-          <!-- JPY -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">JPY</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:35%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:65%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">35%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-60,210</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--down);" title="LF + AM aligned — both net short">●</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▼ 199k</span>
-          </div>
-          <!-- CAD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">CAD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:27%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:73%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">27%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-47,911</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text3);" title="LF/AM diverge — LF short · AM short">●</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 106k</span>
-          </div>
-          <!-- NZD -->
-          <div style="display:grid;grid-template-columns:36px 1fr 42px 64px 52px 14px 46px 68px;gap:8px;align-items:center;padding:7px 0;">
-            <span style="font-size:11px;font-weight:700;color:var(--text);font-family:var(--font-mono);">NZD</span>
-            <div style="background:var(--bg3);border-radius:2px;height:6px;overflow:hidden;position:relative;"><div style="position:absolute;left:0;top:0;width:27%;height:100%;background:var(--up);opacity:.75;"></div><div style="position:absolute;right:0;top:0;width:73%;height:100%;background:var(--down);opacity:.75;"></div></div>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);">27%</span>
-            <span style="font-size:10px;color:var(--down);font-family:var(--font-mono);text-align:right">-15,824</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--down);" title="LF + AM aligned — both net short">●</span>
-            <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);text-align:right">—</span>
-            <span style="font-size:10px;color:var(--text2);font-family:var(--font-mono);text-align:right">▲ 34k</span>
-          </div>
-        </div>
-        <div style="padding:4px 12px 6px;font-size:9px;color:var(--text3);border-top:1px solid var(--border);">● LF+AM aligned · ○ LF/AM diverge · WoW Δ and Net%OI populate after 2+ weeks of history · OI = LF open interest (long + short)</div>
+        <p class="scr-meta"><strong>The docked COT panel, FX tab.</strong> Long/Short bar, Long%, Net contracts, WoW Δ, LF/AM alignment dot, Net%OI, and total LF open interest per currency. ● marks LF+AM aligned, ○ marks LF/AM divergence; WoW Δ and Net%OI populate once 2+ weeks of history are available. OI is total LF open interest (long + short).</p>
       </div>
       <p>The horizontal bar visualizes the long/short split. Green fills from the left (longs), red fills from the right (shorts). A bar extending past the midpoint on the green side means more speculative longs than shorts. Past the midpoint on the red side means net short positioning.</p>
 
