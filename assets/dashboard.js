@@ -2238,10 +2238,17 @@ function _cotStrengthGridHtml(store) {
   // shows through as a gray patch. Fill those slots with invisible
   // placeholder cells instead, so the last row blends into the modal
   // background like the rest of the panel.
+  // The grid is a fixed 6-column layout; when the pair count isn't a
+  // multiple of 6, the trailing slots in the last row have no cell at
+  // all, and the container's own background (the 1px gap-line color)
+  // shows through as a gray patch. Fill those slots with a single
+  // spanning placeholder cell (not one-per-slot) so there's no internal
+  // grid gap line between adjacent placeholders, and it blends fully
+  // into the modal background.
   const remainder = rows.length % 6;
   const emptySlots = remainder === 0 ? 0 : 6 - remainder;
-  for (let i = 0; i < emptySlots; i++) {
-    html += '<div class="cot-strength-empty"></div>';
+  if (emptySlots > 0) {
+    html += `<div class="cot-strength-empty" style="grid-column:span ${emptySlots};"></div>`;
   }
   html += '</div>';
   // Legend swatches sample the same continuous _cotHeatColor() scale the
