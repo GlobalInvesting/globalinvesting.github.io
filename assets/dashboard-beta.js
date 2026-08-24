@@ -1937,6 +1937,10 @@ async function fetchCOTCommoditiesData() {
 // (not in the CFTC TFF report — see COT_CURRENCIES comment above).
 const COT_BREAKDOWN_CCYS    = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NZD', 'CHF', 'JPY'];
 const COT_BREAKDOWN_INDICES = ['SPX', 'NAS100', 'DJ30'];
+// Commodities (v8.161.0 CFTC Disaggregated report — already fetched into
+// cot-data/commodities/{sym}.json for the docked COT panel's Commodities
+// tab). Added to Full Breakdown per Santiago's request — "ya las tenemos".
+const COT_BREAKDOWN_COMMODITIES = ['XAU', 'XAG', 'COPPER', 'WTI'];
 
 // Currency pairs for the Strength Index grid — CORR_MTX_PAIRS filtered to
 // drop any pair touching NOK/SEK (not fetched into COT_BREAKDOWN_CCYS).
@@ -1994,30 +1998,45 @@ async function _fetchCotBreakdownData() {
       return { sym, data: await r.json() };
     } catch { return null; }
   });
+  const comPromises = COT_BREAKDOWN_COMMODITIES.map(async sym => {
+    try {
+      const r = await fetch('./cot-data/commodities/' + sym + '.json');
+      if (!r.ok) return null;
+      return { sym, data: await r.json() };
+    } catch { return null; }
+  });
 
-  const [ccyResults, idxResults] = await Promise.all([Promise.all(ccyPromises), Promise.all(idxPromises)]);
-  const ccys = {}, indices = {};
+  const [ccyResults, idxResults, comResults] = await Promise.all([Promise.all(ccyPromises), Promise.all(idxPromises), Promise.all(comPromises)]);
+  const ccys = {}, indices = {}, commodities = {};
   ccyResults.filter(Boolean).forEach(({ ccy, data }) => { ccys[ccy] = data; });
   idxResults.filter(Boolean).forEach(({ sym, data }) => { indices[sym] = data; });
-  _cotBreakdownData = { ccys, indices };
+  comResults.filter(Boolean).forEach(({ sym, data }) => { commodities[sym] = data; });
+  _cotBreakdownData = { ccys, indices, commodities };
   return _cotBreakdownData;
 }
 
-// Builds one row of the breakdown table for a currency or an index symbol.
-function _cotBreakdownRow(symbol, d, displayName) {
+// Builds one row of the breakdown table for a currency, index, or commodity
+// symbol. `isUsdDenominated` covers both the USD/DXY row (contract already
+// in USD) and commodities (Gold/Silver/Copper/WTI — CFTC's contractUnit for
+// these is a physical measure like "TROY OUNCES"/"POUNDS", not a currency
+// code, and COMEX/NYMEX contracts are themselves USD-quoted, so the base
+// value computed from contractMultiplier is already USD — no STATE.rates
+// lookup applies or is possible for a non-currency unit).
+function _cotBreakdownRow(symbol, d, displayName, isUsdDenominated) {
   const long = d.longPositions || 0, short = d.shortPositions || 0;
   const net  = d.netPosition || 0;
   const oiLF = long + short;
-  const oiTotal = d.openInterestTotal; // FX only — null for indices
+  const oiTotal = d.openInterestTotal; // FX + commodities — null for indices
   const contractMultiplier = d.contractMultiplier;
   const contractUnit = d.contractUnit;
 
-  const oiTotalUSD  = _cotContractValueUSD(symbol === 'USD' ? 'USD' : (contractUnit || symbol), oiTotal, contractMultiplier);
-  const oiLFUSD     = _cotContractValueUSD(symbol === 'USD' ? 'USD' : (contractUnit || symbol), oiLF, contractMultiplier);
-  const longValue   = contractMultiplier != null ? long * contractMultiplier : null;
-  const shortValue  = contractMultiplier != null ? short * contractMultiplier : null;
+  const usdCcy = isUsdDenominated || symbol === 'USD' ? 'USD' : (contractUnit || symbol);
+  const oiTotalUSD   = _cotContractValueUSD(usdCcy, oiTotal, contractMultiplier);
+  const oiLFUSD      = _cotContractValueUSD(usdCcy, oiLF, contractMultiplier);
+  const longValue    = contractMultiplier != null ? long * contractMultiplier : null;
+  const shortValue   = contractMultiplier != null ? short * contractMultiplier : null;
   const netValueBase = contractMultiplier != null ? net * contractMultiplier : null;
-  const netValueUSD  = _cotContractValueUSD(symbol === 'USD' ? 'USD' : (contractUnit || symbol), net, contractMultiplier);
+  const netValueUSD  = _cotContractValueUSD(usdCcy, net, contractMultiplier);
 
   const netPct   = oiLF > 0 ? (net / oiLF) * 100 : null;               // Net Percent (of LF OI, same as docked panel)
   const netPctLF = oiLF > 0 ? (net / oiLF) * 100 : null;                // Net Percent LF (same base — kept as its own column to match Dool's layout)
@@ -2055,9 +2074,10 @@ function _cotBreakdownRow(symbol, d, displayName) {
 }
 
 const COT_BREAKDOWN_INDEX_DISPLAY = { SPX: 'SP500 (E-MINI)', NAS100: 'NAS100 (NQ MINI)', DJ30: 'US30 (YM)' };
+const COT_BREAKDOWN_COMMODITY_DISPLAY = { XAU: 'GOLD', XAG: 'SILVER', COPPER: 'COPPER', WTI: 'WTI CRUDE OIL' };
 
 function _cotBreakdownTableHtml(store) {
-  const head = ['Currency', 'Contract Value', 'Open Interest TOTAL', 'Open Interest TOTAL USD', 'Open Interest LF', 'Open Interest LF USD',
+  const head = ['Symbol', 'Contract Value', 'Open Interest TOTAL', 'Open Interest TOTAL USD', 'Open Interest LF', 'Open Interest LF USD',
     'Long Positions', 'Long Value', 'Short Positions', 'Short Value', 'Net Positions', 'Net Percent', 'Net Percent LF', 'Net % LF Δ',
     'Net Value (Base Currency)', 'Net Value USD'];
   let html = '<table id="cot-breakdown-fs-table"><thead><tr>' + head.map(h => `<th scope="col">${h}</th>`).join('') + '</tr></thead><tbody>';
@@ -2069,15 +2089,31 @@ function _cotBreakdownTableHtml(store) {
     const d = store.indices[sym];
     if (d) html += _cotBreakdownRow(sym, d, COT_BREAKDOWN_INDEX_DISPLAY[sym] || sym);
   });
+  COT_BREAKDOWN_COMMODITIES.forEach(sym => {
+    const d = store.commodities && store.commodities[sym];
+    if (d) html += _cotBreakdownRow(sym, d, COT_BREAKDOWN_COMMODITY_DISPLAY[sym] || sym, true);
+  });
   html += '</tbody></table>';
   return html;
 }
 
-// Pairwise Strength Index: for pair BASE/QUOTE, value = Net%LF(BASE) − Net%LF(QUOTE)
+// Pairwise Strength Index: for pair BASE/QUOTE, value = (Net%LF(BASE) − Net%LF(QUOTE)) / 2
 // — the same "which side has the more crowded leveraged-funds positioning"
 // read Dool's reference sheet shows, normalized to a single ±100% scale so
 // pairs are directly comparable regardless of contract size. |value| > 25%
 // is Dool's own filter threshold for his weekly strategy (see support email).
+//
+// FIX (2026-08-23): the raw difference Net%LF(base) − Net%LF(quote) can
+// range up to ±200% (each leg individually bounded to ±100%), but Dool's
+// own reference sheet — reverse-engineered from his screenshot numbers,
+// e.g. EURUSD −30.30% against his own USD/EUR Net%LF of +36.40%/−24.25%
+// (diff −60.65%, exactly double his displayed value), AUDNZD +64.20%
+// against +52.54%/−75.93% (diff 128.47%, again exactly double) — divides
+// the raw difference by 2 to keep the composite on the same ±100% scale as
+// each individual leg. Confirmed against 3 independent pairs from his
+// sheet, all matching to within rounding. The panel previously omitted
+// this /2, producing values like +127.6%/−113.6% that overflow a scale
+// that's supposed to be capped at ±100%.
 function _cotStrengthGridHtml(store) {
   const pctByCcy = {};
   COT_BREAKDOWN_CCYS.forEach(ccy => {
@@ -2086,12 +2122,26 @@ function _cotStrengthGridHtml(store) {
   });
 
   const pairs = _cotStrengthPairList();
-  let html = '<div id="cot-strength-grid">';
-  pairs.forEach(([, base, quote]) => {
+  // Dool's own reference layout (screenshot) orders cells strictly
+  // descending by value, read row-by-row left-to-right — not a fixed
+  // pair order and not alphabetical. Pairs with insufficient data (null)
+  // sort to the end, after every real value.
+  const rows = pairs.map(([, base, quote]) => {
     const b = pctByCcy[base], q = pctByCcy[quote];
-    const val = (b != null && q != null) ? b - q : null;
+    const val = (b != null && q != null) ? (b - q) / 2 : null;
+    return { base, quote, val };
+  });
+  rows.sort((a, b) => {
+    if (a.val == null && b.val == null) return 0;
+    if (a.val == null) return 1;
+    if (b.val == null) return -1;
+    return b.val - a.val;
+  });
+
+  let html = '<div id="cot-strength-grid">';
+  rows.forEach(({ base, quote, val }) => {
     const s = _cotStrengthCellStyle(val);
-    html += `<div style="background:${s.bg};" title="${base}${quote} LF Strength = Net%LF(${base}) − Net%LF(${quote})${val == null ? ' (insufficient data)' : ''}">`
+    html += `<div style="background:${s.bg};" title="${base}${quote} LF Strength = (Net%LF(${base}) − Net%LF(${quote})) / 2${val == null ? ' (insufficient data)' : ''}">`
       + `<div class="cot-strength-pair">${base}${quote}</div>`
       + `<div class="cot-strength-val" style="color:${s.color};">${s.txt}</div>`
       + '</div>';
@@ -2117,7 +2167,7 @@ async function renderCotBreakdown() {
   let html = '<div style="overflow-x:auto;">' + _cotBreakdownTableHtml(store) + '</div>';
   html += '<div style="margin-top:14px;font-size:11px;color:var(--text3);font-weight:600;">Currency Pairs — LF Strength Index</div>';
   html += _cotStrengthGridHtml(store);
-  html += '<div style="padding:10px 0 0;font-size:9px;color:var(--text3);">Strength Index = Net%LF(base) − Net%LF(quote), on a ±100% scale · Dool\'s filter threshold: |value| &gt; 25% · Open Interest TOTAL / contract value are FX-only (CFTC TFF header fields) — not yet published for equity indices · beta, not yet in production</div>';
+  html += '<div style="padding:10px 0 0;font-size:9px;color:var(--text3);">Strength Index = (Net%LF(base) − Net%LF(quote)) / 2, on a ±100% scale · Dool\'s filter threshold: |value| &gt; 25% · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX, Disaggregated for commodities) — not published for equity indices, shown as "—" there · beta, not yet in production</div>';
   inner.innerHTML = html;
 }
 
