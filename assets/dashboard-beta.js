@@ -2005,29 +2005,32 @@ function _cotHeatColor(magnitude, isUp) {
   return `rgb(${r},${g},${b})`;
 }
 
-// Uses the SAME opaque interpolation as the Net Exposure Rank chart below
-// (_cotHeatColor()) — not the Δ Strength pivot matrix's rgba-alpha swatch
-// scheme. Those are two different established patterns already in this
-// codebase: the flagship Currency Strength Heatmap (index.html's
-// `.h-s-up`/`.h-up`/`.h-flat`/`.h-down`/`.h-s-down`) uses solid, opaque hex
-// backgrounds — e.g. `.h-s-up{background:#1a3a34}`, no alpha channel —
-// while the Δ Strength pivot matrix (heatmap-modal.js's
-// `.corr-cell-pos-hi`/etc.) uses rgba alpha over the dark theme background.
-// A prior revision of this function copied the pivot matrix's rgba
-// approach and described it as "the same as the Currency Strength
-// Heatmap," which was incorrect — that heatmap has never used alpha, and
-// pairing an alpha-blended grid next to this panel's own opaque Net
-// Exposure chart directly caused the "translucent veil, colors don't match
-// the rest of the chart" report. Standardizing on the opaque interpolation
-// (shared with the heatmap AND the rank chart) resolves both.
+// A discrete 3-tier bucket (flat/mild/strong copied verbatim from the
+// Currency Strength Heatmap's own hardcoded hex values) put roughly 2/3 of
+// this grid's real pair values — everything under the mild-tier's own 25%
+// floor — into one flat, barely-tinted "h-flat" bucket (`var(--bg3)`,
+// visually indistinguishable from an empty cell). That IS the "too much
+// gray" report: the heatmap's 0.05/0.15 buckets make sense for its own
+// data (daily %-change, usually small), but most of this grid's real
+// pair values cluster well under 25% on its ±100% scale, so copying the
+// heatmap's bucket boundaries verbatim starved this specific data
+// distribution of any real color. Fixed by using the SAME solid,
+// alpha-free `_cotHeatColor()` interpolation the Net Exposure Rank chart
+// below already uses, continuously — every non-null value gets a real
+// green/red tint from the moment it's non-zero (light near 0, saturating
+// toward the flagship heatmap's own #1a3a34/#3a1a1a hex at the ±100%
+// extremes), so "light green through dark green" (and light/dark red) is
+// a smooth gradient, not three fixed steps. Currency-pair name stays
+// white (`.cot-strength-pair`, set in CSS) exactly like the heatmap's
+// `.hm-sym`; the percentage value carries the up/down color, exactly like
+// the heatmap's `.hm-val.up`/`.hm-val.down`.
 function _cotStrengthCellStyle(pct) {
   if (pct == null) return { bg: 'var(--bg2)', color: 'var(--text3)', txt: '—', bold: false };
   const txt = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
-  const a = Math.abs(pct);
-  if (a < 25) return { bg: 'var(--bg3)', color: 'var(--text2)', txt, bold: false };
-  const strong = a >= 50;
-  const magnitude = Math.min(a, 100) / 100;
-  return { bg: _cotHeatColor(magnitude, pct >= 0), color: '#f2f5f8', txt, bold: strong };
+  const up = pct >= 0;
+  const magnitude = Math.min(Math.abs(pct), 100) / 100;
+  const bg = _cotHeatColor(magnitude, up);
+  return { bg, color: up ? 'var(--up)' : 'var(--down)', txt, bold: Math.abs(pct) >= 50 };
 }
 
 let _cotBreakdownData = null; // cache: { ccys: {ccy: data}, indices: {sym: data} }
@@ -2218,15 +2221,14 @@ function _cotStrengthGridHtml(store) {
       + '</div>';
   });
   html += '</div>';
-  // Legend mirrors the app's own convention for this exact palette (see
-  // heatmap-modal.js's .corr-legend / Δ Strength pivot matrix) — same
-  // swatch style, same strong/mild wording, thresholds specific to this
-  // grid's ±100% scale.
+  // Legend swatches sample the same continuous _cotHeatColor() scale the
+  // cells themselves use (light near 0, saturating toward the flagship
+  // heatmap's own extremes at ±100%) — not a fixed discrete-tier palette.
   html += '<div class="cot-strength-legend">'
-    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, true)};"></span>Strong net-long lean (≥ +50%)</span>`
-    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.30, true)};"></span>Mild net-long lean (≥ +25%)</span>`
-    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.30, false)};"></span>Mild net-short lean (≤ −25%)</span>`
-    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, false)};"></span>Strong net-short lean (≤ −50%)</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.15, true)};"></span>Net-long lean</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, true)};"></span>Strong net-long lean</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.15, false)};"></span>Net-short lean</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, false)};"></span>Strong net-short lean</span>`
     + '</div>';
   return html;
 }
@@ -2283,14 +2285,24 @@ function _cotRankBarStyle(rank) {
   return { bg: _cotHeatColor(magnitude, rank >= 50), color: '#f2f5f8' };
 }
 
-// Single-marker range chart — currencies along the horizontal axis (fixed
-// BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the breakdown
-// table above it — not re-sorted by value), each column a full-height
-// neutral reference track (the 0–100% axis itself, made visible as a
-// track so the marker reads against a real reference frame the way the
-// original chart's range box does) with one marker line at the current
-// reading, against a 0/25/50/75/100 axis on the left. Full panel width, no
-// fixed max-width, so columns fill the available space evenly.
+// Diverging/floating-column chart — currencies along the horizontal axis
+// (fixed BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the
+// breakdown table above it — not re-sorted by value). Each column is a
+// single bar that floats FROM the 50% (neutral) baseline TO the current
+// reading — the standard way to plot a single value against a 0–100%
+// range on one shared axis, and the direct one-lookback-depth analog of
+// the reference chart's range box (whose top/bottom edges are the 2nd/3rd
+// lookback depths this data doesn't have — see the 52-week-only note
+// below). A full-height gray "track" column behind a thin marker line
+// (the prior revision) reads as an empty/loading bar with a stray line on
+// it, not a value — replaced here with the bar itself carrying the value,
+// which is what "starts from the 50% level" in the reference chart
+// actually means once there's only one depth to plot. Bar color: green
+// growing upward from 50 (net-long lean within its own range), red
+// growing downward (net-short lean) — same continuous _cotHeatColor()
+// scale as the Strength Index grid above, keyed off distance from the 50%
+// midpoint. Full panel width, no fixed max-width, columns fill the
+// available space evenly.
 function _cotNetExposureRankChartHtml(store) {
   const rows = COT_BREAKDOWN_CCYS.map(ccy => {
     const d = store.ccys[ccy];
@@ -2309,25 +2321,27 @@ function _cotNetExposureRankChartHtml(store) {
     if (!detail) {
       html += '<div class="cot-rank-col">'
         + '<div class="cot-rank-col-val" style="color:var(--text3);">—</div>'
-        + '<div class="cot-rank-col-track"></div>'
+        + '<div class="cot-rank-col-bararea"></div>'
         + `<div class="cot-rank-col-ccy">${label}</div>`
         + '</div>';
       return;
     }
     const { currentRank, weeks } = detail;
-    const s = _cotRankBarStyle(currentRank);
-    const markerBottom = Math.max(0, Math.min(100, currentRank));
+    const r = Math.max(0, Math.min(100, currentRank));
+    const s = _cotRankBarStyle(r);
+    const barBottom = Math.min(r, 50);
+    const barHeight = Math.abs(r - 50);
     const label3s = currentRank.toFixed(0) + '%';
     html += '<div class="cot-rank-col">'
       + `<div class="cot-rank-col-val" style="color:${s.color};">${label3s}</div>`
-      + `<div class="cot-rank-col-track" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
-      + `<div class="cot-rank-col-marker" style="bottom:${markerBottom}%;background:${s.bg};"></div>`
+      + `<div class="cot-rank-col-bararea" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
+      + `<div class="cot-rank-col-bar" style="bottom:${barBottom}%;height:${barHeight}%;background:${s.bg};"></div>`
       + '</div>'
       + `<div class="cot-rank-col-ccy">${label}</div>`
       + '</div>';
   });
   html += '</div></div></div>';
-  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Marker = latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores)</div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores)</div>';
   return html;
 }
 
