@@ -466,6 +466,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center}
 .cot-strength-pair{font-size:10px;color:var(--text2);font-weight:600}
 .cot-strength-val{font-size:12px;font-weight:700;margin-top:2px}
+#cot-rank-chart{display:flex;flex-direction:column;gap:4px;margin-top:6px;max-width:560px}
+.cot-rank-row{display:flex;align-items:center;gap:8px}
+.cot-rank-ccy{width:38px;flex-shrink:0;font-size:11px;font-weight:700;color:var(--text2)}
+.cot-rank-track{position:relative;flex:1;height:16px;background:var(--bg2);border-radius:2px;overflow:hidden}
+.cot-rank-fill{height:100%;border-radius:2px;transition:width .2s}
+.cot-rank-mid{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--border2)}
+.cot-rank-label{width:36px;flex-shrink:0;text-align:right;font-size:11px;font-weight:700;font-family:var(--font-mono)}
 /* Full-width layout: table-layout:fixed + width:100% lets the browser split
    the available width evenly across all 32 pair columns automatically, so
    the grid fills the fullscreen overlay with no horizontal scrollbar on a
