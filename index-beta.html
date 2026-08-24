@@ -463,20 +463,37 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cot-breakdown-fs-table thead th{text-align:right;color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--border)}
 #cot-breakdown-fs-table thead th:first-child{text-align:left}
 #cot-strength-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border2);margin-top:6px}
-#cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center}
+#cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:filter .1s}
+#cot-strength-grid>div:hover{filter:brightness(1.4)}
 .cot-strength-pair{font-size:10px;color:var(--text2);font-weight:600}
-.cot-strength-val{font-size:12px;font-weight:700;margin-top:2px}
-#cot-rank-chart{display:flex;gap:6px;margin-top:8px;max-width:620px;height:190px}
-#cot-rank-axis{display:flex;flex-direction:column;justify-content:space-between;width:26px;flex-shrink:0;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-mono);padding-bottom:20px}
+.cot-strength-val{font-size:12px;margin-top:2px}
+.cot-strength-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);align-items:center}
+.cot-strength-swatch{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-right:4px}
+/* Full-width band chart: no max-width cap (v8.238.0-beta follow-up — the
+   prior 620px cap was left over from an earlier single-bar layout and never
+   removed when the chart was rewritten as a band+marker chart, so it kept
+   rendering narrow with empty space to the right regardless of the JS
+   change). Columns use flex:1 with no per-column max-width so the 8 BIS-
+   order currencies split the panel's full width evenly, matching every
+   other full-width element in this fullscreen overlay (breakdown table,
+   strength grid). */
+#cot-rank-chart{display:flex;gap:10px;margin-top:8px;width:100%;height:210px}
+#cot-rank-axis{display:flex;flex-direction:column;justify-content:space-between;width:30px;flex-shrink:0;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-mono);padding-bottom:22px}
 #cot-rank-plot{position:relative;flex:1;min-width:0}
-#cot-rank-gridlines{position:absolute;inset:0 0 20px 0}
+#cot-rank-gridlines{position:absolute;inset:0 0 22px 0}
 .cot-rank-gridline{position:absolute;left:0;right:0;border-top:1px solid var(--border2)}
-#cot-rank-cols{position:relative;display:flex;align-items:flex-end;gap:8px;height:100%;padding-bottom:20px}
+#cot-rank-cols{position:relative;display:flex;align-items:flex-end;gap:10px;height:100%;padding-bottom:22px}
 .cot-rank-col{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;position:relative}
 .cot-rank-col-val{font-size:10px;font-weight:700;font-family:var(--font-mono);margin-bottom:3px}
-.cot-rank-col-track{width:100%;max-width:30px;height:100%;display:flex;align-items:flex-end;border-radius:2px 2px 0 0;overflow:hidden}
-.cot-rank-col-fill{width:100%;border-radius:2px 2px 0 0;transition:height .2s}
-.cot-rank-col-ccy{position:absolute;bottom:-18px;font-size:11px;font-weight:700;color:var(--text2)}
+/* Track is the full-height reference axis (0-100%, bottom-anchored);
+   .cot-rank-col-band is the recent-quarter range positioned absolutely
+   within it (bottom/height set inline as %), .cot-rank-col-marker is a
+   thin line at the latest reading — a band with a marker, not a bar
+   filled from zero. */
+.cot-rank-col-track{position:relative;width:100%;max-width:56px;height:100%;border-radius:2px;overflow:visible;background:var(--bg2)}
+.cot-rank-col-band{position:absolute;left:0;right:0;border-radius:2px;min-height:2px}
+.cot-rank-col-marker{position:absolute;left:-3px;right:-3px;height:2px;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.5);transform:translateY(1px)}
+.cot-rank-col-ccy{position:absolute;bottom:-20px;font-size:11px;font-weight:700;color:var(--text2)}
 /* Full-width layout: table-layout:fixed + width:100% lets the browser split
    the available width evenly across all 32 pair columns automatically, so
    the grid fills the fullscreen overlay with no horizontal scrollbar on a
