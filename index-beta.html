@@ -477,6 +477,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    order currencies split the panel's full width evenly, matching every
    other full-width element in this fullscreen overlay (breakdown table,
    strength grid). */
+/* Range highs/lows legend (v8.248.0-beta, Option B): reuses the exact
+   .cot-strength-legend/-swatch visual pattern the Strength Index grid's
+   own legend above this chart already uses, just with the band fill
+   colors as swatches — the label lives here, entirely outside the plot,
+   instead of competing with the bars for space inside it. */
+.cot-rank-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:8px;align-items:center}
 #cot-rank-chart{display:flex;gap:10px;margin-top:8px;width:100%;height:210px}
 #cot-rank-axis{display:flex;flex-direction:column;justify-content:space-between;width:30px;flex-shrink:0;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-mono);padding-bottom:22px}
 #cot-rank-plot{position:relative;flex:1;min-width:0}
@@ -487,14 +493,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    full element height (which also includes the 22px ccy-label strip). */
 #cot-rank-bands{position:absolute;inset:0 0 22px 0;pointer-events:none}
 .cot-rank-band{position:absolute;left:0;right:0}
-/* Labels sit in their own top layer (after #cot-rank-cols in the DOM,
-   see the code comment there) with a solid chip background so a bar
-   reaching into the band's zone passes visually behind the label
-   instead of covering it. */
-#cot-rank-band-labels{position:absolute;inset:0 0 22px 0;pointer-events:none}
-.cot-rank-band-label{position:absolute;left:6px;font-size:9px;font-style:italic;font-weight:600;background:var(--head-bg);padding:1px 5px;border-radius:3px}
-.cot-rank-band-label-hi{top:3px}
-.cot-rank-band-label-lo{bottom:3px}
 #cot-rank-gridlines{position:absolute;inset:0 0 22px 0}
 .cot-rank-gridline{position:absolute;left:0;right:0;border-top:1px solid var(--border2)}
 #cot-rank-cols{position:relative;display:flex;align-items:flex-end;gap:10px;height:100%;padding-bottom:22px}
