@@ -42,6 +42,7 @@ The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — li
 ### Institutional Positioning
 - CFTC Commitments of Traders — Leveraged Funds net positioning (Traders in Financial Futures / TFF, Options+Futures Combined), updated weekly
 - 52-week positioning history with momentum scoring
+- Full Breakdown view (fullscreen): per-symbol Open Interest/Contract Value/Net Position table across FX, equity indices, and commodities; a pairwise Leveraged Funds Strength Index grid; and a Net Exposure % Rank chart showing where current positioning sits within its own trailing range
 
 ### Macro Analytics
 - Economic Surprise Index — CESI-style normalized surprise for all 10 G10 currencies, 90-day rolling window, beat-rate scaled [−100, +100] per Citi convention
