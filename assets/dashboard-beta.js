@@ -2151,10 +2151,21 @@ const COT_BREAKDOWN_COMMODITY_DISPLAY = { XAU: 'GOLD', XAG: 'SILVER', COPPER: 'C
 const COT_BREAKDOWN_CCY_DISPLAY = { USD: 'USD INDEX' };
 
 function _cotBreakdownTableHtml(store) {
-  const head = ['Symbol', 'Contract Value', 'Open Interest TOTAL', 'Open Interest TOTAL USD', 'Open Interest LF', 'Open Interest LF USD',
-    'Long Positions', 'Long Value', 'Short Positions', 'Short Value', 'Net Positions', 'Net Percent', 'Net Percent LF', 'Net % LF Δ',
-    'Net Value (Base Currency)', 'Net Value USD'];
-  let html = '<table id="cot-breakdown-fs-table"><thead><tr>' + head.map(h => `<th scope="col">${h}</th>`).join('') + '</tr></thead><tbody>';
+  // Net Percent and Net Percent LF are two genuinely different metrics
+  // (different denominators — total Open Interest vs. Leveraged Funds'
+  // own Open Interest only), not a display duplicate of each other or a
+  // computation bug. Column titles say so explicitly and flag which one
+  // reconciles against the docked panel's own NET%OI figure, since that's
+  // the comparison point that caused confusion.
+  const head = [
+    { h: 'Symbol' }, { h: 'Contract Value' }, { h: 'Open Interest TOTAL' }, { h: 'Open Interest TOTAL USD' },
+    { h: 'Open Interest LF' }, { h: 'Open Interest LF USD' }, { h: 'Long Positions' }, { h: 'Long Value' },
+    { h: 'Short Positions' }, { h: 'Short Value' }, { h: 'Net Positions' },
+    { h: 'Net Percent', t: 'Net position as % of TOTAL Open Interest (every reporting category combined) — a different, smaller-magnitude denominator than Net Percent LF; does not match the docked panel.' },
+    { h: 'Net Percent LF', t: 'Net position as % of Leveraged Funds\u2019 own Open Interest only — reconciles exactly with the docked COT panel\u2019s NET%OI column.' },
+    { h: 'Net % LF Δ' }, { h: 'Net Value (Base Currency)' }, { h: 'Net Value USD' }
+  ];
+  let html = '<table id="cot-breakdown-fs-table"><thead><tr>' + head.map(c => `<th scope="col"${c.t ? ` title="${c.t}"` : ''}>${c.h}</th>`).join('') + '</tr></thead><tbody>';
   COT_BREAKDOWN_CCYS.forEach(ccy => {
     const d = store.ccys[ccy];
     if (d) html += _cotBreakdownRow(ccy, d, COT_BREAKDOWN_CCY_DISPLAY[ccy] || ccy);
@@ -2233,44 +2244,53 @@ function _cotStrengthGridHtml(store) {
   return html;
 }
 
-// Net Exposure % Rank — classic "COT Index" formula: where today's net
-// leveraged-funds position sits within its own trailing range, on a 0-100%
-// scale (0 = most net-short in the lookback window, 100 = most net-long).
-// `history` already caps at 52 entries (save()'s `existing_history[-52:]`,
-// engine repo) — the max lookback the data actually has. Needs >=2 points
-// to have a range at all; a flat range (max==min, only possible with a
-// brand-new symbol that has just 1-2 identical prints) returns null rather
-// than a fabricated 50%.
+// Net Exposure % Rank — classic "COT Index" formula: where a given reading
+// sits within its own trailing range, on a 0-100% scale (0 = most
+// net-short in that window, 100 = most net-long). `history` caps at 52
+// entries (save()'s `existing_history[-52:]`, engine repo) — the max
+// lookback the data actually has, ~1 year of weekly prints.
 //
 // The reference chart this panel is modeled on plots THREE separate
 // lookback depths per instrument (3-year / 1-year / 3-month) as a range
-// box plus two markers on one shared axis. This data only stores 52 weeks
-// total (~1 year) — there is no honest way to derive a distinct 3-year or
-// 3-month reading from a 52-week series without fabricating history, which
-// the panel's own footnote already discloses and this codebase's Data
-// integrity rules explicitly forbid (see GUIDELINES.md — no fabricated
-// regression/accumulation history). A prior revision tried to approximate
-// the missing depths anyway (a "recent-quarter band" plotted inside the
-// full-52-week range as a stand-in for the missing 1-year/3-month rows),
-// which added a second visual layer without a second real data point
-// behind it and made the chart harder to read, not more informative.
-// The honest version is a single reading — where the current print sits in
-// its own real 52-week range — shown as one clear marker, not a band.
+// box (the widest depth) plus two markers (the two shorter depths) on one
+// shared axis. A literal 3-year depth isn't available — this data only
+// stores ~1 year — so a prior revision collapsed to a single reading,
+// which lost the box-vs-marker structure the reference chart's readability
+// actually comes from. But a genuine second and third depth ARE available
+// without fabricating anything: the 52-week series already contains real
+// trailing 26-week (~6mo) and 13-week (~3mo) sub-windows — computing the
+// current reading's percentile rank within each of those slices is just a
+// different, still-real lookback length over the same real data, not
+// invented history (distinct from the earlier "recent-quarter band"
+// attempt, which plotted a synthetic overlay with no independent
+// computation behind it). Three genuine windows: full (up to 52wk),
+// mid (26wk), short (13wk) — each null if that many weeks don't exist yet.
+function _cotWindowRank(nets, windowSize) {
+  if (!nets || nets.length < 2) return null;
+  const slice = windowSize ? nets.slice(-windowSize) : nets;
+  if (slice.length < 2) return null;
+  const lo = Math.min(...slice), hi = Math.max(...slice);
+  if (hi === lo) return null;
+  const current = nets[nets.length - 1]; // always today's actual reading, ranked against each window's own range
+  return ((current - lo) / (hi - lo)) * 100;
+}
+
 function _cotNetExposureRankDetail(d) {
   const hist = (d && d.history) || [];
   const nets = hist.map(h => h.levNet).filter(n => n != null);
   if (nets.length < 2) return null;
-  const lo = Math.min(...nets), hi = Math.max(...nets);
-  if (hi === lo) return null;
-  const current = nets[nets.length - 1];
-  return { currentRank: ((current - lo) / (hi - lo)) * 100, weeks: nets.length };
+  const full  = _cotWindowRank(nets, null);
+  if (full == null) return null;
+  const mid   = nets.length >= 26 ? _cotWindowRank(nets, 26) : null;
+  const short = nets.length >= 13 ? _cotWindowRank(nets, 13) : null;
+  return { full, mid, short, weeks: nets.length };
 }
 
 // Kept for backward compatibility with any other caller expecting just the
-// current-reading percentile.
+// full-window percentile.
 function _cotNetExposureRank(d) {
   const detail = _cotNetExposureRankDetail(d);
-  return detail ? detail.currentRank : null;
+  return detail ? detail.full : null;
 }
 
 // Same solid-fill scale as _cotStrengthCellStyle() (via the shared
@@ -2285,24 +2305,17 @@ function _cotRankBarStyle(rank) {
   return { bg: _cotHeatColor(magnitude, rank >= 50), color: '#f2f5f8' };
 }
 
-// Diverging/floating-column chart — currencies along the horizontal axis
-// (fixed BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the
-// breakdown table above it — not re-sorted by value). Each column is a
-// single bar that floats FROM the 50% (neutral) baseline TO the current
-// reading — the standard way to plot a single value against a 0–100%
-// range on one shared axis, and the direct one-lookback-depth analog of
-// the reference chart's range box (whose top/bottom edges are the 2nd/3rd
-// lookback depths this data doesn't have — see the 52-week-only note
-// below). A full-height gray "track" column behind a thin marker line
-// (the prior revision) reads as an empty/loading bar with a stray line on
-// it, not a value — replaced here with the bar itself carrying the value,
-// which is what "starts from the 50% level" in the reference chart
-// actually means once there's only one depth to plot. Bar color: green
-// growing upward from 50 (net-long lean within its own range), red
-// growing downward (net-short lean) — same continuous _cotHeatColor()
-// scale as the Strength Index grid above, keyed off distance from the 50%
-// midpoint. Full panel width, no fixed max-width, columns fill the
-// available space evenly.
+// Range box (full-window high/low across the three real depths below) +
+// two markers — the same visual language as the reference chart (box +
+// diamond + circle), rebuilt from three genuinely independent real-data
+// window lengths instead of one value floated against a fixed 50%
+// baseline. Box spans from min to max of whichever of {full, mid, short}
+// exist for that symbol, so it lands wherever the real data puts it —
+// entirely above 50%, entirely below, or straddling it — never forced to
+// touch the midpoint. Box fill color keyed off the full-window reading
+// (the widest, most stable depth); mid = diamond marker, short = circle
+// marker, both rendered in a neutral color so they read as reference
+// points on top of the box rather than a second competing fill.
 function _cotNetExposureRankChartHtml(store) {
   const rows = COT_BREAKDOWN_CCYS.map(ccy => {
     const d = store.ccys[ccy];
@@ -2326,22 +2339,28 @@ function _cotNetExposureRankChartHtml(store) {
         + '</div>';
       return;
     }
-    const { currentRank, weeks } = detail;
-    const r = Math.max(0, Math.min(100, currentRank));
-    const s = _cotRankBarStyle(r);
-    const barBottom = Math.min(r, 50);
-    const barHeight = Math.abs(r - 50);
-    const label3s = currentRank.toFixed(0) + '%';
+    const { full, mid, short, weeks } = detail;
+    const vals = [full, mid, short].filter(v => v != null);
+    const boxLo = Math.max(0, Math.min(...vals));
+    const boxHi = Math.min(100, Math.max(...vals));
+    const s = _cotRankBarStyle(full);
+    const label3s = full.toFixed(0) + '%';
+    const tip = `${ccy}: full history ${label3s}` +
+      (mid   != null ? ` \u00b7 26wk ${mid.toFixed(0)}%`   : '') +
+      (short != null ? ` \u00b7 13wk ${short.toFixed(0)}%` : '') +
+      ` (${weeks} weeks stored)`;
     html += '<div class="cot-rank-col">'
       + `<div class="cot-rank-col-val" style="color:${s.color};">${label3s}</div>`
-      + `<div class="cot-rank-col-bararea" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
-      + `<div class="cot-rank-col-bar" style="bottom:${barBottom}%;height:${barHeight}%;background:${s.bg};"></div>`
+      + `<div class="cot-rank-col-bararea" title="${tip}">`
+      + `<div class="cot-rank-col-bar" style="bottom:${boxLo}%;height:${Math.max(boxHi - boxLo, 1.5)}%;background:${s.bg};"></div>`
+      + (mid   != null ? `<div class="cot-rank-col-mid" style="bottom:${mid}%;"></div>`     : '')
+      + (short != null ? `<div class="cot-rank-col-short" style="bottom:${short}%;"></div>` : '')
       + '</div>'
       + `<div class="cot-rank-col-ccy">${label}</div>`
       + '</div>';
   });
   html += '</div></div></div>';
-  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores)</div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar = range across three real lookback windows (full history up to 52wk, 26wk, 13wk) · ◆ 26wk reading · ● 13wk reading — all computed from the same stored weekly history, no fabricated depth</div>';
   return html;
 }
 
