@@ -2244,53 +2244,36 @@ function _cotStrengthGridHtml(store) {
   return html;
 }
 
-// Net Exposure % Rank — classic "COT Index" formula: where a given reading
-// sits within its own trailing range, on a 0-100% scale (0 = most
-// net-short in that window, 100 = most net-long). `history` caps at 52
-// entries (save()'s `existing_history[-52:]`, engine repo) — the max
-// lookback the data actually has, ~1 year of weekly prints.
+// Net Exposure % Rank — classic "COT Index" formula: where the current
+// reading sits within its own trailing range, on a 0-100% scale (0 = most
+// net-short in the lookback window, 100 = most net-long). `history` caps
+// at 52 entries (save()'s `existing_history[-52:]`, engine repo) — the max
+// lookback the data actually has, ~1 year of weekly prints. Needs >=2
+// points to have a range at all; a flat range (max==min) returns null.
 //
-// The reference chart this panel is modeled on plots THREE separate
-// lookback depths per instrument (3-year / 1-year / 3-month) as a range
-// box (the widest depth) plus two markers (the two shorter depths) on one
-// shared axis. A literal 3-year depth isn't available — this data only
-// stores ~1 year — so a prior revision collapsed to a single reading,
-// which lost the box-vs-marker structure the reference chart's readability
-// actually comes from. But a genuine second and third depth ARE available
-// without fabricating anything: the 52-week series already contains real
-// trailing 26-week (~6mo) and 13-week (~3mo) sub-windows — computing the
-// current reading's percentile rank within each of those slices is just a
-// different, still-real lookback length over the same real data, not
-// invented history (distinct from the earlier "recent-quarter band"
-// attempt, which plotted a synthetic overlay with no independent
-// computation behind it). Three genuine windows: full (up to 52wk),
-// mid (26wk), short (13wk) — each null if that many weeks don't exist yet.
-function _cotWindowRank(nets, windowSize) {
-  if (!nets || nets.length < 2) return null;
-  const slice = windowSize ? nets.slice(-windowSize) : nets;
-  if (slice.length < 2) return null;
-  const lo = Math.min(...slice), hi = Math.max(...slice);
-  if (hi === lo) return null;
-  const current = nets[nets.length - 1]; // always today's actual reading, ranked against each window's own range
-  return ((current - lo) / (hi - lo)) * 100;
-}
-
+// Per Santiago's explicit direction: reproduce the reference chart's own
+// model exactly — a single bar per currency floating FROM the 50%
+// (neutral) midpoint TO the current reading — not a multi-window
+// box/marker construction. A prior revision built a 3-real-window range
+// box (full/26wk/13wk) reasoning from the reference image's apparent
+// per-currency box extents; that read was wrong and added a different
+// chart than what was asked for. This is deliberately the single-value
+// version: one real percentile rank (full stored history), one bar.
 function _cotNetExposureRankDetail(d) {
   const hist = (d && d.history) || [];
   const nets = hist.map(h => h.levNet).filter(n => n != null);
   if (nets.length < 2) return null;
-  const full  = _cotWindowRank(nets, null);
-  if (full == null) return null;
-  const mid   = nets.length >= 26 ? _cotWindowRank(nets, 26) : null;
-  const short = nets.length >= 13 ? _cotWindowRank(nets, 13) : null;
-  return { full, mid, short, weeks: nets.length };
+  const lo = Math.min(...nets), hi = Math.max(...nets);
+  if (hi === lo) return null;
+  const current = nets[nets.length - 1];
+  return { currentRank: ((current - lo) / (hi - lo)) * 100, weeks: nets.length };
 }
 
 // Kept for backward compatibility with any other caller expecting just the
-// full-window percentile.
+// current-reading percentile.
 function _cotNetExposureRank(d) {
   const detail = _cotNetExposureRankDetail(d);
-  return detail ? detail.full : null;
+  return detail ? detail.currentRank : null;
 }
 
 // Same solid-fill scale as _cotStrengthCellStyle() (via the shared
@@ -2305,17 +2288,16 @@ function _cotRankBarStyle(rank) {
   return { bg: _cotHeatColor(magnitude, rank >= 50), color: '#f2f5f8' };
 }
 
-// Range box (full-window high/low across the three real depths below) +
-// two markers — the same visual language as the reference chart (box +
-// diamond + circle), rebuilt from three genuinely independent real-data
-// window lengths instead of one value floated against a fixed 50%
-// baseline. Box spans from min to max of whichever of {full, mid, short}
-// exist for that symbol, so it lands wherever the real data puts it —
-// entirely above 50%, entirely below, or straddling it — never forced to
-// touch the midpoint. Box fill color keyed off the full-window reading
-// (the widest, most stable depth); mid = diamond marker, short = circle
-// marker, both rendered in a neutral color so they read as reference
-// points on top of the box rather than a second competing fill.
+// Diverging/floating-column chart — currencies along the horizontal axis
+// (fixed BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the
+// breakdown table above it — not re-sorted by value). Each column is a
+// single bar that floats FROM the 50% (neutral) baseline TO the current
+// reading — reproducing the reference chart's own model directly, per
+// Santiago's explicit instruction. Bar color: green growing upward from 50
+// (net-long lean within its own range), red growing downward (net-short
+// lean) — same continuous _cotHeatColor() scale as the Strength Index
+// grid above, keyed off distance from the 50% midpoint. Full panel width,
+// no fixed max-width, columns fill the available space evenly.
 function _cotNetExposureRankChartHtml(store) {
   const rows = COT_BREAKDOWN_CCYS.map(ccy => {
     const d = store.ccys[ccy];
@@ -2339,28 +2321,22 @@ function _cotNetExposureRankChartHtml(store) {
         + '</div>';
       return;
     }
-    const { full, mid, short, weeks } = detail;
-    const vals = [full, mid, short].filter(v => v != null);
-    const boxLo = Math.max(0, Math.min(...vals));
-    const boxHi = Math.min(100, Math.max(...vals));
-    const s = _cotRankBarStyle(full);
-    const label3s = full.toFixed(0) + '%';
-    const tip = `${ccy}: full history ${label3s}` +
-      (mid   != null ? ` \u00b7 26wk ${mid.toFixed(0)}%`   : '') +
-      (short != null ? ` \u00b7 13wk ${short.toFixed(0)}%` : '') +
-      ` (${weeks} weeks stored)`;
+    const { currentRank, weeks } = detail;
+    const r = Math.max(0, Math.min(100, currentRank));
+    const s = _cotRankBarStyle(r);
+    const barBottom = Math.min(r, 50);
+    const barHeight = Math.max(Math.abs(r - 50), 1.5);
+    const label3s = currentRank.toFixed(0) + '%';
     html += '<div class="cot-rank-col">'
       + `<div class="cot-rank-col-val" style="color:${s.color};">${label3s}</div>`
-      + `<div class="cot-rank-col-bararea" title="${tip}">`
-      + `<div class="cot-rank-col-bar" style="bottom:${boxLo}%;height:${Math.max(boxHi - boxLo, 1.5)}%;background:${s.bg};"></div>`
-      + (mid   != null ? `<div class="cot-rank-col-mid" style="bottom:${mid}%;"></div>`     : '')
-      + (short != null ? `<div class="cot-rank-col-short" style="bottom:${short}%;"></div>` : '')
+      + `<div class="cot-rank-col-bararea" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
+      + `<div class="cot-rank-col-bar" style="bottom:${barBottom}%;height:${barHeight}%;background:${s.bg};"></div>`
       + '</div>'
       + `<div class="cot-rank-col-ccy">${label}</div>`
       + '</div>';
   });
   html += '</div></div></div>';
-  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar = range across three real lookback windows (full history up to 52wk, 26wk, 13wk) · ◆ 26wk reading · ● 13wk reading — all computed from the same stored weekly history, no fabricated depth</div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores)</div>';
   return html;
 }
 
