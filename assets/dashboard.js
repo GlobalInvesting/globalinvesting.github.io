@@ -1915,6 +1915,541 @@ async function fetchCOTCommoditiesData() {
   _renderCOTRows(results, {}, 'COT_DATA_STORE_COMMODITIES');
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// COT Full Breakdown + Leveraged Funds Strength Index
+// ─────────────────────────────────────────────────────────────────────
+// Requested by an institutional client (see support correspondence,
+// 2026-08-22): a single-screen view with Contract Value / Open Interest
+// (total + LF) / Long-Short Value / Net Value in both base currency and USD
+// per symbol, plus a normalized pairwise "LF Strength Index" grid for
+// filtering pairs with a crowded positioning differential (|value| > 25%).
+//
+// Reuses cot-data/{CCY}.json fields already on disk (netPosition,
+// longPositions, shortPositions) plus the new openInterestTotal /
+// contractMultiplier / contractUnit fields (backend: update-cot-cftc-all.yml,
+// FX-only). USD conversion reuses STATE.rates (Frankfurter/ECB, USD-base:
+// r[CCY] = units of CCY per 1 USD) — no new data source. DXY (USD row) is
+// already USD-denominated 1:1, so no conversion needed there.
+// ─────────────────────────────────────────────────────────────────────
+
+// Same 8 symbols as the docked COT panel (7 currencies + USD/DXY), plus the
+// 3 equity indices shown in the supplied reference layout. NOK/SEK excluded
+// (not in the CFTC TFF report — see COT_CURRENCIES comment above).
+// Ordered per the BIS Triennial Survey G10 turnover convention (the same
+// fixed ranking already used elsewhere in the app for non-dynamically-
+// reordered currency lists — see GUIDELINES.md's "a fixed currency/asset
+// list must follow a documented ranking convention" rule), restricted to
+// the 8 symbols this data actually covers (SEK/NOK aren't in the CFTC TFF
+// report — see COT_CURRENCIES comment above).
+const COT_BREAKDOWN_CCYS    = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'NZD'];
+const COT_BREAKDOWN_INDICES = ['SPX', 'NAS100', 'DJ30'];
+// Commodities (v8.161.0 CFTC Disaggregated report — already fetched into
+// cot-data/commodities/{sym}.json for the docked COT panel's Commodities
+// tab). Added to Full Breakdown since this data was already on hand for
+// the docked panel's Commodities tab.
+const COT_BREAKDOWN_COMMODITIES = ['XAU', 'XAG', 'COPPER', 'WTI'];
+
+// Currency pairs for the Strength Index grid — CORR_MTX_PAIRS filtered to
+// drop any pair touching NOK/SEK (not fetched into COT_BREAKDOWN_CCYS).
+function _cotStrengthPairList() {
+  return CORR_MTX_PAIRS.filter(([, base, quote]) => base !== 'NOK' && base !== 'SEK' && quote !== 'NOK' && quote !== 'SEK');
+}
+
+// Converts a per-currency net contract count into a comparable "Net % LF"
+// (net / total LF open interest) — same normalisation the docked COT panel
+// already uses (levNetPctOI), reused here rather than reinvented.
+function _cotNetPctLF(d) {
+  const long = d.longPositions || 0, short = d.shortPositions || 0;
+  const total = long + short;
+  return total > 0 ? (d.netPosition || 0) / total : 0;
+}
+
+// USD value of one row's net position: contractMultiplier (units of the
+// contract's own currency per contract) × net contracts, converted to USD
+// via STATE.rates. USD/DXY row is already USD — pass-through, no rate needed.
+function _cotContractValueUSD(ccy, contracts, contractMultiplier) {
+  if (contractMultiplier == null || contracts == null) return null;
+  const baseValue = contracts * contractMultiplier; // in the contract's own currency
+  if (ccy === 'USD') return baseValue;
+  const rate = STATE.rates && STATE.rates[ccy]; // units of ccy per 1 USD
+  if (!rate) return null;
+  return baseValue / rate;
+}
+
+// A translucent (rgba alpha) fill over the dark theme background — the
+// approach used in the prior revision — always shows some of the background
+// color through the fill, which reads as a pale veil sitting over the cell
+// rather than a clean color. Standard conditional-formatting heatmaps
+// (spreadsheet software, terminal-style positioning grids) instead
+// interpolate a fully OPAQUE color between a neutral base and the target
+// hue — no alpha channel, so an extreme value renders as a solid, unmixed
+// color with no background bleed-through. `_cotHeatColor()` implements that
+// interpolation once and is shared by both the Strength Index grid and the
+// Net Exposure Rank chart below, so the two visuals read on one consistent
+// color scale rather than two independently-tuned ones.
+const _COT_HEAT_BASE = [30, 34, 45];   // var(--bg2) #1e222d, as an RGB triple
+const _COT_HEAT_UP    = [38, 166, 154]; // var(--up)   #26a69a
+const _COT_HEAT_DOWN   = [239, 83, 80]; // var(--down) #ef5350
+
+// magnitude: 0–1 distance from neutral. isUp: which target hue to blend
+// toward. Returns a solid (opaque) 'rgb(r,g,b)' string — never rgba.
+function _cotHeatColor(magnitude, isUp) {
+  const m = Math.max(0, Math.min(1, magnitude));
+  // Floor of 0.12 so a near-neutral value still reads as faintly tinted
+  // rather than indistinguishable from an empty cell; full saturation
+  // (no base color remaining) at m=1.
+  const t = 0.12 + m * 0.88;
+  const target = isUp ? _COT_HEAT_UP : _COT_HEAT_DOWN;
+  const r = Math.round(_COT_HEAT_BASE[0] + (target[0] - _COT_HEAT_BASE[0]) * t);
+  const g = Math.round(_COT_HEAT_BASE[1] + (target[1] - _COT_HEAT_BASE[1]) * t);
+  const b = Math.round(_COT_HEAT_BASE[2] + (target[2] - _COT_HEAT_BASE[2]) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+// A discrete 3-tier bucket (flat/mild/strong copied verbatim from the
+// Currency Strength Heatmap's own hardcoded hex values) put roughly 2/3 of
+// this grid's real pair values — everything under the mild-tier's own 25%
+// floor — into one flat, barely-tinted "h-flat" bucket (`var(--bg3)`,
+// visually indistinguishable from an empty cell). That IS the "too much
+// gray" report: the heatmap's 0.05/0.15 buckets make sense for its own
+// data (daily %-change, usually small), but most of this grid's real
+// pair values cluster well under 25% on its ±100% scale, so copying the
+// heatmap's bucket boundaries verbatim starved this specific data
+// distribution of any real color. Fixed by using the SAME solid,
+// alpha-free `_cotHeatColor()` interpolation the Net Exposure Rank chart
+// below already uses, continuously — every non-null value gets a real
+// green/red tint from the moment it's non-zero (light near 0, saturating
+// toward the flagship heatmap's own #1a3a34/#3a1a1a hex at the ±100%
+// extremes), so "light green through dark green" (and light/dark red) is
+// a smooth gradient, not three fixed steps. Currency-pair name stays
+// white (`.cot-strength-pair`, set in CSS) exactly like the heatmap's
+// `.hm-sym`; the percentage value carries the up/down color, exactly like
+// the heatmap's `.hm-val.up`/`.hm-val.down`.
+function _cotStrengthCellStyle(pct) {
+  if (pct == null) return { bg: 'var(--bg2)', color: 'var(--text3)', txt: '—', bold: false };
+  const txt = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
+  const up = pct >= 0;
+  const magnitude = Math.min(Math.abs(pct), 100) / 100;
+  const bg = _cotHeatColor(magnitude, up);
+  return { bg, color: up ? 'var(--up)' : 'var(--down)', txt, bold: Math.abs(pct) >= 50 };
+}
+
+let _cotBreakdownData = null; // cache: { ccys: {ccy: data}, indices: {sym: data} }
+
+async function _fetchCotBreakdownData() {
+  const ccyPromises = COT_BREAKDOWN_CCYS.map(async ccy => {
+    try {
+      const r = await fetch('./cot-data/' + ccy + '.json');
+      if (!r.ok) return null;
+      return { ccy, data: await r.json() };
+    } catch { return null; }
+  });
+  const idxPromises = COT_BREAKDOWN_INDICES.map(async sym => {
+    try {
+      const r = await fetch('./cot-data/indices/' + sym + '.json');
+      if (!r.ok) return null;
+      return { sym, data: await r.json() };
+    } catch { return null; }
+  });
+  const comPromises = COT_BREAKDOWN_COMMODITIES.map(async sym => {
+    try {
+      const r = await fetch('./cot-data/commodities/' + sym + '.json');
+      if (!r.ok) return null;
+      return { sym, data: await r.json() };
+    } catch { return null; }
+  });
+
+  const [ccyResults, idxResults, comResults] = await Promise.all([Promise.all(ccyPromises), Promise.all(idxPromises), Promise.all(comPromises)]);
+  const ccys = {}, indices = {}, commodities = {};
+  ccyResults.filter(Boolean).forEach(({ ccy, data }) => { ccys[ccy] = data; });
+  idxResults.filter(Boolean).forEach(({ sym, data }) => { indices[sym] = data; });
+  comResults.filter(Boolean).forEach(({ sym, data }) => { commodities[sym] = data; });
+  _cotBreakdownData = { ccys, indices, commodities };
+  return _cotBreakdownData;
+}
+
+// Builds one row of the breakdown table for a currency, index, or commodity
+// symbol. `isUsdDenominated` covers both the USD/DXY row (contract already
+// in USD) and commodities (Gold/Silver/Copper/WTI — CFTC's contractUnit for
+// these is a physical measure like "TROY OUNCES"/"POUNDS", not a currency
+// code, and COMEX/NYMEX contracts are themselves USD-quoted, so the base
+// value computed from contractMultiplier is already USD — no STATE.rates
+// lookup applies or is possible for a non-currency unit).
+function _cotBreakdownRow(symbol, d, displayName, isUsdDenominated) {
+  const long = d.longPositions || 0, short = d.shortPositions || 0;
+  const net  = d.netPosition || 0;
+  const oiLF = long + short;
+  const oiTotal = d.openInterestTotal; // FX + commodities — null for indices
+  const contractMultiplier = d.contractMultiplier;
+  const contractUnit = d.contractUnit;
+
+  const usdCcy = isUsdDenominated || symbol === 'USD' ? 'USD' : (contractUnit || symbol);
+  const oiTotalUSD   = _cotContractValueUSD(usdCcy, oiTotal, contractMultiplier);
+  const oiLFUSD      = _cotContractValueUSD(usdCcy, oiLF, contractMultiplier);
+  const longValue    = contractMultiplier != null ? long * contractMultiplier : null;
+  const shortValue   = contractMultiplier != null ? short * contractMultiplier : null;
+  const netValueBase = contractMultiplier != null ? net * contractMultiplier : null;
+  const netValueUSD  = _cotContractValueUSD(usdCcy, net, contractMultiplier);
+
+  // Net Percent = net position as % of TOTAL Open Interest (all reporting
+  // categories combined — Dealer + Asset Manager + Leveraged Funds + Other
+  // + Nonreportable), the standard "crowdedness relative to the whole
+  // market" reading. Net Percent LF = net position as % of Leveraged
+  // Funds' OWN OI (long+short of that category only) — a materially
+  // different, larger-magnitude number since LF is only one slice of
+  // total OI; this is the same figure the docked COT panel's "NET%OI"
+  // column already shows (see _renderCOTRows() in dashboard.js: pctOI =
+  // net / (long+short), i.e. net / LF-only OI). Both columns previously
+  // used oiLF as the denominator, making them identical on every symbol —
+  // real bug, not a display duplicate: Net Percent needs oiTotal, which
+  // is null for indices/commodities until the next scheduled workflow run
+  // populates it (see CHANGELOG v8.240.0-beta), so that column reads "—"
+  // for those rows until then rather than silently reusing the wrong base.
+  const netPct   = (oiTotal != null && oiTotal > 0) ? (net / oiTotal) * 100 : null;
+  const netPctLF = oiLF > 0 ? (net / oiLF) * 100 : null;
+  const wowPP    = (() => {                                             // Net % LF Δ — week-over-week change in Net%LF (pp)
+    if (!d.history || d.history.length < 2 || oiLF <= 0) return null;
+    const prev = d.history[d.history.length - 2];
+    const prevOI = (prev.levLong || 0) + (prev.levShort || 0);
+    if (prevOI <= 0) return null;
+    const prevPct = ((prev.levNet ?? ((prev.levLong || 0) - (prev.levShort || 0))) / prevOI) * 100;
+    return netPctLF - prevPct;
+  })();
+
+  const fmt = n => n == null ? '—' : Math.round(n).toLocaleString();
+  const fmtPct = n => n == null ? '—' : (n >= 0 ? '+' : '') + n.toFixed(2) + '%';
+  const cls = n => n == null ? '' : (n >= 0 ? 'up' : 'down');
+
+  return '<tr>'
+    + `<td>${displayName || symbol}</td>`
+    + `<td>${contractMultiplier != null ? contractMultiplier.toLocaleString() : '—'}</td>`
+    + `<td>${fmt(oiTotal)}</td>`
+    + `<td>${fmt(oiTotalUSD)}</td>`
+    + `<td>${fmt(oiLF)}</td>`
+    + `<td>${fmt(oiLFUSD)}</td>`
+    + `<td>${fmt(long)}</td>`
+    + `<td>${fmt(longValue)}</td>`
+    + `<td>${fmt(short)}</td>`
+    + `<td>${fmt(shortValue)}</td>`
+    + `<td class="${cls(net)}">${net >= 0 ? '+' : ''}${fmt(net)}</td>`
+    + `<td class="${cls(netPct)}" title="Net position as % of TOTAL Open Interest (all reporting categories)">${fmtPct(netPct)}</td>`
+    + `<td class="${cls(netPctLF)}" title="Net position as % of Leveraged Funds' own Open Interest — matches the docked panel's NET%OI">${fmtPct(netPctLF)}</td>`
+    + `<td class="${cls(wowPP)}">${wowPP == null ? '—' : (wowPP >= 0 ? '+' : '') + wowPP.toFixed(2) + 'pp'}</td>`
+    + `<td class="${cls(netValueBase)}">${fmt(netValueBase)}</td>`
+    + `<td class="${cls(netValueUSD)}">${fmt(netValueUSD)}</td>`
+    + '</tr>';
+}
+
+const COT_BREAKDOWN_INDEX_DISPLAY = { SPX: 'SP500 (E-MINI)', NAS100: 'NAS100 (NQ MINI)', DJ30: 'US30 (YM)' };
+const COT_BREAKDOWN_COMMODITY_DISPLAY = { XAU: 'GOLD', XAG: 'SILVER', COPPER: 'COPPER', WTI: 'WTI CRUDE OIL' };
+// USD's CFTC contract is the ICE USD Index future, not a currency pair —
+// CFTC's own report labels it "USD INDEX - ICE FUTURES U.S.", so the row/
+// column label should say the same rather than the bare ISO code. Only
+// applied where USD is labeling itself as a standalone symbol (the
+// breakdown table row, the rank chart column) — NOT inside a currency-pair
+// label like "USDCAD"/"USDJPY" in the Strength Index grid, where USD is
+// genuinely the ISO base currency of a real pair, not the index.
+const COT_BREAKDOWN_CCY_DISPLAY = { USD: 'USD INDEX' };
+
+function _cotBreakdownTableHtml(store) {
+  // Net Percent and Net Percent LF are two genuinely different metrics
+  // (different denominators — total Open Interest vs. Leveraged Funds'
+  // own Open Interest only), not a display duplicate of each other or a
+  // computation bug. Column titles say so explicitly and flag which one
+  // reconciles against the docked panel's own NET%OI figure, since that's
+  // the comparison point that caused confusion.
+  const head = [
+    { h: 'Symbol' }, { h: 'Contract Value' }, { h: 'Open Interest TOTAL' }, { h: 'Open Interest TOTAL USD' },
+    { h: 'Open Interest LF' }, { h: 'Open Interest LF USD' }, { h: 'Long Positions' }, { h: 'Long Value' },
+    { h: 'Short Positions' }, { h: 'Short Value' }, { h: 'Net Positions' },
+    { h: 'Net Percent', t: 'Net position as % of TOTAL Open Interest (every reporting category combined) — a different, smaller-magnitude denominator than Net Percent LF; does not match the docked panel.' },
+    { h: 'Net Percent LF', t: 'Net position as % of Leveraged Funds\u2019 own Open Interest only — reconciles exactly with the docked COT panel\u2019s NET%OI column.' },
+    { h: 'Net % LF Δ' }, { h: 'Net Value (Base Currency)' }, { h: 'Net Value USD' }
+  ];
+  let html = '<table id="cot-breakdown-fs-table"><thead><tr>' + head.map(c => `<th scope="col"${c.t ? ` title="${c.t}"` : ''}>${c.h}</th>`).join('') + '</tr></thead><tbody>';
+  COT_BREAKDOWN_CCYS.forEach(ccy => {
+    const d = store.ccys[ccy];
+    if (d) html += _cotBreakdownRow(ccy, d, COT_BREAKDOWN_CCY_DISPLAY[ccy] || ccy);
+  });
+  COT_BREAKDOWN_INDICES.forEach(sym => {
+    const d = store.indices[sym];
+    if (d) html += _cotBreakdownRow(sym, d, COT_BREAKDOWN_INDEX_DISPLAY[sym] || sym);
+  });
+  COT_BREAKDOWN_COMMODITIES.forEach(sym => {
+    const d = store.commodities && store.commodities[sym];
+    if (d) html += _cotBreakdownRow(sym, d, COT_BREAKDOWN_COMMODITY_DISPLAY[sym] || sym, true);
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+// Pairwise Strength Index: for pair BASE/QUOTE, value = (Net%LF(BASE) − Net%LF(QUOTE)) / 2
+// — the same "which side has the more crowded leveraged-funds positioning"
+// read the reference sheet shows, normalized to a single ±100% scale so
+// pairs are directly comparable regardless of contract size. |value| > 25%
+// is the requested filter threshold for identifying a crowded pair.
+//
+// FIX (2026-08-23): the raw difference Net%LF(base) − Net%LF(quote) can
+// range up to ±200% (each leg individually bounded to ±100%), but the
+// reference sheet — reverse-engineered from its reported figures, e.g.
+// EURUSD −30.30% against a USD/EUR Net%LF of +36.40%/−24.25% (diff −60.65%,
+// exactly double the reported value), AUDNZD +64.20% against
+// +52.54%/−75.93% (diff 128.47%, again exactly double) — divides the raw
+// difference by 2 to keep the composite on the same ±100% scale as each
+// individual leg. Confirmed against 3 independent pairs from the reference
+// sheet, all matching to within rounding. The panel previously omitted
+// this /2, producing values like +127.6%/−113.6% that overflow a scale
+// that's supposed to be capped at ±100%.
+function _cotStrengthGridHtml(store) {
+  const pctByCcy = {};
+  COT_BREAKDOWN_CCYS.forEach(ccy => {
+    const d = store.ccys[ccy];
+    if (d) pctByCcy[ccy] = _cotNetPctLF(d) * 100;
+  });
+
+  const pairs = _cotStrengthPairList();
+  // The reference layout orders cells strictly descending by value, read
+  // row-by-row left-to-right — not a fixed pair order and not alphabetical.
+  // Pairs with insufficient data (null) sort to the end, after every real
+  // value.
+  const rows = pairs.map(([, base, quote]) => {
+    const b = pctByCcy[base], q = pctByCcy[quote];
+    const val = (b != null && q != null) ? (b - q) / 2 : null;
+    return { base, quote, val };
+  });
+  rows.sort((a, b) => {
+    if (a.val == null && b.val == null) return 0;
+    if (a.val == null) return 1;
+    if (b.val == null) return -1;
+    return b.val - a.val;
+  });
+
+  let html = '<div id="cot-strength-grid">';
+  rows.forEach(({ base, quote, val }) => {
+    const s = _cotStrengthCellStyle(val);
+    html += `<div style="background:${s.bg};" title="${base}${quote} LF Strength = (Net%LF(${base}) − Net%LF(${quote})) / 2${val == null ? ' (insufficient data)' : ''}">`
+      + `<div class="cot-strength-pair">${base}${quote}</div>`
+      + `<div class="cot-strength-val" style="color:${s.color};font-weight:${s.bold ? 700 : 600};">${s.txt}</div>`
+      + '</div>';
+  });
+  html += '</div>';
+  // Legend swatches sample the same continuous _cotHeatColor() scale the
+  // cells themselves use (light near 0, saturating toward the flagship
+  // heatmap's own extremes at ±100%) — not a fixed discrete-tier palette.
+  html += '<div class="cot-strength-legend">'
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.15, true)};"></span>Net-long lean</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, true)};"></span>Strong net-long lean</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.15, false)};"></span>Net-short lean</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, false)};"></span>Strong net-short lean</span>`
+    + '</div>';
+  return html;
+}
+
+// Net Exposure % Rank — classic "COT Index" formula: where the current
+// reading sits within its own trailing range, on a 0-100% scale (0 = most
+// net-short in the lookback window, 100 = most net-long). `history` caps
+// at 52 entries (save()'s `existing_history[-52:]`, engine repo) — the max
+// lookback the data actually has, ~1 year of weekly prints. Needs >=2
+// points to have a range at all; a flat range (max==min) returns null.
+//
+// This reproduces the reference chart's own model exactly, per explicit
+// direction — a single bar per currency floating FROM the 50%
+// (neutral) midpoint TO the current reading — not a multi-window
+// box/marker construction. A prior revision built a 3-real-window range
+// box (full/26wk/13wk) reasoning from the reference image's apparent
+// per-currency box extents; that read was wrong and added a different
+// chart than what was asked for. This is deliberately the single-value
+// version: one real percentile rank (full stored history), one bar.
+function _cotNetExposureRankDetail(d) {
+  const hist = (d && d.history) || [];
+  const nets = hist.map(h => h.levNet).filter(n => n != null);
+  if (nets.length < 2) return null;
+  const lo = Math.min(...nets), hi = Math.max(...nets);
+  if (hi === lo) return null;
+  const current = nets[nets.length - 1];
+  return { currentRank: ((current - lo) / (hi - lo)) * 100, weeks: nets.length };
+}
+
+// Kept for backward compatibility with any other caller expecting just the
+// current-reading percentile.
+function _cotNetExposureRank(d) {
+  const detail = _cotNetExposureRankDetail(d);
+  return detail ? detail.currentRank : null;
+}
+
+// Same solid-fill scale as _cotStrengthCellStyle() (via the shared
+// _cotHeatColor() interpolation, no alpha channel) but keyed off distance
+// from the 50% (neutral) midpoint of a 0-100 rank rather than distance from
+// 0 on a ±100% scale — a rank pinned at either extreme (0 or 100) is the
+// "crowded" signal here, not a rank of 100 itself being inherently more
+// extreme than a rank of 0.
+function _cotRankBarStyle(rank) {
+  if (rank == null) return { bg: 'var(--bg2)', color: 'var(--text3)' };
+  const magnitude = Math.abs(rank - 50) / 50; // 0 at midpoint, 1 at either extreme
+  return { bg: _cotHeatColor(magnitude, rank >= 50), color: '#f2f5f8' };
+}
+
+// Fixed reference-zone tint for the top/bottom "Range highs"/"Range lows"
+// bands on the Net Exposure Rank chart — same opaque base-to-target
+// interpolation as _cotHeatColor() (never an rgba blend, per the shared
+// heatmap-fill rule), just with --blue/--up as the two target hues
+// instead of --up/--down, and a fixed low magnitude since these bands
+// mark a static zone of the 0-100% axis, not a per-currency data value.
+// Per the chosen Option B treatment (v8.248.0-beta): magnitude 0.10, well
+// below the Strength Index grid's own values — this band is a passive
+// reference zone the bars sit on top of, not a data reading in its own
+// right, so it should read as quieter than anything that IS a value.
+const _COT_RANK_BAND_BLUE = [79, 127, 255]; // var(--blue) #4f7fff
+function _cotRankBandColor(target) {
+  const t = 0.10;
+  const r = Math.round(_COT_HEAT_BASE[0] + (target[0] - _COT_HEAT_BASE[0]) * t);
+  const g = Math.round(_COT_HEAT_BASE[1] + (target[1] - _COT_HEAT_BASE[1]) * t);
+  const b = Math.round(_COT_HEAT_BASE[2] + (target[2] - _COT_HEAT_BASE[2]) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+// Diverging/floating-column chart — currencies along the horizontal axis
+// (fixed BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the
+// breakdown table above it — not re-sorted by value). Each column is a
+// single bar that floats FROM the 50% (neutral) baseline TO the current
+// reading — reproducing the reference chart's own model directly, per
+// explicit instruction. Bar color: green growing upward from 50
+// (net-long lean within its own range), red growing downward (net-short
+// lean) — same continuous _cotHeatColor() scale as the Strength Index
+// grid above, keyed off distance from the 50% midpoint. Full panel width,
+// no fixed max-width, columns fill the available space evenly.
+//
+// Range highs/lows framing (v8.248.0-beta, the chosen Option B treatment): the
+// label lives entirely OUTSIDE the plot area, as a dot+text legend row
+// above the chart — reusing the exact `.cot-strength-legend`/`-swatch`
+// pattern the Strength Index grid's own legend already uses just above
+// this chart, rather than a label competing for space with the bars
+// inside the plot (the badge/chip treatment from the prior session was
+// explicitly rejected). The band fill alone still marks the zone.
+function _cotNetExposureRankChartHtml(store) {
+  const rows = COT_BREAKDOWN_CCYS.map(ccy => {
+    const d = store.ccys[ccy];
+    const detail = d ? _cotNetExposureRankDetail(d) : null;
+    return { ccy, detail };
+  });
+
+  const gridlines = [100, 75, 50, 25, 0];
+  // Fixed top/bottom reference bands, matching the reference chart's
+  // "Range highs" / "Range lows" framing: a static 10%-deep zone at each
+  // end of the 0-100% axis, not a per-currency computed value (the rank
+  // itself is already normalized 0-100, so the extreme zone sits in the
+  // same place for every symbol).
+  const bandHi = _cotRankBandColor(_COT_RANK_BAND_BLUE);
+  const bandLo = _cotRankBandColor(_COT_HEAT_UP);
+  let html = '<div class="cot-rank-legend">'
+    + `<span><span class="cot-strength-swatch" style="background:${bandHi};"></span>Range highs</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${bandLo};"></span>Range lows</span>`
+    + '</div>';
+  html += '<div id="cot-rank-chart">'
+    + '<div id="cot-rank-axis">' + gridlines.map(v => `<div class="cot-rank-axis-tick">${v}%</div>`).join('') + '</div>'
+    + '<div id="cot-rank-plot">'
+    + '<div id="cot-rank-bands">'
+    + `<div class="cot-rank-band cot-rank-band-hi" style="bottom:90%;height:10%;background:${bandHi};"></div>`
+    + `<div class="cot-rank-band cot-rank-band-lo" style="bottom:0;height:10%;background:${bandLo};"></div>`
+    + '</div>'
+    + '<div id="cot-rank-gridlines">' + gridlines.map(v => `<div class="cot-rank-gridline" style="bottom:${v}%;${v === 50 ? 'border-top-style:dashed;' : ''}"></div>`).join('') + '</div>'
+    + '<div id="cot-rank-cols">';
+  rows.forEach(({ ccy, detail }) => {
+    const label = COT_BREAKDOWN_CCY_DISPLAY[ccy] || ccy;
+    if (!detail) {
+      html += '<div class="cot-rank-col">'
+        + `<div class="cot-rank-col-bararea" title="${ccy}: not enough history yet for a range"></div>`
+        + `<div class="cot-rank-col-ccy">${label}</div>`
+        + '</div>';
+      return;
+    }
+    const { currentRank, weeks } = detail;
+    const r = Math.max(0, Math.min(100, currentRank));
+    const s = _cotRankBarStyle(r);
+    const barBottom = Math.min(r, 50);
+    const barHeight = Math.max(Math.abs(r - 50), 1.5);
+    const label3s = currentRank.toFixed(0) + '%';
+    html += '<div class="cot-rank-col">'
+      + `<div class="cot-rank-col-bararea" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
+      + `<div class="cot-rank-col-bar" style="bottom:${barBottom}%;height:${barHeight}%;background:${s.bg};"></div>`
+      + '</div>'
+      + `<div class="cot-rank-col-ccy">${label}</div>`
+      + '</div>';
+  });
+  html += '</div>'
+    + '</div></div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores) · shaded bands mark the top/bottom 10% of the 0-100% range · hover a bar for its exact reading</div>';
+  return html;
+}
+
+async function renderCotBreakdown() {
+  const inner = document.getElementById('cot-breakdown-fullscreen-inner');
+  if (!inner) return;
+  inner.innerHTML = '<div style="color:var(--text3);font-size:11px;padding:8px 2px;">Loading…</div>';
+
+  const store = await _fetchCotBreakdownData();
+  const anyCcy = Object.values(store.ccys)[0];
+  const subtitle = document.getElementById('cot-breakdown-fs-subtitle');
+  if (subtitle) {
+    subtitle.innerHTML = anyCcy
+      ? 'CFTC TFF · Leveraged Funds · week ending ' + (anyCcy.weekEnding || '—') + ' · valid for trades from ' + _cotNextTradingDayLabel(anyCcy.weekEnding)
+      : 'CFTC TFF · Leveraged Funds · weekly';
+  }
+
+  let html = '<div style="overflow-x:auto;">' + _cotBreakdownTableHtml(store) + '</div>';
+  html += '<div style="margin-top:14px;font-size:11px;color:var(--text3);font-weight:600;">Currency Pairs — LF Strength Index</div>';
+  html += '<div style="padding:2px 0 0;font-size:9px;color:var(--text3);">Strength Index = (Net%LF(base) − Net%LF(quote)) / 2, on a ±100% scale</div>';
+  html += _cotStrengthGridHtml(store);
+  html += '<div style="margin-top:16px;font-size:11px;color:var(--text3);font-weight:600;">Net Exposure % Rank — where current LF net position sits in its own trailing range (up to 52wk history)</div>';
+  html += _cotNetExposureRankChartHtml(store);
+  html += '<div style="padding:8px 0 14px;font-size:9px;color:var(--text3);">0% = most net-short leveraged-funds positioning in the lookback window, 100% = most net-long · lookback is whatever history exists per symbol, capped at 52 weeks (the full depth this data stores) · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX and equity indices, Disaggregated for commodities)</div>';
+  inner.innerHTML = html;
+}
+
+// CFTC's Friday report reflects Tuesday's positioning; the terminal's own
+// convention elsewhere (COT panel footnote) is "valid for trades from" the
+// following Monday — reused here rather than inventing a new date rule.
+function _cotNextTradingDayLabel(weekEndingStr) {
+  if (!weekEndingStr) return '—';
+  try {
+    const d = new Date(weekEndingStr + 'T00:00:00Z');
+    // Next Monday after the report's Tuesday date.
+    const day = d.getUTCDay(); // Tue=2
+    const addDays = (8 - day) % 7 || 7;
+    d.setUTCDate(d.getUTCDate() + addDays);
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+  } catch { return '—'; }
+}
+
+function openCotBreakdownFullscreen() {
+  const overlay = document.getElementById('cot-breakdown-fullscreen-overlay');
+  if (!overlay) return;
+  if (overlay.classList.contains('cot-breakdown-fs-active')) return;
+
+  overlay.classList.add('cot-breakdown-fs-active');
+  document.body.style.overflow = 'hidden';
+  renderCotBreakdown();
+}
+
+function closeCotBreakdownFullscreen() {
+  const overlay = document.getElementById('cot-breakdown-fullscreen-overlay');
+  if (!overlay || !overlay.classList.contains('cot-breakdown-fs-active')) return;
+
+  overlay.classList.remove('cot-breakdown-fs-active');
+  document.body.style.overflow = '';
+}
+
+function _cotBreakdownFsWireUp() {
+  document.getElementById('cot-breakdown-btn')?.addEventListener('click', openCotBreakdownFullscreen);
+  document.getElementById('cot-breakdown-fs-close')?.addEventListener('click', closeCotBreakdownFullscreen);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && document.getElementById('cot-breakdown-fullscreen-overlay')?.classList.contains('cot-breakdown-fs-active')) {
+      closeCotBreakdownFullscreen();
+    }
+  });
+}
+// ═══════════════════════════════════════════════════════════════════════
+
 // ── COT panel asset-class tabs (FX / Indices / Commodities) ──
 function initCOTAssetTabs() {
   const tabBar = document.getElementById('cot-asset-tabs');
@@ -15499,6 +16034,7 @@ function initExclusivePanelNav() {
     initCorrAssetTabs();
     _corrMtxWireHover();
     _corrMtxFsWireUp();
+    _cotBreakdownFsWireUp();
     initSentimentAssetTabs();
     initExclusivePanelNav();
 
