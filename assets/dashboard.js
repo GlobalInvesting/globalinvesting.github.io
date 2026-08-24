@@ -2232,6 +2232,17 @@ function _cotStrengthGridHtml(store) {
       + `<div class="cot-strength-val" style="color:${s.color};font-weight:${s.bold ? 700 : 600};">${s.txt}</div>`
       + '</div>';
   });
+  // The grid is a fixed 6-column layout; when the pair count isn't a
+  // multiple of 6, the trailing slots in the last row have no cell at
+  // all, and the container's own background (the 1px gap-line color)
+  // shows through as a gray patch. Fill those slots with invisible
+  // placeholder cells instead, so the last row blends into the modal
+  // background like the rest of the panel.
+  const remainder = rows.length % 6;
+  const emptySlots = remainder === 0 ? 0 : 6 - remainder;
+  for (let i = 0; i < emptySlots; i++) {
+    html += '<div class="cot-strength-empty"></div>';
+  }
   html += '</div>';
   // Legend swatches sample the same continuous _cotHeatColor() scale the
   // cells themselves use (light near 0, saturating toward the flagship
