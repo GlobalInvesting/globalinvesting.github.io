@@ -367,6 +367,7 @@ a { color: inherit; text-decoration: none; }
       <a class="toc-item" href="#what-is-cot">What Is the COT Report</a>
       <a class="toc-item" href="#the-panel">Reading the Panel</a>
       <a class="toc-item" href="#cot-cross-pairs">COT in Cross Pairs</a>
+      <a class="toc-item" href="#cot-full-breakdown">Full Breakdown</a>
       <a class="toc-item" href="#net-contracts">Net Contracts</a>
       <a class="toc-item" href="#long-pct">Long %</a>
       <a class="toc-item" href="#open-interest">Open Interest</a>
@@ -506,6 +507,17 @@ a { color: inherit; text-decoration: none; }
       <div class="callout">
         <div class="callout-label">Note</div>
         <strong>Reading raw values on crosses:</strong> Because the CFTC tracks each currency vs USD, a JPY net short (large negative number) means speculators are short JPY futures — which is bearish JPY and therefore <em>bullish</em> GBP/JPY. The terminal shows the raw CFTC values so you can cross-reference directly with the main COT panel. The footer alignment label does the directional interpretation for you.
+      </div>
+
+      <h3 id="cot-full-breakdown">Full Breakdown — expanded view</h3>
+      <p>A &#x26F6; button in the panel header opens the <strong>Full Breakdown</strong>, a fullscreen expanded view of the same weekly CFTC release. Unlike the docked panel's separate FX / Indices / Commodities tabs, the Full Breakdown lists every covered symbol — FX currencies, equity indices (SP500, NAS100, US30), and commodities (Gold, Silver, Copper, WTI Crude Oil) — together in one combined table. Each row carries the full column set: Contract Value, Open Interest (total and per-contract value), Open Interest LF (total and USD), Long/Short positions and value, Net Positions, Net Percent, Net Percent LF, Net % LF Δ, and Net Value in both base currency and USD.</p>
+      <p>Below the table, the <strong>Currency Pairs — LF Strength Index</strong> grid normalizes Leveraged Funds positioning per pair on a ±100% scale: <code style="font-family:var(--font-mono);font-size:12px;color:var(--blue);">Strength Index = (Net%LF(base) − Net%LF(quote)) / 2</code>. Pairs are ordered strictly by value, from the strongest net-long lean to the strongest net-short lean, with four-tier color banding (net-long lean, strong net-long lean, net-short lean, strong net-short lean). This grid is currency-specific — it doesn't extend to the indices or commodities rows in the table above it.</p>
+      <p>Underneath the grid, the <strong>Net Exposure % Rank</strong> chart shows where each currency's current LF net position sits within its own trailing range (up to 52 weeks — capped at whatever history a symbol actually has). 0% is the most net-short a currency has been in its own lookback window, 100% is the most net-long, and each bar floats from the 50% neutral baseline to the latest reading — so a bar near a shaded top or bottom band flags positioning that's stretched relative to its own recent history, independent of how large the raw net figure looks next to other currencies.</p>
+      <div class="scr-item" style="max-width:100%;margin:18px 0;">
+        <div class="scr-item-frame">
+          <img src="assets/screenshot-cot-full-breakdown.png" alt="COT Full Breakdown view in fullscreen, showing a combined CFTC TFF Leveraged Funds table covering FX currencies, equity indices, and commodities together, with open interest, long and short positions and value, net positions and percent, and net value in base currency and USD, followed by a Currency Pairs LF Strength Index grid and a Net Exposure percent Rank bar chart" width="1920" height="1080" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>The Full Breakdown view.</strong> Combined Leveraged Funds detail table (FX, indices, commodities), the per-pair LF Strength Index grid, and the 52-week Net Exposure % Rank chart.</p>
       </div>
     </div>
 

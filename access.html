@@ -905,7 +905,7 @@ a { color: inherit; text-decoration: none; }
       </div>
 
       <div class="scr-gallery-label gallery-break">Additional Coverage</div>
-      <p class="gallery-break-desc">Six more panels — cross-asset correlations, derivatives, carry, currency strength, AI alerts, and news. Select one to preview it at full size.</p>
+      <p class="gallery-break-desc">Eight more panels — cross-asset correlations, the full pair&times;pair correlation matrix, derivatives, carry, currency strength, COT full breakdown, AI alerts, and news. Select one to preview it at full size.</p>
 
 
       <div class="showcase">
@@ -934,6 +934,14 @@ a { color: inherit; text-decoration: none; }
             <span class="showcase-tab-title">News Feed</span>
             <span class="showcase-tab-desc">FX-relevant headlines filterable by currency, with source and timestamp on every entry.</span>
           </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-6" data-idx="6">
+            <span class="showcase-tab-title">Pair&times;Pair Correlation Matrix</span>
+            <span class="showcase-tab-desc">Every tracked FX pair against every other pair, not just currency composites, ordered by spectral clustering across Daily, 4H, and Hourly timeframes.</span>
+          </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-7" data-idx="7">
+            <span class="showcase-tab-title">COT Full Breakdown</span>
+            <span class="showcase-tab-desc">Full CFTC Leveraged Funds detail across FX, Indices, and Commodities, plus a normalized per-pair Strength Index and a 52-week Net Exposure % Rank chart.</span>
+          </button>
         </div>
         <div class="showcase-preview">
           <div class="showcase-preview-frame" id="showcase-frame" role="tabpanel" aria-labelledby="showcase-tab-0">
@@ -954,6 +962,12 @@ a { color: inherit; text-decoration: none; }
             </div>
             <div class="showcase-slide" data-idx="5" role="button" tabindex="-1" aria-label="Enlarge: News Feed" data-caption="News Feed — FX-relevant headlines filterable by currency, with source and timestamp on every entry.">
               <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="6" role="button" tabindex="-1" aria-label="Enlarge: Pair×Pair Correlation Matrix" data-caption="Pair&times;Pair Correlation Matrix — every tracked FX pair against every other pair, ordered by spectral clustering across Daily, 4H, and Hourly timeframes, so the strongest relationships (positive or negative) cluster at the two edges instead of sitting alphabetically.">
+              <img src="assets/screenshot-correlation-matrix-full.png" data-src="assets/screenshot-correlation-matrix-full.png" alt="Pair by pair FX correlation matrix in fullscreen, Daily tab selected, showing a full grid of Pearson correlation values between every tracked currency pair, rows and columns ordered by spectral clustering so strongly correlated pairs group at the two edges" width="1919" height="799" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="7" role="button" tabindex="-1" aria-label="Enlarge: COT Full Breakdown" data-caption="COT Full Breakdown — full CFTC Leveraged Funds detail across FX, Indices, and Commodities, a normalized per-pair Strength Index, and a 52-week Net Exposure % Rank chart.">
+              <img src="assets/screenshot-cot-full-breakdown.png" data-src="assets/screenshot-cot-full-breakdown.png" alt="COT Full Breakdown view in fullscreen, showing the CFTC TFF Leveraged Funds table with open interest, long and short positions and value, net positions and percent, and net value in base currency and USD, followed by a Currency Pairs LF Strength Index grid and a Net Exposure percent Rank bar chart" width="1920" height="1080" loading="lazy">
             </div>
           </div>
         </div>
