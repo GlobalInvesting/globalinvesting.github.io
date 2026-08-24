@@ -2005,27 +2005,29 @@ function _cotHeatColor(magnitude, isUp) {
   return `rgb(${r},${g},${b})`;
 }
 
-// Reuses the terminal's own established heatmap palette — the same
-// discrete-tier, translucent-swatch scheme already used by the Currency
-// Strength Heatmap (index.html's `.h-s-up`/`.h-up`/`.h-flat`/`.h-down`/
-// `.h-s-down`) and the Δ Strength pivot matrix (heatmap-modal.js's
-// `.corr-cell-pos-hi`/`.corr-cell-pos`/`.corr-cell-flat`/`.corr-cell-neg`/
-// `.corr-cell-neg-hi`) — rather than a bespoke continuous interpolation.
-// Two tiers per side (strong/mild) at low, fixed alpha (.25 / .10) over
-// the panel's own dark background, text colored var(--up)/var(--down)
-// (bold at the strong tier), flat cells left untinted. Strong/mild split
-// at 50%/25% — the 25% boundary matches the panel's own already-documented
-// "crowded positioning differential" threshold, so the grid's coloring and
-// its footnote describe the same line.
+// Uses the SAME opaque interpolation as the Net Exposure Rank chart below
+// (_cotHeatColor()) — not the Δ Strength pivot matrix's rgba-alpha swatch
+// scheme. Those are two different established patterns already in this
+// codebase: the flagship Currency Strength Heatmap (index.html's
+// `.h-s-up`/`.h-up`/`.h-flat`/`.h-down`/`.h-s-down`) uses solid, opaque hex
+// backgrounds — e.g. `.h-s-up{background:#1a3a34}`, no alpha channel —
+// while the Δ Strength pivot matrix (heatmap-modal.js's
+// `.corr-cell-pos-hi`/etc.) uses rgba alpha over the dark theme background.
+// A prior revision of this function copied the pivot matrix's rgba
+// approach and described it as "the same as the Currency Strength
+// Heatmap," which was incorrect — that heatmap has never used alpha, and
+// pairing an alpha-blended grid next to this panel's own opaque Net
+// Exposure chart directly caused the "translucent veil, colors don't match
+// the rest of the chart" report. Standardizing on the opaque interpolation
+// (shared with the heatmap AND the rank chart) resolves both.
 function _cotStrengthCellStyle(pct) {
   if (pct == null) return { bg: 'var(--bg2)', color: 'var(--text3)', txt: '—', bold: false };
   const txt = (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%';
   const a = Math.abs(pct);
   if (a < 25) return { bg: 'var(--bg3)', color: 'var(--text2)', txt, bold: false };
   const strong = a >= 50;
-  const alpha = strong ? '.25' : '.10';
-  if (pct >= 0) return { bg: `rgba(38,166,154,${alpha})`, color: 'var(--up)', txt, bold: strong };
-  return { bg: `rgba(239,83,80,${alpha})`, color: 'var(--down)', txt, bold: strong };
+  const magnitude = Math.min(a, 100) / 100;
+  return { bg: _cotHeatColor(magnitude, pct >= 0), color: '#f2f5f8', txt, bold: strong };
 }
 
 let _cotBreakdownData = null; // cache: { ccys: {ccy: data}, indices: {sym: data} }
@@ -2085,8 +2087,22 @@ function _cotBreakdownRow(symbol, d, displayName, isUsdDenominated) {
   const netValueBase = contractMultiplier != null ? net * contractMultiplier : null;
   const netValueUSD  = _cotContractValueUSD(usdCcy, net, contractMultiplier);
 
-  const netPct   = oiLF > 0 ? (net / oiLF) * 100 : null;               // Net Percent (of LF OI, same as docked panel)
-  const netPctLF = oiLF > 0 ? (net / oiLF) * 100 : null;                // Net Percent LF (same base — kept as its own column to match the reference layout)
+  // Net Percent = net position as % of TOTAL Open Interest (all reporting
+  // categories combined — Dealer + Asset Manager + Leveraged Funds + Other
+  // + Nonreportable), the standard "crowdedness relative to the whole
+  // market" reading. Net Percent LF = net position as % of Leveraged
+  // Funds' OWN OI (long+short of that category only) — a materially
+  // different, larger-magnitude number since LF is only one slice of
+  // total OI; this is the same figure the docked COT panel's "NET%OI"
+  // column already shows (see _renderCOTRows() in dashboard.js: pctOI =
+  // net / (long+short), i.e. net / LF-only OI). Both columns previously
+  // used oiLF as the denominator, making them identical on every symbol —
+  // real bug, not a display duplicate: Net Percent needs oiTotal, which
+  // is null for indices/commodities until the next scheduled workflow run
+  // populates it (see CHANGELOG v8.240.0-beta), so that column reads "—"
+  // for those rows until then rather than silently reusing the wrong base.
+  const netPct   = (oiTotal != null && oiTotal > 0) ? (net / oiTotal) * 100 : null;
+  const netPctLF = oiLF > 0 ? (net / oiLF) * 100 : null;
   const wowPP    = (() => {                                             // Net % LF Δ — week-over-week change in Net%LF (pp)
     if (!d.history || d.history.length < 2 || oiLF <= 0) return null;
     const prev = d.history[d.history.length - 2];
@@ -2112,8 +2128,8 @@ function _cotBreakdownRow(symbol, d, displayName, isUsdDenominated) {
     + `<td>${fmt(short)}</td>`
     + `<td>${fmt(shortValue)}</td>`
     + `<td class="${cls(net)}">${net >= 0 ? '+' : ''}${fmt(net)}</td>`
-    + `<td class="${cls(netPct)}">${fmtPct(netPct)}</td>`
-    + `<td class="${cls(netPctLF)}">${fmtPct(netPctLF)}</td>`
+    + `<td class="${cls(netPct)}" title="Net position as % of TOTAL Open Interest (all reporting categories)">${fmtPct(netPct)}</td>`
+    + `<td class="${cls(netPctLF)}" title="Net position as % of Leveraged Funds' own Open Interest — matches the docked panel's NET%OI">${fmtPct(netPctLF)}</td>`
     + `<td class="${cls(wowPP)}">${wowPP == null ? '—' : (wowPP >= 0 ? '+' : '') + wowPP.toFixed(2) + 'pp'}</td>`
     + `<td class="${cls(netValueBase)}">${fmt(netValueBase)}</td>`
     + `<td class="${cls(netValueUSD)}">${fmt(netValueUSD)}</td>`
@@ -2207,10 +2223,10 @@ function _cotStrengthGridHtml(store) {
   // swatch style, same strong/mild wording, thresholds specific to this
   // grid's ±100% scale.
   html += '<div class="cot-strength-legend">'
-    + '<span><span class="cot-strength-swatch" style="background:rgba(38,166,154,.25);"></span>Strong net-long lean (≥ +50%)</span>'
-    + '<span><span class="cot-strength-swatch" style="background:rgba(38,166,154,.10);"></span>Mild net-long lean (≥ +25%)</span>'
-    + '<span><span class="cot-strength-swatch" style="background:rgba(239,83,80,.10);"></span>Mild net-short lean (≤ −25%)</span>'
-    + '<span><span class="cot-strength-swatch" style="background:rgba(239,83,80,.25);"></span>Strong net-short lean (≤ −50%)</span>'
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, true)};"></span>Strong net-long lean (≥ +50%)</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.30, true)};"></span>Mild net-long lean (≥ +25%)</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.30, false)};"></span>Mild net-short lean (≤ −25%)</span>`
+    + `<span><span class="cot-strength-swatch" style="background:${_cotHeatColor(0.75, false)};"></span>Strong net-short lean (≤ −50%)</span>`
     + '</div>';
   return html;
 }
@@ -2219,42 +2235,37 @@ function _cotStrengthGridHtml(store) {
 // leveraged-funds position sits within its own trailing range, on a 0-100%
 // scale (0 = most net-short in the lookback window, 100 = most net-long).
 // `history` already caps at 52 entries (save()'s `existing_history[-52:]`,
-// engine repo) — the max lookback the data actually has, per Santiago's own
-// note. Needs >=2 points to have a range at all; a flat range (max==min,
-// only possible with a brand-new symbol that has just 1-2 identical prints)
-// returns null rather than a fabricated 50%.
+// engine repo) — the max lookback the data actually has. Needs >=2 points
+// to have a range at all; a flat range (max==min, only possible with a
+// brand-new symbol that has just 1-2 identical prints) returns null rather
+// than a fabricated 50%.
 //
-// The reference chart this panel is modeled on plots each instrument as a
-// BAND (a shorter lookback's own high/low, e.g. a 1-year range) sitting
-// inside a longer axis (a 3-year range), plus a marker for the latest
-// reading — not a bar filled up from zero. This data only has one lookback
-// depth (52 weeks), so the closest honest equivalent is: the full 52-week
-// min/max sets the 0–100% axis (the long window), and the most recent
-// ~13 weeks (a calendar quarter — the longest short-window subdivision
-// this data can support) becomes the band, with the latest print marked
-// separately within it. `_cotNetExposureRankDetail()` returns all three
-// values on that one shared axis.
+// The reference chart this panel is modeled on plots THREE separate
+// lookback depths per instrument (3-year / 1-year / 3-month) as a range
+// box plus two markers on one shared axis. This data only stores 52 weeks
+// total (~1 year) — there is no honest way to derive a distinct 3-year or
+// 3-month reading from a 52-week series without fabricating history, which
+// the panel's own footnote already discloses and this codebase's Data
+// integrity rules explicitly forbid (see GUIDELINES.md — no fabricated
+// regression/accumulation history). A prior revision tried to approximate
+// the missing depths anyway (a "recent-quarter band" plotted inside the
+// full-52-week range as a stand-in for the missing 1-year/3-month rows),
+// which added a second visual layer without a second real data point
+// behind it and made the chart harder to read, not more informative.
+// The honest version is a single reading — where the current print sits in
+// its own real 52-week range — shown as one clear marker, not a band.
 function _cotNetExposureRankDetail(d) {
   const hist = (d && d.history) || [];
   const nets = hist.map(h => h.levNet).filter(n => n != null);
   if (nets.length < 2) return null;
   const lo = Math.min(...nets), hi = Math.max(...nets);
   if (hi === lo) return null;
-  const toRank = v => ((v - lo) / (hi - lo)) * 100;
   const current = nets[nets.length - 1];
-  const recentWindow = nets.slice(-13); // ~1 quarter of the up-to-52-week history
-  const recentLo = Math.min(...recentWindow), recentHi = Math.max(...recentWindow);
-  return {
-    currentRank: toRank(current),
-    bandLowRank: toRank(recentLo),
-    bandHighRank: toRank(recentHi),
-    weeks: nets.length,
-  };
+  return { currentRank: ((current - lo) / (hi - lo)) * 100, weeks: nets.length };
 }
 
 // Kept for backward compatibility with any other caller expecting just the
-// current-reading percentile (used nowhere else currently, but this is the
-// one figure most likely to be reused elsewhere later).
+// current-reading percentile.
 function _cotNetExposureRank(d) {
   const detail = _cotNetExposureRankDetail(d);
   return detail ? detail.currentRank : null;
@@ -2272,13 +2283,14 @@ function _cotRankBarStyle(rank) {
   return { bg: _cotHeatColor(magnitude, rank >= 50), color: '#f2f5f8' };
 }
 
-// Vertical band chart — currencies along the horizontal axis (fixed BIS
-// Triennial Survey order, same as COT_BREAKDOWN_CCYS and the breakdown
-// table above it — not re-sorted by value), each column a band spanning
-// the recent-quarter range with a marker line at the latest reading,
-// against a 0/25/50/75/100 axis on the left. Stretches to the panel's full
-// width (no fixed max-width) so columns fill the available space evenly
-// rather than leaving empty space to the right.
+// Single-marker range chart — currencies along the horizontal axis (fixed
+// BIS Triennial Survey order, same as COT_BREAKDOWN_CCYS and the breakdown
+// table above it — not re-sorted by value), each column a full-height
+// neutral reference track (the 0–100% axis itself, made visible as a
+// track so the marker reads against a real reference frame the way the
+// original chart's range box does) with one marker line at the current
+// reading, against a 0/25/50/75/100 axis on the left. Full panel width, no
+// fixed max-width, so columns fill the available space evenly.
 function _cotNetExposureRankChartHtml(store) {
   const rows = COT_BREAKDOWN_CCYS.map(ccy => {
     const d = store.ccys[ccy];
@@ -2302,26 +2314,20 @@ function _cotNetExposureRankChartHtml(store) {
         + '</div>';
       return;
     }
-    const { currentRank, bandLowRank, bandHighRank, weeks } = detail;
+    const { currentRank, weeks } = detail;
     const s = _cotRankBarStyle(currentRank);
-    // Floor the band to a minimum visible thickness (3pp) so a currency
-    // with a flat recent quarter still renders a visible segment rather
-    // than a hairline.
-    const bandBottom = Math.min(bandLowRank, bandHighRank);
-    const bandHeight = Math.max(Math.abs(bandHighRank - bandLowRank), 3);
     const markerBottom = Math.max(0, Math.min(100, currentRank));
     const label3s = currentRank.toFixed(0) + '%';
     html += '<div class="cot-rank-col">'
       + `<div class="cot-rank-col-val" style="color:${s.color};">${label3s}</div>`
-      + `<div class="cot-rank-col-track" title="${ccy}: latest ${label3s} of its own ${weeks}-week range · recent-quarter band ${bandLowRank.toFixed(0)}–${bandHighRank.toFixed(0)}%">`
-      + `<div class="cot-rank-col-band" style="bottom:${bandBottom}%;height:${bandHeight}%;background:${s.bg};"></div>`
-      + `<div class="cot-rank-col-marker" style="bottom:${markerBottom}%;"></div>`
+      + `<div class="cot-rank-col-track" title="${ccy}: latest reading at ${label3s} of its own ${weeks}-week range">`
+      + `<div class="cot-rank-col-marker" style="bottom:${markerBottom}%;background:${s.bg};"></div>`
       + '</div>'
       + `<div class="cot-rank-col-ccy">${label}</div>`
       + '</div>';
   });
   html += '</div></div></div>';
-  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Band = recent-quarter (13-week) range · marker = latest reading · both plotted against the full 52-week (or shorter, if less history exists) range as the 0–100% axis</div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Marker = latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores)</div>';
   return html;
 }
 
