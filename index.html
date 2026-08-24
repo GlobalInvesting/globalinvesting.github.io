@@ -446,6 +446,68 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    renderCorrPairsMatrix()/openCorrMtxFullscreen() in dashboard.js. */
 #corr-mtx-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #corr-mtx-fullscreen-overlay.corr-mtx-fs-active{display:flex}
+/* COT Full Breakdown overlay — same toggle convention as the
+   correlation matrix overlay above (class-driven, not inline style, so a
+   stray inline style never fights the JS-driven open/close toggle). */
+#cot-breakdown-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
+#cot-breakdown-fullscreen-overlay.cot-breakdown-fs-active{display:flex}
+/* v8.169.0-class bug avoided here: #cot-breakdown-fs-close needs its own
+   explicit rule (mirroring #corr-mtx-fs-close/#cal-fs-close/#lw-fs-close)
+   or it falls back to browser-default white button chrome — exactly what
+   happened to #intel-fs-close before that fix. */
+#cot-breakdown-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
+#cot-breakdown-fs-close:hover{border-color:var(--down);color:var(--down)}
+#cot-breakdown-fs-table{width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-ui)}
+#cot-breakdown-fs-table th,#cot-breakdown-fs-table td{padding:4px 6px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--border2)}
+#cot-breakdown-fs-table th:first-child,#cot-breakdown-fs-table td:first-child{text-align:left;position:sticky;left:0;background:var(--bg);font-weight:600}
+#cot-breakdown-fs-table thead th{text-align:right;color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--border)}
+#cot-breakdown-fs-table thead th:first-child{text-align:left}
+#cot-strength-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border2);margin-top:6px}
+#cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:border-color .1s}
+#cot-strength-grid>div:hover{border-color:var(--border2)}
+.cot-strength-pair{font-size:10px;color:#fff;font-weight:700}
+.cot-strength-val{font-size:12px;margin-top:2px;font-family:var(--font-mono)}
+.cot-strength-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);align-items:center}
+.cot-strength-swatch{display:inline-block;width:10px;height:10px;border-radius:2px;vertical-align:middle;margin-right:4px}
+/* Full-width band chart: no max-width cap (v8.238.0-beta follow-up — the
+   prior 620px cap was left over from an earlier single-bar layout and never
+   removed when the chart was rewritten as a band+marker chart, so it kept
+   rendering narrow with empty space to the right regardless of the JS
+   change). Columns use flex:1 with no per-column max-width so the 8 BIS-
+   order currencies split the panel's full width evenly, matching every
+   other full-width element in this fullscreen overlay (breakdown table,
+   strength grid). */
+/* Range highs/lows legend (v8.248.0-beta, Option B): reuses the exact
+   .cot-strength-legend/-swatch visual pattern the Strength Index grid's
+   own legend above this chart already uses, just with the band fill
+   colors as swatches — the label lives here, entirely outside the plot,
+   instead of competing with the bars for space inside it. */
+.cot-rank-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:8px;align-items:center}
+#cot-rank-chart{display:flex;gap:10px;margin-top:8px;width:100%;height:210px}
+#cot-rank-axis{display:flex;flex-direction:column;justify-content:space-between;width:30px;flex-shrink:0;text-align:right;font-size:9px;color:var(--text3);font-family:var(--font-mono);padding-bottom:22px}
+#cot-rank-plot{position:relative;flex:1;min-width:0}
+/* Fixed reference zone at each end of the 0-100% axis (matches the
+   reference chart's "Range highs"/"Range lows" shaded bands) — shares
+   #cot-rank-gridlines' own inset so the bands' 90%/10% offsets are read
+   against the same 0-100% plot area the bars and gridlines use, not the
+   full element height (which also includes the 22px ccy-label strip). */
+#cot-rank-bands{position:absolute;inset:0 0 22px 0;pointer-events:none}
+.cot-rank-band{position:absolute;left:0;right:0}
+#cot-rank-gridlines{position:absolute;inset:0 0 22px 0}
+.cot-rank-gridline{position:absolute;left:0;right:0;border-top:1px solid var(--border2)}
+#cot-rank-cols{position:relative;display:flex;align-items:flex-end;gap:10px;height:100%;padding-bottom:22px}
+.cot-rank-col{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;position:relative}
+/* Bar area is an invisible full-height hit-target (no track fill, no
+   border) so the floating bar reads as the single value it is. The exact
+   reading is available on hover (title attribute) rather than printed
+   above the bar — matching the reference chart, which carries no
+   per-column percentage label either.
+   .cot-rank-col-bar floats FROM the 50% (neutral) baseline TO the current
+   reading's percentile — reproducing the reference chart's own model
+   directly (see the code comment above _cotNetExposureRankChartHtml()). */
+.cot-rank-col-bararea{position:relative;width:100%;max-width:56px;height:100%;overflow:visible}
+.cot-rank-col-bar{position:absolute;left:0;right:0;border-radius:2px;min-height:2px}
+.cot-rank-col-ccy{position:absolute;bottom:-20px;font-size:11px;font-weight:700;color:var(--text2)}
 /* Full-width layout: table-layout:fixed + width:100% lets the browser split
    the available width evenly across all 32 pair columns automatically, so
    the grid fills the fullscreen overlay with no horizontal scrollbar on a
@@ -1695,6 +1757,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="rates-ctab active" data-asset="fx"      role="tab" aria-selected="true"  style="padding:2px 7px;font-size:10px;font-weight:600;border:none;border-radius:3px;background:var(--accent);color:#fff;cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">FX</button>
         <button class="rates-ctab"        data-asset="indices" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Indices</button>
         <button class="rates-ctab"        data-asset="commodities" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Commodities</button>
+        <button id="cot-breakdown-btn" title="Full Breakdown — Open Interest, contract value, LF Strength Index across all pairs" style="margin-left:auto;padding:2px 7px;font-size:10px;font-weight:600;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Full Breakdown</button>
       </div>
       <div style="padding:6px 10px;">
         <div class="cot-scroll-wrap">
@@ -2450,7 +2513,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.237.0" defer></script>
+<script src="assets/dashboard.js?v=8.249.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
@@ -2529,6 +2592,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <button id="corr-mtx-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
     </div>
     <div id="corr-mtx-fullscreen-inner" style="flex:1;min-height:0;overflow:auto;padding:0;"></div>
+  </div>
+  <!-- Fullscreen COT Full Breakdown overlay — content-swap pattern,
+       same as #corr-mtx-fullscreen-overlay above. Rebuilt fresh on open by
+       renderCotBreakdown(), which does its own cot-data/*.json fetch
+       (_fetchCotBreakdownData()) — independent of the docked COT panel's
+       fetchCOTData(), since the docked panel excludes USD/DXY and the
+       equity indices this breakdown also needs. -->
+  <div id="cot-breakdown-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Full COT breakdown and leveraged funds strength index">
+    <div class="lw-fs-toolbar">
+      <div style="flex:1;display:flex;align-items:center;padding-left:4px;font-size:11px;color:var(--text2);" id="cot-breakdown-fs-subtitle">CFTC TFF · Leveraged Funds · weekly</div>
+      <button id="cot-breakdown-fs-close" title="Exit fullscreen (Esc)">&#x2715; Exit fullscreen</button>
+    </div>
+    <div id="cot-breakdown-fullscreen-inner" style="flex:1;min-height:0;overflow:auto;padding:10px;"></div>
   </div>
   <!-- Fullscreen News/Research/Analysis overlay (v8.167.x) — #intel-scroll is
        moved here on open, restored to #section-news on close. See
