@@ -463,8 +463,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cot-breakdown-fs-table thead th{text-align:right;color:var(--text3);font-size:9px;text-transform:uppercase;letter-spacing:.03em;border-bottom:1px solid var(--border)}
 #cot-breakdown-fs-table thead th:first-child{text-align:left}
 #cot-strength-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border2);margin-top:6px}
-#cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:filter .1s}
-#cot-strength-grid>div:hover{filter:brightness(1.4)}
+#cot-strength-grid>div{background:var(--bg2);padding:6px 4px;text-align:center;border:1px solid rgba(255,255,255,.04);transition:box-shadow .1s,border-color .1s}
+#cot-strength-grid>div:hover{border-color:#fff;box-shadow:inset 0 0 0 1px #fff;z-index:1;position:relative}
 .cot-strength-pair{font-size:10px;color:#fff;font-weight:700}
 .cot-strength-val{font-size:12px;margin-top:2px;font-family:var(--font-mono)}
 .cot-strength-legend{display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono);color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);align-items:center}
@@ -486,14 +486,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .cot-rank-col{display:flex;flex-direction:column;align-items:center;flex:1;height:100%;justify-content:flex-end;position:relative}
 .cot-rank-col-val{font-size:10px;font-weight:700;font-family:var(--font-mono);margin-bottom:3px}
 /* Bar area is an invisible full-height hit-target (no track fill, no
-   border) so the floating bar reads as the single value it is, not as a
-   marker sitting inside an empty container. .cot-rank-col-bar is the one
-   honest data point this history supports: a solid column floating FROM
-   the 50% (neutral) baseline TO the current reading's percentile — the
-   direct analog of the reference chart's range box for a single lookback
-   depth (see the code comment above _cotNetExposureRankChartHtml()). */
+   border) so the box + markers read as real values, not a marker sitting
+   inside an empty container. .cot-rank-col-bar is the range box spanning
+   the full/26wk/13wk window readings (see the code comment above
+   _cotNetExposureRankChartHtml()) — it lands wherever the real data puts
+   it, not forced to touch 50%. .cot-rank-col-mid (diamond, 26wk) and
+   .cot-rank-col-short (circle, 13wk) are individual real readings plotted
+   on top of that box. */
 .cot-rank-col-bararea{position:relative;width:100%;max-width:56px;height:100%;overflow:visible}
-.cot-rank-col-bar{position:absolute;left:0;right:0;border-radius:2px;min-height:2px}
+.cot-rank-col-bar{position:absolute;left:0;right:0;border-radius:2px;min-height:2px;opacity:.85}
+.cot-rank-col-mid,.cot-rank-col-short{position:absolute;left:50%;background:#e8ecef;border:1.5px solid var(--bg);box-shadow:0 0 0 1px rgba(0,0,0,.4);z-index:2}
+.cot-rank-col-mid{width:9px;height:9px;transform:translate(-50%,50%) rotate(45deg);margin-left:0}
+.cot-rank-col-short{width:8px;height:8px;border-radius:50%;transform:translate(-50%,50%)}
 .cot-rank-col-ccy{position:absolute;bottom:-20px;font-size:11px;font-weight:700;color:var(--text2)}
 /* Full-width layout: table-layout:fixed + width:100% lets the browser split
    the available width evenly across all 32 pair columns automatically, so
