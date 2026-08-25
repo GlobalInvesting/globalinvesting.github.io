@@ -3843,6 +3843,11 @@ async function fetchRiskData() {
     _set('dxy',   v => v > 50 && v < 130);
     // MOVE — guardado en byId para usarlo en renderRiskData
     _set('move',  v => v > 10 && v < 400);
+    // Gold/SPX — feed the stress-score's safe-haven-demand and equity-selloff
+    // legs below (v8.260.0: these were referenced in the score but never
+    // populated into byId, silently disabling both legs — see CHANGELOG).
+    _set('gold',  v => v > 500 && v < 10000);
+    _set('spx',   v => v > 1000 && v < 20000);
   }
 
   // Render inmediato con repo + intraday JSON — el usuario ve valores en <100ms.
@@ -3861,6 +3866,9 @@ async function fetchRiskData() {
     _enrich2('us30y',  v => v > 0 && v < 20);
     _enrich2('dxy',    v => v > 50 && v < 130);
     _enrich2('move',   v => v > 10 && v < 400);
+    // Gold/SPX — see matching STEP 1.5 comment above.
+    _enrich2('gold',   v => v > 500 && v < 10000);
+    _enrich2('spx',    v => v > 1000 && v < 20000);
     // FX risk proxies — used by regime scoring (AUD/JPY is the canonical cross-asset risk barometer)
     _enrich2('audjpy', v => v > 50 && v < 150);
     _enrich2('usdjpy', v => v > 80 && v < 200);
