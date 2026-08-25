@@ -18156,12 +18156,24 @@ async function renderDollarSmile() {
 
   if (currentEl && cur) {
     const diffTxt = `${cur.diff >= 0 ? '+' : ''}${cur.diff.toFixed(2)}pp`;
-    // "Latest available" rather than implying this is the current calendar
-    // quarter — real GDP prints ~1 quarter after quarter-end. When the
-    // regime is crisis-driven, show the VIX read too — the diff alone
-    // isn't why this quarter landed in Global Risk-Off.
+    // When the regime is crisis-driven, show the VIX read too — the diff
+    // alone isn't why this quarter landed in Global Risk-Off.
     const vixTxt = cur.regime === 'GLOBAL-RISK-OFF' && cur.vix_max != null ? `, VIX max ${cur.vix_max.toFixed(1)}` : '';
-    currentEl.textContent = `Latest available: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt}${vixTxt})`;
+    // v8.255.0 — "current" is now an async per-currency nowcast (see
+    // fetch_growth_differential.py v2.2.0 _compute_nowcast()), anchored on
+    // USD's own latest reported quarter rather than gated on all 10
+    // currencies reporting simultaneously. When one or more of the other 9
+    // are still on an earlier quarter, say so explicitly and name them —
+    // never blend a stale reading in as if it were as fresh as the rest.
+    // "Latest available" (implying the whole read is that old) is dropped
+    // in favor of "Current", since the badge now reflects a genuine live
+    // nowcast, not a read frozen to the slowest reporter.
+    const pending = cur.pending || [];
+    const coverage = cur.coverage || { reported: 10, total: 10 };
+    const coverageTxt = pending.length
+      ? ` \u2014 ${coverage.reported}/${coverage.total} reporting, ${pending.join('/')} pending`
+      : '';
+    currentEl.textContent = `Current: ${cur.quarter} \u2014 ${_GROWTHDIFF_LABELS[cur.regime] || cur.regime} (${diffTxt}${vixTxt})${coverageTxt}`;
   }
 
   // Earliest quarter carrying a dxy_qret, not hardcoded — so this label
@@ -18263,8 +18275,15 @@ function _dsmileRenderInsight(el, doc, cur, stats) {
 
   el.innerHTML = `${cur ? cur.quarter : '\u2014'}: ${curTxt} \u00b7 <span style="color:var(--up);">${regimeLabel}</span>`;
 
+  // v8.255.0 — disclose the nowcast's per-currency vintages in the hover
+  // tooltip when any currency is running behind USD's anchor quarter,
+  // rather than only surfacing this in the compact currentEl badge.
+  const pendingTxt = cur && cur.pending && cur.pending.length
+    ? ` G9 average uses each currency's own latest available quarter, not all same-quarter: ${cur.pending.map(c => `${c} ${cur.vintages && cur.vintages[c] ? cur.vintages[c] : '\u2014'}`).join(', ')} still on an earlier print than USD's ${cur.quarter}.`
+    : '';
   el.title = `Regime = real GDP YoY differential (USD vs G9, FRED) with a VIX\u226540 crisis override \u2014 a genuine panic quarter is Global Risk-Off regardless of growth. ` +
-    `Table below shows DXY's historical q/q return by regime, same quarter as the GDP reading (which lags ~1 quarter on release): context on dollar behavior by macro backdrop, not a trade signal.`;
+    `Table below shows DXY's historical q/q return by regime, same quarter as the GDP reading (which lags ~1 quarter on release): context on dollar behavior by macro backdrop, not a trade signal.` +
+    `${pendingTxt}`;
 }
 
 function _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear) {
