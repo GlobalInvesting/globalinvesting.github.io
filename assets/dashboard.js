@@ -1305,13 +1305,10 @@ const _HM_THROTTLE_MS = 800;
 function populateHeatmap() {
   const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
 
-  // Prefer STOOQ_RT_CACHE (intraday ~5min delay) over ECB daily rates
-  // because ECB daily rates have zero intraday movement (same open/close on weekends)
-  const rtAvailable = Object.keys(STOOQ_RT_CACHE).length >= 21; // need ≥75% of 32 pairs (G8 + 4 Scandi) for reliable composite
-
-  // pairDefs hoisted to function scope — used both inside the rtAvailable branch
-  // (strength computation) and outside it (pairCountByCcy tooltip counts).
-  // Declaring inside the if-block caused ReferenceError when rtAvailable=false.
+  // pairDefs hoisted to function scope — used both to compute rtAvailable
+  // (real coverage of the 32-pair set) and outside it (pairCountByCcy tooltip
+  // counts). Declaring inside the if-block caused ReferenceError when
+  // rtAvailable=false.
   //
   // sign is always +1: log(close/prevClose) of any base/quote pair already
   // represents the base currency's return, regardless of which currency is
@@ -1362,6 +1359,17 @@ function populateHeatmap() {
       { id: 'eursek', base: 'EUR', quote: 'SEK', sign:  1 },
     ];
 
+  // v8.261.0 FIX: rtAvailable must count real coverage of the 32-pair set
+  // this composite actually needs, not Object.keys(STOOQ_RT_CACHE).length —
+  // that cache also holds ~12 non-FX symbols (vix/move/gold/xauusd/wti/spx/
+  // nikkei/stoxx/us10y/dxy/btc/eth), so the old `>= 21` check could pass with
+  // as few as ~9 of 32 real pairs loaded while still labeling the panel "Live
+  // · G10 composite · 32 pairs". Also, 21 was never actually 75% of 32 (24 is).
+  const _rtPairsLoaded = pairDefs.filter(p => STOOQ_RT_CACHE[p.id] != null).length;
+  const rtAvailable = _rtPairsLoaded >= 24; // 75% of 32 real pairs
+
+  // Prefer STOOQ_RT_CACHE (intraday ~5min delay) over ECB daily rates
+  // because ECB daily rates have zero intraday movement (same open/close on weekends)
   let strengths;
   if (rtAvailable) {
     // Map each currency to its avg % change across all 28 G8 pairs.
