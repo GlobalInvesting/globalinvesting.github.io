@@ -1,21 +1,21 @@
 {
-  "lastUpdate": "2026-08-24T20:55:21Z",
-  "generatedAt": "2026-08-24T20:55:21Z",
+  "lastUpdate": "2026-08-25T00:01:00Z",
+  "generatedAt": "2026-08-25T00:01:00Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-24",
+  "rangeFrom": "2025-08-25",
   "rangeTo": "2026-08-28",
-  "totalEvents": 3776,
+  "totalEvents": 3783,
   "currencyCounts": {
-    "NZD": 90,
-    "EUR": 867,
-    "USD": 1272,
-    "AUD": 257,
+    "EUR": 870,
+    "USD": 1276,
+    "AUD": 259,
     "GBP": 441,
+    "NZD": 88,
     "CHF": 125,
     "CAD": 267,
     "JPY": 218,
@@ -23,31 +23,11 @@
     "NOK": 83
   },
   "impactCounts": {
-    "high": 1672,
-    "medium": 1876,
+    "high": 1674,
+    "medium": 1881,
     "low": 228
   },
   "surpriseStats": {
-    "GBP/cbi distributive trades": {
-      "n": 4,
-      "mean": 1.75,
-      "std": 17.153717
-    },
-    "USD/chicago fed national activity index": {
-      "n": 5,
-      "mean": -0.068,
-      "std": 0.285167
-    },
-    "USD/cb consumer confidence": {
-      "n": 3,
-      "mean": -1.3,
-      "std": 2.306513
-    },
-    "USD/dallas fed manufacturing index": {
-      "n": 3,
-      "mean": 0.566667,
-      "std": 2.267892
-    },
     "AUD/rba weighted median cpi mom": {
       "n": 4,
       "mean": 0.025,
@@ -1128,6 +1108,16 @@
       "mean": 1.0,
       "std": 0.0
     },
+    "GBP/cbi distributive trades": {
+      "n": 3,
+      "mean": -2.333333,
+      "std": 18.475209
+    },
+    "USD/chicago fed national activity index": {
+      "n": 4,
+      "mean": -0.195,
+      "std": 0.03
+    },
     "EUR/ecb consumer inflation expectations": {
       "n": 3,
       "mean": -0.333333,
@@ -1177,6 +1167,11 @@
       "n": 2,
       "mean": -0.1,
       "std": 0.282843
+    },
+    "USD/dallas fed manufacturing index": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 3.040559
     },
     "EUR/germany retail sales yoy": {
       "n": 2,
@@ -1247,6 +1242,11 @@
       "n": 2,
       "mean": 0.25,
       "std": 0.070711
+    },
+    "USD/cb consumer confidence": {
+      "n": 2,
+      "mean": -2.5,
+      "std": 1.414214
     },
     "AUD/private house approvals mom": {
       "n": 4,
@@ -1395,30 +1395,6 @@
     }
   },
   "events": [
-    {
-      "currency": "NZD",
-      "event": "Retail Sales YoY",
-      "dateISO": "2025-08-24",
-      "actual": "2.3%",
-      "forecast": "1.0",
-      "previous": "0.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "22:45"
-    },
-    {
-      "currency": "NZD",
-      "event": "Retail Sales QoQ",
-      "dateISO": "2025-08-24",
-      "actual": "0.5%",
-      "forecast": "0.2",
-      "previous": "0.8",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "22:45"
-    },
     {
       "currency": "EUR",
       "event": "Ifo Business Climate",
@@ -47348,15 +47324,132 @@
     {
       "date": "25 Aug",
       "dateISO": "2026-08-25",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Meeting Minutes",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "04:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Jacobs Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Consumer Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "87.0",
+      "previous": "86.0"
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain PPI YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "5.8%",
+      "previous": "7.0%"
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Ifo Business Climate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "87.2",
+      "previous": "86.6"
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "12:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Barkin Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "13:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States S&#38;P/Case-Shiller Home Price YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.7%",
+      "previous": "1.6%"
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "CB Consumer Confidence",
+      "event": "United States CB Consumer Confidence",
       "impact": "medium",
       "actual": null,
-      "forecast": "90.3",
+      "forecast": "91.2",
       "previous": "90.8"
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States New Home Sales MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-1.3%",
+      "previous": "1.6%"
+    },
+    {
+      "date": "25 Aug",
+      "dateISO": "2026-08-25",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States New Home Sales",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.62M",
+      "previous": "0.628M"
     },
     {
       "date": "26 Aug",
