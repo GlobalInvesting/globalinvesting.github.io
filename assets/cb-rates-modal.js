@@ -1,4 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
+// CB RATES MODAL  v2.7 — Fix: decision labels stacking/overlapping on long-history views
+// v2.7 (2026-08-25): _buildDecisionOverlay()'s 3-tier stacking previously
+//   forced a label into the least-crowded tier even when NONE had room,
+//   stacking it on top of a neighbor instead of skipping it — with decades
+//   of history zoomed to fit, this produced a wall of overlapping +25bp/-25bp
+//   boxes. Now a decision with no free tier renders a thin tick mark instead
+//   of a label; the crosshair tooltip (independent overlay) still shows the
+//   exact decision on hover at any zoom level, so no information is lost,
+//   only the persistent on-chart label at high density. See CHANGELOG.md.
 // CB RATES MODAL  v2.6 — Fix: Rate Chart grew oversized after the v2.5 fix
 // v2.6 (2026-08-02): The client reported the chart taking up far more room than
 //   before, right after v2.5. Root cause: v2.5's #cbr-bd{flex:1;min-height:0}
@@ -252,13 +261,26 @@ function _buildDecisionOverlay(container,lwChart,decisions){
     decisions.forEach(d=>{
       try{const x=ts.timeToCoordinate(d.time);if(x==null||x<-LABEL_W||x>W+LABEL_W)return;visible.push({...d,x});}catch(_){}
     });
+    // Left-to-right so tier-fit scanning is deterministic regardless of the
+    // decisions array's own order.
+    visible.sort((a,b)=>a.x-b.x);
     const tierEnd=TIERS.map(()=>-Infinity);
     const assigned=visible.map(d=>{
-      let tier=0;
+      let tier=-1;
       for(let t=0;t<TIERS.length;t++){
         if(d.x-LABEL_W/2>=tierEnd[t]+MIN_GAP_PX){tier=t;break;}
-        if(t===TIERS.length-1)tier=tierEnd.indexOf(Math.min(...tierEnd));
       }
+      // v2.7: previously fell back to the least-crowded tier even when NONE
+      // had room (tier=tierEnd.indexOf(Math.min(...))), forcing the label to
+      // stack on top of a neighbor instead of skipping it — the exact cause
+      // of the overlapping-label wall on long (decades) history views. Now a
+      // decision with no free tier gets no label box at all; a thin tick
+      // mark still renders so the cluster's density stays visible, and the
+      // crosshair tooltip (independent of this overlay, see
+      // _attachCBRTooltip) still shows the exact decision on hover no
+      // matter how zoomed out the chart is — nothing is actually hidden,
+      // only the persistent on-chart label is.
+      if(tier===-1)return{...d,tier:null};
       tierEnd[tier]=d.x+LABEL_W/2;
       return{...d,tier};
     });
@@ -266,6 +288,10 @@ function _buildDecisionOverlay(container,lwChart,decisions){
     assigned.forEach(d=>{
       const cs2=getComputedStyle(document.documentElement);
       const x=d.x,col=d.delta>0?(cs2.getPropertyValue('--up').trim()||'#26a69a'):(cs2.getPropertyValue('--down').trim()||'#ef5350');
+      if(d.tier===null){
+        html+=`<line x1="${x.toFixed(1)}" y1="${(H-22).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(H-16).toFixed(1)}" stroke="${col}" stroke-width="1.5" stroke-opacity="0.5"/>`;
+        return;
+      }
       const colA=d.delta>0?'rgba(38,166,154,0.35)':'rgba(239,83,80,0.35)';
       const colB=d.delta>0?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
       const sign=d.delta>0?'+':'',label=sign+Math.round(d.delta*100)+'bp';
