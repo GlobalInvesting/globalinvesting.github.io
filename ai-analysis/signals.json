@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-25T00:58:40Z",
+  "generated_at": "2026-08-25T07:16:45Z",
   "signals": [
     {
-      "time": "00:58",
+      "time": "07:16",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + Crowded Carry",
-      "text": "USD/JPY trades at 159.17, holding just below its SMA20 of 159.19 while the 200-hour MA serves as a tactical ceiling. The Pentagon has signaled it is not ruling out military force in the Strait of Hormuz, introducing a geopolitical risk premium that conflicts with the structural 275bp Fed-BoJ carry advantage. Options markets are aggressively hedging downside risk with the 1M 25d risk reversal at -1.96, a level showing strong demand for JPY protection despite the carry-supportive backdrop. Speculative positioning shows JPY net shorts at -73,641, creating a crowded environment vulnerable to a disorderly unwind if geopolitical tensions spike. JPY's safe-haven function is currently distorted, with USD/JPY vs VIX correlation at +0.435 (z=+2.06σ), suggesting carry remains the dominant driver until a major volatility breakout. Trade bias: Neutral/range USD/JPY; carry support is offset by acute intervention and geopolitical risks. Catalyst: US-Iran escalation headlines. Risk: VIX breaks above 25, restoring JPY safe-haven flows and forcing a carry liquidation.",
+      "title": "USD/JPY — Carry + Geopolitical Tension + Volatility",
+      "text": "USD/JPY trades at 159.37, holding just below the 160.00 level which remains a critical threshold for potential Japanese policy action. The 275bp Fed-BoJ carry advantage (Fed 3.75% vs BoJ 1.0%) remains the primary driver of the bid, though US Treasury Secretary Bessent’s comments on Iran secondary sanctions introduce a geopolitical risk layer. Options markets reflect a sharp divergence from spot as the 25d Risk Reversal sits at -1.96 (Strong Put Skew), signaling heavy institutional demand for downside protection despite the bullish carry trend. Furthermore, JPY COT LF net shorts at -73,641 (pctl 38) grew by 14,115 WoW, indicating specs are still leaning into the carry trade despite rising intervention risks. USD/JPY vs VIX correlation at +0.435 (z=+2.06σ) confirms the JPY is failing to act as a safe-haven, leaving the pair vulnerable to a sharp unwind only if VIX clears the 25 threshold. Trade bias: Long USD/JPY; carry dominance persists while VIX remains at 15.8 (normal volatility). Catalyst: BoJ meeting 18 Sep — hike bias indicated. Risk: Sustained break above 160.00 triggers confirmed BoJ/MoF intervention, forcing a disorderly unwind of crowded shorts.",
       "evidence": [
-        "USD/JPY Carry: +275bp",
-        "USD/JPY RR: -1.96",
-        "JPY COT Net: -73,641"
+        "Fed 3.75% vs BoJ 1.0% — +275bp",
+        "USD/JPY 25d RR: -1.96",
+        "JPY COT LF net: -73,641"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "00:54",
+      "time": "07:12",
       "priority": "warning",
-      "title": "AUD/CHF — G10 Bilateral Theme + Geopolitical Drag",
-      "text": "AUD/CHF is the primary G10 bilateral theme with a 1.071% performance spread between the week's leader and laggard. AUD 1W average strength sits at +0.686% across 4 pairs, while CHF has weakened by -0.385% despite its typical safe-haven profile. The Australian Dollar's outperformance is currently testing headwinds from new Iran sanctions, which have begun to sour risk appetite and pull the pair off recent two-month highs. A massive +435bp carry advantage for AUD vs CHF remains the fundamental anchor, though COT positioning for AUD is becoming elevated at a 52-week percentile of 81. Retail sentiment is extremely short AUD/USD at 88%, providing a contrarian cushion against institutional profit-taking. Trade bias: Long AUD/CHF; carry advantage dominates provided risk sentiment does not undergo a systemic collapse. Catalyst: RBA Meeting Minutes on 25 August. Risk: Sustained geopolitical escalation drives a classic flight to CHF, neutralizing the carry premium.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Carry",
+      "text": "AUD/CHF reflects the week's dominant G10 divergence as AUD outperforms the peer group by an average of +0.636% (n=4) while CHF lags at -0.466% (n=6), creating a substantial 1.102% spread. RBA holds at 4.35%. Conversely, CHF remains under pressure with a negative real rate of -0.40%, compared to AUD’s mildly restrictive +0.55% real rate. AUD/USD retail sentiment at 90% short highlights a contrarian risk where retail is fading the institutional trend, suggesting potential for further upside squeeze. AUD/USD is currently positioned above its SMA20/50/200 cluster (0.7065/0.7004/0.6957), supporting the broader AUD strength theme. Trade bias: Long AUD/CHF; massive carry premium and RBA hawkishness drive bilateral divergence. Catalyst: Australia CPI data. Risk: Sharp spike in VIX above 25 revives CHF safe-haven demand, compressing the carry spread.",
       "evidence": [
-        "AUD 1W avg: +0.686% (n=4)",
-        "G10 spread: 1.071%",
-        "AUD/CHF Carry: +435bp"
+        "AUD 1W avg: +0.636% (n=4)",
+        "CHF 1W avg: -0.466% (n=6)",
+        "G10 spread: 1.102%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "00:52",
+      "time": "07:08",
       "priority": "warning",
-      "title": "GBP/USD — Positioning Extreme + Volatility Premium",
-      "text": "GBP/USD trades at 1.3638, positioned well above its SMA20/50/200 cluster (1.3400-1.3502), marking a clean bullish technical profile. However, CFTC data shows speculative long positioning is reaching extreme levels with a 52-week percentile of 94 and a z-score of +1.45, suggesting the move is becoming crowded. This institutional positioning is met by an extreme retail short bias of 83%, creating a squeeze scenario if price extends. The options market is pricing in significant uncertainty, evidenced by a massive +5.2% Vol Risk Premium (IV 11.0% vs HV30 5.8%), the highest in the G10 space. This elevated hedging demand suggests that while the trend remains bullish, market participants are paying a steep premium for protection against a trend reversal. Trade bias: Bullish GBP/USD; momentum remains intact but high VRP suggests limited near-term upside without a fresh catalyst. Catalyst: US CPI next week. Risk: LF net long reversal begins to align with negative ESI (-8.3), triggering a profit-taking liquidation.",
+      "title": "GBP/USD — Volatility Risk Premium + Positioning",
+      "text": "GBP/USD trades at 1.3641, maintaining its position above the SMA20/50/200 cluster at 1.3502/1.3400/1.3429. Market pricing reflects significant caution as GBP/USD ATM IV at 11.0% sits 5.2 points above its HV30 of 5.8%, indicating a highly elevated Volatility Risk Premium (VRP). This expensive protection coincides with a crowded speculative long position, with COT LF net long +46,070 sitting at the 94th percentile (z=+1.45) of its 52-week range. While the 8bp carry advantage for GBP (SONIA 3.73% vs SOFR 3.65%) is marginal, the combination of crowded positioning and high vol premium suggests the market is paying for protection against a sharp correction. Retail traders are heavily faded, with 83% short in GBP/USD, which typically supports the existing institutional long trend until a positioning flush occurs. Trade bias: Neutral/GBP longs; crowded spec positioning and extreme VRP limit immediate upside conviction. Catalyst: next BoE meeting (mkt: 100% hold priced). Risk: Data misses in UK activity lead to a rapid unwind of crowded speculative longs toward the 1.3502 SMA20 support.",
       "evidence": [
-        "GBP COT pctl(52w): 94",
+        "GBP COT LF net: +46,070 (pctl 94)",
         "GBP/USD VRP: +5.2%",
-        "Retail Sentiment: 83% Short"
+        "Retail: 83% short"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "00:48",
+      "time": "07:01",
       "priority": "info",
-      "title": "EUR/USD — ESI Divergence + Restrictive Real Rates",
-      "text": "EUR/USD is holding at 1.1671, maintaining a position above its SMA200 (1.1635) and both its SMA20 and SMA50. The pair is supported by a widening divergence in economic data trends, as the Eurozone ESI shows a moderate positive bias (+9.6) against the US ESI's strong negative print of -15.7. While the nominal carry favors the USD by +135bp, the real policy rate differential is much tighter at +1.41% (USD +1.48% vs EUR +0.07%), reducing the structural incentive to hold dollars as US data persists in missing expectations. COT data shows leveraged funds remain net short EUR (-76,035), placing them at the 10th percentile of the 52-week range, which suggests significant room for a short-covering rally if the ECB's hawkish bias is reaffirmed. Trade bias: Bullish EUR/USD; contrarian to crowded spec shorts and supported by US data underperformance. Catalyst: ECB meeting 10 Sep — Hike bias priced. Risk: US 10Y yields rebound sharply on geopolitical safe-haven bids, re-asserting the nominal carry advantage.",
+      "title": "NZD/USD — ESI Divergence + Positioning",
+      "text": "NZD/USD trades at 0.5955, supported by its position above the SMA20/50/200 cluster (0.5888/0.5803/0.5843). RBNZ holds at 2.5%. This creates a policy vs positioning divergence, as specs continue to hold shorts against an accommodative real rate of -1.56%. However, the NZD Economic Surprise Index (ESI) is neutral at +4.0, while the USD ESI shows strong negative persistence at -15.7, suggesting that US data weakness is providing the primary support for the pair. Trade bias: Bullish NZD/USD; spec short-covering likely as RBNZ hike bias contradicts crowded bearish positioning. Catalyst: RBNZ meeting 2 Sep — hike bias. Risk: RBNZ pauses hiking cycle, validating the spec short and removing the squeeze catalyst.",
       "evidence": [
+        "NZD COT LF net: -27,414 (pctl 15)",
         "USD ESI: -15.7",
-        "EUR COT pctl(52w): 10",
-        "USD/EUR Carry: +135bp"
+        "RBNZ Rate: 2.5% [HIKING]"
       ],
       "_source": "engine-ai-primary"
     }
