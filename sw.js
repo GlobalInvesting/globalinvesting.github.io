@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.255.0';
+const CACHE_VERSION = 'gi-v8.256.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -34,7 +34,7 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 // prior failure mode.
 const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.191.0',
-  '/assets/dashboard.js?v=8.255.0',
+  '/assets/dashboard.js?v=8.256.0',
   '/assets/gi-auth.js?v=1.7.5',
   '/assets/gi-overview.js?v=1.4.1',
   '/assets/fx-websocket.js?v=1.0.0',
@@ -66,15 +66,19 @@ const DATA_PATH_PREFIXES = [
   '/ai-analysis/',
   '/calendar-data/',
   '/cot-data/',
+  '/dtcc-data/',
   '/economic-data/',
   '/extended-data/',
   '/fx-data/',
+  '/growth-differential-data/',
   '/intraday-data/',
   '/meetings-data/',
   '/news-data/',
   '/ohlc-data/',
   '/rates/',
+  '/research-data/',
   '/rr-data/',
+  '/seasonality-data/',
   '/sentiment-data/',
 ];
 
