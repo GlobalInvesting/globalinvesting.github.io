@@ -1356,7 +1356,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Statistically significant recurring windows (monthly, p&lt;0.05, non-overlapping)</div>
               <div style="overflow-x:auto;">
               <table id="szn-windows-table" style="width:100%;min-width:480px;border-collapse:collapse;font-size:10.5px;">
-                <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero">p-value</td></tr></thead>
+                <thead><tr style="color:var(--text3);"><td style="padding:2px 0;">Window</td><td style="text-align:right;">Dir</td><td style="text-align:right;" title="Average return divided by its standard deviation across qualifying years">Avg ret ± Std dev</td><td style="text-align:right;" title="Win rate is shown for context only — it is not the significance test used to select this window">Win rate</td><td style="text-align:right;" title="One-sample t-test p-value, H0: true mean window return is zero — the raw, per-window test result before multiple-comparisons correction">p-value</td><td style="text-align:right;" title="Benjamini-Hochberg FDR-adjusted q-value, corrected across all ~78 candidate windows tested for this pair — this, not the raw p-value, is what selects which windows are shown">q-value</td></tr></thead>
                 <tbody id="szn-windows-tbody"></tbody>
               </table>
               </div>
@@ -2517,7 +2517,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.5" defer></script>
-<script src="assets/dashboard.js?v=8.259.3" defer></script>
+<script src="assets/dashboard.js?v=8.260.0" defer></script>
 <script src="assets/gi-overview.js?v=1.4.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
