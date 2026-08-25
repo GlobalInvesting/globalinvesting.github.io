@@ -675,27 +675,37 @@ function _rcmRenderMatrix() {
 
 // ── Tab 3: Pair Detail ───────────────────────────────────────────────────────
 function _rcmRenderPairDetail(baseCcy, quoteCcy) {
-  // v8.4.6: baseCcy/quoteCcy are Bloomberg canonical (e.g. base=NZD, quote=USD).
-  // We derive the high-rate leg (highCcy) and low-rate leg (lowCcy) from actual
-  // rate data — not from argument order — so display is always correct regardless
-  // of which currency currently has the higher rate.
+  // v8.261.1 FIX: the v8.4.6 comment this replaced assumed baseCcy/quoteCcy
+  // arrive in "Bloomberg canonical" order (e.g. base=NZD, quote=USD for the
+  // NZD/USD pair, unrelated to which leg has the higher rate) and therefore
+  // re-derived highCcy/lowCcy from real-rate data, ignoring argument order.
+  // That assumption is stale: openRealCarryModal()'s only caller (the Carry
+  // Ranking panel's row click, dashboard.js fetchCarryRanking()) already
+  // computes longCcy/shortCcy by NOMINAL rate — the standard carry-trade
+  // construction (borrow low nominal, invest high nominal) — and passes them
+  // straight through as baseCcy/quoteCcy. Re-deriving by real rate here meant
+  // that whenever a pair's real carry is negative (nominal-long leg has the
+  // LOWER real rate — algebraically possible any time inflation more than
+  // offsets the nominal edge), the modal would silently swap which currency
+  // it labels "carry advantage" and orders as long/short, versus the exact
+  // row the user clicked in the ranking table. Live G10 rates checked this
+  // session all had positive real carry in the visible top 10 (no currently
+  // observable instance), but the flip is guaranteed to recur in any rate
+  // regime with fewer than 10 positive-real-carry pairs. Fixed by trusting
+  // the caller's order directly — baseCcy IS the long/high-nominal leg,
+  // quoteCcy IS the short/low-nominal leg, full stop, matching what
+  // fetchCarryRanking()'s own row already displays for that pair (including
+  // a correctly negative real-carry figure when applicable, same as today).
   const d = _rcmData;
   if (!d || !baseCcy || !quoteCcy) {
     return `<div class="rcm-loading">Select a pair from the Carry Ranking to view detail.</div>`;
   }
 
-  // Determine carry direction from real rates (or nominal if real unavailable)
-  const rrBase  = d.realRates[baseCcy];
-  const rrQuote = d.realRates[quoteCcy];
-  const nomBase  = d.nominalRates[baseCcy]?.rate;
-  const nomQuote = d.nominalRates[quoteCcy]?.rate;
-  // highCcy = leg earning higher real carry (falling back to nominal if real unavailable)
-  const baseScore  = rrBase  ?? nomBase  ?? -Infinity;
-  const quoteScore = rrQuote ?? nomQuote ?? -Infinity;
-  const highCcy = baseScore >= quoteScore ? baseCcy : quoteCcy;
-  const lowCcy  = highCcy === baseCcy ? quoteCcy : baseCcy;
+  const highCcy = baseCcy;
+  const lowCcy  = quoteCcy;
   // Carry direction indicator shown in the UI — replaces "LONG X / SHORT Y"
   const carryDir = `${highCcy} carry advantage`;
+
 
   const nomEntryL = d.nominalRates[highCcy];
   const nomEntryS = d.nominalRates[lowCcy];
