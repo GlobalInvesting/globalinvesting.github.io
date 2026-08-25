@@ -616,6 +616,15 @@ const ECN_FLOOR_SPREADS = {
   audjpy:0.8, audnzd:1.5, audchf:1.5,
   cadjpy:1.0, chfjpy:1.5, nzdjpy:1.8,
   usdnok:2.0, usdsek:2.0,
+  // v8.262.2: 9 pairs below were absent from this table entirely — TYPICAL_SPREADS'
+  // Proxy get() falls back to a flat 0.5 for any unlisted key, so every one of these
+  // silently rendered the same 0.5 pip spread as EUR/USD regardless of real liquidity.
+  // EUR/NOK, EUR/SEK are EUR-crossed-with-Scandies (thinner than USD/NOK, USD/SEK
+  // themselves since they compound two legs' liquidity) — calibrated wider than the
+  // already-present usdnok/usdsek floor. The rest are standard non-USD/non-EUR crosses,
+  // calibrated in line with the existing gbpcad/audnzd/nzdjpy tier they sit alongside.
+  eurnok:3.5, eursek:3.5, eurnzd:1.8, gbpaud:2.2, gbpnzd:3.0,
+  audcad:1.2, cadchf:1.5, nzdcad:2.0, nzdchf:2.0,
 };
 // Live spread cache — populated by fetchReferenceSpreads() from HV30+VIX+MOVE model.
 // Using a Proxy so TYPICAL_SPREADS reads from LIVE_SPREADS when a key has been set,
