@@ -1282,7 +1282,7 @@
     },
     {
       "date": "1999-12-01",
-      "value": "NaN"
+      "value": "0.5"
     },
     {
       "date": "1999-11-01",
@@ -1414,7 +1414,7 @@
     },
     {
       "date": "1997-03-01",
-      "value": "NaN"
+      "value": "1"
     },
     {
       "date": "1997-02-01",
@@ -1686,7 +1686,7 @@
     },
     {
       "date": "1991-07-01",
-      "value": "NaN"
+      "value": "6"
     },
     {
       "date": "1991-06-01",
@@ -1702,7 +1702,7 @@
     },
     {
       "date": "1991-03-01",
-      "value": "NaN"
+      "value": "6"
     },
     {
       "date": "1991-02-01",
@@ -1765,5 +1765,5 @@
   "rateDate": "2026-08-25",
   "lastSource": "SNB-scraping",
   "totalObservations": 440,
-  "backfillNote": "0 historical monthly observations backfilled on 2026-08-25 \u2014 see backfill_rates_history.py"
+  "backfillNote": "0 historical monthly observations backfilled on 2026-08-25 \u2014 see backfill_rates_history.py; 4 pre-existing \"NaN\"-marker rows repaired (forward-filled)"
 }
