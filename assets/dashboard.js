@@ -256,8 +256,20 @@ async function renderFairValue() {
     let fvTxt = '—', zTxt = '—', zColor = 'var(--text3)';
     const usableForPair = _fvUsableRows(rows);
     if (usableForPair.length >= FV_MIN_ROWS) {
+      // v8.262.0 FIX: walk-forward split, same principle as fetch_correlations()'s
+      // v8.180.0 fix — a window that estimates a model's parameters AND scores
+      // that same window's own endpoint against those parameters is look-ahead
+      // biased, even with zero future data involved (see GUIDELINES.md's general
+      // rule). This regression previously fit beta/residStd on windowRows
+      // INCLUDING `last`, then scored `last` against that same fit — OLS pulls
+      // the fitted line toward its own endpoint, systematically damping the
+      // z-score's magnitude right when it's evaluated. Fixed: fit on a training
+      // window that stops one row before `last` (still >= 2*k rows required by
+      // _fvRegress's own singularity guard), then score `last` — which was never
+      // part of the fit — against that trained beta/residStd.
       const windowRows = usableForPair.slice(-FV_ROLLING_WINDOW);
-      const reg = _fvRegress(windowRows);
+      const trainRows  = windowRows.slice(0, -1); // excludes `last`'s own row
+      const reg = _fvRegress(trainRows);
       const lastHasAllFeatures = FV_FEATURE_KEYS.every(k => last[k] != null);
       if (reg && reg.residStd > 0 && lastHasAllFeatures) {
         const fairValue = reg.beta[0] + FV_FEATURE_KEYS.reduce((s, k, i) => s + reg.beta[i + 1] * last[k], 0);
