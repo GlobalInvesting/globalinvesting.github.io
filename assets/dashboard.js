@@ -14867,6 +14867,17 @@ const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
 const _ESI_VENDOR_ALIASES = {
   'core retail sales mom': 'retail sales ex autos mom',
   'prelim gdp qoq': 'gdp growth rate qoq',
+  // [v8.251.0] Ported from calendar-panel.js's _CAL_VENDOR_ALIASES v1.19.21 —
+  // same six pairs, same verification method (chained previous/forecast
+  // values across the vendor boundary). See that file's changelog entry for
+  // the full rationale and per-pair numbers. Must stay in sync.
+  'cpi mom': 'inflation rate mom',
+  'cpi yoy': 'inflation rate yoy',
+  'trimmed mean cpi mom': 'rba trimmed mean cpi mom',
+  'unemployment claims': 'initial jobless claims',
+  'revised uom consumer sentiment': 'michigan consumer sentiment',
+  'revised uom inflation expectations': 'michigan inflation expectations',
+  'prelim gdp price index qoq': 'gdp price index qoq',
 };
 const _canonEsi = t => {
   let s = t.replace(/\s*\([^)]*\)/g,'').trim();

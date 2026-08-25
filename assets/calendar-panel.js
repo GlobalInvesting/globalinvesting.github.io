@@ -1,7 +1,33 @@
 /**
- * calendar-panel.js v1.19.20 — Native economic calendar renderer
+ * calendar-panel.js v1.19.21 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
+ *
+ * v1.19.21 (2026-08-24): FIX — drill-down modal showed "No prior
+ *   actual/forecast history for this event in the last year" for several
+ *   G10 indicators despite a full year of Myfxbook history existing under a
+ *   different vendor title — same root cause as v1.19.18, six more
+ *   unconfirmed pairs. Reported by Santiago via screenshots (AUD CPI y/y
+ *   showing empty vs. USD CB Consumer Confidence showing a full year
+ *   correctly). Audited every currency's ForexFactory-sourced forward event
+ *   against calendar-data/calendar.json's Myfxbook history programmatically
+ *   (not by inspection) and verified each candidate pair by chaining
+ *   previous/forecast values across the vendor boundary before adding it —
+ *   e.g. AUD "CPI y/y" pending previous=3.8% exactly matches Myfxbook
+ *   "Australia Inflation Rate YoY"'s last actual (2026-07-29, 3.8%); USD
+ *   "Revised UoM Consumer Sentiment" pending previous=51.0 exactly matches
+ *   "United States Michigan Consumer Sentiment"'s last actual (2026-08-14,
+ *   51.0). Six new _CAL_VENDOR_ALIASES entries added — see that map for the
+ *   full list and Guard 8 rationale. Several other candidates from the same
+ *   audit (EUR French/German Flash PMIs, GBP Flash PMIs, JPY Tokyo Core CPI
+ *   y/y, CAD Senior Loan Officer Survey, USD Prelim Benchmark Payrolls
+ *   Revision) were checked and found to have no Myfxbook history under any
+ *   title in the current dataset — left unaliased, correctly showing "No
+ *   prior history" rather than being guessed into a merge. Ported the same
+ *   six pairs into dashboard.js's _ESI_VENDOR_ALIASES and
+ *   fetch_economic_calendar.py's VENDOR_ALIASES (globalinvesting-scripts
+ *   repo) in the same session, per the existing three-way sync rule. See
+ *   CHANGELOG.md v8.251.0 (engine repo).
  *
  * v1.19.20 (2026-08-19): fetchEconomicCalendar poll interval 2min → 90s, as
  *   part of the same-session backend latency audit that also lowered
@@ -937,6 +963,28 @@
     // FF "Prelim GDP q/q" (UK) == Myfxbook "GDP Growth Rate QoQ" — both are
     // the UK's preliminary quarterly GDP print, just named differently.
     'prelim gdp qoq': 'gdp growth rate qoq',
+    // [v1.19.21] Six more pairs, found and verified the same way as the two
+    // above — each confirmed by an exact or near-exact previous/forecast
+    // value chain between the FF-sourced forward event and Myfxbook's
+    // history (see CHANGELOG.md v1.19.21 for the per-pair verification
+    // numbers). Reported by Santiago: the drill-down modal for AUD CPI y/y
+    // (and several other G10 indicators) showed "No prior actual/forecast
+    // history" despite a full year of Myfxbook history existing under a
+    // different vendor title — the exact same root cause as v1.19.18, just
+    // uncaught pairs. Guard 8 applies here as much as it did there: only
+    // pairs confirmed against real chained forecast/previous values are
+    // listed; anything not confirmed (e.g. EUR French/German Flash PMIs,
+    // GBP Flash PMIs, JPY Tokyo Core CPI y/y, CAD Senior Loan Officer
+    // Survey, USD Prelim Benchmark Payrolls Revision) genuinely has no
+    // Myfxbook history under any title found in this session and is left
+    // showing "No prior history" — a correct, honest result, not a bug.
+    'cpi mom': 'inflation rate mom',
+    'cpi yoy': 'inflation rate yoy',
+    'trimmed mean cpi mom': 'rba trimmed mean cpi mom',
+    'unemployment claims': 'initial jobless claims',
+    'revised uom consumer sentiment': 'michigan consumer sentiment',
+    'revised uom inflation expectations': 'michigan inflation expectations',
+    'prelim gdp price index qoq': 'gdp price index qoq',
   };
   function _calCanonTitle(t) {
     let s = (t || '').toLowerCase().replace(/\s*\([^)]*\)/g, '').trim();
