@@ -17771,11 +17771,22 @@ window.addEventListener('gi-theme-change', function() {
   // alongside std_dev rather than alone, since dispersion is part of the
   // story. Windows are also now guaranteed non-overlapping (server-side
   // dedup) so this table can no longer show the same pattern 2-3 times.
+  //
+  // v4.0 (2026-08-25 industry-standard audit): the v3.0 flat p<0.05 gate
+  // was still an uncorrected multiple-comparisons problem — 78 candidate
+  // windows are tested per pair, and a live run against real OHLC history
+  // confirmed the theory: 64 "significant" windows across 43 of 51 pairs
+  // under raw p<0.05, collapsing to 1 window in 1 pair (Nasdaq Feb->Jul,
+  // p=0.0001) once Benjamini-Hochberg FDR correction is applied across
+  // each pair's full candidate set — see compute_seasonality.py v4.0.
+  // The selection gate is now q_value < 0.05 (BH-adjusted), not raw
+  // p_value < 0.05; both are still shown so a user can see the individual
+  // test result alongside the corrected one.
   function _sznRenderWindows(windows) {
     const tbody = document.getElementById('szn-windows-tbody');
     if (!tbody) return;
     if (!windows || !windows.length) {
-      tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text3);padding:4px 0;">No window reached statistical significance (p&lt;0.05) for this pair over the available history.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:4px 0;">No window reached FDR-corrected statistical significance (q&lt;0.05, Benjamini-Hochberg) for this pair over the available history.</td></tr>';
       return;
     }
     const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -17785,7 +17796,8 @@ window.addEventListener('gi-theme-change', function() {
         <td style="text-align:right;color:${w.dir === 'Short' ? 'var(--down)' : 'var(--up)'};">${w.dir}</td>
         <td style="text-align:right;color:${w.avg_return < 0 ? 'var(--down)' : 'var(--up)'};">${w.avg_return > 0 ? '+' : ''}${w.avg_return}% \u00b1 ${w.std_dev != null ? w.std_dev : '\u2014'}%</td>
         <td style="text-align:right;color:var(--text3);">${w.win_rate}%</td>
-        <td style="text-align:right;">${w.p_value != null ? w.p_value : '\u2014'}</td>
+        <td style="text-align:right;color:var(--text3);">${w.p_value != null ? w.p_value : '\u2014'}</td>
+        <td style="text-align:right;">${w.q_value != null ? w.q_value : '\u2014'}</td>
       </tr>`).join('');
   }
 
@@ -17795,7 +17807,7 @@ window.addEventListener('gi-theme-change', function() {
     const top = data.windows && data.windows[0];
     const label = _sznPairLabel(pair);
     if (!top) {
-      insight.textContent = `${label} has ${data.years} years of history but no window reached statistical significance (p<0.05, one-sample t-test) over that period \u2014 no strong recurring seasonal pattern found.`;
+      insight.textContent = `${label} has ${data.years} years of history but no window reached FDR-corrected statistical significance (q<0.05, Benjamini-Hochberg across the ~78 candidate windows tested) over that period \u2014 no strong recurring seasonal pattern found.`;
       return;
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -17813,7 +17825,7 @@ window.addEventListener('gi-theme-change', function() {
     } else {
       sampleNote = `${data.years}y of history exceeds the 15-25y sample size seasonality research typically recommends`;
     }
-    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
+    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}, q=${top.q_value} FDR-adjusted; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
   }
 
   async function _sznLoad(pair) {
