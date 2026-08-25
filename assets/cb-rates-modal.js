@@ -1,4 +1,15 @@
 // ═══════════════════════════════════════════════════════════════════════════
+// CB RATES MODAL  v2.8 — Persistent decision markers removed; hover tooltip only
+// v2.8 (2026-08-25): Per Santiago's request, removed _buildDecisionOverlay()
+//   entirely (was already dead code — zero call sites after this session's
+//   edit) instead of keeping the tick-mark fallback from v2.7. The Rate
+//   Chart no longer draws any on-chart decision markers at all; the
+//   crosshair tooltip (_attachCBRTooltip, unchanged) remains the sole way
+//   to see a decision's exact date/rate/±bp, on hover, at any zoom level.
+//   Also removed a stray closeCBRatesModal() cleanup line querying
+//   '.cbr-decision-svg' — that element is never created anymore, so the
+//   querySelector always resolved to null; harmless (guarded by `?.`) but
+//   dead code left over from the same removal. See CHANGELOG.md.
 // CB RATES MODAL  v2.7 — Fix: decision labels stacking/overlapping on long-history views
 // v2.7 (2026-08-25): _buildDecisionOverlay()'s 3-tier stacking previously
 //   forced a label into the least-crowded tier even when NONE had room,
@@ -244,70 +255,6 @@ function _cbrLwOptions(){
   };
 }
 
-function _buildDecisionOverlay(container,lwChart,decisions){
-  const old=container.querySelector('.cbr-decision-svg');
-  if(old){if(old._cleanup)old._cleanup();old.remove();}
-  if(!decisions.length)return;
-  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-  svg.classList.add('cbr-decision-svg');
-  svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:2;overflow:visible;';
-  container.appendChild(svg);
-  const LABEL_W=32,LABEL_H=14,MIN_GAP_PX=6;
-  const TIERS=[6,24,42];
-  function redraw(){
-    const ts=lwChart.timeScale(),H=container.offsetHeight,W=container.offsetWidth;
-    if(!H||!W)return;
-    const visible=[];
-    decisions.forEach(d=>{
-      try{const x=ts.timeToCoordinate(d.time);if(x==null||x<-LABEL_W||x>W+LABEL_W)return;visible.push({...d,x});}catch(_){}
-    });
-    // Left-to-right so tier-fit scanning is deterministic regardless of the
-    // decisions array's own order.
-    visible.sort((a,b)=>a.x-b.x);
-    const tierEnd=TIERS.map(()=>-Infinity);
-    const assigned=visible.map(d=>{
-      let tier=-1;
-      for(let t=0;t<TIERS.length;t++){
-        if(d.x-LABEL_W/2>=tierEnd[t]+MIN_GAP_PX){tier=t;break;}
-      }
-      // v2.7: previously fell back to the least-crowded tier even when NONE
-      // had room (tier=tierEnd.indexOf(Math.min(...))), forcing the label to
-      // stack on top of a neighbor instead of skipping it — the exact cause
-      // of the overlapping-label wall on long (decades) history views. Now a
-      // decision with no free tier gets no label box at all; a thin tick
-      // mark still renders so the cluster's density stays visible, and the
-      // crosshair tooltip (independent of this overlay, see
-      // _attachCBRTooltip) still shows the exact decision on hover no
-      // matter how zoomed out the chart is — nothing is actually hidden,
-      // only the persistent on-chart label is.
-      if(tier===-1)return{...d,tier:null};
-      tierEnd[tier]=d.x+LABEL_W/2;
-      return{...d,tier};
-    });
-    let html='';
-    assigned.forEach(d=>{
-      const cs2=getComputedStyle(document.documentElement);
-      const x=d.x,col=d.delta>0?(cs2.getPropertyValue('--up').trim()||'#26a69a'):(cs2.getPropertyValue('--down').trim()||'#ef5350');
-      if(d.tier===null){
-        html+=`<line x1="${x.toFixed(1)}" y1="${(H-22).toFixed(1)}" x2="${x.toFixed(1)}" y2="${(H-16).toFixed(1)}" stroke="${col}" stroke-width="1.5" stroke-opacity="0.5"/>`;
-        return;
-      }
-      const colA=d.delta>0?'rgba(38,166,154,0.35)':'rgba(239,83,80,0.35)';
-      const colB=d.delta>0?'rgba(38,166,154,0.12)':'rgba(239,83,80,0.12)';
-      const sign=d.delta>0?'+':'',label=sign+Math.round(d.delta*100)+'bp';
-      const ty=TIERS[d.tier];
-      const stemTop=ty+LABEL_H+2;
-      html+=`<line x1="${x.toFixed(1)}" y1="${stemTop}" x2="${x.toFixed(1)}" y2="${(H-16).toFixed(1)}" stroke="${colA}" stroke-width="1" stroke-dasharray="2,3"/>`;
-      html+=`<rect x="${(x-LABEL_W/2).toFixed(1)}" y="${ty}" width="${LABEL_W}" height="${LABEL_H}" rx="3" fill="${colB}" stroke="${col}" stroke-width="0.5" stroke-opacity="0.6"/>`;
-      html+=`<text x="${x.toFixed(1)}" y="${(ty+LABEL_H-3).toFixed(1)}" text-anchor="middle" font-size="8.5" font-family=getComputedStyle(document.documentElement).getPropertyValue('--font-mono').trim()||"'Courier New',monospace" fill="${col}" font-weight="700">${label}</text>`;
-    });
-    svg.innerHTML=html;
-  }
-  redraw();
-  lwChart.timeScale().subscribeVisibleTimeRangeChange(redraw);
-  svg._cleanup=()=>{try{lwChart.timeScale().unsubscribeVisibleTimeRangeChange(redraw);}catch(_){}};
-}
-
 function _attachCBRTooltip(container,lwChart,mainSeries,fwdSeries,decisions){
   const tip=document.createElement('div');tip.className='cbr-lw-tooltip';container.style.position='relative';container.appendChild(tip);
   const TW=180,TM=10,decMap={};decisions.forEach(d=>{decMap[d.time]=d;});
@@ -371,7 +318,9 @@ function _buildCBRChart(data){
     fwdSeries.setData([{time:last.time,value:last.value},{time:fwdTime,value:fwdRate}]);
   }
   _cbrLwChart.timeScale().fitContent();
-  _buildDecisionOverlay(container,_cbrLwChart,decisions);
+  // v2.8: persistent decision markers removed — see _buildDecisionOverlay's
+  // header note. _attachCBRTooltip below still receives `decisions` and
+  // surfaces the exact date/rate/±bp on hover, unchanged.
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
     const{w,h}=_cbrDims();
@@ -585,7 +534,6 @@ function closeCBRatesModal(){
   const wrap=document.querySelector('.cbr-lw-wrap');
   if(wrap?._cbrResize)window.removeEventListener('resize',wrap._cbrResize);
   if(wrap?._cbrRo)wrap._cbrRo.disconnect();
-  const svg=wrap?.querySelector('.cbr-decision-svg');if(svg?._cleanup)svg._cleanup();
   _destroyCBRChart();
 }
 
