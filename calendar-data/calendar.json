@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-26T12:01:34Z",
-  "generatedAt": "2026-08-26T12:01:34Z",
+  "lastUpdate": "2026-08-26T12:31:03Z",
+  "generatedAt": "2026-08-26T12:31:03Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -64,54 +64,59 @@
       "std": 3.449902
     },
     "USD/personal income mom": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.340343
+      "n": 5,
+      "mean": 0.06,
+      "std": 0.304959
     },
     "USD/gdp growth rate qoq": {
-      "n": 4,
+      "n": 5,
       "mean": 0.0,
-      "std": 0.583095
+      "std": 0.504975
     },
     "USD/durable goods orders mom": {
-      "n": 4,
-      "mean": 0.55,
-      "std": 2.768273
+      "n": 5,
+      "mean": 0.56,
+      "std": 2.397499
     },
     "USD/gdp price index qoq": {
-      "n": 4,
-      "mean": 0.475,
-      "std": 1.571358
+      "n": 5,
+      "mean": 0.4,
+      "std": 1.371131
     },
     "USD/pce price index yoy": {
-      "n": 4,
-      "mean": 0.0,
-      "std": 0.0
+      "n": 5,
+      "mean": 0.02,
+      "std": 0.044721
     },
     "USD/core pce price index mom": {
-      "n": 4,
-      "mean": -0.05,
-      "std": 0.057735
+      "n": 5,
+      "mean": -0.04,
+      "std": 0.054772
     },
     "USD/durable goods orders ex transp mom": {
-      "n": 4,
-      "mean": 0.45,
-      "std": 0.43589
+      "n": 5,
+      "mean": 0.32,
+      "std": 0.476445
     },
     "USD/core pce price index yoy": {
-      "n": 4,
+      "n": 5,
       "mean": 0.0,
       "std": 0.0
     },
     "USD/durable goods orders ex defense mom": {
-      "n": 4,
-      "mean": 0.7,
-      "std": 3.498571
+      "n": 5,
+      "mean": 0.8,
+      "std": 3.038092
     },
     "USD/pce price index mom": {
-      "n": 4,
-      "mean": -0.075,
-      "std": 0.05
+      "n": 5,
+      "mean": -0.04,
+      "std": 0.089443
+    },
+    "USD/corporate profits qoq": {
+      "n": 2,
+      "mean": 0.7,
+      "std": 9.616652
     },
     "USD/continuing jobless claims": {
       "n": 16,
@@ -124,9 +129,9 @@
       "std": 9.449647
     },
     "USD/personal spending mom": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.057735
+      "n": 5,
+      "mean": 0.06,
+      "std": 0.054772
     },
     "USD/new home sales mom": {
       "n": 5,
@@ -47572,9 +47577,9 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders Ex Transp MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "0.6%",
-      "previous": "0.6%"
+      "previous": "1.1%"
     },
     {
       "date": "26 Aug",
@@ -47585,7 +47590,7 @@
       "flag": "🇺🇸",
       "event": "United States Core PCE Price Index YoY",
       "impact": "high",
-      "actual": null,
+      "actual": "3.3%",
       "forecast": "3.3%",
       "previous": "3.3%"
     },
@@ -47598,7 +47603,7 @@
       "flag": "🇺🇸",
       "event": "United States Personal Income MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "0.2%",
       "previous": "0.2%"
     },
@@ -47611,7 +47616,7 @@
       "flag": "🇺🇸",
       "event": "United States GDP Growth Rate QoQ",
       "impact": "high",
-      "actual": null,
+      "actual": "1.5%",
       "forecast": "1.5%",
       "previous": "2.1%"
     },
@@ -47624,7 +47629,7 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders ex Defense MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "1.3%",
       "forecast": "0.1%",
       "previous": "0.3%"
     },
@@ -47637,7 +47642,7 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "1.1%",
       "forecast": "0.5%",
       "previous": "0.3%"
     },
@@ -47650,7 +47655,7 @@
       "flag": "🇺🇸",
       "event": "United States GDP Price Index QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "6.4%",
       "forecast": "6.3%",
       "previous": "3.6%"
     },
@@ -47663,7 +47668,7 @@
       "flag": "🇺🇸",
       "event": "United States PCE Price Index YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.7%",
       "forecast": "3.6%",
       "previous": "3.7%"
     },
@@ -47676,7 +47681,7 @@
       "flag": "🇺🇸",
       "event": "United States Core PCE Price Index MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
       "previous": "0.1%"
     },
@@ -47689,7 +47694,7 @@
       "flag": "🇺🇸",
       "event": "United States PCE Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.1%",
       "previous": "-0.1%"
     },
@@ -47702,7 +47707,7 @@
       "flag": "🇺🇸",
       "event": "United States Corporate Profits QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "8.2%",
       "forecast": "0.7%",
       "previous": "0.5%"
     },
@@ -47715,7 +47720,7 @@
       "flag": "🇺🇸",
       "event": "United States Personal Spending MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.1%",
       "previous": "0.3%"
     },
