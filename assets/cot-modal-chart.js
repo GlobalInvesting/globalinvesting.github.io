@@ -1,3 +1,12 @@
+// COT MODAL CHART  v2.9 — every chart (Net Position, Daily Spot Close,
+//   Long/Short, OI, Participants) now defaults to a 2-year "recent window"
+//   instead of fitContent()'s full-history view. Full history (now up to 522
+//   weeks / ~10 years, per the COT backfill) is still loaded and reachable by
+//   scrolling/zooming the time axis out — fitContent() runs first so short
+//   datasets (a symbol with <2y of history) are unaffected, then
+//   setVisibleRange() narrows the *initial* view only. Previously every chart
+//   opened fully zoomed out across all 10 years, compressing 522 weekly bars
+//   (or ~2,500 daily spot closes) into an unreadable blur.
 // COT MODAL CHART  v2.8 — Daily Spot Close now covers Commodities/Indices tabs,
 //   not just FX: _COT_SPOT extended with XAU→gold.json, XAG→silver.json,
 //   WTI→wti.json, SPX→spx.json, DJ30→dji.json, NAS100→nasdaq.json (same
@@ -557,6 +566,30 @@ function _lwResize(container,lwChart){
   return apply;
 }
 
+// Default every COT modal chart to a readable "recent window" after the full
+// history loads. fitContent() alone zooms out to fit the ENTIRE dataset (up
+// to 522 weekly bars / ~10 years, or ~2,500 daily spot closes) into whatever
+// width the panel has, which compresses everything into an unreadable blur.
+// Full history stays loaded and reachable by scrolling/zooming the time axis
+// out — this only sets the INITIAL visible range, never the data itself.
+// `times` must be the same ascending array of 'YYYY-MM-DD' strings passed to
+// setData() for the chart's primary series. When the dataset itself already
+// covers less than `yearsBack`, fitContent()'s result is left untouched.
+function _lwDefaultWindow(chart, times, yearsBack) {
+  yearsBack = yearsBack || 2;
+  chart.timeScale().fitContent();
+  if (!times || times.length < 2) return;
+  const first = times[0], last = times[times.length - 1];
+  if (!first || !last) return;
+  const lastD = new Date(last + 'T00:00:00Z');
+  if (isNaN(lastD.getTime())) return;
+  const cutoff = new Date(lastD);
+  cutoff.setUTCFullYear(cutoff.getUTCFullYear() - yearsBack);
+  const cutoffStr = cutoff.toISOString().slice(0, 10);
+  if (cutoffStr <= first) return; // dataset is already shorter than the window
+  try { chart.timeScale().setVisibleRange({ from: cutoffStr, to: last }); } catch (_) {}
+}
+
 // ── Chart builders ────────────────────────────────────────────────────────────
 function _buildNetChart(container, dates, netData, ccy, meta) {
   meta = meta || { primaryAbbr: 'LF' };
@@ -570,7 +603,7 @@ function _buildNetChart(container, dates, netData, ccy, meta) {
     color: '#4f7fff', priceLineVisible: false, lastValueVisible: true, base: 0,
   });
   hist.setData(dates.map((d, i) => ({ time: d, value: netData[i] ?? 0, color: (netData[i] ?? 0) >= 0 ? (_up + 'd1') : (_dn + 'd1') })));
-  chart.timeScale().fitContent();
+  _lwDefaultWindow(chart, dates, 2);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => hist, param => {
     const v = param.seriesData.get(hist); if (!v) return null;
@@ -593,7 +626,7 @@ function _buildOIChart(container, dates, oiData, ccy, meta) {
     lineWidth: 2, priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 4,
   });
   oiS.setData(dates.map((d, i) => ({ time: d, value: oiData[i] ?? 0 })).filter(p => p.value > 0));
-  chart.timeScale().fitContent();
+  _lwDefaultWindow(chart, dates, 2);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => oiS, param => {
     const v = param.seriesData.get(oiS); if (!v) return null;
@@ -629,7 +662,7 @@ function _buildSpotChart(container, spotData, label) {
     priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 4,
   });
   spotS.setData(spotData);
-  chart.timeScale().fitContent();
+  _lwDefaultWindow(chart, spotData.map(p => p.time), 2);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => spotS, param => {
     const v = param.seriesData.get(spotS); if (!v) return null;
@@ -648,7 +681,7 @@ function _buildSplitChart(container,dates,lngData,shrtData,ccy){
   const sS=chart.addSeries(LWC.AreaSeries,{lineColor:_dn,topColor:_dn+'26',bottomColor:_dn+'03',lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
   lS.setData(dates.map((d,i)=>({time:d,value:lngData[i]??0})));
   sS.setData(dates.map((d,i)=>({time:d,value:shrtData[i]??0})));
-  chart.timeScale().fitContent();_lwResize(container,chart);
+  _lwDefaultWindow(chart,dates,2);_lwResize(container,chart);
   _mkTooltip(container,chart,()=>lS,param=>{
     const lv=param.seriesData.get(lS),sv=param.seriesData.get(sS);if(!lv)return null;
     const mon=typeof param.time==='string'?param.time.slice(0,7):'';
@@ -677,7 +710,7 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy,meta)
     ddS=chart.addSeries(LWC.LineSeries,{color:_dn,lineWidth:2,priceLineVisible:false,lastValueVisible:true,crosshairMarkerRadius:4});
     ddS.setData(dates.map((d,i)=>({time:d,value:ddData[i]})).filter(p=>p.value!=null));
   }
-  chart.timeScale().fitContent();_lwResize(container,chart);
+  _lwDefaultWindow(chart,dates,2);_lwResize(container,chart);
   const legendEl=container.parentElement?.querySelector('#cot-part-legend');
   if(legendEl){
     legendEl.innerHTML=[[meta.primaryLabel,_bl],[meta.secondaryLabel,_or],[meta.tertiaryLabel,_dn]].map(([lbl,col])=>
