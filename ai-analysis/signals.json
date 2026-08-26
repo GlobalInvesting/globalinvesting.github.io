@@ -1,39 +1,51 @@
 {
-  "generated_at": "2026-08-26T01:03:12Z",
+  "generated_at": "2026-08-26T07:15:49Z",
   "signals": [
     {
-      "time": "00:59",
+      "time": "07:15",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Hawkish RBA",
-      "text": "AUD/USD trades at 0.7167, well above its SMA20/50/200 cluster following the release of hawkish RBA minutes and accelerating services inflation in Japan which bolsters the APAC-linked bid. The G10 Currency Strength Scorecard confirms a dominant bilateral theme with AUD outperforming peers by +0.782% while CHF lags at -0.393%, creating a 1.175% spread. This strength is supported by a +435bp AUD/CHF carry premium, though the pair faces a massive retail hurdle with 86% of retail traders currently short. Speculative positioning remains bullish with AUD LF net long at +49,749 (pctl 81), suggesting institutional support for the carry-driven trend. The combination of hawkish central bank rhetoric and a significant carry advantage keeps the pair biased higher despite retail fading. Trade bias: Long AUD/CHF; carry-driven outperformance supported by RBA hawkishness. Catalyst: Australia CPI release Wednesday. Risk: Surprise inflation miss leads to a rapid unwind of the AUD carry premium.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Carry",
+      "text": "AUD/CHF trades at 0.5766, supported by a strong G10 outperformance theme where AUD averages +1.035% across its peer group. The pair is underpinned by a substantial +435bp carry advantage as RBA 4.35% is paired with SNB 0.00%, creating a high-conviction carry environment while VIX remains at 15.4. AUD positioning is increasingly crowded with LF net at +49,749 (94th percentile), yet retail sentiment is 90% short, providing a contrarian fuel for further upside. AUD/USD technicals show the currency cluster well above the SMA20/50/200, confirming broad-based momentum. Trade bias: Long AUD/CHF; carry advantage and retail divergence favor trend extension. Catalyst: RBNZ meeting 2 Sep for regional cross-proxy sentiment. Risk: VIX spikes above 25, triggering a sharp unwind of the crowded AUD long position.",
       "evidence": [
-        "AUD 1W avg: +0.782% (n=4)",
-        "CHF 1W avg: -0.393% (n=6)",
-        "G10 spread: 1.175%"
+        "AUD 1W avg: +1.035% (n=4)",
+        "CHF 1W avg: -0.538% (n=6)",
+        "G10 spread: 1.572%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "00:52",
+      "time": "07:12",
+      "priority": "critical",
+      "title": "EUR/JPY — ECB Repricing + Options Skew",
+      "text": "EUR/JPY trades at 185.52, with the Euro finding fresh support from TIER-1 reports that the ECB is set for a September rate hike. BoJ holds at 1.0%. Institutional options markets signal caution as the 25d risk reversal at -1.66 reflects a strong put skew, indicating that desks are paying for protection against a JPY snapback. This divergence between hawkish ECB headlines and heavy options hedging suggests a volatile consolidation phase near recent highs. Trade bias: Long EUR/JPY; hawkish ECB policy shift supports carry while hedging demand limits chase. Catalyst: ECB meeting 10 Sep — hike bias active. Risk: BoJ verbal intervention triggers a sharp correction toward the SMA200 at 158.36.",
+      "evidence": [
+        "EUR/JPY 25d RR: -1.66 (STRONG put skew)",
+        "ECB-BoJ OIS: +121bp",
+        "JPY ESI: +20.7"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "07:08",
       "priority": "warning",
-      "title": "USD/CAD — Trade Escalation + ESI Divergence",
-      "text": "USD/CAD trades at 1.3840, oscillating around its SMA200 of 1.3841 as trade tensions between the US and Canada escalate following retaliatory tariffs. The pair faces a +150bp carry advantage favoring the USD, yet the Economic Surprise Index (ESI) shows a stark divergence with Canada data outperforming (+23.4) while US data disappoints (-12.2). COT positioning for CAD is at a 52-week extreme short with LF net at -89,836 (pctl 13, z -1.48), creating an asymmetric risk for a short-squeeze if trade headlines stabilize. Despite the USD carry advantage, the technical position below the SMA20/50 cluster suggests bearish momentum is building. The dollar is currently caught between trade-driven safe-haven demand and weakening domestic macro data. Trade bias: Bearish USD/CAD; short-squeeze risk on extreme CAD positioning and superior ESI. Catalyst: BoC meeting 9 Sep — hold priced. Risk: Further US trade escalation drives safe-haven flows back into USD, overriding the macro data gap.",
+      "title": "USD/CAD — Trade Tension + Oil Contagion",
+      "text": "USD/CAD at 1.3862 is reversing earlier gains as TIER-1 headlines report widening US tariffs on Canada alongside a -2.45% drop in WTI oil prices to $80.3. The CAD ESI remains strong at +23.4, but this macro resilience is being tested by deteriorating trade relations and a negative -0.281 correlation with oil. Despite these headwinds, USD/CAD remains technically weak, trading below its SMA20/50/200 cluster at 1.3926, 1.4055, and 1.3841 respectively. Speculative positioning is heavily short CAD at -89,836 (3rd percentile), creating a high-risk environment for a short-squeeze if trade tensions de-escalate. Trade bias: Bullish USD/CAD, supported by trade friction and falling crude prices. Catalyst: BoC meeting 9 Sep — 100% hold priced. Risk: Crude oil recovers above $85, invalidating the CAD weakness thesis.",
       "evidence": [
-        "CAD ESI: +23.4 vs USD ESI: -12.2",
-        "CAD LF pctl: 13 (extreme short)",
-        "USD/CAD carry: +150bp"
+        "WTI Oil: $80.3 (-2.45%)",
+        "CAD COT pctl: 3 (extreme short)",
+        "USD/CAD: 1.3862"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "00:46",
+      "time": "07:03",
       "priority": "info",
-      "title": "GBP/USD — Volatility Premium + SMA Support",
-      "text": "GBP/USD at 1.3648 is holding above its SMA20/50/200 cluster, specifically the SMA20 at 1.3520 which serves as the immediate technical floor. GBP maintains a narrow +8bp carry advantage over the USD according to OIS benchmarks, but the options market is pricing in significant tail risk with an IV of 11.0% against an HV30 of 5.8%. This +5.2% Vol Risk Premium (VRP) is the highest in the G10 space, indicating heavy institutional hedging despite relatively flat speculative positioning (LF net +46,070, pctl 94 but WoW adds slowing). The real rate differential remains supportive for the Pound as the UK real rate of +0.85% exceeds the Eurozone's +0.07%. Markets appear to be paying for protection against a break of the current bullish trend. Trade bias: Neutral GBP/USD; elevated volatility premium suggests caution despite bullish technical alignment. Catalyst: next BoE meeting (mkt: 100% hold priced) 17 Sep. Risk: VRP collapses as realized volatility catches up, forcing a repricing of the directional bias.",
+      "title": "GBP/USD — Volatility Risk Premium Extreme",
+      "text": "GBP/USD at 1.3638 continues to hold its bullish technical posture above the SMA20/50 cluster at 1.3520/1.3404. The options market is pricing in significant tail risk with an implied volatility of 11.0% against a realized HV30 of only 5.8%, resulting in an extreme +5.2% Volatility Risk Premium (VRP). This suggests institutional traders are aggressively buying protection despite a neutral 25d risk reversal of -0.09 and a crowded spec long position (92nd percentile). The high cost of protection relative to actual movement indicates market participants are bracing for a volatility spike that has yet to manifest in spot prices. Trade bias: Neutral GBP/USD; elevated VRP makes long entries expensive. Catalyst: US PCE data 28 Aug. Risk: GBP/USD closes below the SMA20 at 1.3520, confirming a shift from consolidation to correction.",
       "evidence": [
-        "GBP/USD VRP: +5.2% (extreme premium)",
-        "GBP real rate: +0.85%",
-        "GBP/USD SMA20: 1.3520"
+        "GBP/USD VRP: +5.2% (IV 11.0% vs HV30 5.8%)",
+        "GBP COT pctl: 92 (crowded long)",
+        "GBP/USD: 1.3638"
       ],
       "_source": "engine-ai-primary"
     }
