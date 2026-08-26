@@ -1352,8 +1352,8 @@
   }
 
   // ── [v1.18.0] Actual-vs-forecast history chart (LWC) ─────────────────
-  // Santiago asked whether an actual-vs-forecast chart in the history modal
-  // is industry standard — it is (Trading Economics / Investing.com both
+  // The client asked whether an actual-vs-forecast chart in the history modal
+  // is industry standard — it is (multiple financial data vendors' sites
   // show one). Reuses the same loader/theming pattern already established
   // in econ-surprises-modal.js / cot-modal-chart.js: guarded loader (no-op
   // if LWC is already on the page), CSS-var theming, destroy-before-rebuild.

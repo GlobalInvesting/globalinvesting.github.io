@@ -7,7 +7,7 @@
  *    not exist in any repo; the intended replacement never matched a live
  *    NZD event in a full year of calendar.json, audited this session) to
  *    'Industrial Production YoY', fed by new fetch_te_nzd_ind_prod.py
- *    (Trading Economics scrape). Also corrected the header doc block's
+ *    (third-party vendor scrape). Also corrected the header doc block's
  *    "Ind Prod: AUD, NZD, CAD — none of the three..." bullet, stale for
  *    AUD/CAD which were already wired via their own proxies. See
  *    GUIDELINES.md v8.231.0 for the full incident. No other change.
@@ -125,13 +125,13 @@
  * and their underlying sources are untouched, no data or trend-coloring
  * regression risk.
  *
- * ── v2.2.7 (2026-08-14) — SEK Core CPI wired; corrects a wrong "no TE
+ * ── v2.2.7 (2026-08-14) — SEK Core CPI wired; corrects a wrong "no vendor
  *    equivalent" gap note; CHF/NZD fetcher live-validated ──────────
  * CATS.SEK.core wired to ['Core Inflation Rate YoY'], same source and
  * event title as CHF/NZD. v2.2.6's SEK note was wrong: it only checked
- * Myfxbook (correctly finding no page there) and concluded no TE
- * equivalent existed either, without actually checking TE. TE does carry
- * this series (tradingeconomics.com/sweden/core-inflation-rate, labelled
+ * Myfxbook (correctly finding no page there) and concluded no vendor
+ * equivalent existed either, without actually checking. The vendor does carry
+ * this series (see the private script's header for the URL, labelled
  * "CPIF excl. Energy YoY" \u2014 a different display name than CHF/NZD's
  * pages use, which is likely why the earlier pass missed it). Confirmed
  * server-rendered and live-scraped successfully this session \u2014 see
@@ -145,23 +145,23 @@
  * populated successfully via a production GH Actions run this session.
  *
  * ── v2.2.6 (2026-08-14) — CHF/NZD Core CPI wired to a new non-Myfxbook
- *    source (Trading Economics, unvalidated pending a live run) ──────────
+ *    source (a third-party vendor, unvalidated pending a live run) ──────────
  * Wired CATS.CHF.core and CATS.NZD.core to ['Core Inflation Rate YoY'],
  * fed by the new fetch_te_core_inflation.py (globalinvesting-scripts repo)
  * rather than Myfxbook, since no Myfxbook page exists for either (re-
- * confirmed this session). IMPORTANT: NZD's series is Trading Economics'
+ * confirmed this session). IMPORTANT: NZD's series is the vendor's
  * own "Core Inflation Rate" (RBNZ-sourced, ex-gasoline) \u2014 explicitly NOT
  * the RBNZ Sectoral Factor Model figure quoted in financial press (2.7%
  * YoY Q2 2026 vs this series' ~3.2% YoY) \u2014 see fetch_te_core_inflation.py
  * header for the full distinction; do not conflate the two in copy. Both
  * wirings are UNVALIDATED as of this version: the fetcher's live
  * guest:guest access could not be tested from the session's sandbox
- * (no network path to tradingeconomics.com) \u2014 run it manually once before
+ * (no network path to the vendor's domain) \u2014 run it manually once before
  * scheduling it in a workflow. Until then, or if guest access turns out
  * not to cover these indicators, both cells simply render blank, same as
  * before this change \u2014 no regression risk either way.
  * SEK core (CPIF ex Energy) investigated in the same pass \u2014 no equivalent
- * Trading Economics indicator found either, left unwired, still a
+ * vendor indicator found either, left unwired, still a
  * documented genuine gap (v2.2.4 finding stands).
  * AUD rtl investigated per the client's report of a still-blank cell despite
  * v2.2.3's fix \u2014 confirmed NOT a wiring bug: the live Myfxbook page itself
@@ -479,7 +479,7 @@
  *     Myfxbook (this feed's primary source), but all three are populated
  *     via proxies/direct fetches, none of them blank in current production:
  *     AUD via Ai Group Industry Index (Myfxbook), CAD via Manufacturing
- *     Sales MoM (Myfxbook), NZD via Trading Economics' own "Industrial
+ *     Sales MoM (Myfxbook), NZD via the vendor's own "Industrial
  *     Production" series (fetch_te_nzd_ind_prod.py — Myfxbook's RSS feed
  *     never surfaces NZD's equivalent release despite a live page existing
  *     for it; see that script's module docstring for the full incident).
@@ -708,7 +708,7 @@
       // "Switzerland " prefix stripping needs no new logic.
       cpimom:['Inflation Rate MoM'],
       // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to a
-      // new non-Myfxbook source instead of left blank. Trading Economics
+      // new non-Myfxbook source instead of left blank. The vendor's
       // "Switzerland Core Inflation Rate" (FSO-sourced), fetched by
       // fetch_te_core_inflation.py v1.0. UNVALIDATED as of v2.2.6 \u2014 that
       // script's live guest:guest access was never confirmed to actually
@@ -739,11 +739,11 @@
       cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
       cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
       // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to
-      // Trading Economics "New Zealand Core Inflation Rate" (NZCIR,
+      // The vendor's "New Zealand Core Inflation Rate" (NZCIR,
       // RBNZ-sourced, ex-gasoline), via fetch_te_core_inflation.py v1.0.
       // \u26a0\ufe0f THIS IS NOT THE RBNZ SECTORAL FACTOR MODEL quoted in financial
       // press after each CPI release (that reading was 2.7% YoY Q2 2026) \u2014
-      // TE's NZCIR is a different, older ex-fuel core measure (~3.2% YoY
+      // The vendor's NZCIR is a different, older ex-fuel core measure (~3.2% YoY
       // Q4 2025 at time of writing). Do not relabel this as "Sectoral
       // Factor Model" anywhere \u2014 see fetch_te_core_inflation.py header for
       // the full explanation. UNVALIDATED as of v2.2.6 \u2014 live guest:guest
@@ -769,7 +769,7 @@
       // any repo (dead reference; the actual intended replacement,
       // fetch_ff_calendar.py's "manufacturing sales" _IMPACT_UPGRADES entry,
       // never once matched a live NZD event across a full year of
-      // calendar.json, confirmed by audit). Repointed to Trading Economics'
+      // calendar.json, confirmed by audit). Repointed to the vendor's
       // "Industrial Production" series (fetch_te_nzd_ind_prod.py), which is
       // both live and the genuinely correctly-named series for this column
       // \u2014 not a proxy substitution like AUD/CAD's mappings. See
@@ -787,8 +787,8 @@
       cpimom:['CPIF MoM'],
       // CORRECTION (v2.2.7, 2026-08-14): v2.2.4's "genuine gap" note below
       // was checking the wrong source. Myfxbook indeed has no calendar page
-      // for this series, but Trading Economics does \u2014 tradingeconomics.com/
-      // sweden/core-inflation-rate, labelled "CPIF excl. Energy YoY" (TE's
+      // for this series, but the vendor does \u2014 see the private script's
+      // header for the URL, labelled "CPIF excl. Energy YoY" (the vendor's
       // own display name, not "Core Inflation Rate" like CHF/NZD's pages).
       // Confirmed server-rendered and live-scraped successfully the same
       // session this was caught \u2014 see fetch_te_core_inflation.py v3.0.
