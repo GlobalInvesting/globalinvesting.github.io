@@ -3527,8 +3527,14 @@ async function fetchSentiment() {
       if (data && data.data && data.data.length) {
         const mapped = data.data.slice(0,10).map(d => ({
           sym:  (d.instrument||d.sym||'').replace('_','/'),
-          buy:  Math.round(d.longVolume || d.buy || 50),
-          sell: Math.round(d.shortVolume || d.sell || 50),
+          // v8.262.3: was `d.longVolume || d.buy || 50` — `||` treats a genuine
+          // 0 (extreme all-short crowding, the exact reading this panel exists
+          // to surface) as falsy and silently fell through to the 50% neutral
+          // default, same failure class already fixed once in fetch_rates.py's
+          // clean_rate() ("Algunas tasas son 0% ... No debe descartarse").
+          // `??` only falls through on null/undefined, preserving a real 0.
+          buy:  Math.round(d.longVolume ?? d.buy ?? 50),
+          sell: Math.round(d.shortVolume ?? d.sell ?? 50),
           assetClass: 'fx',
         })).filter(d=>d.sym);
         // Dukascopy doesn't publish metals sentiment — carry over any Metals
