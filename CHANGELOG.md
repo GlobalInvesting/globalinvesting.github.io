@@ -1,3 +1,101 @@
+## v8.262.4 (2026-08-25) — FX Liquidity chart: DST bug already fixed once for the main Market Sessions panel had two unfixed sibling copies
+
+### Continuing industry-standard audit
+Continued the module-by-module audit into Market Sessions. The main panel (`updateSessions()`, `SESSION_DEFS`/`localHourToUTC`) is correctly DST-aware — its own code comment explains exactly why a fixed-UTC session boundary drifts an hour off the real local trading day for half the year. Auditing the adjacent FX Liquidity chart (shares the same session concept, drawn as background bands + hover tooltip) found that exact bug, unfixed, in two places.
+
+### Data integrity — assets/dashboard.js
+- **`drawLiquidityChart()`'s session-band drawing hardcoded fixed UTC slot boundaries** (Sydney 22:00-07:00, Tokyo 00:00-09:00, London 08:00-17:00, NY 13:00-22:00) — shifts the shaded bands an hour off the real session during the half of the year each zone is on DST. Fixed: bands now computed per-draw from `SESSION_DEFS`/`localHourToUTC` (the same DST-aware source the main panel already uses), converting each session's real UTC open/close into array slots instead of a fixed table.
+- **`getActiveSessions()`'s tooltip-only `SESSION_NAMES` table had an independent, third hardcoded-UTC copy of the identical session hours** — same bug, same fix pattern, now recomputed from `SESSION_DEFS`/`localHourToUTC` per call. Function signature unchanged (`getActiveSessions(utcH)`), so its one caller (the liquidity-chart hover handler) needed no change.
+- **Found and removed in passing:** `LIQ_SESSIONS`, a fourth hardcoded-UTC session table sitting right above the two real bugs — confirmed via full-file grep it was never referenced anywhere, genuinely dead code, not a silent fifth instance of the bug.
+- `node --check` clean, `dashboard.test.js` 89/89 still passing.
+- Cache-buster: `dashboard.js?v=8.262.3` → `?v=8.262.4`; `sw.js` `CACHE_VERSION`/`STATIC_PRECACHE` synced to `gi-v8.262.4`.
+
+### GUIDELINES.md
+Added one Data integrity rule (see footer) — when a DST/timezone bug is found and fixed in one place, grep the whole file for every other hardcoded UTC-hour session/market-hours table sharing the same four zones before considering the class of bug closed; this is the third sibling copy of one fix found in this codebase's history (session boundaries specifically), not a one-off.
+
+---
+
+## v8.262.3 (2026-08-25) — Retail FX Positioning: Dukascopy fallback silently hid genuine 0% long/short readings
+
+### Continuing industry-standard audit
+Continued the module-by-module audit into Retail FX Positioning. CB Rate Expectations was audited first this session — clean, no changes (staleness guard, per-bank step sizes, and probability clamping all check out).
+
+### Data integrity — assets/dashboard.js
+- **`fetchSentiment()`'s SOURCE 2 (Dukascopy fallback) mapped `buy: Math.round(d.longVolume || d.buy || 50)` / `sell: Math.round(d.shortVolume || d.sell || 50)`.** `||` treats a genuine `0` as falsy — so an extreme, all-short (or all-long) retail crowding reading, exactly the kind of reading this panel exists to surface, would silently fall through to the 50% neutral default instead of displaying the real 0%. Same failure class already fixed once elsewhere in this project (`fetch_rates.py`'s `clean_rate()`, "Algunas tasas son 0% ... No debe descartarse").
+- Fixed: switched both fields to `??` (nullish coalescing), which only falls through on `null`/`undefined`, preserving a real `0` reading through the fallback chain.
+- `node --check` clean, `dashboard.test.js` 89/89 still passing.
+- Cache-buster: `dashboard.js?v=8.262.2` → `?v=8.262.3`; `sw.js` `CACHE_VERSION`/`STATIC_PRECACHE` synced to `gi-v8.262.3`.
+
+---
+
+## v8.262.2 (2026-08-25) — FX Pairs — Majors: 9 of 32 pairs (incl. EUR/NOK, EUR/SEK) were missing from the static spread floor, silently rendering a flat 0.5 pip fallback
+
+### Continuing industry-standard audit
+Continued the module-by-module audit into FX Pairs — Majors. `fetchReferenceSpreads()`'s live HV30+VIX+MOVE model only ever computes `LIVE_SPREADS` for the 7 USD majors (its own `ECN_FLOOR`/`VOL_COEF` maps are explicitly scoped to those 7) — every other pair in the 32-pair table depends entirely on the static `ECN_FLOOR_SPREADS` table as its permanent value, not a temporary fallback (the code comment saying "until first update" only describes the 7-pair case correctly). Cross-referencing `PAIRS`' full 32-id list against `ECN_FLOOR_SPREADS`'s keys found 9 pairs absent entirely: `eurnok`, `eursek`, `eurnzd`, `gbpaud`, `gbpnzd`, `audcad`, `cadchf`, `nzdcad`, `nzdchf`. `TYPICAL_SPREADS`'s Proxy `get()` falls back to a flat `0.5` for any key not present in either map — so all 9, including EUR/NOK and EUR/SEK (thinner crosses than USD/NOK, USD/SEK, which already carry a calibrated `2.0`), rendered the same 0.5 pip spread as EUR/USD in every render, understating their real cost of trading.
+
+### Frontend — assets/dashboard.js
+- Added the 9 missing pairs to `ECN_FLOOR_SPREADS`: `eurnok`/`eursek` calibrated wider than `usdnok`/`usdsek` (a EUR-crossed-with-Scandies leg compounds two currencies' liquidity rather than one), the remaining 7 calibrated in line with the existing `gbpcad`/`audnzd`/`nzdjpy` tier they sit alongside in the table.
+- `node --check` clean, `dashboard.test.js` 89/89 still passing (no existing test covers this table directly).
+- Cache-buster: `dashboard.js?v=8.262.0` → `?v=8.262.2`; `sw.js` `CACHE_VERSION`/`STATIC_PRECACHE` synced to `gi-v8.262.2`.
+
+### GUIDELINES.md
+Added one Data integrity rule (see footer) — a per-pair static calibration table needs to be checked against the panel's own full pair list on delivery, not just against the smaller model it was designed alongside; a Proxy/dict fallback with a generic default silently hides a coverage gap in exactly the way an explicit `undefined`/error would not.
+
+---
+
+## v8.262.1 (2026-08-25) — Alerts & Market Signals: Groq-fallback guard-parity fix (v8.250.0) had regressed again — signal guards and _source tagging silently absent from the fallback branch
+
+### Continuing industry-standard audit
+Continued the module-by-module audit into Alerts & Market Signals. This session's fresh zip export of `generate_narrative_signals.py` showed the Groq fallback branch had reverted to exactly the pre-v8.250.0 state — no `_apply_signal_guards()` call, no per-signal `_source` tag — despite `GUIDELINES.md`/`CHANGELOG.md` both describing that gap as closed. `generate_signals_via_gemini()`'s own primary path still correctly tags each signal (`_sig["_source"] = SOURCE_ALIAS_PRIMARY`) and the Gemini-primary call site in `main()` still correctly runs `_apply_signal_guards()` — only the Groq branch had regressed, for the second time.
+
+### Engine — scripts/generate_narrative_signals.py
+- **Re-applied the v8.250.0 fix a second time:** the Groq fallback branch now tags every signal with `_sig["_source"] = SOURCE_ALIAS_FALLBACK` and runs `_apply_signal_guards()` before writing — identical to the Gemini-primary path. Without this, a Groq-generated signal with an imperfect footer (Groq follows the Rule 14 format instruction less reliably than Gemini) silently degrades to the legacy flat-card layout with zero trace in the run log.
+- Verified `_apply_signal_guards()` is 1:1 on input length (`result.append()` runs unconditionally per signal, no guard drops an entry outright) — safe to call unconditionally inside the existing `if signals:` block.
+
+### Verification
+`ast.parse` / `py_compile` clean.
+
+### New rule
+A fix for a code-path-parity gap (guard/tagging logic present on one branch of a fallback cascade, missing from a sibling branch) can regress silently across sessions exactly like any other fix — a CHANGELOG/GUIDELINES entry documenting it is not durable protection. When re-auditing a panel with a documented past incident, diff the specific lines the fix touched against the fresh export, not just trust the historical entry.
+
+---
+
+## v8.262.0 (2026-08-25) — FX Fair Value's z-score was look-ahead-biased against its own regression window's endpoint — same mechanism as the v8.180.0 Correlations fix, never applied here
+
+### Continuing industry-standard audit — panels not covered in the first pass
+Session-start inventory found the first audit pass (Rates, COT, Correlations, Calendar, Dollar Smile, CB Rates, Risk Regime, ESI, Seasonality, Heatmap, Carry Rank, Economic Map) had left ~11 panels unaudited: Price Chart, FX Pairs — Majors, CB Rate Expectations, Cross-Asset tiles, Derivatives, Retail FX Positioning, Market Sessions, Alerts & Market Signals, FX Fair Value, DTCC FX, Watchlist. Starting with FX Fair Value as the highest-risk candidate (a regression-based signal, same class as the already-fixed Correlations pairs-trade signal).
+
+### Frontend — assets/dashboard.js
+- **Real bug found:** `renderFairValue()`'s BEER-style regression fit `_fvRegress()` on `windowRows` — the most recent `FV_ROLLING_WINDOW` (60) usable rows — **including** `last` (the very row the resulting z-score is then computed against). `GUIDELINES.md`'s existing general rule, established fixing `fetch_correlations()`'s pairs-trade signal in v8.180.0, states this explicitly: *"any point-in-time statistical signal (z-score, percentile, threshold flag) must be evaluated against a reference distribution that does not include the point being evaluated"* — OLS pulls the fitted line toward its own endpoint, systematically damping exactly the z-score magnitude being read off it. That rule was never re-checked against Fair Value's own regression when it shipped (v8.197.0) or in any session since.
+- **Live proof of mechanism:** a synthetic 60-row test (59 rows of noisy linear relationship + 1 deliberate outlier row as `last`) showed the in-sample z-score reading 7.3σ for the outlier, vs. its true magnitude once excluded from the fit — the old code's own residStd was inflated ~12x by including the outlier it was about to score, directly damping the z-score by the same factor. Real production data won't show swings this extreme, but the direction of the bias (any big move gets read as smaller than it is, right when the panel is supposed to flag it) is real and always active.
+- **Fix:** walk-forward split, same pattern as `fetch_correlations()`'s v8.180.0 fix — `_fvRegress()` itself is unchanged (still a generic fit-and-residual-std function), but `renderFairValue()` now fits it on `windowRows.slice(0, -1)` (the training window, stopping one row before `last`) and scores `last` — which was never part of the fit — against that trained beta/residStd. Training window still comfortably clears `_fvRegress()`'s own `>= 2*k` singularity guard (59 rows vs. 10 required).
+- Cache-buster: `dashboard.js?v=8.261.2` → `8.262.0` in `index.html`; `sw.js` `CACHE_VERSION`/`STATIC_PRECACHE` synced to `gi-v8.262.0`.
+
+### Gate run this session
+`node --check` clean, 89/89 `dashboard.test.js` tests pass, synthetic before/after regression test run standalone (documented above).
+
+### New rule
+A look-ahead-bias fix landed for one panel (`fetch_correlations()`, v8.180.0) does not automatically cover a sibling panel using the same statistical pattern (point-in-time regression z-score) — even when the general rule was written down in `GUIDELINES.md` at the time. When a methodology rule is added, grep every other panel/script for the same statistical shape (here: "fit a model on a window, then score that window's own endpoint against it") before considering the rule fully applied, not just the one incident that prompted it.
+
+---
+
+ — CHANGELOG.md was 95 entries stale relative to what's actually in this repo's own code — reconciled, plus the one real code gap the desync had hidden (heatmap rtAvailable gate)
+
+### Session-start reconciliation
+Per the standing rule ("a CHANGELOG entry is not evidence a fix reached the repo" — and the inverse also holds), diffed this session's fresh zip export against the industry-standard-audit work already reflected in code: `fetch_rates.py` v14.3 (36mo cap removed), `fetch_growth_differential.py`'s `_compute_nowcast()`, `sw.js`'s `DATA_PATH_PREFIXES`, `renderRiskData()`'s gold/spx wiring, `compute_seasonality.py` v4.0 (Benjamini-Hochberg FDR correction), and `real-carry-modal.js`'s `_rcmRenderPairDetail()` caller-order fix were all confirmed live in this export — this repo's own `CHANGELOG.md`, however, was still sitting at v8.166.3, missing every entry from v8.255.0 through v8.261.1. Full narrative history for that span lives in `globalinvesting-engine`'s `GUIDELINES.md` footer (each entry cross-references its own `CHANGELOG.md v8.x.x`); not reproduced verbatim here to avoid a stale duplicate copy — see that footer for the complete audit trail (Dollar Smile nowcast, `DATA_PATH_PREFIXES` gaps, CB Rates 20y backfill + NaN repair, Risk Regime gold/spx wiring, Seasonality FDR correction, Currency Strength Heatmap gate, Carry Trade Rank caller-order fix).
+
+### Frontend — assets/dashboard.js
+- **One real code gap found by the reconciliation itself:** `populateHeatmap()`'s `rtAvailable` gate had reverted to (or never actually received) the v8.261.0 fix described in `GUIDELINES.md` — still read `Object.keys(STOOQ_RT_CACHE).length >= 21`, which counts ~12 non-FX symbols sharing that cache (vix/move/gold/xauusd/wti/spx/nikkei/stoxx/us10y/dxy/btc/eth) alongside the 32 real FX pairs, so the gate could pass on as few as ~9/32 real pairs while still labeling the panel "Live · G10 composite · 32 pairs". Fixed by counting `STOOQ_RT_CACHE[p.id] != null` against the real 32-pair `pairDefs` list, gated at 24/32 (75%).
+- Cache-buster: `dashboard.js?v=8.261.0` → `8.261.2` in `index.html`; `sw.js` `CACHE_VERSION`/`STATIC_PRECACHE` synced to `gi-v8.261.2`.
+
+### Gate run this session
+`node --check` clean, 89/89 `dashboard.test.js` tests pass.
+
+### New rule
+A stale `CHANGELOG.md` isn't just a documentation gap — it removes the ability to trust "already fixed" claims about this repo without re-diffing the actual code, and can mask a real fix that quietly reverted (as the heatmap gate did here) behind an otherwise-accurate narrative record living in a sibling repo. On session start, if `CHANGELOG.md`'s head version trails what the code itself shows (cache-buster, version headers, docstrings), reconcile before doing new work, not just when picking up mid-task.
+
+---
+
 ## v8.166.3 (2026-08-19) — Mobile: huge empty gaps in the News tab (News/Research/Analysis sub-panels) fixed — desktop's equal-thirds CSS Grid had no real height to distribute on mobile
 
 ### Santiago flagged
