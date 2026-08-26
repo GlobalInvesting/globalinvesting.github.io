@@ -889,7 +889,14 @@ function openCOTModal(ccy,data,opts){
         <span class="cot-ov-sec-lbl">52-Week Range</span>
       </div>
       ${(()=>{
-        const vals = history.map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
+        // v8.263.2: explicit 52-week slice — this stat's own header is the
+        // static "52-Week Range" label above, so it must always measure the
+        // trailing 52 weeks specifically (the standard 52w-high/low
+        // convention), regardless of how much total history the underlying
+        // file now carries (widened to ~10y this session). Previously read
+        // the full `history` array unsliced, which was harmless only by
+        // coincidence — the file itself never held more than 52 weeks total.
+        const vals = history.slice(-52).map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
         if (vals.length < 2) return '<div class="cot-kfv"><span class="cot-kfv-key" style="color:var(--text3)">Insufficient data</span></div>';
         const hi = Math.max(...vals), lo = Math.min(...vals);
         const pct = hi !== lo ? Math.round((net - lo) / (hi - lo) * 100) : 50;
