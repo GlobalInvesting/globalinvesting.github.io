@@ -1,3 +1,29 @@
+// COT MODAL CHART  v3.3 — _lwSyncTimeRanges now gates relay by which chart
+//   container the user is actually interacting with (pointerdown/enter/wheel
+//   on the Net Position vs. Daily Spot Close container), not just a
+//   re-entrancy boolean. A chart's own delayed bar-snapping echo (a frame or
+//   two after a relayed setVisibleRange, since Net's weekly bars and Spot's
+//   daily bars don't snap to identical boundaries) was slipping past the
+//   v3.2 boolean guard and getting relayed onto the OTHER chart — observed
+//   live as Daily Spot Close staying pinned to the current-date edge no
+//   matter how far Net Position was panned. Gating by "which container is
+//   the user on" means a chart's own emitted events are never forwarded
+//   unless that chart is the one being actively dragged/zoomed.
+// COT MODAL CHART  v3.2 — every chart's shared options helper (_lwOpts) now
+//   sets timeScale.lockVisibleTimeRangeOnResize:true. LWC's default resize
+//   behavior holds bar spacing constant across a width change, which SHIFTS
+//   the visible time window rather than leaving it alone — _lwResize()'s
+//   scheduled applyOptions({width,height}) calls during initial chart build
+//   (while the modal's flex layout is still settling) were silently
+//   narrowing the _lwDefaultWindow()-set range before the user ever touched
+//   the chart. Net Position/Daily Spot Close (the only synced pair)
+//   compounded this into a visibly over-zoomed, mismatched opening state.
+// COT MODAL CHART  v3.1 — _lwSyncTimeRanges's re-entrancy guard now clears on
+//   the next animation frame instead of synchronously right after
+//   setVisibleRange(), since a target chart's change notification for a
+//   programmatic call doesn't always fire in the same synchronous tick —
+//   when it arrived late, the guard had already reopened and the echo
+//   bounced straight back, reading as auto-zoom while panning.
 // COT MODAL CHART  v3.0 — Net Position/Daily Spot Close pan-and-zoom sync +
 //   tighter Net Position default window. Net Position now defaults to 1 year
 //   (was 2y) so its weekly bars render wide enough to read individually — 2y
@@ -621,32 +647,47 @@ function _lwDefaultWindow(chart, times, yearsBack) {
 // resolutions, since the same calendar window covers a different bar COUNT
 // on each chart. Syncing by calendar time range instead (LWC's documented
 // pattern for multi-chart sync) works regardless of each chart's own bar
-// density. Guarded with a re-entrancy flag so the two-way subscription
-// doesn't feed back into an infinite loop.
-function _lwSyncTimeRanges(chartA, chartB) {
+// density.
+//
+// Gated by which container the user is actually interacting with (`active`,
+// set via pointerdown/pointerenter/wheel on elA/elB), not just a re-entrancy
+// boolean. v8.266.1's rAF-cleared `syncing` flag stopped the *immediate*
+// same-tick echo, but a chart's own internal bar-snapping can still emit a
+// SECOND, slightly-different range-change notification a frame or two after
+// the guard already cleared (its snapped daily/weekly boundary isn't
+// identical to what was requested). With only a boolean guard, that delayed
+// echo was indistinguishable from real user input and got relayed straight
+// back onto the other chart — observed live as Daily Spot Close staying
+// pinned to the current-date edge no matter how far the user panned Net
+// Position: every Net drag tick relayed correctly, but Spot's delayed
+// snap-echo kept re-asserting a still image close to the previous position
+// back onto the *chart the user wasn't touching*, and once the user's own
+// drag ended, only that misrouted echo was left standing. Gating relay to
+// "only forward events from the chart whose container the user is
+// currently on" means a chart's own emitted events are never relayed
+// anywhere unless that specific chart is the one being interacted with —
+// structurally removing the echo-misroute path rather than trying to
+// out-time it.
+function _lwSyncTimeRanges(chartA, chartB, elA, elB) {
   if (!chartA || !chartB) return;
-  // Re-entrancy guard: cleared on the NEXT ANIMATION FRAME, not synchronously
-  // right after the setVisibleRange() call below. Clearing it synchronously
-  // assumes LWC's subscribeVisibleTimeRangeChange notification for a
-  // programmatic setVisibleRange() fires perfectly synchronously — it
-  // doesn't always. When the target chart's own notification arrived a tick
-  // late, `syncing` had already flipped back to false, so the target's
-  // "change" bounced straight back to the source (setVisibleRange applied
-  // again to a chart with a different bar resolution), and that reapplication
-  // could itself shift the effective range slightly (bar-boundary rounding
-  // differs between Net Position's weekly bars and Daily Spot Close's daily
-  // ones). Repeated every drag tick, this reads as the chart auto-zooming
-  // while the user is only trying to pan it. Holding the guard open across a
-  // full animation frame absorbs any async notification instead of racing it.
+  let active = null; // 'A' | 'B' | null (neither touched yet)
+  const markA = () => { active = 'A'; };
+  const markB = () => { active = 'B'; };
+  if (elA) { elA.addEventListener('pointerdown', markA); elA.addEventListener('pointerenter', markA); elA.addEventListener('wheel', markA, { passive: true }); }
+  if (elB) { elB.addEventListener('pointerdown', markB); elB.addEventListener('pointerenter', markB); elB.addEventListener('wheel', markB, { passive: true }); }
+  // Re-entrancy guard: cleared on the NEXT ANIMATION FRAME (v8.266.1), not
+  // synchronously right after setVisibleRange() — kept as defense-in-depth
+  // against a same-active-chart double-fire, on top of the `active` gate
+  // above which is what actually stops cross-chart misrouting.
   let syncing = false;
-  function relay(from, to, range) {
-    if (syncing || !range) return;
+  function relay(which, to, range) {
+    if (active !== which || syncing || !range) return;
     syncing = true;
     try { to.timeScale().setVisibleRange(range); } catch (_) {}
     requestAnimationFrame(() => { syncing = false; });
   }
-  chartA.timeScale().subscribeVisibleTimeRangeChange(range => relay(chartA, chartB, range));
-  chartB.timeScale().subscribeVisibleTimeRangeChange(range => relay(chartB, chartA, range));
+  chartA.timeScale().subscribeVisibleTimeRangeChange(range => relay('A', chartB, range));
+  chartB.timeScale().subscribeVisibleTimeRangeChange(range => relay('B', chartA, range));
 }
 
 // ── Chart builders ────────────────────────────────────────────────────────────
@@ -1232,7 +1273,7 @@ function cotTab(el,tabId){
                 // Mirror pan/zoom both ways once both charts exist — see
                 // _lwSyncTimeRanges for why this needs calendar-time sync,
                 // not logical-range sync (weekly bars vs. daily closes).
-                if(_netChart&&_spotChart)_lwSyncTimeRanges(_netChart,_spotChart);
+                if(_netChart&&_spotChart)_lwSyncTimeRanges(_netChart,_spotChart,w,ws);
               } else {
                 if(statusEl)statusEl.textContent='Spot data unavailable';
                 ws._built=false;
