@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-26T14:08:58Z",
-  "generatedAt": "2026-08-26T14:08:58Z",
+  "lastUpdate": "2026-08-26T14:31:08Z",
+  "generatedAt": "2026-08-26T14:31:08Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-26",
   "rangeTo": "2026-08-28",
-  "totalEvents": 3800,
+  "totalEvents": 3802,
   "currencyCounts": {
     "EUR": 869,
-    "USD": 1286,
+    "USD": 1288,
     "AUD": 264,
     "GBP": 442,
     "NZD": 88,
@@ -23,7 +23,7 @@
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1892,
+    "medium": 1894,
     "high": 1680,
     "low": 228
   },
@@ -144,14 +144,14 @@
       "std": 0.034217
     },
     "USD/eia gasoline stocks change": {
-      "n": 15,
-      "mean": 0.817533,
-      "std": 1.504945
+      "n": 16,
+      "mean": 0.651687,
+      "std": 1.598107
     },
     "USD/eia crude oil stocks change": {
-      "n": 15,
-      "mean": 1.060067,
-      "std": 6.057703
+      "n": 16,
+      "mean": 0.96225,
+      "std": 5.865362
     },
     "JPY/unemployment rate": {
       "n": 3,
@@ -47644,7 +47644,7 @@
       "impact": "high",
       "actual": "1.1%",
       "forecast": "0.5%",
-      "previous": "0.3%"
+      "previous": "0.5%"
     },
     {
       "date": "26 Aug",
@@ -47723,6 +47723,32 @@
       "actual": "0.2%",
       "forecast": "0.1%",
       "previous": "0.3%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "-2.536M",
+      "forecast": "-0.7M",
+      "previous": "0.688M"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "0.095M",
+      "forecast": "0.6M",
+      "previous": "4.405M"
     },
     {
       "date": "26 Aug",
