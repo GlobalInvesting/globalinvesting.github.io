@@ -1,16 +1,21 @@
 {
-  "netPosition": 324,
-  "longPositions": 954,
-  "shortPositions": 630,
+  "netPosition": -76035,
+  "longPositions": 75200,
+  "shortPositions": 151235,
   "positionCategory": "Leveraged Funds (speculative)",
-  "assetManagerNet": -2058,
+  "secondaryCategory": "Asset Manager/Institutional",
+  "tertiaryCategory": "Dealer/Intermediary",
+  "assetClass": "currency",
+  "displayName": null,
+  "openInterestTotal": 927418,
+  "contractMultiplier": 125000,
+  "contractUnit": "EUR",
+  "assetManagerNet": 266460,
   "assetManagerLong": 481655,
   "assetManagerShort": 215195,
-  "dealerNet": -4550,
+  "dealerNet": -235514,
   "dealerLong": 55508,
   "dealerShort": 291022,
-  "wowNetChange": -258,
-  "levNetPctOI": 20.5,
   "history": [
     {
       "weekEnding": "2025-08-26",
@@ -422,11 +427,11 @@
     },
     {
       "weekEnding": "2026-08-18",
-      "levNet": 324,
-      "levLong": 954,
-      "levShort": 630,
-      "assetManagerNet": -2058,
-      "dealerNet": -4550
+      "levNet": -76035,
+      "levLong": 75200,
+      "levShort": 151235,
+      "assetManagerNet": 266460,
+      "dealerNet": -235514
     }
   ],
   "sourceType": "options_futures_combined",

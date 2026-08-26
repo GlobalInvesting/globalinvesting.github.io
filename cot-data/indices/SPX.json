@@ -1,20 +1,21 @@
 {
-  "netPosition": -259529,
-  "longPositions": 176168,
-  "shortPositions": 435697,
+  "netPosition": -267509,
+  "longPositions": 172752,
+  "shortPositions": 440261,
   "positionCategory": "Leveraged Funds (speculative)",
   "secondaryCategory": "Asset Manager/Institutional",
   "tertiaryCategory": "Dealer/Intermediary",
   "assetClass": "equityIndex",
   "displayName": "S&P 500",
-  "assetManagerNet": 950286,
+  "openInterestTotal": 3132186,
+  "contractMultiplier": 50,
+  "contractUnit": "USD",
+  "assetManagerNet": 952422,
   "assetManagerLong": 1160173,
   "assetManagerShort": 207751,
-  "dealerNet": -773792,
+  "dealerNet": -763013,
   "dealerLong": 221344,
   "dealerShort": 984357,
-  "wowNetChange": -3881,
-  "levNetPctOI": -42.4,
   "history": [
     {
       "weekEnding": "2025-08-26",
@@ -426,11 +427,11 @@
     },
     {
       "weekEnding": "2026-08-18",
-      "levNet": -259529,
-      "levLong": 176168,
-      "levShort": 435697,
-      "assetManagerNet": 950286,
-      "dealerNet": -773792
+      "levNet": -267509,
+      "levLong": 172752,
+      "levShort": 440261,
+      "assetManagerNet": 952422,
+      "dealerNet": -763013
     }
   ],
   "sourceType": "options_futures_combined",

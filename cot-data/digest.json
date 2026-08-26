@@ -1,13 +1,21 @@
 {
   "weekEnding": "2026-08-18",
-  "topCcy": "JPY",
-  "topWow": -14115,
-  "topWowStr": "-14.1k",
-  "topNet": -73641,
-  "topNetPct": -35.8,
-  "topZScore": 0.03,
-  "message": "JPY shorts increased 14.1k contracts \u00b7 NET -73.6k (-35.8%)",
+  "topCcy": "EUR",
+  "topWow": -76617,
+  "topWowStr": "-76.6k",
+  "topNet": -76035,
+  "topNetPct": -33.6,
+  "topZScore": -6.9,
+  "message": "EUR shorts increased 76.6k contracts \u00b7 NET -76.0k (-33.6%)",
   "summary": [
+    {
+      "ccy": "EUR",
+      "net": -76035,
+      "wow": -76617,
+      "net_pct": -33.6,
+      "z_score": -6.9,
+      "percentile": 2
+    },
     {
       "ccy": "JPY",
       "net": -73641,
@@ -63,14 +71,6 @@
       "net_pct": 36.4,
       "z_score": 1.86,
       "percentile": 100
-    },
-    {
-      "ccy": "EUR",
-      "net": -76035,
-      "wow": 1636,
-      "net_pct": -33.6,
-      "z_score": -1.99,
-      "percentile": 10
     }
   ]
 }
