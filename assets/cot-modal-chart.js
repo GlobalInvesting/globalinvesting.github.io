@@ -535,7 +535,22 @@ function _lwOpts(W,H){
       horzLine:{color:_text2+'33',style:2,labelVisible:true},
     },
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    timeScale:{borderVisible:false},
+    // lockVisibleTimeRangeOnResize: LWC's default behavior (confirmed against
+    // v5 docs — the option exists specifically to disable it) keeps the same
+    // bar spacing (px/bar) across a width change, which SHIFTS the visible
+    // calendar window rather than leaving it alone. _lwResize() fires
+    // applyOptions({width,height}) repeatedly during initial chart build
+    // (60ms/200ms/500ms, plus an explicit 250ms call in cotTab) while the
+    // modal's flex layout is still settling — each of those resizes was
+    // silently narrowing/shifting the _lwDefaultWindow()-set range before the
+    // user ever touched the chart, which is why the Net Position/Daily Spot
+    // Close pair (the only charts wired through _lwSyncTimeRanges, so each
+    // resize-induced shift on one side also got relayed onto the other,
+    // compounding it) could open already zoomed in tighter than the intended
+    // 1-year default and never recover on its own. Locking this stops any
+    // resize from touching the time window at all — only explicit
+    // setVisibleRange() calls and real user pan/zoom should ever move it.
+    timeScale:{borderVisible:false,lockVisibleTimeRangeOnResize:true},
     handleScroll:{mouseWheel:true,pressedMouseMove:true},
     handleScale:{mouseWheel:true,pinch:true},
     localization:{priceFormatter:v=>v!=null?Math.round(v).toLocaleString():'—'},
