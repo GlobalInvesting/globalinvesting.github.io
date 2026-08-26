@@ -1,5 +1,7 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.5 — #ycm-bd now actually stretches in the real
+// YIELD CURVE MODAL  v2.6 — _ycShape() Flat-band ordering fixed (v8.263.0):
+//   see the comment inside _ycShape() below for the full incident writeup.
+// v2.5 — #ycm-bd now actually stretches in the real
 //   (inline-panel.js) render path, so the v2.4 min-height:100% fix has a
 //   definite parent height to resolve against.
 // Fluid layout, terminal CSS variables throughout.
@@ -142,16 +144,25 @@ function _ycShape(tenors) {
   if (t10y == null) return null;
   const spread_10_2y = t2y != null ? t10y - t2y : null;
   const spread_10_3m = t3m != null ? t10y - t3m : null;
+  // v8.263.0: band order fixed. The Flat tooltip explicitly documents "within
+  // ±20bp of zero" — but checking `< 0` before the ±0.2 Flat band made that
+  // band's entire negative half (-0.01 to -0.20) unreachable: any spread just
+  // barely negative (e.g. -2bp, pure noise) fell through to the `< 0` check
+  // first and was returned as "Inverted", triggering the modal's strongest
+  // tooltip ("the most reliable recession signal... every US recession in the
+  // past 50 years was preceded by this") for what is, by the panel's own
+  // stated definition, a Flat curve. The Flat band must be checked before the
+  // Inverted cutoff so "Inverted" only fires beyond the documented ±20bp zone.
   if (spread_10_2y != null) {
+    if (spread_10_2y >= -0.2 && spread_10_2y <= 0.2) return 'Flat';
     if (spread_10_2y < 0) return 'Inverted';
     if (spread_10_2y > 0.5) return 'Steep';
-    if (spread_10_2y >= -0.2 && spread_10_2y <= 0.2) return 'Flat';
     return 'Normal';
   }
   if (spread_10_3m != null) {
+    if (Math.abs(spread_10_3m) <= 0.2) return 'Flat';
     if (spread_10_3m < 0) return 'Inverted';
     if (spread_10_3m > 0.5) return 'Steep';
-    if (Math.abs(spread_10_3m) <= 0.2) return 'Flat';
     return 'Normal';
   }
   return null;
