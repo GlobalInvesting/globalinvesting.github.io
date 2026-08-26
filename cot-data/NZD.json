@@ -3,20 +3,3775 @@
   "longPositions": 4041,
   "shortPositions": 31455,
   "positionCategory": "Leveraged Funds (speculative)",
-  "secondaryCategory": "Asset Manager/Institutional",
-  "tertiaryCategory": "Dealer/Intermediary",
-  "assetClass": "currency",
-  "displayName": null,
-  "openInterestTotal": 94131,
-  "contractMultiplier": 100000,
-  "contractUnit": "NZD",
   "assetManagerNet": -25459,
   "assetManagerLong": 7169,
   "assetManagerShort": 32628,
   "dealerNet": 52998,
   "dealerLong": 71690,
   "dealerShort": 18692,
+  "wowNetChange": 6617,
+  "levNetPctOI": -77.2,
   "history": [
+    {
+      "weekEnding": "2016-08-23",
+      "levNet": 26053,
+      "levLong": 32916,
+      "levShort": 6863,
+      "assetManagerNet": -13564,
+      "dealerNet": -12577
+    },
+    {
+      "weekEnding": "2016-08-30",
+      "levNet": 28026,
+      "levLong": 34309,
+      "levShort": 6283,
+      "assetManagerNet": -15534,
+      "dealerNet": -12798
+    },
+    {
+      "weekEnding": "2016-09-06",
+      "levNet": 30262,
+      "levLong": 38312,
+      "levShort": 8050,
+      "assetManagerNet": -14233,
+      "dealerNet": -16423
+    },
+    {
+      "weekEnding": "2016-09-13",
+      "levNet": 29336,
+      "levLong": 36272,
+      "levShort": 6936,
+      "assetManagerNet": -14512,
+      "dealerNet": -16541
+    },
+    {
+      "weekEnding": "2016-09-20",
+      "levNet": 21711,
+      "levLong": 36550,
+      "levShort": 14839,
+      "assetManagerNet": -14058,
+      "dealerNet": -9593
+    },
+    {
+      "weekEnding": "2016-09-27",
+      "levNet": 27250,
+      "levLong": 36580,
+      "levShort": 9330,
+      "assetManagerNet": -18261,
+      "dealerNet": -11657
+    },
+    {
+      "weekEnding": "2016-10-04",
+      "levNet": 27457,
+      "levLong": 35682,
+      "levShort": 8225,
+      "assetManagerNet": -18636,
+      "dealerNet": -11679
+    },
+    {
+      "weekEnding": "2016-10-11",
+      "levNet": 23106,
+      "levLong": 30999,
+      "levShort": 7893,
+      "assetManagerNet": -19910,
+      "dealerNet": -5017
+    },
+    {
+      "weekEnding": "2016-10-18",
+      "levNet": 20252,
+      "levLong": 28135,
+      "levShort": 7883,
+      "assetManagerNet": -19234,
+      "dealerNet": -1151
+    },
+    {
+      "weekEnding": "2016-10-25",
+      "levNet": 20019,
+      "levLong": 28254,
+      "levShort": 8235,
+      "assetManagerNet": -19478,
+      "dealerNet": -868
+    },
+    {
+      "weekEnding": "2016-11-01",
+      "levNet": 20943,
+      "levLong": 28946,
+      "levShort": 8003,
+      "assetManagerNet": -19889,
+      "dealerNet": -1459
+    },
+    {
+      "weekEnding": "2016-11-08",
+      "levNet": 29881,
+      "levLong": 37935,
+      "levShort": 8054,
+      "assetManagerNet": -24371,
+      "dealerNet": -5615
+    },
+    {
+      "weekEnding": "2016-11-15",
+      "levNet": 28985,
+      "levLong": 35079,
+      "levShort": 6094,
+      "assetManagerNet": -24381,
+      "dealerNet": -4754
+    },
+    {
+      "weekEnding": "2016-11-22",
+      "levNet": 23471,
+      "levLong": 29898,
+      "levShort": 6427,
+      "assetManagerNet": -24437,
+      "dealerNet": 1629
+    },
+    {
+      "weekEnding": "2016-11-29",
+      "levNet": 20520,
+      "levLong": 26956,
+      "levShort": 6436,
+      "assetManagerNet": -24335,
+      "dealerNet": 5315
+    },
+    {
+      "weekEnding": "2016-12-06",
+      "levNet": 17490,
+      "levLong": 23653,
+      "levShort": 6163,
+      "assetManagerNet": -24634,
+      "dealerNet": 6754
+    },
+    {
+      "weekEnding": "2016-12-13",
+      "levNet": 17431,
+      "levLong": 25354,
+      "levShort": 7923,
+      "assetManagerNet": -23820,
+      "dealerNet": 5788
+    },
+    {
+      "weekEnding": "2016-12-20",
+      "levNet": 22393,
+      "levLong": 29310,
+      "levShort": 6917,
+      "assetManagerNet": -25934,
+      "dealerNet": 3084
+    },
+    {
+      "weekEnding": "2016-12-27",
+      "levNet": 17975,
+      "levLong": 25446,
+      "levShort": 7471,
+      "assetManagerNet": -26386,
+      "dealerNet": 10242
+    },
+    {
+      "weekEnding": "2017-01-03",
+      "levNet": 14620,
+      "levLong": 23423,
+      "levShort": 8803,
+      "assetManagerNet": -26164,
+      "dealerNet": 13233
+    },
+    {
+      "weekEnding": "2017-01-10",
+      "levNet": 12163,
+      "levLong": 20439,
+      "levShort": 8276,
+      "assetManagerNet": -26740,
+      "dealerNet": 16021
+    },
+    {
+      "weekEnding": "2017-01-17",
+      "levNet": 12244,
+      "levLong": 22344,
+      "levShort": 10100,
+      "assetManagerNet": -25328,
+      "dealerNet": 14347
+    },
+    {
+      "weekEnding": "2017-01-24",
+      "levNet": 16610,
+      "levLong": 27146,
+      "levShort": 10536,
+      "assetManagerNet": -23152,
+      "dealerNet": 6630
+    },
+    {
+      "weekEnding": "2017-01-31",
+      "levNet": 21473,
+      "levLong": 34307,
+      "levShort": 12834,
+      "assetManagerNet": -16409,
+      "dealerNet": -5792
+    },
+    {
+      "weekEnding": "2017-02-07",
+      "levNet": 26001,
+      "levLong": 36207,
+      "levShort": 10206,
+      "assetManagerNet": -16074,
+      "dealerNet": -11642
+    },
+    {
+      "weekEnding": "2017-02-14",
+      "levNet": 30005,
+      "levLong": 38565,
+      "levShort": 8560,
+      "assetManagerNet": -17258,
+      "dealerNet": -15024
+    },
+    {
+      "weekEnding": "2017-02-21",
+      "levNet": 30822,
+      "levLong": 37399,
+      "levShort": 6577,
+      "assetManagerNet": -17145,
+      "dealerNet": -15322
+    },
+    {
+      "weekEnding": "2017-02-28",
+      "levNet": 32632,
+      "levLong": 39784,
+      "levShort": 7152,
+      "assetManagerNet": -16464,
+      "dealerNet": -17836
+    },
+    {
+      "weekEnding": "2017-03-07",
+      "levNet": 21246,
+      "levLong": 28605,
+      "levShort": 7359,
+      "assetManagerNet": -16764,
+      "dealerNet": -7129
+    },
+    {
+      "weekEnding": "2017-03-14",
+      "levNet": 11700,
+      "levLong": 19710,
+      "levShort": 8010,
+      "assetManagerNet": -14867,
+      "dealerNet": 3350
+    },
+    {
+      "weekEnding": "2017-03-21",
+      "levNet": 2938,
+      "levLong": 15981,
+      "levShort": 13043,
+      "assetManagerNet": -14170,
+      "dealerNet": 12661
+    },
+    {
+      "weekEnding": "2017-03-28",
+      "levNet": -201,
+      "levLong": 14112,
+      "levShort": 14313,
+      "assetManagerNet": -14165,
+      "dealerNet": 15871
+    },
+    {
+      "weekEnding": "2017-04-04",
+      "levNet": -2909,
+      "levLong": 14149,
+      "levShort": 17058,
+      "assetManagerNet": -13942,
+      "dealerNet": 18433
+    },
+    {
+      "weekEnding": "2017-04-11",
+      "levNet": -4397,
+      "levLong": 14768,
+      "levShort": 19165,
+      "assetManagerNet": -14439,
+      "dealerNet": 20504
+    },
+    {
+      "weekEnding": "2017-04-18",
+      "levNet": -3265,
+      "levLong": 15114,
+      "levShort": 18379,
+      "assetManagerNet": -14159,
+      "dealerNet": 19201
+    },
+    {
+      "weekEnding": "2017-04-25",
+      "levNet": -3779,
+      "levLong": 15330,
+      "levShort": 19109,
+      "assetManagerNet": -14445,
+      "dealerNet": 19809
+    },
+    {
+      "weekEnding": "2017-05-02",
+      "levNet": -5866,
+      "levLong": 14203,
+      "levShort": 20069,
+      "assetManagerNet": -10441,
+      "dealerNet": 18863
+    },
+    {
+      "weekEnding": "2017-05-09",
+      "levNet": -7767,
+      "levLong": 13667,
+      "levShort": 21434,
+      "assetManagerNet": -10441,
+      "dealerNet": 21083
+    },
+    {
+      "weekEnding": "2017-05-16",
+      "levNet": -9773,
+      "levLong": 13360,
+      "levShort": 23133,
+      "assetManagerNet": -9797,
+      "dealerNet": 22170
+    },
+    {
+      "weekEnding": "2017-05-23",
+      "levNet": -6584,
+      "levLong": 16201,
+      "levShort": 22785,
+      "assetManagerNet": -9531,
+      "dealerNet": 18554
+    },
+    {
+      "weekEnding": "2017-05-30",
+      "levNet": -3529,
+      "levLong": 19028,
+      "levShort": 22557,
+      "assetManagerNet": -8358,
+      "dealerNet": 14165
+    },
+    {
+      "weekEnding": "2017-06-06",
+      "levNet": 297,
+      "levLong": 21629,
+      "levShort": 21332,
+      "assetManagerNet": -8366,
+      "dealerNet": 9673
+    },
+    {
+      "weekEnding": "2017-06-13",
+      "levNet": 4094,
+      "levLong": 30015,
+      "levShort": 25921,
+      "assetManagerNet": -8167,
+      "dealerNet": 4419
+    },
+    {
+      "weekEnding": "2017-06-20",
+      "levNet": 22846,
+      "levLong": 40386,
+      "levShort": 17540,
+      "assetManagerNet": -8376,
+      "dealerNet": -14585
+    },
+    {
+      "weekEnding": "2017-06-27",
+      "levNet": 26973,
+      "levLong": 46676,
+      "levShort": 19703,
+      "assetManagerNet": -7544,
+      "dealerNet": -19344
+    },
+    {
+      "weekEnding": "2017-07-03",
+      "levNet": 30519,
+      "levLong": 46104,
+      "levShort": 15585,
+      "assetManagerNet": -7640,
+      "dealerNet": -24053
+    },
+    {
+      "weekEnding": "2017-07-11",
+      "levNet": 31764,
+      "levLong": 46215,
+      "levShort": 14451,
+      "assetManagerNet": -6804,
+      "dealerNet": -26111
+    },
+    {
+      "weekEnding": "2017-07-18",
+      "levNet": 36906,
+      "levLong": 45287,
+      "levShort": 8381,
+      "assetManagerNet": -6636,
+      "dealerNet": -31738
+    },
+    {
+      "weekEnding": "2017-07-25",
+      "levNet": 36294,
+      "levLong": 42877,
+      "levShort": 6583,
+      "assetManagerNet": -6961,
+      "dealerNet": -30880
+    },
+    {
+      "weekEnding": "2017-08-01",
+      "levNet": 36234,
+      "levLong": 43181,
+      "levShort": 6947,
+      "assetManagerNet": -7083,
+      "dealerNet": -30833
+    },
+    {
+      "weekEnding": "2017-08-08",
+      "levNet": 31076,
+      "levLong": 38872,
+      "levShort": 7796,
+      "assetManagerNet": -5980,
+      "dealerNet": -27511
+    },
+    {
+      "weekEnding": "2017-08-15",
+      "levNet": 24869,
+      "levLong": 33753,
+      "levShort": 8884,
+      "assetManagerNet": -6903,
+      "dealerNet": -21156
+    },
+    {
+      "weekEnding": "2017-08-22",
+      "levNet": 20096,
+      "levLong": 28874,
+      "levShort": 8778,
+      "assetManagerNet": -5706,
+      "dealerNet": -17880
+    },
+    {
+      "weekEnding": "2017-08-29",
+      "levNet": 17326,
+      "levLong": 28563,
+      "levShort": 11237,
+      "assetManagerNet": -6028,
+      "dealerNet": -14410
+    },
+    {
+      "weekEnding": "2017-09-05",
+      "levNet": 13012,
+      "levLong": 26307,
+      "levShort": 13295,
+      "assetManagerNet": -7432,
+      "dealerNet": -8080
+    },
+    {
+      "weekEnding": "2017-09-12",
+      "levNet": 9253,
+      "levLong": 23775,
+      "levShort": 14522,
+      "assetManagerNet": -6305,
+      "dealerNet": -6237
+    },
+    {
+      "weekEnding": "2017-09-19",
+      "levNet": 2925,
+      "levLong": 21038,
+      "levShort": 18113,
+      "assetManagerNet": -6543,
+      "dealerNet": 2177
+    },
+    {
+      "weekEnding": "2017-09-26",
+      "levNet": 5023,
+      "levLong": 20299,
+      "levShort": 15276,
+      "assetManagerNet": -6412,
+      "dealerNet": 279
+    },
+    {
+      "weekEnding": "2017-10-03",
+      "levNet": 4502,
+      "levLong": 19064,
+      "levShort": 14562,
+      "assetManagerNet": -6449,
+      "dealerNet": 394
+    },
+    {
+      "weekEnding": "2017-10-10",
+      "levNet": 3017,
+      "levLong": 20898,
+      "levShort": 17881,
+      "assetManagerNet": -7032,
+      "dealerNet": 2996
+    },
+    {
+      "weekEnding": "2017-10-17",
+      "levNet": 3950,
+      "levLong": 19998,
+      "levShort": 16048,
+      "assetManagerNet": -6786,
+      "dealerNet": 1687
+    },
+    {
+      "weekEnding": "2017-10-24",
+      "levNet": -3490,
+      "levLong": 19498,
+      "levShort": 22988,
+      "assetManagerNet": -6830,
+      "dealerNet": 10096
+    },
+    {
+      "weekEnding": "2017-10-31",
+      "levNet": -10951,
+      "levLong": 19847,
+      "levShort": 30798,
+      "assetManagerNet": -3898,
+      "dealerNet": 15923
+    },
+    {
+      "weekEnding": "2017-11-07",
+      "levNet": -16169,
+      "levLong": 17317,
+      "levShort": 33486,
+      "assetManagerNet": -4076,
+      "dealerNet": 20805
+    },
+    {
+      "weekEnding": "2017-11-14",
+      "levNet": -18078,
+      "levLong": 15969,
+      "levShort": 34047,
+      "assetManagerNet": -632,
+      "dealerNet": 20062
+    },
+    {
+      "weekEnding": "2017-11-21",
+      "levNet": -18660,
+      "levLong": 19820,
+      "levShort": 38480,
+      "assetManagerNet": -2367,
+      "dealerNet": 24412
+    },
+    {
+      "weekEnding": "2017-11-28",
+      "levNet": -19047,
+      "levLong": 20658,
+      "levShort": 39705,
+      "assetManagerNet": -3081,
+      "dealerNet": 24625
+    },
+    {
+      "weekEnding": "2017-12-05",
+      "levNet": -18425,
+      "levLong": 20171,
+      "levShort": 38596,
+      "assetManagerNet": -3517,
+      "dealerNet": 24370
+    },
+    {
+      "weekEnding": "2017-12-12",
+      "levNet": -16328,
+      "levLong": 19784,
+      "levShort": 36112,
+      "assetManagerNet": -5927,
+      "dealerNet": 25850
+    },
+    {
+      "weekEnding": "2017-12-19",
+      "levNet": -24165,
+      "levLong": 11573,
+      "levShort": 35738,
+      "assetManagerNet": -5036,
+      "dealerNet": 31822
+    },
+    {
+      "weekEnding": "2017-12-26",
+      "levNet": -23900,
+      "levLong": 10827,
+      "levShort": 34727,
+      "assetManagerNet": -4883,
+      "dealerNet": 31246
+    },
+    {
+      "weekEnding": "2018-01-02",
+      "levNet": -27938,
+      "levLong": 8596,
+      "levShort": 36534,
+      "assetManagerNet": -296,
+      "dealerNet": 30419
+    },
+    {
+      "weekEnding": "2018-01-09",
+      "levNet": -23047,
+      "levLong": 9462,
+      "levShort": 32509,
+      "assetManagerNet": 1396,
+      "dealerNet": 23209
+    },
+    {
+      "weekEnding": "2018-01-16",
+      "levNet": -17849,
+      "levLong": 10912,
+      "levShort": 28761,
+      "assetManagerNet": 1430,
+      "dealerNet": 16655
+    },
+    {
+      "weekEnding": "2018-01-23",
+      "levNet": -10483,
+      "levLong": 18643,
+      "levShort": 29126,
+      "assetManagerNet": 203,
+      "dealerNet": 10337
+    },
+    {
+      "weekEnding": "2018-01-30",
+      "levNet": -6339,
+      "levLong": 23858,
+      "levShort": 30197,
+      "assetManagerNet": 2909,
+      "dealerNet": 2380
+    },
+    {
+      "weekEnding": "2018-02-06",
+      "levNet": -6827,
+      "levLong": 22754,
+      "levShort": 29581,
+      "assetManagerNet": 3574,
+      "dealerNet": 2493
+    },
+    {
+      "weekEnding": "2018-02-13",
+      "levNet": -4113,
+      "levLong": 23022,
+      "levShort": 27135,
+      "assetManagerNet": 3179,
+      "dealerNet": 665
+    },
+    {
+      "weekEnding": "2018-02-20",
+      "levNet": -3964,
+      "levLong": 23622,
+      "levShort": 27586,
+      "assetManagerNet": 3145,
+      "dealerNet": 733
+    },
+    {
+      "weekEnding": "2018-02-27",
+      "levNet": -4532,
+      "levLong": 25581,
+      "levShort": 30113,
+      "assetManagerNet": 3393,
+      "dealerNet": 724
+    },
+    {
+      "weekEnding": "2018-03-06",
+      "levNet": -744,
+      "levLong": 27277,
+      "levShort": 28021,
+      "assetManagerNet": 3300,
+      "dealerNet": -3335
+    },
+    {
+      "weekEnding": "2018-03-13",
+      "levNet": -1382,
+      "levLong": 29613,
+      "levShort": 30995,
+      "assetManagerNet": 3802,
+      "dealerNet": -3645
+    },
+    {
+      "weekEnding": "2018-03-20",
+      "levNet": 18473,
+      "levLong": 28679,
+      "levShort": 10206,
+      "assetManagerNet": 2202,
+      "dealerNet": -21455
+    },
+    {
+      "weekEnding": "2018-03-27",
+      "levNet": 19154,
+      "levLong": 31703,
+      "levShort": 12549,
+      "assetManagerNet": 492,
+      "dealerNet": -19555
+    },
+    {
+      "weekEnding": "2018-04-03",
+      "levNet": 19168,
+      "levLong": 31976,
+      "levShort": 12808,
+      "assetManagerNet": -165,
+      "dealerNet": -18945
+    },
+    {
+      "weekEnding": "2018-04-10",
+      "levNet": 20722,
+      "levLong": 37676,
+      "levShort": 16954,
+      "assetManagerNet": 3049,
+      "dealerNet": -24102
+    },
+    {
+      "weekEnding": "2018-04-17",
+      "levNet": 22019,
+      "levLong": 39013,
+      "levShort": 16994,
+      "assetManagerNet": 7297,
+      "dealerNet": -30312
+    },
+    {
+      "weekEnding": "2018-04-24",
+      "levNet": 21562,
+      "levLong": 33949,
+      "levShort": 12387,
+      "assetManagerNet": 5516,
+      "dealerNet": -27541
+    },
+    {
+      "weekEnding": "2018-05-01",
+      "levNet": 15120,
+      "levLong": 27136,
+      "levShort": 12016,
+      "assetManagerNet": 2656,
+      "dealerNet": -16767
+    },
+    {
+      "weekEnding": "2018-05-08",
+      "levNet": 11958,
+      "levLong": 26951,
+      "levShort": 14993,
+      "assetManagerNet": -245,
+      "dealerNet": -9029
+    },
+    {
+      "weekEnding": "2018-05-15",
+      "levNet": 6447,
+      "levLong": 28185,
+      "levShort": 21738,
+      "assetManagerNet": -6761,
+      "dealerNet": 3458
+    },
+    {
+      "weekEnding": "2018-05-22",
+      "levNet": -997,
+      "levLong": 22057,
+      "levShort": 23054,
+      "assetManagerNet": -5189,
+      "dealerNet": 9989
+    },
+    {
+      "weekEnding": "2018-05-29",
+      "levNet": -684,
+      "levLong": 23272,
+      "levShort": 23956,
+      "assetManagerNet": -4119,
+      "dealerNet": 9422
+    },
+    {
+      "weekEnding": "2018-06-05",
+      "levNet": -467,
+      "levLong": 23151,
+      "levShort": 23618,
+      "assetManagerNet": -5142,
+      "dealerNet": 9522
+    },
+    {
+      "weekEnding": "2018-06-12",
+      "levNet": 510,
+      "levLong": 22941,
+      "levShort": 22431,
+      "assetManagerNet": -5091,
+      "dealerNet": 8171
+    },
+    {
+      "weekEnding": "2018-06-19",
+      "levNet": -13993,
+      "levLong": 10245,
+      "levShort": 24238,
+      "assetManagerNet": -5112,
+      "dealerNet": 23951
+    },
+    {
+      "weekEnding": "2018-06-26",
+      "levNet": -15708,
+      "levLong": 10073,
+      "levShort": 25781,
+      "assetManagerNet": -5195,
+      "dealerNet": 26053
+    },
+    {
+      "weekEnding": "2018-07-03",
+      "levNet": -21617,
+      "levLong": 10812,
+      "levShort": 32429,
+      "assetManagerNet": -9460,
+      "dealerNet": 36159
+    },
+    {
+      "weekEnding": "2018-07-10",
+      "levNet": -20844,
+      "levLong": 10708,
+      "levShort": 31552,
+      "assetManagerNet": -11285,
+      "dealerNet": 37415
+    },
+    {
+      "weekEnding": "2018-07-17",
+      "levNet": -19797,
+      "levLong": 12171,
+      "levShort": 31968,
+      "assetManagerNet": -11145,
+      "dealerNet": 35969
+    },
+    {
+      "weekEnding": "2018-07-24",
+      "levNet": -19138,
+      "levLong": 11199,
+      "levShort": 30337,
+      "assetManagerNet": -11377,
+      "dealerNet": 35367
+    },
+    {
+      "weekEnding": "2018-07-31",
+      "levNet": -18712,
+      "levLong": 10045,
+      "levShort": 28757,
+      "assetManagerNet": -11801,
+      "dealerNet": 35872
+    },
+    {
+      "weekEnding": "2018-08-07",
+      "levNet": -21145,
+      "levLong": 9558,
+      "levShort": 30703,
+      "assetManagerNet": -10177,
+      "dealerNet": 36432
+    },
+    {
+      "weekEnding": "2018-08-14",
+      "levNet": -24904,
+      "levLong": 9779,
+      "levShort": 34683,
+      "assetManagerNet": -9217,
+      "dealerNet": 39230
+    },
+    {
+      "weekEnding": "2018-08-21",
+      "levNet": -25123,
+      "levLong": 8734,
+      "levShort": 33857,
+      "assetManagerNet": -7975,
+      "dealerNet": 38780
+    },
+    {
+      "weekEnding": "2018-08-28",
+      "levNet": -24036,
+      "levLong": 9772,
+      "levShort": 33808,
+      "assetManagerNet": -8475,
+      "dealerNet": 37533
+    },
+    {
+      "weekEnding": "2018-09-04",
+      "levNet": -19550,
+      "levLong": 11221,
+      "levShort": 30771,
+      "assetManagerNet": -13771,
+      "dealerNet": 38589
+    },
+    {
+      "weekEnding": "2018-09-11",
+      "levNet": -15654,
+      "levLong": 14338,
+      "levShort": 29992,
+      "assetManagerNet": -13617,
+      "dealerNet": 36803
+    },
+    {
+      "weekEnding": "2018-09-18",
+      "levNet": -15863,
+      "levLong": 11864,
+      "levShort": 27727,
+      "assetManagerNet": -17127,
+      "dealerNet": 40540
+    },
+    {
+      "weekEnding": "2018-09-25",
+      "levNet": -15067,
+      "levLong": 11427,
+      "levShort": 26494,
+      "assetManagerNet": -19573,
+      "dealerNet": 40662
+    },
+    {
+      "weekEnding": "2018-10-02",
+      "levNet": -14991,
+      "levLong": 11273,
+      "levShort": 26264,
+      "assetManagerNet": -19032,
+      "dealerNet": 39931
+    },
+    {
+      "weekEnding": "2018-10-09",
+      "levNet": -17754,
+      "levLong": 14649,
+      "levShort": 32403,
+      "assetManagerNet": -19280,
+      "dealerNet": 43938
+    },
+    {
+      "weekEnding": "2018-10-16",
+      "levNet": -18807,
+      "levLong": 10735,
+      "levShort": 29542,
+      "assetManagerNet": -18746,
+      "dealerNet": 45971
+    },
+    {
+      "weekEnding": "2018-10-23",
+      "levNet": -18146,
+      "levLong": 10091,
+      "levShort": 28237,
+      "assetManagerNet": -16648,
+      "dealerNet": 41912
+    },
+    {
+      "weekEnding": "2018-10-30",
+      "levNet": -17346,
+      "levLong": 9455,
+      "levShort": 26801,
+      "assetManagerNet": -15463,
+      "dealerNet": 43083
+    },
+    {
+      "weekEnding": "2018-11-06",
+      "levNet": -18276,
+      "levLong": 9180,
+      "levShort": 27456,
+      "assetManagerNet": -7517,
+      "dealerNet": 33085
+    },
+    {
+      "weekEnding": "2018-11-13",
+      "levNet": -17410,
+      "levLong": 8566,
+      "levShort": 25976,
+      "assetManagerNet": -3247,
+      "dealerNet": 26795
+    },
+    {
+      "weekEnding": "2018-11-20",
+      "levNet": -20745,
+      "levLong": 9653,
+      "levShort": 30398,
+      "assetManagerNet": 2001,
+      "dealerNet": 24425
+    },
+    {
+      "weekEnding": "2018-11-27",
+      "levNet": -21494,
+      "levLong": 10836,
+      "levShort": 32330,
+      "assetManagerNet": 3330,
+      "dealerNet": 23511
+    },
+    {
+      "weekEnding": "2018-12-04",
+      "levNet": -24236,
+      "levLong": 10317,
+      "levShort": 34553,
+      "assetManagerNet": 5906,
+      "dealerNet": 21883
+    },
+    {
+      "weekEnding": "2018-12-11",
+      "levNet": -16657,
+      "levLong": 11339,
+      "levShort": 27996,
+      "assetManagerNet": 7183,
+      "dealerNet": 14077
+    },
+    {
+      "weekEnding": "2018-12-18",
+      "levNet": -1503,
+      "levLong": 11105,
+      "levShort": 12608,
+      "assetManagerNet": 7746,
+      "dealerNet": 249
+    },
+    {
+      "weekEnding": "2018-12-24",
+      "levNet": 203,
+      "levLong": 12133,
+      "levShort": 11930,
+      "assetManagerNet": 1649,
+      "dealerNet": 3009
+    },
+    {
+      "weekEnding": "2018-12-31",
+      "levNet": 1217,
+      "levLong": 13434,
+      "levShort": 12217,
+      "assetManagerNet": 504,
+      "dealerNet": 3922
+    },
+    {
+      "weekEnding": "2019-01-08",
+      "levNet": -3171,
+      "levLong": 10622,
+      "levShort": 13793,
+      "assetManagerNet": 1374,
+      "dealerNet": 6491
+    },
+    {
+      "weekEnding": "2019-01-15",
+      "levNet": -3516,
+      "levLong": 10465,
+      "levShort": 13981,
+      "assetManagerNet": 479,
+      "dealerNet": 6925
+    },
+    {
+      "weekEnding": "2019-01-22",
+      "levNet": -2235,
+      "levLong": 12064,
+      "levShort": 14299,
+      "assetManagerNet": -665,
+      "dealerNet": 8783
+    },
+    {
+      "weekEnding": "2019-01-29",
+      "levNet": -3823,
+      "levLong": 10338,
+      "levShort": 14161,
+      "assetManagerNet": 1181,
+      "dealerNet": 7907
+    },
+    {
+      "weekEnding": "2019-02-05",
+      "levNet": -5653,
+      "levLong": 8486,
+      "levShort": 14139,
+      "assetManagerNet": 6517,
+      "dealerNet": 2424
+    },
+    {
+      "weekEnding": "2019-02-12",
+      "levNet": -4398,
+      "levLong": 9110,
+      "levShort": 13508,
+      "assetManagerNet": 296,
+      "dealerNet": 8199
+    },
+    {
+      "weekEnding": "2019-02-19",
+      "levNet": -5983,
+      "levLong": 8657,
+      "levShort": 14640,
+      "assetManagerNet": 2550,
+      "dealerNet": 7768
+    },
+    {
+      "weekEnding": "2019-02-26",
+      "levNet": -6354,
+      "levLong": 7567,
+      "levShort": 13921,
+      "assetManagerNet": 3253,
+      "dealerNet": 7379
+    },
+    {
+      "weekEnding": "2019-03-05",
+      "levNet": -5203,
+      "levLong": 9219,
+      "levShort": 14422,
+      "assetManagerNet": 943,
+      "dealerNet": 8323
+    },
+    {
+      "weekEnding": "2019-03-12",
+      "levNet": -2142,
+      "levLong": 9583,
+      "levShort": 11725,
+      "assetManagerNet": -1431,
+      "dealerNet": 8552
+    },
+    {
+      "weekEnding": "2019-03-19",
+      "levNet": -5817,
+      "levLong": 6572,
+      "levShort": 12389,
+      "assetManagerNet": -1093,
+      "dealerNet": 10144
+    },
+    {
+      "weekEnding": "2019-03-26",
+      "levNet": -7902,
+      "levLong": 8791,
+      "levShort": 16693,
+      "assetManagerNet": 5424,
+      "dealerNet": 4293
+    },
+    {
+      "weekEnding": "2019-04-02",
+      "levNet": -5213,
+      "levLong": 8533,
+      "levShort": 13746,
+      "assetManagerNet": 3080,
+      "dealerNet": 4956
+    },
+    {
+      "weekEnding": "2019-04-09",
+      "levNet": -2918,
+      "levLong": 9019,
+      "levShort": 11937,
+      "assetManagerNet": -1778,
+      "dealerNet": 7294
+    },
+    {
+      "weekEnding": "2019-04-16",
+      "levNet": -2055,
+      "levLong": 8449,
+      "levShort": 10504,
+      "assetManagerNet": -5995,
+      "dealerNet": 11221
+    },
+    {
+      "weekEnding": "2019-04-23",
+      "levNet": 1845,
+      "levLong": 16335,
+      "levShort": 14490,
+      "assetManagerNet": -12760,
+      "dealerNet": 14835
+    },
+    {
+      "weekEnding": "2019-04-30",
+      "levNet": 623,
+      "levLong": 16692,
+      "levShort": 16069,
+      "assetManagerNet": -19652,
+      "dealerNet": 23234
+    },
+    {
+      "weekEnding": "2019-05-07",
+      "levNet": -54,
+      "levLong": 14570,
+      "levShort": 14624,
+      "assetManagerNet": -19535,
+      "dealerNet": 23406
+    },
+    {
+      "weekEnding": "2019-05-14",
+      "levNet": 1033,
+      "levLong": 16176,
+      "levShort": 15143,
+      "assetManagerNet": -20400,
+      "dealerNet": 22970
+    },
+    {
+      "weekEnding": "2019-05-21",
+      "levNet": 3900,
+      "levLong": 22499,
+      "levShort": 18599,
+      "assetManagerNet": -22356,
+      "dealerNet": 25134
+    },
+    {
+      "weekEnding": "2019-05-28",
+      "levNet": 684,
+      "levLong": 19544,
+      "levShort": 18860,
+      "assetManagerNet": -25702,
+      "dealerNet": 31609
+    },
+    {
+      "weekEnding": "2019-06-04",
+      "levNet": -325,
+      "levLong": 17825,
+      "levShort": 18150,
+      "assetManagerNet": -28656,
+      "dealerNet": 35073
+    },
+    {
+      "weekEnding": "2019-06-11",
+      "levNet": -1408,
+      "levLong": 14980,
+      "levShort": 16388,
+      "assetManagerNet": -26029,
+      "dealerNet": 31705
+    },
+    {
+      "weekEnding": "2019-06-18",
+      "levNet": -2344,
+      "levLong": 14617,
+      "levShort": 16961,
+      "assetManagerNet": -30340,
+      "dealerNet": 39012
+    },
+    {
+      "weekEnding": "2019-06-25",
+      "levNet": -3833,
+      "levLong": 11187,
+      "levShort": 15020,
+      "assetManagerNet": -32259,
+      "dealerNet": 40169
+    },
+    {
+      "weekEnding": "2019-07-02",
+      "levNet": -10197,
+      "levLong": 5903,
+      "levShort": 16100,
+      "assetManagerNet": -25214,
+      "dealerNet": 38262
+    },
+    {
+      "weekEnding": "2019-07-09",
+      "levNet": -10578,
+      "levLong": 5333,
+      "levShort": 15911,
+      "assetManagerNet": -22636,
+      "dealerNet": 36932
+    },
+    {
+      "weekEnding": "2019-07-16",
+      "levNet": -12814,
+      "levLong": 5529,
+      "levShort": 18343,
+      "assetManagerNet": -13815,
+      "dealerNet": 29844
+    },
+    {
+      "weekEnding": "2019-07-23",
+      "levNet": -13831,
+      "levLong": 6295,
+      "levShort": 20126,
+      "assetManagerNet": -4010,
+      "dealerNet": 22007
+    },
+    {
+      "weekEnding": "2019-07-30",
+      "levNet": -10796,
+      "levLong": 6475,
+      "levShort": 17271,
+      "assetManagerNet": -6747,
+      "dealerNet": 22138
+    },
+    {
+      "weekEnding": "2019-08-06",
+      "levNet": -9685,
+      "levLong": 8397,
+      "levShort": 18082,
+      "assetManagerNet": -9539,
+      "dealerNet": 23760
+    },
+    {
+      "weekEnding": "2019-08-13",
+      "levNet": -2486,
+      "levLong": 16864,
+      "levShort": 19350,
+      "assetManagerNet": -20514,
+      "dealerNet": 28230
+    },
+    {
+      "weekEnding": "2019-08-20",
+      "levNet": -3737,
+      "levLong": 17716,
+      "levShort": 21453,
+      "assetManagerNet": -24775,
+      "dealerNet": 33987
+    },
+    {
+      "weekEnding": "2019-08-27",
+      "levNet": -8701,
+      "levLong": 16961,
+      "levShort": 25662,
+      "assetManagerNet": -25160,
+      "dealerNet": 37354
+    },
+    {
+      "weekEnding": "2019-09-03",
+      "levNet": -9481,
+      "levLong": 18350,
+      "levShort": 27831,
+      "assetManagerNet": -28215,
+      "dealerNet": 40211
+    },
+    {
+      "weekEnding": "2019-09-10",
+      "levNet": -6000,
+      "levLong": 21285,
+      "levShort": 27285,
+      "assetManagerNet": -28752,
+      "dealerNet": 39546
+    },
+    {
+      "weekEnding": "2019-09-17",
+      "levNet": -13019,
+      "levLong": 15789,
+      "levShort": 28808,
+      "assetManagerNet": -27419,
+      "dealerNet": 45186
+    },
+    {
+      "weekEnding": "2019-09-24",
+      "levNet": -12053,
+      "levLong": 19057,
+      "levShort": 31110,
+      "assetManagerNet": -31739,
+      "dealerNet": 47379
+    },
+    {
+      "weekEnding": "2019-10-01",
+      "levNet": -13496,
+      "levLong": 17987,
+      "levShort": 31483,
+      "assetManagerNet": -30292,
+      "dealerNet": 48050
+    },
+    {
+      "weekEnding": "2019-10-08",
+      "levNet": -14991,
+      "levLong": 16036,
+      "levShort": 31027,
+      "assetManagerNet": -28416,
+      "dealerNet": 48347
+    },
+    {
+      "weekEnding": "2019-10-15",
+      "levNet": -14520,
+      "levLong": 16398,
+      "levShort": 30918,
+      "assetManagerNet": -30220,
+      "dealerNet": 49526
+    },
+    {
+      "weekEnding": "2019-10-22",
+      "levNet": -16674,
+      "levLong": 14340,
+      "levShort": 31014,
+      "assetManagerNet": -28413,
+      "dealerNet": 50681
+    },
+    {
+      "weekEnding": "2019-10-29",
+      "levNet": -16258,
+      "levLong": 13789,
+      "levShort": 30047,
+      "assetManagerNet": -28871,
+      "dealerNet": 49992
+    },
+    {
+      "weekEnding": "2019-11-05",
+      "levNet": -17530,
+      "levLong": 13398,
+      "levShort": 30928,
+      "assetManagerNet": -28382,
+      "dealerNet": 48573
+    },
+    {
+      "weekEnding": "2019-11-12",
+      "levNet": -15150,
+      "levLong": 16430,
+      "levShort": 31580,
+      "assetManagerNet": -32452,
+      "dealerNet": 50009
+    },
+    {
+      "weekEnding": "2019-11-19",
+      "levNet": -16691,
+      "levLong": 12579,
+      "levShort": 29270,
+      "assetManagerNet": -28307,
+      "dealerNet": 47810
+    },
+    {
+      "weekEnding": "2019-11-26",
+      "levNet": -18312,
+      "levLong": 10894,
+      "levShort": 29206,
+      "assetManagerNet": -26029,
+      "dealerNet": 47962
+    },
+    {
+      "weekEnding": "2019-12-03",
+      "levNet": -19198,
+      "levLong": 12809,
+      "levShort": 32007,
+      "assetManagerNet": -16273,
+      "dealerNet": 39250
+    },
+    {
+      "weekEnding": "2019-12-10",
+      "levNet": -21189,
+      "levLong": 11085,
+      "levShort": 32274,
+      "assetManagerNet": -11605,
+      "dealerNet": 36729
+    },
+    {
+      "weekEnding": "2019-12-17",
+      "levNet": -4548,
+      "levLong": 11641,
+      "levShort": 16189,
+      "assetManagerNet": -8986,
+      "dealerNet": 17132
+    },
+    {
+      "weekEnding": "2019-12-24",
+      "levNet": -4883,
+      "levLong": 15414,
+      "levShort": 20297,
+      "assetManagerNet": -6599,
+      "dealerNet": 15395
+    },
+    {
+      "weekEnding": "2019-12-31",
+      "levNet": -9111,
+      "levLong": 16111,
+      "levShort": 25222,
+      "assetManagerNet": -2689,
+      "dealerNet": 9076
+    },
+    {
+      "weekEnding": "2020-01-07",
+      "levNet": -8149,
+      "levLong": 16674,
+      "levShort": 24823,
+      "assetManagerNet": 2145,
+      "dealerNet": 4154
+    },
+    {
+      "weekEnding": "2020-01-14",
+      "levNet": -6495,
+      "levLong": 14390,
+      "levShort": 20885,
+      "assetManagerNet": 1410,
+      "dealerNet": 3229
+    },
+    {
+      "weekEnding": "2020-01-21",
+      "levNet": -3366,
+      "levLong": 15304,
+      "levShort": 18670,
+      "assetManagerNet": 1121,
+      "dealerNet": 1186
+    },
+    {
+      "weekEnding": "2020-01-28",
+      "levNet": -3602,
+      "levLong": 14142,
+      "levShort": 17744,
+      "assetManagerNet": 1159,
+      "dealerNet": 1033
+    },
+    {
+      "weekEnding": "2020-02-04",
+      "levNet": -1940,
+      "levLong": 16013,
+      "levShort": 17953,
+      "assetManagerNet": -4198,
+      "dealerNet": 5935
+    },
+    {
+      "weekEnding": "2020-02-11",
+      "levNet": -1726,
+      "levLong": 17409,
+      "levShort": 19135,
+      "assetManagerNet": -8082,
+      "dealerNet": 9786
+    },
+    {
+      "weekEnding": "2020-02-18",
+      "levNet": -3841,
+      "levLong": 16640,
+      "levShort": 20481,
+      "assetManagerNet": -13680,
+      "dealerNet": 19776
+    },
+    {
+      "weekEnding": "2020-02-25",
+      "levNet": -4740,
+      "levLong": 18545,
+      "levShort": 23285,
+      "assetManagerNet": -17331,
+      "dealerNet": 25360
+    },
+    {
+      "weekEnding": "2020-03-03",
+      "levNet": -5900,
+      "levLong": 20070,
+      "levShort": 25970,
+      "assetManagerNet": -19144,
+      "dealerNet": 28819
+    },
+    {
+      "weekEnding": "2020-03-10",
+      "levNet": -1851,
+      "levLong": 19632,
+      "levShort": 21483,
+      "assetManagerNet": -22492,
+      "dealerNet": 27060
+    },
+    {
+      "weekEnding": "2020-03-17",
+      "levNet": -1365,
+      "levLong": 17460,
+      "levShort": 18825,
+      "assetManagerNet": -17721,
+      "dealerNet": 19352
+    },
+    {
+      "weekEnding": "2020-03-24",
+      "levNet": -1183,
+      "levLong": 13341,
+      "levShort": 14524,
+      "assetManagerNet": -8879,
+      "dealerNet": 15138
+    },
+    {
+      "weekEnding": "2020-03-31",
+      "levNet": -1884,
+      "levLong": 14400,
+      "levShort": 16284,
+      "assetManagerNet": -7939,
+      "dealerNet": 14789
+    },
+    {
+      "weekEnding": "2020-04-07",
+      "levNet": -72,
+      "levLong": 16272,
+      "levShort": 16344,
+      "assetManagerNet": -8833,
+      "dealerNet": 13610
+    },
+    {
+      "weekEnding": "2020-04-14",
+      "levNet": -890,
+      "levLong": 14303,
+      "levShort": 15193,
+      "assetManagerNet": -9181,
+      "dealerNet": 14608
+    },
+    {
+      "weekEnding": "2020-04-21",
+      "levNet": -1483,
+      "levLong": 13574,
+      "levShort": 15057,
+      "assetManagerNet": -8996,
+      "dealerNet": 15271
+    },
+    {
+      "weekEnding": "2020-04-28",
+      "levNet": -2249,
+      "levLong": 14307,
+      "levShort": 16556,
+      "assetManagerNet": -9308,
+      "dealerNet": 14968
+    },
+    {
+      "weekEnding": "2020-05-05",
+      "levNet": -3242,
+      "levLong": 16268,
+      "levShort": 19510,
+      "assetManagerNet": -10340,
+      "dealerNet": 17200
+    },
+    {
+      "weekEnding": "2020-05-12",
+      "levNet": -4659,
+      "levLong": 16268,
+      "levShort": 20927,
+      "assetManagerNet": -9888,
+      "dealerNet": 17814
+    },
+    {
+      "weekEnding": "2020-05-19",
+      "levNet": -3823,
+      "levLong": 14877,
+      "levShort": 18700,
+      "assetManagerNet": -10682,
+      "dealerNet": 17635
+    },
+    {
+      "weekEnding": "2020-05-26",
+      "levNet": -5383,
+      "levLong": 15077,
+      "levShort": 20460,
+      "assetManagerNet": -8500,
+      "dealerNet": 15427
+    },
+    {
+      "weekEnding": "2020-06-02",
+      "levNet": -4784,
+      "levLong": 16043,
+      "levShort": 20827,
+      "assetManagerNet": -7193,
+      "dealerNet": 12538
+    },
+    {
+      "weekEnding": "2020-06-09",
+      "levNet": -8205,
+      "levLong": 14855,
+      "levShort": 23060,
+      "assetManagerNet": -842,
+      "dealerNet": 8002
+    },
+    {
+      "weekEnding": "2020-06-16",
+      "levNet": -966,
+      "levLong": 11834,
+      "levShort": 12800,
+      "assetManagerNet": 86,
+      "dealerNet": 2444
+    },
+    {
+      "weekEnding": "2020-06-23",
+      "levNet": -2599,
+      "levLong": 11027,
+      "levShort": 13626,
+      "assetManagerNet": 1316,
+      "dealerNet": 2104
+    },
+    {
+      "weekEnding": "2020-06-30",
+      "levNet": -3681,
+      "levLong": 11107,
+      "levShort": 14788,
+      "assetManagerNet": 2657,
+      "dealerNet": 1276
+    },
+    {
+      "weekEnding": "2020-07-07",
+      "levNet": -3233,
+      "levLong": 10437,
+      "levShort": 13670,
+      "assetManagerNet": 1891,
+      "dealerNet": 2717
+    },
+    {
+      "weekEnding": "2020-07-14",
+      "levNet": -3176,
+      "levLong": 11450,
+      "levShort": 14626,
+      "assetManagerNet": 2704,
+      "dealerNet": 876
+    },
+    {
+      "weekEnding": "2020-07-21",
+      "levNet": -787,
+      "levLong": 14020,
+      "levShort": 14807,
+      "assetManagerNet": 992,
+      "dealerNet": -78
+    },
+    {
+      "weekEnding": "2020-07-28",
+      "levNet": -6492,
+      "levLong": 10660,
+      "levShort": 17152,
+      "assetManagerNet": 3878,
+      "dealerNet": 2356
+    },
+    {
+      "weekEnding": "2020-08-04",
+      "levNet": -6399,
+      "levLong": 11840,
+      "levShort": 18239,
+      "assetManagerNet": 3979,
+      "dealerNet": 1806
+    },
+    {
+      "weekEnding": "2020-08-11",
+      "levNet": -7872,
+      "levLong": 10403,
+      "levShort": 18275,
+      "assetManagerNet": 6204,
+      "dealerNet": 1400
+    },
+    {
+      "weekEnding": "2020-08-18",
+      "levNet": -3319,
+      "levLong": 13653,
+      "levShort": 16972,
+      "assetManagerNet": 6118,
+      "dealerNet": -3041
+    },
+    {
+      "weekEnding": "2020-08-25",
+      "levNet": -3292,
+      "levLong": 13355,
+      "levShort": 16647,
+      "assetManagerNet": 6460,
+      "dealerNet": -2852
+    },
+    {
+      "weekEnding": "2020-09-01",
+      "levNet": -1558,
+      "levLong": 14450,
+      "levShort": 16008,
+      "assetManagerNet": 3321,
+      "dealerNet": -2767
+    },
+    {
+      "weekEnding": "2020-09-08",
+      "levNet": -1455,
+      "levLong": 13635,
+      "levShort": 15090,
+      "assetManagerNet": 1768,
+      "dealerNet": -1042
+    },
+    {
+      "weekEnding": "2020-09-15",
+      "levNet": -1998,
+      "levLong": 12147,
+      "levShort": 14145,
+      "assetManagerNet": 1635,
+      "dealerNet": -581
+    },
+    {
+      "weekEnding": "2020-09-22",
+      "levNet": -4158,
+      "levLong": 9879,
+      "levShort": 14037,
+      "assetManagerNet": 4903,
+      "dealerNet": -2598
+    },
+    {
+      "weekEnding": "2020-09-29",
+      "levNet": -1356,
+      "levLong": 12152,
+      "levShort": 13508,
+      "assetManagerNet": 2064,
+      "dealerNet": -1785
+    },
+    {
+      "weekEnding": "2020-10-06",
+      "levNet": -1866,
+      "levLong": 12028,
+      "levShort": 13894,
+      "assetManagerNet": 4264,
+      "dealerNet": -3326
+    },
+    {
+      "weekEnding": "2020-10-13",
+      "levNet": 324,
+      "levLong": 15447,
+      "levShort": 15123,
+      "assetManagerNet": 4492,
+      "dealerNet": -5576
+    },
+    {
+      "weekEnding": "2020-10-20",
+      "levNet": -794,
+      "levLong": 13475,
+      "levShort": 14269,
+      "assetManagerNet": 4245,
+      "dealerNet": -4432
+    },
+    {
+      "weekEnding": "2020-10-27",
+      "levNet": -1795,
+      "levLong": 15529,
+      "levShort": 17324,
+      "assetManagerNet": 6765,
+      "dealerNet": -5945
+    },
+    {
+      "weekEnding": "2020-11-03",
+      "levNet": -856,
+      "levLong": 15014,
+      "levShort": 15870,
+      "assetManagerNet": 6102,
+      "dealerNet": -6188
+    },
+    {
+      "weekEnding": "2020-11-10",
+      "levNet": -3507,
+      "levLong": 16618,
+      "levShort": 20125,
+      "assetManagerNet": 9840,
+      "dealerNet": -8575
+    },
+    {
+      "weekEnding": "2020-11-17",
+      "levNet": -4183,
+      "levLong": 17910,
+      "levShort": 22093,
+      "assetManagerNet": 10477,
+      "dealerNet": -10186
+    },
+    {
+      "weekEnding": "2020-11-24",
+      "levNet": -3478,
+      "levLong": 21677,
+      "levShort": 25155,
+      "assetManagerNet": 10872,
+      "dealerNet": -11692
+    },
+    {
+      "weekEnding": "2020-12-01",
+      "levNet": -4162,
+      "levLong": 21756,
+      "levShort": 25918,
+      "assetManagerNet": 12537,
+      "dealerNet": -12860
+    },
+    {
+      "weekEnding": "2020-12-08",
+      "levNet": -4817,
+      "levLong": 22042,
+      "levShort": 26859,
+      "assetManagerNet": 13679,
+      "dealerNet": -13713
+    },
+    {
+      "weekEnding": "2020-12-15",
+      "levNet": -2037,
+      "levLong": 15368,
+      "levShort": 17405,
+      "assetManagerNet": 13432,
+      "dealerNet": -16925
+    },
+    {
+      "weekEnding": "2020-12-21",
+      "levNet": -1748,
+      "levLong": 16815,
+      "levShort": 18563,
+      "assetManagerNet": 12708,
+      "dealerNet": -15682
+    },
+    {
+      "weekEnding": "2020-12-29",
+      "levNet": -994,
+      "levLong": 17162,
+      "levShort": 18156,
+      "assetManagerNet": 11540,
+      "dealerNet": -14413
+    },
+    {
+      "weekEnding": "2021-01-05",
+      "levNet": -1987,
+      "levLong": 16118,
+      "levShort": 18105,
+      "assetManagerNet": 11906,
+      "dealerNet": -14935
+    },
+    {
+      "weekEnding": "2021-01-12",
+      "levNet": 2364,
+      "levLong": 17492,
+      "levShort": 15128,
+      "assetManagerNet": 10646,
+      "dealerNet": -15842
+    },
+    {
+      "weekEnding": "2021-01-19",
+      "levNet": 4816,
+      "levLong": 20362,
+      "levShort": 15546,
+      "assetManagerNet": 7655,
+      "dealerNet": -15187
+    },
+    {
+      "weekEnding": "2021-01-26",
+      "levNet": 6114,
+      "levLong": 22094,
+      "levShort": 15980,
+      "assetManagerNet": 5956,
+      "dealerNet": -14745
+    },
+    {
+      "weekEnding": "2021-02-02",
+      "levNet": 5191,
+      "levLong": 24559,
+      "levShort": 19368,
+      "assetManagerNet": 3237,
+      "dealerNet": -10628
+    },
+    {
+      "weekEnding": "2021-02-09",
+      "levNet": 3945,
+      "levLong": 22016,
+      "levShort": 18071,
+      "assetManagerNet": 4952,
+      "dealerNet": -12926
+    },
+    {
+      "weekEnding": "2021-02-16",
+      "levNet": 4997,
+      "levLong": 23404,
+      "levShort": 18407,
+      "assetManagerNet": 6413,
+      "dealerNet": -14360
+    },
+    {
+      "weekEnding": "2021-02-23",
+      "levNet": 4144,
+      "levLong": 23091,
+      "levShort": 18947,
+      "assetManagerNet": 9466,
+      "dealerNet": -16533
+    },
+    {
+      "weekEnding": "2021-03-02",
+      "levNet": 7070,
+      "levLong": 24429,
+      "levShort": 17359,
+      "assetManagerNet": 7739,
+      "dealerNet": -16429
+    },
+    {
+      "weekEnding": "2021-03-09",
+      "levNet": 7878,
+      "levLong": 25333,
+      "levShort": 17455,
+      "assetManagerNet": 7031,
+      "dealerNet": -15782
+    },
+    {
+      "weekEnding": "2021-03-16",
+      "levNet": -1337,
+      "levLong": 13776,
+      "levShort": 15113,
+      "assetManagerNet": 5042,
+      "dealerNet": -4317
+    },
+    {
+      "weekEnding": "2021-03-23",
+      "levNet": -1503,
+      "levLong": 15701,
+      "levShort": 17204,
+      "assetManagerNet": 3390,
+      "dealerNet": -2593
+    },
+    {
+      "weekEnding": "2021-03-30",
+      "levNet": 1013,
+      "levLong": 16005,
+      "levShort": 14992,
+      "assetManagerNet": 1100,
+      "dealerNet": -2224
+    },
+    {
+      "weekEnding": "2021-04-06",
+      "levNet": 2719,
+      "levLong": 17263,
+      "levShort": 14544,
+      "assetManagerNet": 233,
+      "dealerNet": -2585
+    },
+    {
+      "weekEnding": "2021-04-13",
+      "levNet": 3047,
+      "levLong": 17882,
+      "levShort": 14835,
+      "assetManagerNet": -198,
+      "dealerNet": -2927
+    },
+    {
+      "weekEnding": "2021-04-20",
+      "levNet": 4076,
+      "levLong": 19858,
+      "levShort": 15782,
+      "assetManagerNet": 1883,
+      "dealerNet": -5997
+    },
+    {
+      "weekEnding": "2021-04-27",
+      "levNet": 5219,
+      "levLong": 21636,
+      "levShort": 16417,
+      "assetManagerNet": 3753,
+      "dealerNet": -10044
+    },
+    {
+      "weekEnding": "2021-05-04",
+      "levNet": 4197,
+      "levLong": 20787,
+      "levShort": 16590,
+      "assetManagerNet": 6284,
+      "dealerNet": -11800
+    },
+    {
+      "weekEnding": "2021-05-11",
+      "levNet": 4119,
+      "levLong": 20451,
+      "levShort": 16332,
+      "assetManagerNet": 7378,
+      "dealerNet": -13811
+    },
+    {
+      "weekEnding": "2021-05-18",
+      "levNet": 5211,
+      "levLong": 19405,
+      "levShort": 14194,
+      "assetManagerNet": 6549,
+      "dealerNet": -13820
+    },
+    {
+      "weekEnding": "2021-05-25",
+      "levNet": 6796,
+      "levLong": 20556,
+      "levShort": 13760,
+      "assetManagerNet": 4672,
+      "dealerNet": -13581
+    },
+    {
+      "weekEnding": "2021-06-01",
+      "levNet": 5137,
+      "levLong": 20683,
+      "levShort": 15546,
+      "assetManagerNet": 5719,
+      "dealerNet": -13401
+    },
+    {
+      "weekEnding": "2021-06-08",
+      "levNet": 4314,
+      "levLong": 18569,
+      "levShort": 14255,
+      "assetManagerNet": 5951,
+      "dealerNet": -12836
+    },
+    {
+      "weekEnding": "2021-06-15",
+      "levNet": 1908,
+      "levLong": 15489,
+      "levShort": 13581,
+      "assetManagerNet": 7705,
+      "dealerNet": -10857
+    },
+    {
+      "weekEnding": "2021-06-22",
+      "levNet": 7631,
+      "levLong": 20157,
+      "levShort": 12526,
+      "assetManagerNet": -711,
+      "dealerNet": -6563
+    },
+    {
+      "weekEnding": "2021-06-29",
+      "levNet": 8318,
+      "levLong": 20951,
+      "levShort": 12633,
+      "assetManagerNet": -2148,
+      "dealerNet": -6541
+    },
+    {
+      "weekEnding": "2021-07-06",
+      "levNet": 9361,
+      "levLong": 20973,
+      "levShort": 11612,
+      "assetManagerNet": -3672,
+      "dealerNet": -6393
+    },
+    {
+      "weekEnding": "2021-07-13",
+      "levNet": 10278,
+      "levLong": 21816,
+      "levShort": 11538,
+      "assetManagerNet": -6214,
+      "dealerNet": -3345
+    },
+    {
+      "weekEnding": "2021-07-20",
+      "levNet": 11653,
+      "levLong": 22587,
+      "levShort": 10934,
+      "assetManagerNet": -8406,
+      "dealerNet": -2454
+    },
+    {
+      "weekEnding": "2021-07-27",
+      "levNet": 9518,
+      "levLong": 21204,
+      "levShort": 11686,
+      "assetManagerNet": -6334,
+      "dealerNet": -3047
+    },
+    {
+      "weekEnding": "2021-08-03",
+      "levNet": 6625,
+      "levLong": 19225,
+      "levShort": 12600,
+      "assetManagerNet": -4646,
+      "dealerNet": -2175
+    },
+    {
+      "weekEnding": "2021-08-10",
+      "levNet": 7054,
+      "levLong": 19598,
+      "levShort": 12544,
+      "assetManagerNet": -3498,
+      "dealerNet": -2713
+    },
+    {
+      "weekEnding": "2021-08-17",
+      "levNet": 5362,
+      "levLong": 17899,
+      "levShort": 12537,
+      "assetManagerNet": -2510,
+      "dealerNet": -2855
+    },
+    {
+      "weekEnding": "2021-08-24",
+      "levNet": 7183,
+      "levLong": 18474,
+      "levShort": 11291,
+      "assetManagerNet": -6605,
+      "dealerNet": 1225
+    },
+    {
+      "weekEnding": "2021-08-31",
+      "levNet": 4977,
+      "levLong": 19399,
+      "levShort": 14422,
+      "assetManagerNet": -4242,
+      "dealerNet": -835
+    },
+    {
+      "weekEnding": "2021-09-07",
+      "levNet": 8458,
+      "levLong": 20005,
+      "levShort": 11547,
+      "assetManagerNet": -580,
+      "dealerNet": -9420
+    },
+    {
+      "weekEnding": "2021-09-14",
+      "levNet": 10448,
+      "levLong": 16381,
+      "levShort": 5933,
+      "assetManagerNet": -1716,
+      "dealerNet": -11402
+    },
+    {
+      "weekEnding": "2021-09-21",
+      "levNet": 11265,
+      "levLong": 18361,
+      "levShort": 7096,
+      "assetManagerNet": -1975,
+      "dealerNet": -10373
+    },
+    {
+      "weekEnding": "2021-09-28",
+      "levNet": 10702,
+      "levLong": 16530,
+      "levShort": 5828,
+      "assetManagerNet": -529,
+      "dealerNet": -9648
+    },
+    {
+      "weekEnding": "2021-10-05",
+      "levNet": 10592,
+      "levLong": 17364,
+      "levShort": 6772,
+      "assetManagerNet": -3361,
+      "dealerNet": -6145
+    },
+    {
+      "weekEnding": "2021-10-12",
+      "levNet": 9594,
+      "levLong": 19474,
+      "levShort": 9880,
+      "assetManagerNet": -3833,
+      "dealerNet": -4353
+    },
+    {
+      "weekEnding": "2021-10-19",
+      "levNet": 5976,
+      "levLong": 19972,
+      "levShort": 13996,
+      "assetManagerNet": -236,
+      "dealerNet": -6339
+    },
+    {
+      "weekEnding": "2021-10-26",
+      "levNet": 5334,
+      "levLong": 20937,
+      "levShort": 15603,
+      "assetManagerNet": 6599,
+      "dealerNet": -14423
+    },
+    {
+      "weekEnding": "2021-11-02",
+      "levNet": 11026,
+      "levLong": 23865,
+      "levShort": 12839,
+      "assetManagerNet": 4029,
+      "dealerNet": -18114
+    },
+    {
+      "weekEnding": "2021-11-09",
+      "levNet": 12464,
+      "levLong": 22258,
+      "levShort": 9794,
+      "assetManagerNet": 2762,
+      "dealerNet": -17411
+    },
+    {
+      "weekEnding": "2021-11-16",
+      "levNet": 13658,
+      "levLong": 24394,
+      "levShort": 10736,
+      "assetManagerNet": 1055,
+      "dealerNet": -15811
+    },
+    {
+      "weekEnding": "2021-11-23",
+      "levNet": 14503,
+      "levLong": 25565,
+      "levShort": 11062,
+      "assetManagerNet": -2157,
+      "dealerNet": -12549
+    },
+    {
+      "weekEnding": "2021-11-30",
+      "levNet": 15362,
+      "levLong": 30110,
+      "levShort": 14748,
+      "assetManagerNet": -9450,
+      "dealerNet": -3946
+    },
+    {
+      "weekEnding": "2021-12-07",
+      "levNet": 19729,
+      "levLong": 33132,
+      "levShort": 13403,
+      "assetManagerNet": -16296,
+      "dealerNet": -583
+    },
+    {
+      "weekEnding": "2021-12-14",
+      "levNet": 2033,
+      "levLong": 13894,
+      "levShort": 11861,
+      "assetManagerNet": -17269,
+      "dealerNet": 18584
+    },
+    {
+      "weekEnding": "2021-12-21",
+      "levNet": 1036,
+      "levLong": 11408,
+      "levShort": 10372,
+      "assetManagerNet": -17324,
+      "dealerNet": 20110
+    },
+    {
+      "weekEnding": "2021-12-28",
+      "levNet": -353,
+      "levLong": 11833,
+      "levShort": 12186,
+      "assetManagerNet": -16098,
+      "dealerNet": 19356
+    },
+    {
+      "weekEnding": "2022-01-04",
+      "levNet": -1227,
+      "levLong": 9988,
+      "levShort": 11215,
+      "assetManagerNet": -15588,
+      "dealerNet": 19548
+    },
+    {
+      "weekEnding": "2022-01-11",
+      "levNet": -1246,
+      "levLong": 11940,
+      "levShort": 13186,
+      "assetManagerNet": -14866,
+      "dealerNet": 19575
+    },
+    {
+      "weekEnding": "2022-01-18",
+      "levNet": -4768,
+      "levLong": 12351,
+      "levShort": 17119,
+      "assetManagerNet": -13286,
+      "dealerNet": 21602
+    },
+    {
+      "weekEnding": "2022-01-25",
+      "levNet": 633,
+      "levLong": 18408,
+      "levShort": 17775,
+      "assetManagerNet": -21993,
+      "dealerNet": 25648
+    },
+    {
+      "weekEnding": "2022-02-01",
+      "levNet": 904,
+      "levLong": 21189,
+      "levShort": 20285,
+      "assetManagerNet": -24142,
+      "dealerNet": 27635
+    },
+    {
+      "weekEnding": "2022-02-08",
+      "levNet": 1974,
+      "levLong": 19295,
+      "levShort": 17321,
+      "assetManagerNet": -24045,
+      "dealerNet": 26513
+    },
+    {
+      "weekEnding": "2022-02-15",
+      "levNet": 1760,
+      "levLong": 26938,
+      "levShort": 25178,
+      "assetManagerNet": -26830,
+      "dealerNet": 29796
+    },
+    {
+      "weekEnding": "2022-02-22",
+      "levNet": 125,
+      "levLong": 19827,
+      "levShort": 19702,
+      "assetManagerNet": -26091,
+      "dealerNet": 30286
+    },
+    {
+      "weekEnding": "2022-03-01",
+      "levNet": -5487,
+      "levLong": 12495,
+      "levShort": 17982,
+      "assetManagerNet": -22452,
+      "dealerNet": 31183
+    },
+    {
+      "weekEnding": "2022-03-08",
+      "levNet": -8435,
+      "levLong": 15611,
+      "levShort": 24046,
+      "assetManagerNet": -15115,
+      "dealerNet": 25499
+    },
+    {
+      "weekEnding": "2022-03-15",
+      "levNet": 7556,
+      "levLong": 20879,
+      "levShort": 13323,
+      "assetManagerNet": -12705,
+      "dealerNet": 7708
+    },
+    {
+      "weekEnding": "2022-03-22",
+      "levNet": 3665,
+      "levLong": 16729,
+      "levShort": 13064,
+      "assetManagerNet": -10078,
+      "dealerNet": 7881
+    },
+    {
+      "weekEnding": "2022-03-29",
+      "levNet": -2513,
+      "levLong": 13490,
+      "levShort": 16003,
+      "assetManagerNet": -6445,
+      "dealerNet": 8779
+    },
+    {
+      "weekEnding": "2022-04-05",
+      "levNet": -4648,
+      "levLong": 13027,
+      "levShort": 17675,
+      "assetManagerNet": -5896,
+      "dealerNet": 9417
+    },
+    {
+      "weekEnding": "2022-04-12",
+      "levNet": -5505,
+      "levLong": 13803,
+      "levShort": 19308,
+      "assetManagerNet": -7447,
+      "dealerNet": 12551
+    },
+    {
+      "weekEnding": "2022-04-19",
+      "levNet": -1137,
+      "levLong": 16901,
+      "levShort": 18038,
+      "assetManagerNet": -9621,
+      "dealerNet": 11946
+    },
+    {
+      "weekEnding": "2022-04-26",
+      "levNet": 5346,
+      "levLong": 21590,
+      "levShort": 16244,
+      "assetManagerNet": -15694,
+      "dealerNet": 13108
+    },
+    {
+      "weekEnding": "2022-05-03",
+      "levNet": -1861,
+      "levLong": 16891,
+      "levShort": 18752,
+      "assetManagerNet": -16789,
+      "dealerNet": 22244
+    },
+    {
+      "weekEnding": "2022-05-10",
+      "levNet": -3093,
+      "levLong": 17606,
+      "levShort": 20699,
+      "assetManagerNet": -20378,
+      "dealerNet": 28407
+    },
+    {
+      "weekEnding": "2022-05-17",
+      "levNet": -5444,
+      "levLong": 16854,
+      "levShort": 22298,
+      "assetManagerNet": -21377,
+      "dealerNet": 32001
+    },
+    {
+      "weekEnding": "2022-05-24",
+      "levNet": -5406,
+      "levLong": 12424,
+      "levShort": 17830,
+      "assetManagerNet": -21689,
+      "dealerNet": 31509
+    },
+    {
+      "weekEnding": "2022-05-31",
+      "levNet": -9321,
+      "levLong": 10634,
+      "levShort": 19955,
+      "assetManagerNet": -19132,
+      "dealerNet": 31656
+    },
+    {
+      "weekEnding": "2022-06-07",
+      "levNet": -9392,
+      "levLong": 13428,
+      "levShort": 22820,
+      "assetManagerNet": -19733,
+      "dealerNet": 32401
+    },
+    {
+      "weekEnding": "2022-06-14",
+      "levNet": 5243,
+      "levLong": 17062,
+      "levShort": 11819,
+      "assetManagerNet": -19533,
+      "dealerNet": 17604
+    },
+    {
+      "weekEnding": "2022-06-21",
+      "levNet": 4009,
+      "levLong": 16881,
+      "levShort": 12872,
+      "assetManagerNet": -17756,
+      "dealerNet": 17164
+    },
+    {
+      "weekEnding": "2022-06-28",
+      "levNet": 3285,
+      "levLong": 14516,
+      "levShort": 11231,
+      "assetManagerNet": -17475,
+      "dealerNet": 17596
+    },
+    {
+      "weekEnding": "2022-07-05",
+      "levNet": 1740,
+      "levLong": 16335,
+      "levShort": 14595,
+      "assetManagerNet": -18334,
+      "dealerNet": 20609
+    },
+    {
+      "weekEnding": "2022-07-12",
+      "levNet": 2877,
+      "levLong": 17019,
+      "levShort": 14142,
+      "assetManagerNet": -17692,
+      "dealerNet": 19105
+    },
+    {
+      "weekEnding": "2022-07-19",
+      "levNet": 3888,
+      "levLong": 17829,
+      "levShort": 13941,
+      "assetManagerNet": -17710,
+      "dealerNet": 18252
+    },
+    {
+      "weekEnding": "2022-07-26",
+      "levNet": 1940,
+      "levLong": 19446,
+      "levShort": 17506,
+      "assetManagerNet": -16342,
+      "dealerNet": 18490
+    },
+    {
+      "weekEnding": "2022-08-02",
+      "levNet": 2480,
+      "levLong": 16934,
+      "levShort": 14454,
+      "assetManagerNet": -16726,
+      "dealerNet": 18056
+    },
+    {
+      "weekEnding": "2022-08-09",
+      "levNet": 2111,
+      "levLong": 17866,
+      "levShort": 15755,
+      "assetManagerNet": -14754,
+      "dealerNet": 17191
+    },
+    {
+      "weekEnding": "2022-08-16",
+      "levNet": 2791,
+      "levLong": 16210,
+      "levShort": 13419,
+      "assetManagerNet": -10544,
+      "dealerNet": 9937
+    },
+    {
+      "weekEnding": "2022-08-23",
+      "levNet": -750,
+      "levLong": 14377,
+      "levShort": 15127,
+      "assetManagerNet": -11534,
+      "dealerNet": 16273
+    },
+    {
+      "weekEnding": "2022-08-30",
+      "levNet": -1611,
+      "levLong": 13734,
+      "levShort": 15345,
+      "assetManagerNet": -12914,
+      "dealerNet": 18080
+    },
+    {
+      "weekEnding": "2022-09-06",
+      "levNet": -1226,
+      "levLong": 14219,
+      "levShort": 15445,
+      "assetManagerNet": -14838,
+      "dealerNet": 20384
+    },
+    {
+      "weekEnding": "2022-09-13",
+      "levNet": -1526,
+      "levLong": 16540,
+      "levShort": 18066,
+      "assetManagerNet": -16615,
+      "dealerNet": 22335
+    },
+    {
+      "weekEnding": "2022-09-20",
+      "levNet": -7353,
+      "levLong": 13331,
+      "levShort": 20684,
+      "assetManagerNet": -17168,
+      "dealerNet": 29134
+    },
+    {
+      "weekEnding": "2022-09-27",
+      "levNet": -5599,
+      "levLong": 13515,
+      "levShort": 19114,
+      "assetManagerNet": -17313,
+      "dealerNet": 26879
+    },
+    {
+      "weekEnding": "2022-10-04",
+      "levNet": -7771,
+      "levLong": 13373,
+      "levShort": 21144,
+      "assetManagerNet": -12426,
+      "dealerNet": 23782
+    },
+    {
+      "weekEnding": "2022-10-11",
+      "levNet": -10411,
+      "levLong": 10204,
+      "levShort": 20615,
+      "assetManagerNet": -15764,
+      "dealerNet": 30073
+    },
+    {
+      "weekEnding": "2022-10-18",
+      "levNet": -8219,
+      "levLong": 9688,
+      "levShort": 17907,
+      "assetManagerNet": -19535,
+      "dealerNet": 31813
+    },
+    {
+      "weekEnding": "2022-10-25",
+      "levNet": -2066,
+      "levLong": 14771,
+      "levShort": 16837,
+      "assetManagerNet": -19041,
+      "dealerNet": 24979
+    },
+    {
+      "weekEnding": "2022-11-01",
+      "levNet": 4331,
+      "levLong": 19970,
+      "levShort": 15639,
+      "assetManagerNet": -18961,
+      "dealerNet": 17788
+    },
+    {
+      "weekEnding": "2022-11-08",
+      "levNet": 2481,
+      "levLong": 17232,
+      "levShort": 14751,
+      "assetManagerNet": -19104,
+      "dealerNet": 19379
+    },
+    {
+      "weekEnding": "2022-11-15",
+      "levNet": -2147,
+      "levLong": 14176,
+      "levShort": 16323,
+      "assetManagerNet": -15562,
+      "dealerNet": 19463
+    },
+    {
+      "weekEnding": "2022-11-22",
+      "levNet": -3358,
+      "levLong": 13684,
+      "levShort": 17042,
+      "assetManagerNet": -11585,
+      "dealerNet": 16363
+    },
+    {
+      "weekEnding": "2022-11-29",
+      "levNet": -7059,
+      "levLong": 14406,
+      "levShort": 21465,
+      "assetManagerNet": -7199,
+      "dealerNet": 14089
+    },
+    {
+      "weekEnding": "2022-12-06",
+      "levNet": -8994,
+      "levLong": 12083,
+      "levShort": 21077,
+      "assetManagerNet": -4182,
+      "dealerNet": 13583
+    },
+    {
+      "weekEnding": "2022-12-13",
+      "levNet": -11270,
+      "levLong": 13889,
+      "levShort": 25159,
+      "assetManagerNet": -411,
+      "dealerNet": 11089
+    },
+    {
+      "weekEnding": "2022-12-20",
+      "levNet": -5050,
+      "levLong": 6057,
+      "levShort": 11107,
+      "assetManagerNet": 4759,
+      "dealerNet": -524
+    },
+    {
+      "weekEnding": "2022-12-27",
+      "levNet": -3765,
+      "levLong": 9013,
+      "levShort": 12778,
+      "assetManagerNet": 1892,
+      "dealerNet": 935
+    },
+    {
+      "weekEnding": "2023-01-03",
+      "levNet": -621,
+      "levLong": 8201,
+      "levShort": 8822,
+      "assetManagerNet": -2023,
+      "dealerNet": 2081
+    },
+    {
+      "weekEnding": "2023-01-10",
+      "levNet": 3564,
+      "levLong": 10219,
+      "levShort": 6655,
+      "assetManagerNet": -3982,
+      "dealerNet": -350
+    },
+    {
+      "weekEnding": "2023-01-17",
+      "levNet": -206,
+      "levLong": 9684,
+      "levShort": 9890,
+      "assetManagerNet": -4613,
+      "dealerNet": 4387
+    },
+    {
+      "weekEnding": "2023-01-24",
+      "levNet": -2829,
+      "levLong": 8686,
+      "levShort": 11515,
+      "assetManagerNet": -946,
+      "dealerNet": 1895
+    },
+    {
+      "weekEnding": "2023-01-31",
+      "levNet": 1206,
+      "levLong": 13074,
+      "levShort": 11868,
+      "assetManagerNet": -203,
+      "dealerNet": -1565
+    },
+    {
+      "weekEnding": "2023-02-07",
+      "levNet": 3418,
+      "levLong": 12663,
+      "levShort": 9245,
+      "assetManagerNet": -1997,
+      "dealerNet": 61
+    },
+    {
+      "weekEnding": "2023-02-14",
+      "levNet": 2262,
+      "levLong": 11353,
+      "levShort": 9091,
+      "assetManagerNet": -366,
+      "dealerNet": -2898
+    },
+    {
+      "weekEnding": "2023-02-21",
+      "levNet": 2075,
+      "levLong": 11651,
+      "levShort": 9576,
+      "assetManagerNet": -1296,
+      "dealerNet": -1289
+    },
+    {
+      "weekEnding": "2023-02-28",
+      "levNet": 8514,
+      "levLong": 21437,
+      "levShort": 12923,
+      "assetManagerNet": -11209,
+      "dealerNet": 4351
+    },
+    {
+      "weekEnding": "2023-03-07",
+      "levNet": 8227,
+      "levLong": 22450,
+      "levShort": 14223,
+      "assetManagerNet": -12973,
+      "dealerNet": 6667
+    },
+    {
+      "weekEnding": "2023-03-14",
+      "levNet": -510,
+      "levLong": 12319,
+      "levShort": 12829,
+      "assetManagerNet": -12391,
+      "dealerNet": 14000
+    },
+    {
+      "weekEnding": "2023-03-21",
+      "levNet": -4719,
+      "levLong": 7359,
+      "levShort": 12078,
+      "assetManagerNet": -10411,
+      "dealerNet": 15001
+    },
+    {
+      "weekEnding": "2023-03-28",
+      "levNet": -888,
+      "levLong": 9971,
+      "levShort": 10859,
+      "assetManagerNet": -10066,
+      "dealerNet": 11039
+    },
+    {
+      "weekEnding": "2023-04-04",
+      "levNet": 1073,
+      "levLong": 13202,
+      "levShort": 12129,
+      "assetManagerNet": -9964,
+      "dealerNet": 7160
+    },
+    {
+      "weekEnding": "2023-04-11",
+      "levNet": -271,
+      "levLong": 11697,
+      "levShort": 11968,
+      "assetManagerNet": -8153,
+      "dealerNet": 6023
+    },
+    {
+      "weekEnding": "2023-04-18",
+      "levNet": 1535,
+      "levLong": 10109,
+      "levShort": 8574,
+      "assetManagerNet": -8699,
+      "dealerNet": 6994
+    },
+    {
+      "weekEnding": "2023-04-25",
+      "levNet": 3207,
+      "levLong": 12769,
+      "levShort": 9562,
+      "assetManagerNet": -12357,
+      "dealerNet": 10197
+    },
+    {
+      "weekEnding": "2023-05-02",
+      "levNet": 4566,
+      "levLong": 15293,
+      "levShort": 10727,
+      "assetManagerNet": -13819,
+      "dealerNet": 10758
+    },
+    {
+      "weekEnding": "2023-05-09",
+      "levNet": 3322,
+      "levLong": 17571,
+      "levShort": 14249,
+      "assetManagerNet": -9833,
+      "dealerNet": 6279
+    },
+    {
+      "weekEnding": "2023-05-16",
+      "levNet": 4284,
+      "levLong": 13064,
+      "levShort": 8780,
+      "assetManagerNet": -11660,
+      "dealerNet": 7369
+    },
+    {
+      "weekEnding": "2023-05-23",
+      "levNet": 4386,
+      "levLong": 15263,
+      "levShort": 10877,
+      "assetManagerNet": -8043,
+      "dealerNet": 2964
+    },
+    {
+      "weekEnding": "2023-05-30",
+      "levNet": 4353,
+      "levLong": 14366,
+      "levShort": 10013,
+      "assetManagerNet": -13204,
+      "dealerNet": 10542
+    },
+    {
+      "weekEnding": "2023-06-06",
+      "levNet": 4161,
+      "levLong": 14037,
+      "levShort": 9876,
+      "assetManagerNet": -13482,
+      "dealerNet": 11946
+    },
+    {
+      "weekEnding": "2023-06-13",
+      "levNet": 6352,
+      "levLong": 15149,
+      "levShort": 8797,
+      "assetManagerNet": -15062,
+      "dealerNet": 12965
+    },
+    {
+      "weekEnding": "2023-06-20",
+      "levNet": 712,
+      "levLong": 9463,
+      "levShort": 8751,
+      "assetManagerNet": -12106,
+      "dealerNet": 13159
+    },
+    {
+      "weekEnding": "2023-06-27",
+      "levNet": 145,
+      "levLong": 11448,
+      "levShort": 11303,
+      "assetManagerNet": -8078,
+      "dealerNet": 8452
+    },
+    {
+      "weekEnding": "2023-07-03",
+      "levNet": 3201,
+      "levLong": 12468,
+      "levShort": 9267,
+      "assetManagerNet": -8796,
+      "dealerNet": 8373
+    },
+    {
+      "weekEnding": "2023-07-11",
+      "levNet": 1867,
+      "levLong": 13329,
+      "levShort": 11462,
+      "assetManagerNet": -8399,
+      "dealerNet": 8359
+    },
+    {
+      "weekEnding": "2023-07-18",
+      "levNet": -877,
+      "levLong": 12704,
+      "levShort": 13581,
+      "assetManagerNet": -3319,
+      "dealerNet": 1227
+    },
+    {
+      "weekEnding": "2023-07-25",
+      "levNet": 3881,
+      "levLong": 12867,
+      "levShort": 8986,
+      "assetManagerNet": -4102,
+      "dealerNet": 18
+    },
+    {
+      "weekEnding": "2023-08-01",
+      "levNet": 7867,
+      "levLong": 15368,
+      "levShort": 7501,
+      "assetManagerNet": -10203,
+      "dealerNet": 1929
+    },
+    {
+      "weekEnding": "2023-08-08",
+      "levNet": 10287,
+      "levLong": 19072,
+      "levShort": 8785,
+      "assetManagerNet": -18320,
+      "dealerNet": 9351
+    },
+    {
+      "weekEnding": "2023-08-15",
+      "levNet": 11079,
+      "levLong": 21902,
+      "levShort": 10823,
+      "assetManagerNet": -23769,
+      "dealerNet": 15578
+    },
+    {
+      "weekEnding": "2023-08-22",
+      "levNet": 9442,
+      "levLong": 21443,
+      "levShort": 12001,
+      "assetManagerNet": -27597,
+      "dealerNet": 21497
+    },
+    {
+      "weekEnding": "2023-08-29",
+      "levNet": 5959,
+      "levLong": 19948,
+      "levShort": 13989,
+      "assetManagerNet": -28510,
+      "dealerNet": 26408
+    },
+    {
+      "weekEnding": "2023-09-05",
+      "levNet": 4348,
+      "levLong": 17246,
+      "levShort": 12898,
+      "assetManagerNet": -28063,
+      "dealerNet": 27456
+    },
+    {
+      "weekEnding": "2023-09-12",
+      "levNet": 3761,
+      "levLong": 15845,
+      "levShort": 12084,
+      "assetManagerNet": -28850,
+      "dealerNet": 28190
+    },
+    {
+      "weekEnding": "2023-09-19",
+      "levNet": -2543,
+      "levLong": 7880,
+      "levShort": 10423,
+      "assetManagerNet": -27729,
+      "dealerNet": 33840
+    },
+    {
+      "weekEnding": "2023-09-26",
+      "levNet": -906,
+      "levLong": 10650,
+      "levShort": 11556,
+      "assetManagerNet": -21280,
+      "dealerNet": 25461
+    },
+    {
+      "weekEnding": "2023-10-03",
+      "levNet": 2380,
+      "levLong": 14904,
+      "levShort": 12524,
+      "assetManagerNet": -17547,
+      "dealerNet": 17750
+    },
+    {
+      "weekEnding": "2023-10-10",
+      "levNet": 4356,
+      "levLong": 16820,
+      "levShort": 12464,
+      "assetManagerNet": -15827,
+      "dealerNet": 13548
+    },
+    {
+      "weekEnding": "2023-10-17",
+      "levNet": 5429,
+      "levLong": 16750,
+      "levShort": 11321,
+      "assetManagerNet": -20470,
+      "dealerNet": 16413
+    },
+    {
+      "weekEnding": "2023-10-24",
+      "levNet": 2882,
+      "levLong": 15706,
+      "levShort": 12824,
+      "assetManagerNet": -25669,
+      "dealerNet": 26977
+    },
+    {
+      "weekEnding": "2023-10-31",
+      "levNet": 4734,
+      "levLong": 16766,
+      "levShort": 12032,
+      "assetManagerNet": -28074,
+      "dealerNet": 27936
+    },
+    {
+      "weekEnding": "2023-11-07",
+      "levNet": -472,
+      "levLong": 10681,
+      "levShort": 11153,
+      "assetManagerNet": -23811,
+      "dealerNet": 27131
+    },
+    {
+      "weekEnding": "2023-11-14",
+      "levNet": -1190,
+      "levLong": 10503,
+      "levShort": 11693,
+      "assetManagerNet": -23925,
+      "dealerNet": 27841
+    },
+    {
+      "weekEnding": "2023-11-21",
+      "levNet": -2604,
+      "levLong": 8110,
+      "levShort": 10714,
+      "assetManagerNet": -23253,
+      "dealerNet": 27203
+    },
+    {
+      "weekEnding": "2023-11-28",
+      "levNet": -4561,
+      "levLong": 8894,
+      "levShort": 13455,
+      "assetManagerNet": -23878,
+      "dealerNet": 29282
+    },
+    {
+      "weekEnding": "2023-12-05",
+      "levNet": -8503,
+      "levLong": 7929,
+      "levShort": 16432,
+      "assetManagerNet": -17068,
+      "dealerNet": 24135
+    },
+    {
+      "weekEnding": "2023-12-12",
+      "levNet": -7300,
+      "levLong": 8564,
+      "levShort": 15864,
+      "assetManagerNet": -12079,
+      "dealerNet": 18249
+    },
+    {
+      "weekEnding": "2023-12-19",
+      "levNet": 2461,
+      "levLong": 10335,
+      "levShort": 7874,
+      "assetManagerNet": -9356,
+      "dealerNet": 4276
+    },
+    {
+      "weekEnding": "2023-12-26",
+      "levNet": 584,
+      "levLong": 9490,
+      "levShort": 8906,
+      "assetManagerNet": -5602,
+      "dealerNet": 1956
+    },
+    {
+      "weekEnding": "2024-01-02",
+      "levNet": 1696,
+      "levLong": 11596,
+      "levShort": 9900,
+      "assetManagerNet": -3842,
+      "dealerNet": -1392
+    },
+    {
+      "weekEnding": "2024-01-09",
+      "levNet": 3238,
+      "levLong": 11713,
+      "levShort": 8475,
+      "assetManagerNet": -5248,
+      "dealerNet": -738
+    },
+    {
+      "weekEnding": "2024-01-16",
+      "levNet": 897,
+      "levLong": 10285,
+      "levShort": 9388,
+      "assetManagerNet": -5194,
+      "dealerNet": 1071
+    },
+    {
+      "weekEnding": "2024-01-23",
+      "levNet": 3369,
+      "levLong": 11239,
+      "levShort": 7870,
+      "assetManagerNet": -8417,
+      "dealerNet": 3530
+    },
+    {
+      "weekEnding": "2024-01-30",
+      "levNet": 3917,
+      "levLong": 13843,
+      "levShort": 9926,
+      "assetManagerNet": -10596,
+      "dealerNet": 5095
+    },
+    {
+      "weekEnding": "2024-02-06",
+      "levNet": 3506,
+      "levLong": 14397,
+      "levShort": 10891,
+      "assetManagerNet": -8466,
+      "dealerNet": 4711
+    },
+    {
+      "weekEnding": "2024-02-13",
+      "levNet": 6032,
+      "levLong": 15788,
+      "levShort": 9756,
+      "assetManagerNet": -7766,
+      "dealerNet": 20
+    },
+    {
+      "weekEnding": "2024-02-20",
+      "levNet": 8004,
+      "levLong": 16605,
+      "levShort": 8601,
+      "assetManagerNet": -6566,
+      "dealerNet": -2825
+    },
+    {
+      "weekEnding": "2024-02-27",
+      "levNet": 2847,
+      "levLong": 15159,
+      "levShort": 12312,
+      "assetManagerNet": 2196,
+      "dealerNet": -8530
+    },
+    {
+      "weekEnding": "2024-03-05",
+      "levNet": 6567,
+      "levLong": 16944,
+      "levShort": 10377,
+      "assetManagerNet": -4755,
+      "dealerNet": -2871
+    },
+    {
+      "weekEnding": "2024-03-12",
+      "levNet": 3273,
+      "levLong": 12180,
+      "levShort": 8907,
+      "assetManagerNet": -4625,
+      "dealerNet": -1389
+    },
+    {
+      "weekEnding": "2024-03-19",
+      "levNet": 1383,
+      "levLong": 13525,
+      "levShort": 12142,
+      "assetManagerNet": -11928,
+      "dealerNet": 9386
+    },
+    {
+      "weekEnding": "2024-03-26",
+      "levNet": 5947,
+      "levLong": 16030,
+      "levShort": 10083,
+      "assetManagerNet": -20976,
+      "dealerNet": 16227
+    },
+    {
+      "weekEnding": "2024-04-02",
+      "levNet": 9904,
+      "levLong": 22115,
+      "levShort": 12211,
+      "assetManagerNet": -27815,
+      "dealerNet": 20513
+    },
+    {
+      "weekEnding": "2024-04-09",
+      "levNet": 8114,
+      "levLong": 17764,
+      "levShort": 9650,
+      "assetManagerNet": -25430,
+      "dealerNet": 19856
+    },
+    {
+      "weekEnding": "2024-04-16",
+      "levNet": 5161,
+      "levLong": 19659,
+      "levShort": 14498,
+      "assetManagerNet": -26917,
+      "dealerNet": 23973
+    },
+    {
+      "weekEnding": "2024-04-23",
+      "levNet": 6970,
+      "levLong": 19368,
+      "levShort": 12398,
+      "assetManagerNet": -25628,
+      "dealerNet": 20562
+    },
+    {
+      "weekEnding": "2024-04-30",
+      "levNet": 9074,
+      "levLong": 21615,
+      "levShort": 12541,
+      "assetManagerNet": -24532,
+      "dealerNet": 16607
+    },
+    {
+      "weekEnding": "2024-05-07",
+      "levNet": 8697,
+      "levLong": 20999,
+      "levShort": 12302,
+      "assetManagerNet": -22949,
+      "dealerNet": 16754
+    },
+    {
+      "weekEnding": "2024-05-14",
+      "levNet": 6965,
+      "levLong": 20202,
+      "levShort": 13237,
+      "assetManagerNet": -21956,
+      "dealerNet": 15815
+    },
+    {
+      "weekEnding": "2024-05-21",
+      "levNet": 5255,
+      "levLong": 18264,
+      "levShort": 13009,
+      "assetManagerNet": -11018,
+      "dealerNet": 5971
+    },
+    {
+      "weekEnding": "2024-05-28",
+      "levNet": 2336,
+      "levLong": 19496,
+      "levShort": 17160,
+      "assetManagerNet": -7999,
+      "dealerNet": 4904
+    },
+    {
+      "weekEnding": "2024-06-04",
+      "levNet": 4679,
+      "levLong": 16457,
+      "levShort": 11778,
+      "assetManagerNet": -3873,
+      "dealerNet": -2383
+    },
+    {
+      "weekEnding": "2024-06-11",
+      "levNet": 6664,
+      "levLong": 16495,
+      "levShort": 9831,
+      "assetManagerNet": -1612,
+      "dealerNet": -6668
+    },
+    {
+      "weekEnding": "2024-06-18",
+      "levNet": 9815,
+      "levLong": 17867,
+      "levShort": 8052,
+      "assetManagerNet": 7521,
+      "dealerNet": -20002
+    },
+    {
+      "weekEnding": "2024-06-25",
+      "levNet": 12563,
+      "levLong": 20006,
+      "levShort": 7443,
+      "assetManagerNet": 10952,
+      "dealerNet": -25728
+    },
+    {
+      "weekEnding": "2024-07-02",
+      "levNet": 15591,
+      "levLong": 23825,
+      "levShort": 8234,
+      "assetManagerNet": 11731,
+      "dealerNet": -27782
+    },
+    {
+      "weekEnding": "2024-07-09",
+      "levNet": 12671,
+      "levLong": 20320,
+      "levShort": 7649,
+      "assetManagerNet": 11271,
+      "dealerNet": -26047
+    },
+    {
+      "weekEnding": "2024-07-16",
+      "levNet": 12576,
+      "levLong": 22370,
+      "levShort": 9794,
+      "assetManagerNet": -54,
+      "dealerNet": -11222
+    },
+    {
+      "weekEnding": "2024-07-23",
+      "levNet": 18126,
+      "levLong": 28674,
+      "levShort": 10548,
+      "assetManagerNet": -14373,
+      "dealerNet": -902
+    },
+    {
+      "weekEnding": "2024-07-30",
+      "levNet": 14096,
+      "levLong": 30805,
+      "levShort": 16709,
+      "assetManagerNet": -27565,
+      "dealerNet": 18922
+    },
+    {
+      "weekEnding": "2024-08-06",
+      "levNet": 4405,
+      "levLong": 23047,
+      "levShort": 18642,
+      "assetManagerNet": -25753,
+      "dealerNet": 27417
+    },
+    {
+      "weekEnding": "2024-08-13",
+      "levNet": 2014,
+      "levLong": 16800,
+      "levShort": 14786,
+      "assetManagerNet": -19385,
+      "dealerNet": 22559
+    },
+    {
+      "weekEnding": "2024-08-20",
+      "levNet": 1733,
+      "levLong": 16718,
+      "levShort": 14985,
+      "assetManagerNet": -13756,
+      "dealerNet": 16711
+    },
+    {
+      "weekEnding": "2024-08-27",
+      "levNet": 1178,
+      "levLong": 16297,
+      "levShort": 15119,
+      "assetManagerNet": -9476,
+      "dealerNet": 10208
+    },
+    {
+      "weekEnding": "2024-09-03",
+      "levNet": 4346,
+      "levLong": 17803,
+      "levShort": 13457,
+      "assetManagerNet": -5841,
+      "dealerNet": 881
+    },
+    {
+      "weekEnding": "2024-09-10",
+      "levNet": 1607,
+      "levLong": 14506,
+      "levShort": 12899,
+      "assetManagerNet": -4388,
+      "dealerNet": 1662
+    },
+    {
+      "weekEnding": "2024-09-17",
+      "levNet": 4143,
+      "levLong": 14540,
+      "levShort": 10397,
+      "assetManagerNet": -1205,
+      "dealerNet": -2323
+    },
+    {
+      "weekEnding": "2024-09-24",
+      "levNet": 9019,
+      "levLong": 18919,
+      "levShort": 9900,
+      "assetManagerNet": -3335,
+      "dealerNet": -4351
+    },
+    {
+      "weekEnding": "2024-10-01",
+      "levNet": 8739,
+      "levLong": 18631,
+      "levShort": 9892,
+      "assetManagerNet": 2126,
+      "dealerNet": -11224
+    },
+    {
+      "weekEnding": "2024-10-08",
+      "levNet": 8658,
+      "levLong": 17186,
+      "levShort": 8528,
+      "assetManagerNet": 2092,
+      "dealerNet": -9549
+    },
+    {
+      "weekEnding": "2024-10-15",
+      "levNet": 5489,
+      "levLong": 15319,
+      "levShort": 9830,
+      "assetManagerNet": -634,
+      "dealerNet": -2907
+    },
+    {
+      "weekEnding": "2024-10-22",
+      "levNet": 9355,
+      "levLong": 19070,
+      "levShort": 9715,
+      "assetManagerNet": -5840,
+      "dealerNet": -2120
+    },
+    {
+      "weekEnding": "2024-10-29",
+      "levNet": 12177,
+      "levLong": 22598,
+      "levShort": 10421,
+      "assetManagerNet": -11875,
+      "dealerNet": 2897
+    },
+    {
+      "weekEnding": "2024-11-05",
+      "levNet": 8064,
+      "levLong": 19437,
+      "levShort": 11373,
+      "assetManagerNet": -19025,
+      "dealerNet": 13474
+    },
+    {
+      "weekEnding": "2024-11-12",
+      "levNet": 5031,
+      "levLong": 20610,
+      "levShort": 15579,
+      "assetManagerNet": -21055,
+      "dealerNet": 18107
+    },
+    {
+      "weekEnding": "2024-11-19",
+      "levNet": 2145,
+      "levLong": 19557,
+      "levShort": 17412,
+      "assetManagerNet": -25355,
+      "dealerNet": 26408
+    },
+    {
+      "weekEnding": "2024-11-26",
+      "levNet": -1181,
+      "levLong": 17973,
+      "levShort": 19154,
+      "assetManagerNet": -26722,
+      "dealerNet": 30825
+    },
+    {
+      "weekEnding": "2024-12-03",
+      "levNet": -2202,
+      "levLong": 15614,
+      "levShort": 17816,
+      "assetManagerNet": -27189,
+      "dealerNet": 30319
+    },
+    {
+      "weekEnding": "2024-12-10",
+      "levNet": -6545,
+      "levLong": 14818,
+      "levShort": 21363,
+      "assetManagerNet": -28535,
+      "dealerNet": 36386
+    },
+    {
+      "weekEnding": "2024-12-17",
+      "levNet": -12819,
+      "levLong": 9402,
+      "levShort": 22221,
+      "assetManagerNet": -32940,
+      "dealerNet": 52574
+    },
+    {
+      "weekEnding": "2024-12-24",
+      "levNet": -12714,
+      "levLong": 10339,
+      "levShort": 23053,
+      "assetManagerNet": -37404,
+      "dealerNet": 56323
+    },
+    {
+      "weekEnding": "2024-12-31",
+      "levNet": -11779,
+      "levLong": 13477,
+      "levShort": 25256,
+      "assetManagerNet": -39252,
+      "dealerNet": 57084
+    },
+    {
+      "weekEnding": "2025-01-07",
+      "levNet": -13547,
+      "levLong": 12991,
+      "levShort": 26538,
+      "assetManagerNet": -40443,
+      "dealerNet": 59116
+    },
+    {
+      "weekEnding": "2025-01-14",
+      "levNet": -14107,
+      "levLong": 10519,
+      "levShort": 24626,
+      "assetManagerNet": -40779,
+      "dealerNet": 59637
+    },
+    {
+      "weekEnding": "2025-01-21",
+      "levNet": -13741,
+      "levLong": 8488,
+      "levShort": 22229,
+      "assetManagerNet": -40043,
+      "dealerNet": 58386
+    },
+    {
+      "weekEnding": "2025-01-28",
+      "levNet": -17935,
+      "levLong": 5309,
+      "levShort": 23244,
+      "assetManagerNet": -36716,
+      "dealerNet": 55164
+    },
+    {
+      "weekEnding": "2025-02-04",
+      "levNet": -16426,
+      "levLong": 5628,
+      "levShort": 22054,
+      "assetManagerNet": -36358,
+      "dealerNet": 52748
+    },
+    {
+      "weekEnding": "2025-02-11",
+      "levNet": -11376,
+      "levLong": 7589,
+      "levShort": 18965,
+      "assetManagerNet": -43315,
+      "dealerNet": 52171
+    },
+    {
+      "weekEnding": "2025-02-18",
+      "levNet": -13860,
+      "levLong": 9359,
+      "levShort": 23219,
+      "assetManagerNet": -43799,
+      "dealerNet": 54248
+    },
+    {
+      "weekEnding": "2025-02-25",
+      "levNet": -14735,
+      "levLong": 9742,
+      "levShort": 24477,
+      "assetManagerNet": -42513,
+      "dealerNet": 52890
+    },
+    {
+      "weekEnding": "2025-03-04",
+      "levNet": -8919,
+      "levLong": 15333,
+      "levShort": 24252,
+      "assetManagerNet": -51528,
+      "dealerNet": 57994
+    },
+    {
+      "weekEnding": "2025-03-11",
+      "levNet": -9910,
+      "levLong": 13034,
+      "levShort": 22944,
+      "assetManagerNet": -48557,
+      "dealerNet": 56190
+    },
+    {
+      "weekEnding": "2025-03-18",
+      "levNet": -4947,
+      "levLong": 15555,
+      "levShort": 20502,
+      "assetManagerNet": -36910,
+      "dealerNet": 44085
+    },
+    {
+      "weekEnding": "2025-03-25",
+      "levNet": -8337,
+      "levLong": 11659,
+      "levShort": 19996,
+      "assetManagerNet": -39370,
+      "dealerNet": 48700
+    },
+    {
+      "weekEnding": "2025-04-01",
+      "levNet": -10036,
+      "levLong": 9101,
+      "levShort": 19137,
+      "assetManagerNet": -38828,
+      "dealerNet": 49660
+    },
+    {
+      "weekEnding": "2025-04-08",
+      "levNet": -9938,
+      "levLong": 8056,
+      "levShort": 17994,
+      "assetManagerNet": -28864,
+      "dealerNet": 40851
+    },
+    {
+      "weekEnding": "2025-04-15",
+      "levNet": -9460,
+      "levLong": 7524,
+      "levShort": 16984,
+      "assetManagerNet": -21491,
+      "dealerNet": 32355
+    },
+    {
+      "weekEnding": "2025-04-22",
+      "levNet": -6299,
+      "levLong": 8684,
+      "levShort": 14983,
+      "assetManagerNet": -20692,
+      "dealerNet": 27313
+    },
+    {
+      "weekEnding": "2025-04-29",
+      "levNet": -7187,
+      "levLong": 9431,
+      "levShort": 16618,
+      "assetManagerNet": -16280,
+      "dealerNet": 22703
+    },
+    {
+      "weekEnding": "2025-05-06",
+      "levNet": -5448,
+      "levLong": 7996,
+      "levShort": 13444,
+      "assetManagerNet": -17006,
+      "dealerNet": 21898
+    },
+    {
+      "weekEnding": "2025-05-13",
+      "levNet": -3532,
+      "levLong": 9774,
+      "levShort": 13306,
+      "assetManagerNet": -20157,
+      "dealerNet": 23498
+    },
+    {
+      "weekEnding": "2025-05-20",
+      "levNet": -7867,
+      "levLong": 7911,
+      "levShort": 15778,
+      "assetManagerNet": -19888,
+      "dealerNet": 28045
+    },
+    {
+      "weekEnding": "2025-05-27",
+      "levNet": -6999,
+      "levLong": 6918,
+      "levShort": 13917,
+      "assetManagerNet": -19046,
+      "dealerNet": 25973
+    },
+    {
+      "weekEnding": "2025-06-03",
+      "levNet": -8234,
+      "levLong": 7410,
+      "levShort": 15644,
+      "assetManagerNet": -18407,
+      "dealerNet": 25700
+    },
+    {
+      "weekEnding": "2025-06-10",
+      "levNet": -7160,
+      "levLong": 7691,
+      "levShort": 14851,
+      "assetManagerNet": -17162,
+      "dealerNet": 23396
+    },
+    {
+      "weekEnding": "2025-06-17",
+      "levNet": -12260,
+      "levLong": 3796,
+      "levShort": 16056,
+      "assetManagerNet": 5873,
+      "dealerNet": 3880
+    },
+    {
+      "weekEnding": "2025-06-24",
+      "levNet": -11981,
+      "levLong": 2403,
+      "levShort": 14384,
+      "assetManagerNet": 12195,
+      "dealerNet": -2500
+    },
+    {
+      "weekEnding": "2025-07-01",
+      "levNet": -8424,
+      "levLong": 4906,
+      "levShort": 13330,
+      "assetManagerNet": 8515,
+      "dealerNet": -3013
+    },
+    {
+      "weekEnding": "2025-07-08",
+      "levNet": -8654,
+      "levLong": 4986,
+      "levShort": 13640,
+      "assetManagerNet": 9229,
+      "dealerNet": -4595
+    },
+    {
+      "weekEnding": "2025-07-15",
+      "levNet": -6744,
+      "levLong": 5697,
+      "levShort": 12441,
+      "assetManagerNet": 8192,
+      "dealerNet": -2823
+    },
+    {
+      "weekEnding": "2025-07-22",
+      "levNet": -7328,
+      "levLong": 5952,
+      "levShort": 13280,
+      "assetManagerNet": 5034,
+      "dealerNet": 2579
+    },
+    {
+      "weekEnding": "2025-07-29",
+      "levNet": -6250,
+      "levLong": 7542,
+      "levShort": 13792,
+      "assetManagerNet": 3903,
+      "dealerNet": 1111
+    },
+    {
+      "weekEnding": "2025-08-05",
+      "levNet": -6778,
+      "levLong": 6609,
+      "levShort": 13387,
+      "assetManagerNet": -1811,
+      "dealerNet": 9368
+    },
+    {
+      "weekEnding": "2025-08-12",
+      "levNet": -4190,
+      "levLong": 8959,
+      "levShort": 13149,
+      "assetManagerNet": -3679,
+      "dealerNet": 8437
+    },
+    {
+      "weekEnding": "2025-08-19",
+      "levNet": -4004,
+      "levLong": 8920,
+      "levShort": 12924,
+      "assetManagerNet": -3198,
+      "dealerNet": 7531
+    },
     {
       "weekEnding": "2025-08-26",
       "levNet": -225,
