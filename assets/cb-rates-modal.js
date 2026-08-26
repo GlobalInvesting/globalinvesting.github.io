@@ -248,7 +248,15 @@ function _cbrLwOptions(){
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
-    timeScale:{borderVisible:false,timeVisible:false,fixLeftEdge:false,fixRightEdge:false,animation:{duration:0}},
+    // fixRightEdge:true — same fix as cot-modal-chart.js v3.4 (see
+    // GUIDELINES.md "chart pan/sync bug that looks like an echo/timing bug"
+    // rule): this chart's data ends at (or one synthetic month past) the
+    // latest real rate observation, with fixRightEdge left at its old
+    // default (false) and no rightOffset reserved — the same LWC quirk
+    // applies whenever a user zooms in and then drags past the right edge.
+    // Flagged as a candidate in v8.267.0's CHANGELOG entry, confirmed and
+    // fixed here per the same native-option pattern.
+    timeScale:{borderVisible:false,timeVisible:false,fixLeftEdge:false,fixRightEdge:true,animation:{duration:0}},
     handleScroll:{mouseWheel:true,pressedMouseMove:true},
     handleScale:{mouseWheel:true,pinch:true},
     localization:{priceFormatter:v=>v!=null?v.toFixed(2)+'%':'—'},
