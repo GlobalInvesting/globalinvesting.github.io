@@ -12115,13 +12115,6 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
 // for interbank volume. Falls back to BIS/LSEG session-overlap baseline if unavailable.
 
 const LIQ_BASE = [18,14,11,10,12,20,30,42,58,68,72,70,72,82,95,100,95,80,68,55,42,30,22,20];
-// Session definitions (UTC hours)
-const LIQ_SESSIONS = [
-  { name:'Sydney',   start:22, end:7,  color:'rgba(120,100,255,0.10)' },
-  { name:'Tokyo',    start:0,  end:9,  color:'rgba(79,127,255,0.08)'  },
-  { name:'London',   start:8,  end:17, color:'rgba(38,166,154,0.10)' },
-  { name:'New York', start:13, end:22, color:'rgba(246,148,28,0.07)' },
-];
 
 // _liqData:     48 half-hour values for the current day (real H-L range proxy when available)
 // _liqBaseline: 48 half-hour values for the 30-day rolling average (drawn as reference line)
@@ -12252,12 +12245,15 @@ function drawLiquidityChart() {
 
   ctx.clearRect(0, 0, W, H);
 
-  // Session bands — convert UTC slot boundaries to canvas coordinates
-  // Sydney 22:00-07:00 UTC = array slots 44-14 (wraps)
-  // Tokyo  00:00-09:00 UTC = array slots 0-18
-  // London 08:00-17:00 UTC = array slots 16-34
-  // NY     13:00-22:00 UTC = array slots 26-44
+  // Session bands — DST-aware, converted from the same SESSION_DEFS/localHourToUTC
+  // used by the main Market Sessions panel above. v8.262.4: this block previously
+  // hardcoded fixed UTC slot boundaries (Sydney 22-7, Tokyo 0-9, London 8-17,
+  // NY 13-22) — correct only half the year, exactly the DST bug already found
+  // and fixed once for the main Sessions panel's own boundaries but never
+  // propagated to this sibling chart's shaded bands.
   if (!isWeekend) {
+    const _liqNow = new Date();
+    const _liqBandColors = { sydney:'rgba(120,100,255,0.07)', tokyo:'rgba(79,127,255,0.07)', london:'rgba(38,166,154,0.08)', newyork:'rgba(246,148,28,0.06)' };
     const drawBand = (aStart, aEnd, color) => {
       // Convert array slots to canvas slots, handling wrap
       let cStart = sc(aStart), cEnd = sc(aEnd);
@@ -12265,10 +12261,13 @@ function drawLiquidityChart() {
       ctx.fillStyle = color;
       ctx.fillRect(PAD_L + (cStart/47)*cW, PAD_T, ((cEnd-cStart)/47)*cW, cH);
     };
-    drawBand(44, 48+14, 'rgba(120,100,255,0.07)'); // Sydney (wraps — draw as 22→end)
-    drawBand(0,  18,    'rgba(79,127,255,0.07)');    // Tokyo
-    drawBand(16, 34,    'rgba(38,166,154,0.08)');   // London
-    drawBand(26, 44,    'rgba(246,148,28,0.06)');   // NY
+    SESSION_DEFS.forEach(s => {
+      const openUTC  = localHourToUTC(s.zone, s.openLocal, _liqNow);
+      const closeUTC = localHourToUTC(s.zone, s.closeLocal, _liqNow);
+      const aStart = openUTC * 2;
+      const aEnd   = (closeUTC <= openUTC ? closeUTC + 24 : closeUTC) * 2; // wrap past midnight
+      drawBand(aStart, aEnd, _liqBandColors[s.id]);
+    });
   }
 
   if (!isWeekend) {
@@ -12334,10 +12333,24 @@ function drawLiquidityChart() {
     ctx.fillText('MARKET CLOSED — WEEKEND', W/2, PAD_T+cH/2);
   }
 
-  // Hour labels — starting 22:00 UTC, every 4h: 22,02,06,10,14,18
+  // Hour labels — DST/timezone-correct: convert each UTC slot boundary to the
+  // user's LOCAL hour before drawing, same conversion `peakUTC.getHours()`
+  // already applies a few lines above for the "Peak HH:MM" label. v8.262.5:
+  // this axis previously hardcoded the raw UTC hours as static label strings
+  // (22,02,06,10,14,18,22) — correct only for a browser physically in UTC+0;
+  // every other timezone (e.g. GMT-3) saw an axis that didn't match either
+  // their own clock or the "Peak HH:MM"/subtitle local-time labels on the
+  // same panel. Confirmed via user screenshot: axis started at "22" while
+  // the panel's own subtitle read "21:12 GMT-3".
   ctx.fillStyle=_themeColor('--text3'); ctx.font='8px Courier New'; ctx.textAlign='center';
-  [{lbl:'22',ci:0},{lbl:'02',ci:8},{lbl:'06',ci:16},{lbl:'10',ci:24},{lbl:'14',ci:32},{lbl:'18',ci:40},{lbl:'22',ci:47}]
-    .forEach(({lbl,ci}) => ctx.fillText(lbl, PAD_L+(ci/47)*cW, H-4));
+  [0, 8, 16, 24, 32, 40, 47].forEach(ci => {
+    const arraySlot = sa(ci);
+    const d = new Date();
+    d.setUTCHours(Math.floor(arraySlot / 2), arraySlot % 2 === 0 ? 0 : 30, 0, 0);
+    const lh = d.getHours(), lm = d.getMinutes();
+    const lbl = lm === 0 ? lh.toString().padStart(2, '0') : lh.toString().padStart(2, '0') + ':' + lm.toString().padStart(2, '0');
+    ctx.fillText(lbl, PAD_L+(ci/47)*cW, H-4);
+  });
 
 
   // Bottom labels
@@ -12379,18 +12392,21 @@ window.addEventListener('resize', drawLiquidityChart);
 
 // ── FX Liquidity tooltip ──────────────────────────────────────────────────────
 (function() {
-  const SESSION_NAMES = [
-    { name:'Sydney',   start:22, end:7  },
-    { name:'Tokyo',    start:0,  end:9  },
-    { name:'London',   start:8,  end:17 },
-    { name:'New York', start:13, end:22 },
-  ];
-
+  // Session names — DST-aware, mirrors SESSION_DEFS/localHourToUTC used by the
+  // main Market Sessions panel and by drawLiquidityChart()'s bands above.
+  // v8.262.4: previously a separate hardcoded-UTC SESSION_NAMES table (Sydney
+  // 22-7, Tokyo 0-9, London 8-17, New York 13-22) — same DST bug, third
+  // sibling copy found in this file.
   function getActiveSessions(utcH) {
-    const active = SESSION_NAMES.filter(s => {
-      if (s.end < s.start) return utcH >= s.start || utcH < s.end; // wraps midnight
-      return utcH >= s.start && utcH < s.end;
-    }).map(s => s.name);
+    const now = new Date();
+    const active = SESSION_DEFS.map(s => {
+      const openUTC  = localHourToUTC(s.zone, s.openLocal, now);
+      const closeUTC = localHourToUTC(s.zone, s.closeLocal, now);
+      const isActive = closeUTC < openUTC
+        ? (utcH >= openUTC || utcH < closeUTC)   // wraps midnight
+        : (utcH >= openUTC && utcH < closeUTC);
+      return isActive ? (s.id === 'newyork' ? 'New York' : s.id.charAt(0).toUpperCase() + s.id.slice(1)) : null;
+    }).filter(Boolean);
     return active.length ? active.join(' + ') : 'Inter-session';
   }
 
