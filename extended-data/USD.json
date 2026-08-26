@@ -1,1 +1,25 @@
-{"data":{"bond10y":4.658,"bond2y":4.24,"bond5y":4.365,"vix":15.8,"hyOas":2.7,"hyOasDelta20d":-0.09,"igOas":0.81,"igOasDelta20d":0.01,"inflationExpectations":2.27,"inflationExpectationsSource":"FRED T5YIE breakeven (5Y TIPS)","bond2y_prev":4.24},"dates":{"bond10y":"2026-08-25","bond2y":"2026-08-24","bond5y":"2026-08-25","vix":"2026-08-25","hyOas":"2026-08-21","igOas":"2026-08-21","inflationExpectations":"2026-08-18","bond2y_prev":"2026-08-21"}}
+{
+  "lastUpdate": "2026-08-26",
+  "source": "FX/VIX/OAS: Frankfurter, FRED \u2014 v14.3 (bond10y/bond2y/bond5y AND inflationExpectations preserved from disk, not fetched \u2014 bonds owned by globalinvesting-scripts/fetch_bond_yields.py, inflationExpectations by the private-scripts weekly job)",
+  "data": {
+    "bond10y": 4.658,
+    "bond2y": 4.24,
+    "bond5y": 4.365,
+    "vix": 15.85,
+    "hyOas": 2.69,
+    "hyOasDelta20d": -0.12,
+    "igOas": 0.81,
+    "igOasDelta20d": 0.0,
+    "inflationExpectations": 2.27,
+    "inflationExpectationsSource": "FRED T5YIE breakeven (5Y TIPS)"
+  },
+  "dates": {
+    "bond10y": "2026-08-25",
+    "bond2y": "2026-08-24",
+    "bond5y": "2026-08-25",
+    "vix": "2026-08-24",
+    "hyOas": "2026-08-24",
+    "igOas": "2026-08-24",
+    "inflationExpectations": "2026-08-18"
+  }
+}
