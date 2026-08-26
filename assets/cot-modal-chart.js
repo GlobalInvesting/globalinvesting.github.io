@@ -610,19 +610,28 @@ function _lwDefaultWindow(chart, times, yearsBack) {
 // doesn't feed back into an infinite loop.
 function _lwSyncTimeRanges(chartA, chartB) {
   if (!chartA || !chartB) return;
+  // Re-entrancy guard: cleared on the NEXT ANIMATION FRAME, not synchronously
+  // right after the setVisibleRange() call below. Clearing it synchronously
+  // assumes LWC's subscribeVisibleTimeRangeChange notification for a
+  // programmatic setVisibleRange() fires perfectly synchronously — it
+  // doesn't always. When the target chart's own notification arrived a tick
+  // late, `syncing` had already flipped back to false, so the target's
+  // "change" bounced straight back to the source (setVisibleRange applied
+  // again to a chart with a different bar resolution), and that reapplication
+  // could itself shift the effective range slightly (bar-boundary rounding
+  // differs between Net Position's weekly bars and Daily Spot Close's daily
+  // ones). Repeated every drag tick, this reads as the chart auto-zooming
+  // while the user is only trying to pan it. Holding the guard open across a
+  // full animation frame absorbs any async notification instead of racing it.
   let syncing = false;
-  chartA.timeScale().subscribeVisibleTimeRangeChange(range => {
+  function relay(from, to, range) {
     if (syncing || !range) return;
     syncing = true;
-    try { chartB.timeScale().setVisibleRange(range); } catch (_) {}
-    syncing = false;
-  });
-  chartB.timeScale().subscribeVisibleTimeRangeChange(range => {
-    if (syncing || !range) return;
-    syncing = true;
-    try { chartA.timeScale().setVisibleRange(range); } catch (_) {}
-    syncing = false;
-  });
+    try { to.timeScale().setVisibleRange(range); } catch (_) {}
+    requestAnimationFrame(() => { syncing = false; });
+  }
+  chartA.timeScale().subscribeVisibleTimeRangeChange(range => relay(chartA, chartB, range));
+  chartB.timeScale().subscribeVisibleTimeRangeChange(range => relay(chartB, chartA, range));
 }
 
 // ── Chart builders ────────────────────────────────────────────────────────────
