@@ -1,5 +1,32 @@
 /**
- * econ-matrix.js v2.5.2 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.3 — Native Economic Matrix panel
+ *
+ * ── v2.5.3 (2026-08-26) — New "Emp Chg" column (net jobs created / employment
+ *    change), added per direct feedback from an institutional-background
+ *    client: he correctly flagged that G10 labor-market data was missing —
+ *    not accurate. "Unemp" already existed and shipped in v2.0.0; what was
+ *    genuinely absent was the flow/leading counterpart (net jobs created),
+ *    which markets and central banks watch alongside the unemployment
+ *    rate/stock figure. Wired using the SAME calendar.json source as every
+ *    other column (fetch_ff_calendar.py / calendar-watcher.js already carry
+ *    these event titles — no new fetcher needed), with each currency's
+ *    title verified directly against live calendar.json before wiring, not
+ *    assumed (see CATS entries). USD → 'Non Farm Payrolls' (the headline
+ *    print, deliberately not blended with the distinct 'ADP Employment
+ *    Change' preview series). GBP/AUD/CAD → bare 'Employment Change'
+ *    (excludes each release's Full/Part-Time sub-components). NZD →
+ *    'Employment Change QoQ' (NZ's native quarterly cadence, matching its
+ *    GDP/CPI columns). EUR → 'Euro Area Employment Change QoQ'/YoY.
+ *    Confirmed genuine gaps, left blank rather than guessed: JPY and CHF
+ *    have no employment-change-equivalent title in the current source at
+ *    all; NOK/SEK's only labor-flow titles ('Unemployed Persons(<Mon>)' /
+ *    'Employed Persons(<Mon>)') are raw headcount LEVELS, not a
+ *    change/rate figure, and wiring them would silently misrepresent the
+ *    column's stated semantics — same principle as not conflating NZD's
+ *    PPI Input/Output series elsewhere in this file. index.html's <thead>
+ *    and all 10 skeleton <tbody> rows updated in the same change, in the
+ *    same position (between PPI and Unemp) — see COLUMNS array warning
+ *    comment above.
  *
  * ── v2.5.2 (2026-08-22) — NZD Ind Prod cell: repointed CATS.NZD.prod from
  *    the dead 'Manufacturing Sales YoY' mapping (comment falsely claimed it
@@ -533,6 +560,13 @@
     { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
     { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
     { key: 'ppi',     label: 'PPI',       title: 'Latest producer-price inflation \u2014 YoY where published, QoQ/MoM otherwise (see subtext on each cell for the period actually shown). EUR shows Germany\u2019s national PPI as a proxy \u2014 no genuine Euro Area-aggregate PPI title exists in the current source. Blank where the currency\u2019s economy has no standalone PPI release in the current source.' },
+    // v2.5.3: added per client feedback (institutional trader, 2026-08-26) —
+    // Unemp already existed, but the flow/leading indicator (net jobs
+    // created) did not, and central banks + markets watch both. Verified
+    // per-currency titles directly against live calendar-data/calendar.json
+    // (not assumed) before wiring — see CATS entries for per-currency
+    // sourcing notes and confirmed gaps (JPY/CHF/NOK/SEK).
+    { key: 'emp',     label: 'Emp Chg',   title: 'Latest employment change \u2014 net jobs created, a flow/leading labor-market indicator distinct from the Unemployment Rate (a stock/lagging indicator). US shows Non-Farm Payrolls, the single most market-watched G10 print. Blank where the currency\u2019s economy has no standalone employment-change release in the current source \u2014 see column-specific per-currency notes.' },
     { key: 'unemp',   label: 'Unemp',     title: 'Latest unemployment rate' },
     { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change' },
     { key: 'conf',    label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published. PMI readings are on a 0\u2013100 scale where 50 is the expansion/contraction cutoff \u2014 non-PMI substitutes (Ifo, NAB Business Confidence, Industrial Confidence, etc.) use their own survey-specific scale with no fixed 50 threshold.' },
@@ -587,6 +621,12 @@
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI MoM'], // confirmed only MoM published in the current source \u2014 no PPI YoY title observed
+      // v2.5.3: 'Non Farm Payrolls' only \u2014 deliberately NOT mixed with 'ADP
+      // Employment Change' (a distinct private-sector preview series released
+      // ~2 days before NFP, not an alternate cadence of the same release,
+      // same non-mixing principle as NZD's PPI Input/Output note below). NFP
+      // is the headline print markets and the Fed anchor to.
+      emp:   ['Non Farm Payrolls'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['ISM Manufacturing PMI'],
@@ -616,6 +656,8 @@
       // fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29; wiring the
       // real title here now that the source will actually carry it.
       ppi:   ['PPI Output YoY', 'PPI Output MoM'],
+      // v2.5.3: bare 'Employment Change'.
+      emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['S&P Global Manufacturing PMI', 'CBI Industrial Trends Orders'],
@@ -639,6 +681,10 @@
       // any "Japan " prefix drift the same way it does elsewhere). Fixed
       // upstream in fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29.
       ppi:   ['PPI YoY', 'PPI MoM'],
+      // v2.5.3: confirmed gap \u2014 no 'Employment Change'-equivalent title
+      // found in calendar.json for JPY. Unemployment Rate remains Japan's
+      // primary published labor-market indicator in the current source.
+      emp:   [],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
@@ -656,6 +702,11 @@
       // RBA Trimmed Mean CPI is AUD's standard core-equivalent (see column def).
       core:  ['RBA Trimmed Mean CPI YoY', 'Quarterly RBA Trimmed Mean CPI YoY'],
       ppi:   ['PPI QoQ'], // ABS publishes PPI quarterly, not monthly \u2014 QoQ is the genuine native cadence, not a fallback
+      // v2.5.3: bare 'Employment Change' (net, seasonally adjusted) \u2014
+      // deliberately excludes 'Full Time Employment Chg', a sub-component
+      // of the same release, not an alternate cadence (same non-mixing
+      // principle as NZD's PPI Input/Output note below).
+      emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing \u2014 published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
@@ -681,6 +732,9 @@
       // elsewhere). Fixed upstream in fetch_ff_calendar.py v3.43 /
       // calendar-watcher.js v5.29.
       ppi:   ['PPI YoY', 'PPI MoM'],
+      // v2.5.3: bare 'Employment Change' \u2014 excludes 'Full/Part Time
+      // Employment Chg' sub-components, same reasoning as AUD above.
+      emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
@@ -726,6 +780,9 @@
       // Relies on canon()'s existing "Switzerland " prefix stripping \u2014 no
       // new stripping logic needed.
       ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
+      // v2.5.3: confirmed gap \u2014 no 'Employment Change'-equivalent title
+      // found in calendar.json for CHF.
+      emp:   [],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
@@ -763,6 +820,9 @@
       // CHF's YoY/MoM pair), and every other currency's ppi column reports
       // the output/producer-price concept, not an input-cost index.
       ppi:   ['PPI Output QoQ'],
+      // v2.5.3: NZ publishes employment quarterly, same cadence as its
+      // GDP/CPI columns above \u2014 'Employment Change QoQ'.
+      emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
       // v2.5.0: was ['Manufacturing Sales YoY'], commented as "injected by
       // fetch_supplementary_indicators.py" \u2014 that script does not exist in
@@ -802,6 +862,12 @@
       // any name on Myfxbook specifically.
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
+      // v2.5.3: confirmed gap, NOT wired to 'Employed Persons(<Mon>)' \u2014
+      // that title is a raw LEVEL (headcount), not a change/rate figure, and
+      // would silently misrepresent this column's stated semantics (net
+      // jobs created). No genuine employment-CHANGE title found in the
+      // current source for SEK.
+      emp:   [],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
@@ -816,6 +882,10 @@
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI YoY'], // parenthetical-month title style (e.g. "PPI YoY(May)") \u2014 strictMatch already handles this
+      // v2.5.3: confirmed gap, same reasoning as SEK above \u2014
+      // 'Unemployed Persons(<Mon>)' in the current source is a raw LEVEL,
+      // not a change figure, so it is not wired here.
+      emp:   [],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Production MoM'],
       conf:  ['Industrial Confidence'],
@@ -847,6 +917,10 @@
     // \u2014 same proxy pattern as conf above \u2014 rather than mislabeled as
     // an EA-wide figure.
     ppi:   ['Germany PPI YoY', 'PPI YoY'],
+    // v2.5.3: QoQ listed first (tie-break priority only) to match this
+    // block's own GDP-column convention of QoQ-first for EA headline flow
+    // releases; YoY included as the same-day secondary candidate.
+    emp:   ['Euro Area Employment Change QoQ', 'Euro Area Employment Change YoY'],
     unemp: ['Euro Area Unemployment Rate'],
     prod:  ['Euro Area Industrial Production MoM'],
     // v2.2.0: was previously an intentional gap (see v2.0.0 header note —
