@@ -1,83 +1,33 @@
 {
-  "lastUpdate": "2026-08-25T21:01:05Z",
-  "generatedAt": "2026-08-25T21:01:05Z",
+  "lastUpdate": "2026-08-26T00:00:55Z",
+  "generatedAt": "2026-08-26T00:00:55Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-25",
+  "rangeFrom": "2025-08-26",
   "rangeTo": "2026-08-28",
-  "totalEvents": 3786,
+  "totalEvents": 3799,
   "currencyCounts": {
-    "EUR": 870,
-    "USD": 1279,
-    "AUD": 259,
-    "GBP": 441,
+    "EUR": 869,
+    "USD": 1285,
+    "AUD": 264,
+    "GBP": 442,
     "NZD": 88,
-    "CHF": 125,
+    "CHF": 126,
     "CAD": 267,
-    "JPY": 218,
-    "SEK": 156,
+    "JPY": 217,
+    "SEK": 158,
     "NOK": 83
   },
   "impactCounts": {
-    "high": 1675,
-    "medium": 1883,
+    "medium": 1891,
+    "high": 1680,
     "low": 228
   },
   "surpriseStats": {
-    "AUD/rba weighted median cpi mom": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.095743
-    },
-    "AUD/rba weighted median cpi yoy": {
-      "n": 4,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "AUD/rba trimmed mean cpi mom": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.095743
-    },
-    "AUD/rba trimmed mean cpi yoy": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.095743
-    },
-    "AUD/inflation rate yoy": {
-      "n": 4,
-      "mean": -0.3,
-      "std": 0.11547
-    },
-    "AUD/cpi": {
-      "n": 4,
-      "mean": -0.3725,
-      "std": 0.068496
-    },
-    "AUD/inflation rate mom": {
-      "n": 4,
-      "mean": -0.325,
-      "std": 0.095743
-    },
-    "NZD/rbnz interest rate decision": {
-      "n": 2,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "EUR/new car registrations yoy": {
-      "n": 2,
-      "mean": -0.55,
-      "std": 1.343503
-    },
-    "EUR/consumer confidence": {
-      "n": 8,
-      "mean": 0.8375,
-      "std": 2.041664
-    },
     "SEK/consumer inflation expectations": {
       "n": 2,
       "mean": -0.4,
@@ -97,6 +47,11 @@
       "n": 3,
       "mean": -0.2,
       "std": 0.72111
+    },
+    "EUR/consumer confidence": {
+      "n": 7,
+      "mean": 1.1,
+      "std": 2.054264
     },
     "EUR/economic sentiment": {
       "n": 3,
@@ -1078,6 +1033,41 @@
       "mean": -2.5,
       "std": 11.902381
     },
+    "AUD/rba weighted median cpi mom": {
+      "n": 3,
+      "mean": 0.066667,
+      "std": 0.057735
+    },
+    "AUD/rba weighted median cpi yoy": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "AUD/cpi": {
+      "n": 3,
+      "mean": -0.363333,
+      "std": 0.080829
+    },
+    "AUD/inflation rate yoy": {
+      "n": 3,
+      "mean": -0.333333,
+      "std": 0.11547
+    },
+    "AUD/rba trimmed mean cpi mom": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 0.11547
+    },
+    "AUD/rba trimmed mean cpi yoy": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 0.11547
+    },
+    "AUD/inflation rate mom": {
+      "n": 3,
+      "mean": -0.366667,
+      "std": 0.057735
+    },
     "EUR/germany ifo business climate": {
       "n": 3,
       "mean": 0.733333,
@@ -1395,66 +1385,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Ifo Business Climate",
-      "dateISO": "2025-08-25",
-      "actual": "89",
-      "forecast": "88.6",
-      "previous": "88.6",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "08:00"
-    },
-    {
-      "currency": "USD",
-      "event": "Chicago Fed National Activity Index",
-      "dateISO": "2025-08-25",
-      "actual": "-0.19",
-      "forecast": "-0.2",
-      "previous": "-0.18",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "New Home Sales",
-      "dateISO": "2025-08-25",
-      "actual": "0.652M",
-      "forecast": "0.63",
-      "previous": "0.656",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "14:00"
-    },
-    {
-      "currency": "USD",
-      "event": "New Home Sales MoM",
-      "dateISO": "2025-08-25",
-      "actual": "-0.6%",
-      "forecast": "-1.1",
-      "previous": "4.1",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "14:00"
-    },
-    {
-      "currency": "USD",
-      "event": "Dallas Fed Manufacturing Index",
-      "dateISO": "2025-08-25",
-      "actual": "-1.8",
-      "forecast": "0.2",
-      "previous": "0.9",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
     {
       "currency": "EUR",
       "event": "Consumer Confidence",
@@ -44113,19 +44043,6 @@
       "previous": "-30.0"
     },
     {
-      "date": "4 Aug",
-      "dateISO": "2026-08-04",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Monetary Policy Meeting Minutes",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
       "date": "5 Aug",
       "dateISO": "2026-08-05",
       "timeUTC": "06:45",
@@ -47497,10 +47414,10 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "CPI m/m",
-      "impact": "high",
+      "event": "Australia Inflation Rate MoM",
+      "impact": "medium",
       "actual": null,
-      "forecast": "0.9%",
+      "forecast": "0.8%",
       "previous": "-0.1%"
     },
     {
@@ -47510,8 +47427,47 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "CPI y/y",
+      "event": "Australia RBA Weighted Median CPI YoY",
       "impact": "high",
+      "actual": null,
+      "forecast": "3.6%",
+      "previous": "3.7%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Weighted Median CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia CPI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "102.7",
+      "previous": "102.03"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Inflation Rate YoY",
+      "impact": "medium",
       "actual": null,
       "forecast": "3.3%",
       "previous": "3.8%"
@@ -47523,10 +47479,140 @@
       "country": "AUD",
       "currency": "AUD",
       "flag": "🇦🇺",
-      "event": "Trimmed Mean CPI m/m",
+      "event": "Australia RBA Trimmed Mean CPI YoY",
       "impact": "high",
       "actual": null,
-      "forecast": "0.4%",
+      "forecast": "3.5%",
+      "previous": "3.6%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Construction Work Done QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "3.4%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Trimmed Mean CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "06:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden PPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.6%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "06:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden PPI YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "6.9%",
+      "previous": "7.4%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "10:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom CBI Distributive Trades",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-24.0",
+      "previous": "-26.0"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Durable Goods Orders Ex Transp MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.6%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core PCE Price Index YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.3%",
+      "previous": "3.3%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Personal Income MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States GDP Growth Rate QoQ",
+      "impact": "high",
+      "actual": null,
+      "forecast": "1.5%",
+      "previous": "2.1%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Durable Goods Orders ex Defense MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.1%",
       "previous": "0.3%"
     },
     {
@@ -47536,7 +47622,46 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Core PCE Price Index m/m",
+      "event": "United States Durable Goods Orders MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.7%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States GDP Price Index QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "6.3%",
+      "previous": "3.6%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States PCE Price Index YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.6%",
+      "previous": "3.7%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core PCE Price Index MoM",
       "impact": "high",
       "actual": null,
       "forecast": "0.2%",
@@ -47549,11 +47674,11 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Prelim GDP q/q",
-      "impact": "high",
+      "event": "United States PCE Price Index MoM",
+      "impact": "medium",
       "actual": null,
-      "forecast": "1.5%",
-      "previous": "1.5%"
+      "forecast": "0.1%",
+      "previous": "-0.1%"
     },
     {
       "date": "26 Aug",
@@ -47562,11 +47687,50 @@
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Prelim GDP Price Index q/q",
+      "event": "United States Corporate Profits QoQ",
       "impact": "medium",
       "actual": null,
-      "forecast": "6.2%",
-      "previous": "6.2%"
+      "forecast": "0.7%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Personal Spending MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "0.3%"
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "15:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Fed Barkin Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "26 Aug",
+      "dateISO": "2026-08-26",
+      "timeUTC": "16:15",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland SNB Martin Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
     },
     {
       "date": "27 Aug",
