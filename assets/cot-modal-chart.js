@@ -1,3 +1,15 @@
+// COT MODAL CHART  v3.4 — _lwOpts now sets timeScale.fixRightEdge:true on
+//   every COT modal chart. Root-caused the "Daily Spot Close stays pinned to
+//   the right edge, only stretches" report as a real LWC quirk unrelated to
+//   the sync mechanism (v3.1-3.3 were correct fixes for a real, separate
+//   echo-misroute bug, but didn't touch this one): with no rightOffset
+//   reserved past the last bar, dragging past the right edge clamps "to" at
+//   the last bar while "to"'s counterpart keeps moving, WIDENING the visible
+//   window from the left instead of refusing to move — reads exactly like a
+//   stuck/broken pan. Confirmed via a local LWC v5.0.7 + Playwright repro on
+//   an isolated single chart with zero sync code, then confirmed the fix
+//   (LWC's own fixRightEdge option) resolves it with the two-chart sync
+//   active too, in both drag directions. See GUIDELINES.md.
 // COT MODAL CHART  v3.3 — _lwSyncTimeRanges now gates relay by which chart
 //   container the user is actually interacting with (pointerdown/enter/wheel
 //   on the Net Position vs. Daily Spot Close container), not just a
@@ -576,7 +588,26 @@ function _lwOpts(W,H){
     // 1-year default and never recover on its own. Locking this stops any
     // resize from touching the time window at all — only explicit
     // setVisibleRange() calls and real user pan/zoom should ever move it.
-    timeScale:{borderVisible:false,lockVisibleTimeRangeOnResize:true},
+    //
+    // fixRightEdge:true — every COT modal chart's data ends at "now" (no
+    // rightOffset/forming-bar whitespace reserved past the last real bar,
+    // unlike e.g. the main price chart's rightOffset:14). Without this,
+    // dragging past the right edge (trying to pan "into the future") hits a
+    // real LWC quirk: the right edge silently clamps at the last bar while
+    // the left edge keeps moving, so continued dragging in that direction
+    // WIDENS the visible window from the left instead of doing nothing —
+    // this reads exactly like "the chart won't pan/is stuck at the right
+    // edge, only stretches", which is what v8.266.1's and v8.266.2's fixes
+    // were chasing in the sync mechanism itself (both of those fixes are
+    // real and correct for the separate bugs they addressed — cross-chart
+    // echo misroute — but neither was the cause of THIS symptom). Confirmed
+    // live via a local Lightweight Charts v5.0.7 + Playwright repro:
+    // isolated single-chart drag-past-right-edge reproduced the exact
+    // asymmetric stretch with zero sync code involved, and fixRightEdge:true
+    // is LWC's own purpose-built, documented option for exactly this case —
+    // it hard-locks the right edge so a drag past it does nothing (not
+    // "stretches"), with zero effect on normal panning/zooming elsewhere.
+    timeScale:{borderVisible:false,lockVisibleTimeRangeOnResize:true,fixRightEdge:true},
     handleScroll:{mouseWheel:true,pressedMouseMove:true},
     handleScale:{mouseWheel:true,pinch:true},
     localization:{priceFormatter:v=>v!=null?Math.round(v).toLocaleString():'—'},
