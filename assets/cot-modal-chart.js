@@ -1,3 +1,12 @@
+// COT MODAL CHART  v3.0 — Net Position/Daily Spot Close pan-and-zoom sync +
+//   tighter Net Position default window. Net Position now defaults to 1 year
+//   (was 2y) so its weekly bars render wide enough to read individually — 2y
+//   packed ~104 bars into the panel at a width that made them hard to tell
+//   apart. Daily Spot Close mirrors the same 1y opening window, and the two
+//   charts now stay in sync going forward: panning or zooming either one
+//   moves the other by calendar time (_lwSyncTimeRanges) — a logical/bar-
+//   index sync doesn't work here since the two series have different bar
+//   counts (weekly vs. daily) for the same calendar span.
 // COT MODAL CHART  v2.9 — every chart (Net Position, Daily Spot Close,
 //   Long/Short, OI, Participants) now defaults to a 2-year "recent window"
 //   instead of fitContent()'s full-history view. Full history (now up to 522
@@ -590,6 +599,32 @@ function _lwDefaultWindow(chart, times, yearsBack) {
   try { chart.timeScale().setVisibleRange({ from: cutoffStr, to: last }); } catch (_) {}
 }
 
+// Mirrors pan/zoom between two Lightweight Charts instances that plot the
+// SAME calendar span at DIFFERENT data resolutions (Net Position: weekly
+// bars; Daily Spot Close: daily closes) — a logical/bar-index range sync
+// (chart.timeScale().setVisibleLogicalRange) doesn't work across mismatched
+// resolutions, since the same calendar window covers a different bar COUNT
+// on each chart. Syncing by calendar time range instead (LWC's documented
+// pattern for multi-chart sync) works regardless of each chart's own bar
+// density. Guarded with a re-entrancy flag so the two-way subscription
+// doesn't feed back into an infinite loop.
+function _lwSyncTimeRanges(chartA, chartB) {
+  if (!chartA || !chartB) return;
+  let syncing = false;
+  chartA.timeScale().subscribeVisibleTimeRangeChange(range => {
+    if (syncing || !range) return;
+    syncing = true;
+    try { chartB.timeScale().setVisibleRange(range); } catch (_) {}
+    syncing = false;
+  });
+  chartB.timeScale().subscribeVisibleTimeRangeChange(range => {
+    if (syncing || !range) return;
+    syncing = true;
+    try { chartA.timeScale().setVisibleRange(range); } catch (_) {}
+    syncing = false;
+  });
+}
+
 // ── Chart builders ────────────────────────────────────────────────────────────
 function _buildNetChart(container, dates, netData, ccy, meta) {
   meta = meta || { primaryAbbr: 'LF' };
@@ -603,7 +638,13 @@ function _buildNetChart(container, dates, netData, ccy, meta) {
     color: '#4f7fff', priceLineVisible: false, lastValueVisible: true, base: 0,
   });
   hist.setData(dates.map((d, i) => ({ time: d, value: netData[i] ?? 0, color: (netData[i] ?? 0) >= 0 ? (_up + 'd1') : (_dn + 'd1') })));
-  _lwDefaultWindow(chart, dates, 2);
+  // Net Position uses a 1-year default (not the 2-year default the other
+  // charts use) — at 2 years, ~104 weekly bars packed into this panel's width
+  // render too thin to read individually; 1 year (~52 bars) gives each bar
+  // roughly double the pixel width. Daily Spot Close (below) is synced to
+  // mirror whatever window Net Position ends up showing (see
+  // _lwSyncTimeRanges in cotTab), so it opens at the same 1-year window too.
+  _lwDefaultWindow(chart, dates, 1);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => hist, param => {
     const v = param.seriesData.get(hist); if (!v) return null;
@@ -662,7 +703,11 @@ function _buildSpotChart(container, spotData, label) {
     priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 4,
   });
   spotS.setData(spotData);
-  _lwDefaultWindow(chart, spotData.map(p => p.time), 2);
+  // Matches Net Position's 1-year default (see _buildNetChart) so both charts
+  // open on the same window before the pan/zoom sync (_lwSyncTimeRanges) even
+  // fires once — not load-bearing for staying in sync (the subscription
+  // handles that), but avoids a visible jump-to-match on first render.
+  _lwDefaultWindow(chart, spotData.map(p => p.time), 1);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => spotS, param => {
     const v = param.seriesData.get(spotS); if (!v) return null;
@@ -1149,14 +1194,21 @@ function cotTab(el,tabId){
         // Kick off async fetch immediately so it overlaps with the 150ms wait
         const spotPromise=_fetchCOTSpot(d.ccy);
         setTimeout(()=>requestAnimationFrame(()=>{
-          if(w&&!w._built){w._built=true;_buildNetChart(w,d.dates,d.netData,d.ccy,d.meta);}
+          let _netChart=null,_spotChart=null;
+          if(w&&!w._built){w._built=true;_netChart=_buildNetChart(w,d.dates,d.netData,d.ccy,d.meta);w._lwChart=_netChart;}
+          else if(w&&w._lwChart){_netChart=w._lwChart;}
           if(ws&&!ws._built){
             ws._built=true;
             spotPromise.then(spotData=>{
               const filtered=(spotData||[]).filter(p=>p.time>=d.dates[0]);
               if(filtered.length){
                 if(statusEl)statusEl.textContent='';
-                _buildSpotChart(ws,filtered,spotLabel);
+                _spotChart=_buildSpotChart(ws,filtered,spotLabel);
+                ws._lwChart=_spotChart;
+                // Mirror pan/zoom both ways once both charts exist — see
+                // _lwSyncTimeRanges for why this needs calendar-time sync,
+                // not logical-range sync (weekly bars vs. daily closes).
+                if(_netChart&&_spotChart)_lwSyncTimeRanges(_netChart,_spotChart);
               } else {
                 if(statusEl)statusEl.textContent='Spot data unavailable';
                 ws._built=false;
