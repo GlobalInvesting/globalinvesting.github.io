@@ -1,0 +1,100 @@
+name: Update Myfxbook Sentiment — v1.0 (private scripts)
+
+# ESTRATEGIA DE TRIGGER
+#
+# Corre cada hora, todos los días (schedule nativo de GitHub).
+#
+# DURACIÓN ESTIMADA: ~1-2 min por corrida.
+#
+# PLACEMENT: script fetch_myfxbook_sentiment.py vive en el repo privado
+# globalinvesting-scripts (checkout explícito vía SCRIPTS_PAT). Los minutos
+# de Actions se consumen en este repo público → ilimitados y sin costo.
+# Movido desde globalinvesting-scripts (repo privado) el 2026-08-27 —
+# ver CHANGELOG.md "Migración a Actions gratuitas — Fase 1 (myfxbook-sentiment)"
+# y GUIDELINES.md "Public workflow files must not name data/infra vendors"
+# para el criterio ya establecido con update-fx-liquidity.yml y el resto de
+# los workflows públicos.
+
+on:
+  schedule:
+    - cron: '20 * * * *'   # cada hora, minuto 20
+  workflow_dispatch:   # trigger manual desde GitHub UI para test
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: update-myfxbook-sentiment
+  cancel-in-progress: false   # no cancelar un fetch en curso — esperar
+
+permissions:
+  contents: write   # necesario para git push al mismo repo
+  actions: write    # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+
+jobs:
+  fetch-sentiment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v4
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v4
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch sentiment data
+        env:
+          MYFXBOOK_EMAIL:    ${{ secrets.MYFXBOOK_EMAIL }}
+          MYFXBOOK_PASSWORD: ${{ secrets.MYFXBOOK_PASSWORD }}
+          OUTPUT_PATH:       sentiment-data/myfxbook.json
+        run: python3 private-scripts/fetch_myfxbook_sentiment.py
+
+      - name: Commit and push
+        id: push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cp sentiment-data/myfxbook.json /tmp/myfxbook_fresh.json
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/myfxbook_fresh.json sentiment-data/myfxbook.json
+            git add sentiment-data/myfxbook.json
+            if git diff --staged --quiet; then
+              echo "No changes — skipping commit."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit -m "Sentiment update — ${TIMESTAMP}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep $((i * 2))
+          done
+          echo "⚠️  All push attempts exhausted — data will refresh on next scheduled run."
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Trigger Pages deploy
+        # Pushes hechos con el GITHUB_TOKEN por default NO disparan otros
+        # workflows on:push (regla anti-loop de GitHub) — hay que disparar
+        # deploy-pages.yml explícitamente, y solo si esta corrida pusheó datos
+        # nuevos. Mismo patrón que update-fx-liquidity.yml.
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
