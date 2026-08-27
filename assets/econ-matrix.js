@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v2.5.7 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.8 — Native Economic Matrix panel
  *
  * ── v2.5.5 (2026-08-26) — Wired NOK/SEK "Emp Chg" to a new Trading
  *    Economics fallback (fetch_te_employment_change.py v1.0) — both
@@ -1033,6 +1033,29 @@
     ppi:  'No producer-price release in the current source for this currency',
   };
 
+  // ── Emp Chg column: official headline vs. in-house proxy ──────────────────
+  // Santiago asked why JPY's Emp Chg magnitude (-360.0K) looked so out of
+  // line with USD's (-23.0K) given Japan's smaller population — verified
+  // the two aren't comparable because they're not the same TYPE of release,
+  // not because of a scaling error. USD/AUD/CAD/GBP/NZD/EUR each have an
+  // OFFICIAL "Employment Change"-equivalent headline release, recognized
+  // and market-tracked as such (ForexFactory: "AU Employment Change", "CA
+  // Employment Change", etc.) — AUD/CAD/GBP/NZD/EUR's version is itself
+  // already a household-survey (Labour Force Survey) figure, same broad
+  // concept as JPY's, only USD's Non Farm Payrolls is the establishment-
+  // survey outlier. JPY/CHF/NOK/SEK have NO such officially-tracked
+  // headline at all — what's wired for those four is a proxy we built
+  // ourselves (CHF/NOK/SEK: TE's Eurostat quarterly % change; JPY: a
+  // locally-computed MoM delta of a level) to fill a real coverage gap,
+  // not a mirror of an existing market-recognized release. Both groups are
+  // accurate data, but they don't carry the same evidentiary weight, so a
+  // reader comparing magnitudes across the column should know which is
+  // which.
+  const EMP_PROXY_CCY = new Set(['JPY', 'CHF', 'NOK', 'SEK']);
+  const EMP_PROXY_NOTE = 'In-house estimate, not an officially-tracked headline release ' +
+    '(unlike USD/AUD/CAD/GBP/NZD/EUR\u2019s native Employment Change-equivalent) \u2014 ' +
+    'see GUIDELINES.md for sourcing.';
+
   // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
   // Purely a display convenience so YoY/QoQ/MoM/Annualized prints are never
   // visually ambiguous (e.g. NZD CPI is QoQ-only; several GDP prints are YoY
@@ -1321,9 +1344,14 @@
     const period = periodLabel(ev.event, ccy, gapKey);
     const ref = refLabel(ev);
     const sub = (period ? period + ' \u00b7 ' : '') + ref;
-    const title = ev.event + ' \u00b7 ' + ev.dateISO + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
+    const isEmpProxy = gapKey === 'emp' && EMP_PROXY_CCY.has(ccy);
+    let title = ev.event + ' \u00b7 ' + ev.dateISO + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
+    if (isEmpProxy) title += ' \u00b7 ' + EMP_PROXY_NOTE;
+    const marker = isEmpProxy
+      ? '<sup style="color:var(--text3);font-size:8px;margin-left:2px;">\u2020</sup>'
+      : '';
     return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + title.replace(/"/g, '&quot;') + '">' +
-      '<div class="econmx-val">' + (ev.actual != null ? ev.actual : '\u2014') + '</div>' +
+      '<div class="econmx-val">' + (ev.actual != null ? ev.actual : '\u2014') + marker + '</div>' +
       '<div class="econmx-ref">' + sub + '</div>' +
       '</td>';
   }
