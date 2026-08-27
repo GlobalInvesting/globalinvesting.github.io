@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-27T22:15:55Z",
+  "updated_at": "2026-08-27T23:18:59Z",
   "source": "yfinance daily closes via ohlc-data/*.json (fetch_ohlc.py) \u00b7 SMA20/50/200",
   "levels": {
     "USD": {
@@ -13,16 +13,16 @@
     },
     "EUR": {
       "pair": "EUR/USD",
-      "close": 1.1656,
+      "close": 1.1655,
       "sma20": 1.1591,
       "sma50": 1.1487,
-      "sma200": 1.1637,
+      "sma200": 1.1636,
       "position": "above_sma20_above_sma50_above_sma200",
       "asof": "2026-08-27"
     },
     "GBP": {
       "pair": "GBP/USD",
-      "close": 1.3593,
+      "close": 1.3592,
       "sma20": 1.3537,
       "sma50": 1.3418,
       "sma200": 1.3437,
@@ -31,7 +31,7 @@
     },
     "JPY": {
       "pair": "USD/JPY",
-      "close": 159.37,
+      "close": 159.39,
       "sma20": 158.75,
       "sma50": 160.86,
       "sma200": 158.38,
@@ -40,7 +40,7 @@
     },
     "AUD": {
       "pair": "AUD/USD",
-      "close": 0.7198,
+      "close": 0.7199,
       "sma20": 0.7094,
       "sma50": 0.7013,
       "sma200": 0.6968,
@@ -49,7 +49,7 @@
     },
     "CAD": {
       "pair": "USD/CAD",
-      "close": 1.3851,
+      "close": 1.3853,
       "sma20": 1.391,
       "sma50": 1.4045,
       "sma200": 1.3839,
@@ -58,8 +58,8 @@
     },
     "CHF": {
       "pair": "USD/CHF",
-      "close": 0.8039,
-      "sma20": 0.8072,
+      "close": 0.8042,
+      "sma20": 0.8073,
       "sma50": 0.8087,
       "sma200": 0.7931,
       "position": "below_sma20_below_sma50_above_sma200",
@@ -67,7 +67,7 @@
     },
     "NZD": {
       "pair": "NZD/USD",
-      "close": 0.5953,
+      "close": 0.5952,
       "sma20": 0.5908,
       "sma50": 0.5813,
       "sma200": 0.5848,
@@ -76,8 +76,8 @@
     },
     "NOK": {
       "pair": "USD/NOK",
-      "close": 9.319,
-      "sma20": 9.428,
+      "close": 9.322,
+      "sma20": 9.429,
       "sma50": 9.61,
       "sma200": 9.653,
       "position": "below_sma20_below_sma50_below_sma200",
@@ -85,7 +85,7 @@
     },
     "SEK": {
       "pair": "USD/SEK",
-      "close": 9.514,
+      "close": 9.517,
       "sma20": 9.506,
       "sma50": 9.606,
       "sma200": 9.341,
