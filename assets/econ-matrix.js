@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v2.5.5 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.6 — Native Economic Matrix panel
  *
  * ── v2.5.5 (2026-08-26) — Wired NOK/SEK "Emp Chg" to a new Trading
  *    Economics fallback (fetch_te_employment_change.py v1.0) — both
@@ -813,15 +813,24 @@
       // Relies on canon()'s existing "Switzerland " prefix stripping \u2014 no
       // new stripping logic needed.
       ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
-      // v2.5.4: v2.5.3's "no title found" is now stale \u2014 fetch_ff_calendar.py
-      // v3.47 / calendar-watcher.js v5.34.0 restored "Switzerland Non Farm
-      // Payrolls" (FSO) to general calendar coverage, so a CHF labor-market
-      // title does now reach calendar.json. Deliberately still NOT wired
-      // here: it is a quarterly employment headcount LEVEL (millions, FSO),
-      // not a change/rate figure \u2014 wiring it would misrepresent this
-      // column's stated "net jobs created" semantics, the same level-vs-
-      // change conflation risk already flagged for NOK/SEK below.
-      emp:   [],
+      // v2.5.6: v2.5.4's "confirmed gap" is now stale for THIS source —
+      // 'Non Farm Payrolls' (FSO) is still correctly excluded as a
+      // quarterly headcount LEVEL, not a change/rate figure. But Santiago
+      // flagged TE's own page menu for Switzerland also lists a genuine
+      // "Employment Change" indicator (distinct from Full Time
+      // Employment/Job Offers, both levels, correctly not used) —
+      // live-fetched tradingeconomics.com/switzerland/employment-change and
+      // confirmed EUROSTAT-sourced, seasonally adjusted, QUARTERLY %
+      // change in persons employed: +0.20% (Mar 2026), a real current
+      // print, same exact definition/template as NOK/SEK below. Switzerland
+      // has a bilateral statistical cooperation agreement with Eurostat
+      // covering this series despite not being EU/EEA — do not assume
+      // Eurostat coverage implies EU/EEA membership elsewhere without
+      // checking per-country (JPY was checked and confirmed to have no
+      // equivalent — no bilateral agreement, no "Employment Change" listed
+      // anywhere in TE's Japan indicator menu).
+      // Fetched by fetch_te_employment_change.py v1.1.
+      emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
