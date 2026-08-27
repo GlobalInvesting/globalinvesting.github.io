@@ -1,8 +1,12 @@
 /**
- * calendar-panel.js v1.19.21 — Native economic calendar renderer
+ * calendar-panel.js v1.19.22 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
+ * v1.19.22 (2026-08-26): FIX — same-local-day events rendered in whatever
+ *   order the upstream events array happened to carry them, not sorted by
+ *   real time. Now sorted by the true UTC instant (dateISO+timeUTC) within
+ *   each local-date group before render. See CHANGELOG.md.
  * v1.19.21 (2026-08-24): FIX — drill-down modal showed "No prior
  *   actual/forecast history for this event in the last year" for several
  *   G10 indicators despite a full year of Myfxbook history existing under a
@@ -2177,7 +2181,30 @@
     const groups = [];
 
     Array.from(allDates).sort().forEach(dateISO => {
-      const dayEvs  = byDate[dateISO] || [];
+      // v1.19.22: dayEvs previously rendered in whatever order the underlying
+      // `events` array happened to have them, NOT sorted by time. That array
+      // is a concat of ff_calendar.json + a calendar.json "fill" (see the
+      // truncation-fallback above), and even a single source file is only
+      // ever sorted by the dateISO STRING by the Python fetchers
+      // (`sorted(events, key=lambda e: e["dateISO"])`) — never by
+      // dateISO+timeUTC together — so same-day order was never guaranteed
+      // even before concatenation, and multiple independent writers
+      // (fetch_ff_calendar.py, calendar-watcher.js, several TE fallbacks,
+      // direct-commit fallbacks) each append in their own run order.
+      // Grouping by LOCAL date (toLocalDateISO(), correct — an event at
+      // 00:00-02:59 UTC belongs under the PREVIOUS local evening for GMT-3
+      // users) made this latent bug visible: those late-UTC events can sit
+      // anywhere in the underlying array relative to the rest of that local
+      // day's events, including before them, so they rendered first instead
+      // of last. Fixed by sorting on the real UTC instant, independent of
+      // upstream array order.
+      const dayEvs = (byDate[dateISO] || []).slice().sort((a, b) => {
+        const ams = Date.UTC(+a.dateISO.slice(0,4), +a.dateISO.slice(5,7)-1, +a.dateISO.slice(8,10),
+          ...(a.timeUTC ? a.timeUTC.split(':').map(Number) : [23, 59]));
+        const bms = Date.UTC(+b.dateISO.slice(0,4), +b.dateISO.slice(5,7)-1, +b.dateISO.slice(8,10),
+          ...(b.timeUTC ? b.timeUTC.split(':').map(Number) : [23, 59]));
+        return ams - bms;
+      });
       const dayHols = holidayByDate[dateISO] || [];
       const isToday = dateISO === today;
       let gHtml = `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
