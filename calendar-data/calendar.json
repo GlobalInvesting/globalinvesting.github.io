@@ -1,173 +1,33 @@
 {
-  "lastUpdate": "2026-08-26T23:51:19Z",
-  "generatedAt": "2026-08-26T23:51:19Z",
+  "lastUpdate": "2026-08-27T00:01:05Z",
+  "generatedAt": "2026-08-27T00:01:05Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Myfxbook · ForexFactory",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-08-26",
+  "rangeFrom": "2025-08-27",
   "rangeTo": "2026-08-28",
-  "totalEvents": 3802,
+  "totalEvents": 3804,
   "currencyCounts": {
-    "EUR": 869,
-    "USD": 1288,
-    "AUD": 264,
+    "AUD": 265,
+    "EUR": 873,
     "GBP": 442,
+    "USD": 1283,
     "NZD": 88,
     "CHF": 126,
-    "CAD": 267,
-    "JPY": 217,
+    "CAD": 268,
+    "JPY": 218,
     "SEK": 158,
     "NOK": 83
   },
   "impactCounts": {
-    "medium": 1894,
     "high": 1680,
+    "medium": 1896,
     "low": 228
   },
   "surpriseStats": {
-    "SEK/consumer inflation expectations": {
-      "n": 2,
-      "mean": -0.4,
-      "std": 0.989949
-    },
-    "EUR/retail sales mom": {
-      "n": 6,
-      "mean": -0.316667,
-      "std": 0.462241
-    },
-    "EUR/retail sales yoy": {
-      "n": 7,
-      "mean": -0.342857,
-      "std": 1.431616
-    },
-    "EUR/business confidence": {
-      "n": 3,
-      "mean": -0.2,
-      "std": 0.72111
-    },
-    "EUR/consumer confidence": {
-      "n": 7,
-      "mean": 1.1,
-      "std": 2.054264
-    },
-    "EUR/economic sentiment": {
-      "n": 3,
-      "mean": 0.766667,
-      "std": 0.11547
-    },
-    "USD/jobless claims 4-week average": {
-      "n": 16,
-      "mean": 0.046875,
-      "std": 3.449902
-    },
-    "USD/personal income mom": {
-      "n": 5,
-      "mean": 0.06,
-      "std": 0.304959
-    },
-    "USD/gdp growth rate qoq": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.504975
-    },
-    "USD/durable goods orders mom": {
-      "n": 5,
-      "mean": 0.56,
-      "std": 2.397499
-    },
-    "USD/gdp price index qoq": {
-      "n": 5,
-      "mean": 0.4,
-      "std": 1.371131
-    },
-    "USD/pce price index yoy": {
-      "n": 5,
-      "mean": 0.02,
-      "std": 0.044721
-    },
-    "USD/core pce price index mom": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.054772
-    },
-    "USD/durable goods orders ex transp mom": {
-      "n": 5,
-      "mean": 0.32,
-      "std": 0.476445
-    },
-    "USD/core pce price index yoy": {
-      "n": 5,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/durable goods orders ex defense mom": {
-      "n": 5,
-      "mean": 0.8,
-      "std": 3.038092
-    },
-    "USD/pce price index mom": {
-      "n": 5,
-      "mean": -0.04,
-      "std": 0.089443
-    },
-    "USD/corporate profits qoq": {
-      "n": 2,
-      "mean": 0.7,
-      "std": 9.616652
-    },
-    "USD/continuing jobless claims": {
-      "n": 16,
-      "mean": -2.75,
-      "std": 14.040418
-    },
-    "USD/initial jobless claims": {
-      "n": 16,
-      "mean": 1.6875,
-      "std": 9.449647
-    },
-    "USD/personal spending mom": {
-      "n": 5,
-      "mean": 0.06,
-      "std": 0.054772
-    },
-    "USD/new home sales mom": {
-      "n": 5,
-      "mean": -6.88,
-      "std": 4.131828
-    },
-    "USD/new home sales": {
-      "n": 5,
-      "mean": -0.0326,
-      "std": 0.034217
-    },
-    "USD/eia gasoline stocks change": {
-      "n": 16,
-      "mean": 0.651687,
-      "std": 1.598107
-    },
-    "USD/eia crude oil stocks change": {
-      "n": 16,
-      "mean": 0.96225,
-      "std": 5.865362
-    },
-    "JPY/unemployment rate": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.11547
-    },
-    "JPY/industrial production mom": {
-      "n": 3,
-      "mean": 0.566667,
-      "std": 1.150362
-    },
-    "JPY/retail sales yoy": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 2.426932
-    },
     "NZD/anz business confidence": {
       "n": 3,
       "mean": 21.233333,
@@ -208,6 +68,11 @@
       "mean": 0.12,
       "std": 0.148324
     },
+    "EUR/retail sales yoy": {
+      "n": 6,
+      "mean": 0.083333,
+      "std": 0.966264
+    },
     "EUR/unemployment benefit claims": {
       "n": 2,
       "mean": 2.25,
@@ -237,6 +102,11 @@
       "n": 3,
       "mean": 4.133333,
       "std": 7.145162
+    },
+    "EUR/retail sales mom": {
+      "n": 5,
+      "mean": -0.14,
+      "std": 0.181659
     },
     "GBP/nationwide housing prices mom": {
       "n": 3,
@@ -338,6 +208,16 @@
       "mean": 0.1,
       "std": 0.556776
     },
+    "USD/eia crude oil stocks change": {
+      "n": 15,
+      "mean": 0.974867,
+      "std": 6.071001
+    },
+    "USD/eia gasoline stocks change": {
+      "n": 15,
+      "mean": 0.7066,
+      "std": 1.638499
+    },
     "AUD/balance of trade": {
       "n": 3,
       "mean": -0.732667,
@@ -372,6 +252,21 @@
       "n": 3,
       "mean": 0.0,
       "std": 0.173205
+    },
+    "USD/initial jobless claims": {
+      "n": 15,
+      "mean": 2.066667,
+      "std": 9.654508
+    },
+    "USD/continuing jobless claims": {
+      "n": 15,
+      "mean": -2.533333,
+      "std": 14.5055
+    },
+    "USD/jobless claims 4-week average": {
+      "n": 15,
+      "mean": -0.083333,
+      "std": 3.530058
     },
     "JPY/household spending yoy": {
       "n": 3,
@@ -978,6 +873,11 @@
       "mean": 1.525,
       "std": 0.846069
     },
+    "EUR/consumer confidence": {
+      "n": 6,
+      "mean": 0.733333,
+      "std": 1.983599
+    },
     "EUR/netherlands consumer confidence": {
       "n": 3,
       "mean": 3.666667,
@@ -1017,6 +917,11 @@
       "n": 2,
       "mean": 2.05,
       "std": 2.333452
+    },
+    "EUR/business confidence": {
+      "n": 2,
+      "mean": -0.5,
+      "std": 0.707107
     },
     "EUR/france business confidence": {
       "n": 3,
@@ -1083,6 +988,16 @@
       "mean": -9.3,
       "std": 0.0
     },
+    "USD/new home sales": {
+      "n": 4,
+      "mean": -0.02875,
+      "std": 0.038239
+    },
+    "USD/new home sales mom": {
+      "n": 4,
+      "mean": -7.85,
+      "std": 4.060788
+    },
     "AUD/unemployment rate": {
       "n": 4,
       "mean": -0.025,
@@ -1108,10 +1023,65 @@
       "mean": -7.75,
       "std": 18.571932
     },
+    "USD/gdp growth rate qoq": {
+      "n": 4,
+      "mean": 0.1,
+      "std": 0.522813
+    },
+    "USD/durable goods orders ex defense mom": {
+      "n": 4,
+      "mean": -0.475,
+      "std": 1.212092
+    },
+    "USD/core pce price index yoy": {
+      "n": 4,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "USD/gdp price index qoq": {
+      "n": 4,
+      "mean": 0.75,
+      "std": 1.3
+    },
+    "USD/durable goods orders ex transp mom": {
+      "n": 4,
+      "mean": 0.25,
+      "std": 0.519615
+    },
+    "USD/pce price index yoy": {
+      "n": 4,
+      "mean": 0.025,
+      "std": 0.05
+    },
+    "USD/core pce price index mom": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.05
+    },
     "USD/chicago fed national activity index": {
       "n": 4,
       "mean": -0.195,
       "std": 0.03
+    },
+    "USD/personal spending mom": {
+      "n": 4,
+      "mean": 0.075,
+      "std": 0.05
+    },
+    "USD/pce price index mom": {
+      "n": 4,
+      "mean": -0.025,
+      "std": 0.095743
+    },
+    "USD/personal income mom": {
+      "n": 4,
+      "mean": 0.175,
+      "std": 0.189297
+    },
+    "USD/durable goods orders mom": {
+      "n": 4,
+      "mean": -0.4,
+      "std": 1.232883
     },
     "EUR/ecb consumer inflation expectations": {
       "n": 3,
@@ -1132,6 +1102,11 @@
       "n": 2,
       "mean": -9.2,
       "std": 25.880108
+    },
+    "JPY/retail sales yoy": {
+      "n": 2,
+      "mean": -0.25,
+      "std": 3.323402
     },
     "EUR/spain retail sales mom": {
       "n": 2,
@@ -1158,6 +1133,11 @@
       "mean": -7.85,
       "std": 0.212132
     },
+    "EUR/economic sentiment": {
+      "n": 2,
+      "mean": 0.8,
+      "std": 0.141421
+    },
     "EUR/spain business confidence": {
       "n": 2,
       "mean": -0.1,
@@ -1167,6 +1147,16 @@
       "n": 2,
       "mean": 0.15,
       "std": 3.040559
+    },
+    "JPY/unemployment rate": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "JPY/industrial production mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.848528
     },
     "EUR/germany retail sales yoy": {
       "n": 2,
@@ -1390,90 +1380,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Consumer Confidence",
-      "dateISO": "2025-08-26",
-      "actual": "87",
-      "forecast": "90.0",
-      "previous": "88.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:45"
-    },
-    {
-      "currency": "USD",
-      "event": "Durable Goods Orders Ex Transp MoM",
-      "dateISO": "2025-08-26",
-      "actual": "1.1%",
-      "forecast": "0.2",
-      "previous": "0.3",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Durable Goods Orders ex Defense MoM",
-      "dateISO": "2025-08-26",
-      "actual": "-2.5%",
-      "forecast": "-3.6",
-      "previous": "-9.5",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Durable Goods Orders MoM",
-      "dateISO": "2025-08-26",
-      "actual": "-2.8%",
-      "forecast": "-4.0",
-      "previous": "-9.4",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "S&P/Case-Shiller Home Price YoY",
-      "dateISO": "2025-08-26",
-      "actual": "2.1%",
-      "forecast": "2.1",
-      "previous": "2.8",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "13:00"
-    },
-    {
-      "currency": "USD",
-      "event": "CB Consumer Confidence",
-      "dateISO": "2025-08-26",
-      "actual": "97.4",
-      "forecast": "96.2",
-      "previous": "98.7",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:00"
-    },
-    {
-      "currency": "USD",
-      "event": "API Crude Oil Stock Change",
-      "dateISO": "2025-08-26",
-      "actual": "-0.974M",
-      "forecast": "-1.7",
-      "previous": "-2.4",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "20:30"
-    },
     {
       "currency": "AUD",
       "event": "Monthly CPI Indicator",
@@ -44126,32 +44032,6 @@
       "previous": "-7.167M"
     },
     {
-      "date": "5 Aug",
-      "dateISO": "2026-08-05",
-      "timeUTC": "20:05",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Fed Cook Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "5 Aug",
-      "dateISO": "2026-08-05",
-      "timeUTC": "20:30",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "President Trump Speaks",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
       "date": "6 Aug",
       "dateISO": "2026-08-06",
       "timeUTC": "01:30",
@@ -47779,15 +47659,158 @@
     {
       "date": "27 Aug",
       "dateISO": "2026-08-27",
+      "timeUTC": "00:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jackson Hole Symposium",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia RBA Bulletin",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "01:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan BoJ Himino Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany GfK Consumer Confidence",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-29.6",
+      "previous": "-29.6"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France PPI YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.7%",
+      "previous": "2.6%"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France PPI MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.6%",
+      "previous": "-0.6%"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Unemployment Benefit Claims",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "10.0K",
+      "previous": "5.9K"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "11:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area ECB Monetary Policy Meeting Accounts",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "12:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "C$-2.0B",
+      "previous": "C$-7.2B"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
       "flag": "🇺🇸",
-      "event": "Unemployment Claims",
+      "event": "United States Goods Trade Balance",
+      "impact": "high",
+      "actual": null,
+      "forecast": "$-99.0B",
+      "previous": "$-101.4B"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Wholesale Inventories MoM",
       "impact": "medium",
       "actual": null,
-      "forecast": "208K",
-      "previous": "206K"
+      "forecast": "0.1%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "27 Aug",
+      "dateISO": "2026-08-27",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Retail Inventories Ex Autos MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "-0.4%"
     },
     {
       "date": "27 Aug",
@@ -47796,11 +47819,11 @@
       "country": "JPY",
       "currency": "JPY",
       "flag": "🇯🇵",
-      "event": "Tokyo Core CPI y/y",
+      "event": "Japan Unemployment Rate",
       "impact": "medium",
       "actual": null,
-      "forecast": "1.8%",
-      "previous": "1.9%"
+      "forecast": "2.5%",
+      "previous": "2.5%"
     },
     {
       "date": "28 Aug",
