@@ -18,6 +18,12 @@ on:
     branches: [main]
   workflow_dispatch:   # permite disparo manual desde la UI para test/backfill
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in — mismo estándar (FIX-12/FIX-19)
+                                              # ya aplicado en el resto de workflows del proyecto; este
+                                              # es el que más corre (cada push a main) y era el único
+                                              # workflow activo sin la variable.
+
 permissions:
   contents: read
   pages: write
