@@ -1,5 +1,13 @@
 /**
- * econ-matrix.js v2.5.4 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.5 — Native Economic Matrix panel
+ *
+ * ── v2.5.5 (2026-08-26) — Wired NOK/SEK "Emp Chg" to a new Trading
+ *    Economics fallback (fetch_te_employment_change.py v1.0) — both
+ *    currencies' only Myfxbook labor-market title is a raw LEVEL, not a
+ *    change/rate figure, so the cell stayed correctly blank until now.
+ *    JPY/CHF's "Emp Chg" cells remain deliberately blank for a different,
+ *    already-documented reason (ratio / quarterly headcount level, not a
+ *    genuine gap in coverage) — see the v2.5.4 note directly below.
  *
  * ── v2.5.4 (2026-08-26) — Documentation-only update: JPY/CHF "Emp Chg"
  *    blank-cell comments were stale. fetch_ff_calendar.py v3.47 /
@@ -893,12 +901,23 @@
       // any name on Myfxbook specifically.
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
-      // v2.5.3: confirmed gap, NOT wired to 'Employed Persons(<Mon>)' \u2014
-      // that title is a raw LEVEL (headcount), not a change/rate figure, and
-      // would silently misrepresent this column's stated semantics (net
-      // jobs created). No genuine employment-CHANGE title found in the
-      // current source for SEK.
-      emp:   [],
+      // v2.5.5: Myfxbook still has no genuine employment-CHANGE title for
+      // SEK (only the raw-LEVEL 'Employed Persons(<Mon>)') \u2014 wired to a
+      // new non-Myfxbook source instead of left blank, the same pattern
+      // already used for CHF/NZD/SEK core inflation (SEK also being the
+      // currency where that exact pattern first paid off, per v2.2.7).
+      // Trading Economics' "Employment Change"
+      // (tradingeconomics.com/sweden/employment-change, EUROSTAT-sourced,
+      // seasonally adjusted QUARTERLY % change in persons employed) is a
+      // genuine change/rate figure, not a level, so it does NOT carry the
+      // level-vs-change conflation risk this column exists to avoid.
+      // Fetched by fetch_te_employment_change.py v1.0. UNVALIDATED end-to-
+      // end as of v2.5.5 \u2014 that script's live requests-based scrape was
+      // never run from a GitHub Actions runner (see its header). If it
+      // never populates a matching event, this cell simply stays blank,
+      // same as before \u2014 see fetch_te_employment_change.py before
+      // assuming it's broken.
+      emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
@@ -913,10 +932,22 @@
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI YoY'], // parenthetical-month title style (e.g. "PPI YoY(May)") \u2014 strictMatch already handles this
-      // v2.5.3: confirmed gap, same reasoning as SEK above \u2014
-      // 'Unemployed Persons(<Mon>)' in the current source is a raw LEVEL,
-      // not a change figure, so it is not wired here.
-      emp:   [],
+      // v2.5.5: Myfxbook still has no genuine employment-CHANGE title for
+      // NOK (only the raw-LEVEL 'Unemployed Persons(<Mon>)', excluded for
+      // the same reason as SEK below) \u2014 wired to a new non-Myfxbook
+      // source instead of left blank, the same pattern already used for
+      // CHF/NZD/SEK core inflation. Trading Economics' "Employment Change"
+      // (tradingeconomics.com/norway/employment-change, EUROSTAT-sourced,
+      // seasonally adjusted QUARTERLY % change in persons employed) is a
+      // genuine change/rate figure, not a level, so it does NOT carry the
+      // level-vs-change conflation risk this column exists to avoid.
+      // Fetched by fetch_te_employment_change.py v1.0. UNVALIDATED end-to-
+      // end as of v2.5.5 \u2014 that script's live requests-based scrape was
+      // never run from a GitHub Actions runner (see its header). If it
+      // never populates a matching event, this cell simply stays blank,
+      // same as before \u2014 see fetch_te_employment_change.py before
+      // assuming it's broken.
+      emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Production MoM'],
       conf:  ['Industrial Confidence'],
