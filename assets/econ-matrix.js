@@ -1,5 +1,5 @@
 /**
- * econ-matrix.js v2.5.6 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.7 — Native Economic Matrix panel
  *
  * ── v2.5.5 (2026-08-26) — Wired NOK/SEK "Emp Chg" to a new Trading
  *    Economics fallback (fetch_te_employment_change.py v1.0) — both
@@ -706,18 +706,22 @@
       // any "Japan " prefix drift the same way it does elsewhere). Fixed
       // upstream in fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29.
       ppi:   ['PPI YoY', 'PPI MoM'],
-      // v2.5.4: v2.5.3's "no title found" is now stale \u2014 fetch_ff_calendar.py
-      // v3.47 / calendar-watcher.js v5.34.0 restored "Jobs/applications
-      // ratio" (MHLW) to general calendar coverage, so a JPY labor-market
-      // title does now reach calendar.json. Deliberately still NOT wired
-      // here: it is a labor-market TIGHTNESS RATIO (job openings \u00f7
-      // applicants, >1 = more jobs than seekers), not a net-jobs-created
-      // flow figure \u2014 wiring it into this column would misrepresent the
-      // column's stated "net jobs created" semantics, the same
-      // level/ratio-vs-change conflation risk already flagged for NOK/SEK
-      // below. Unemployment Rate remains Japan's wired labor-market
-      // indicator in this column set.
-      emp:   [],
+      // v2.5.7: v2.5.4's "Deliberately still NOT wired" is now stale for
+      // THIS specific approach — "Jobs/applications ratio" is still
+      // correctly excluded (a tightness ratio, not a flow). But Santiago
+      // noted TE's own chart widget for japan/employed-persons exposes a
+      // Value/Chg/Chg% toggle, confirming TE itself treats a MoM delta of
+      // that level as legitimate. That toggle's data isn't reachable via a
+      // static-HTML scrape, but the same "Related" table already gives us
+      // Last/Previous for "Employed Persons" (Thousand), so
+      // fetch_te_employment_change.py v1.2 computes delta = Last −
+      // Previous locally and emits it as an absolute Thousand ("K") value
+      // — matching USD/GBP/AUD/CAD's native NFP-style unit (Employed
+      // Persons' own unit), not a %. Distinct event title
+      // ("Employment Change MoM") from NOK/SEK/CHF's below, both because
+      // it's a locally-computed value, not a vendor-published change
+      // series, and to surface "MoM" cadence in the UI.
+      emp:   ['Employment Change MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
