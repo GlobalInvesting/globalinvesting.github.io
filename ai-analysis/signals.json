@@ -1,39 +1,63 @@
 {
-  "generated_at": "2026-08-26T22:51:04Z",
+  "generated_at": "2026-08-27T06:54:18Z",
   "signals": [
     {
-      "time": "22:49",
+      "time": "06:53",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Commodity Bid",
-      "text": "AUD/CHF reflects the week's dominant G10 divergence, with AUD outperforming by +1.146% while CHF lags by -0.659%, creating a 1.806% spread. This strength is underpinned by a 435bp carry advantage (RBA 4.35% vs SNB 0.0%) and recent hot domestic CPI data that keeps the RBA on a more restrictive footing than its G10 peers. SNB holds at 0.00%. AUD/USD holding above its SMA20/50/200 cluster at 0.7086/0.7009/0.6964 confirms broad AUD demand. Trade bias: Long AUD/CHF; carry advantage and RBA policy divergence support continued outperformance. Catalyst: RBA meeting 29 Sep — 100% hold priced. Risk: VIX breaks above 25, triggering a flight to safety and unwinding the 435bp carry trade.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Hawkish RBA Repricing",
+      "text": "AUD/CHF trades at 0.5785, anchored by the strongest leader-to-laggard spread in the G10 scorecard at 1.951%. AUD 1W average performance is +1.225% (n=4) while CHF lags at -0.726% (n=6), creating a clear divergence. The AUD is supported by a +435bp carry premium over CHF and a hawkish shift in RBA bets targeting the 0.7275 level in AUD/USD. In contrast, CHF weakness is building as the SNB holds rates at 0.00% amid a normal volatility regime (VIX 15.2). The pair remains technically supported by the AUD/USD SMA cluster at 0.6964/0.7086. Trade bias: Bullish AUD/CHF; carry advantage and RBA hawkishness dominate the weakening CHF. Catalyst: RBA meeting 29 Sep — 100% hold priced. Risk: VIX spikes above 25, triggering a sharp safe-haven CHF bid and carry unwind.",
       "evidence": [
-        "AUD 1W avg: +1.146% (n=4)",
-        "CHF 1W avg: -0.659% (n=6)",
-        "G10 spread: 1.806%"
+        "AUD 1W avg: +1.225% (n=4)",
+        "CHF 1W avg: -0.726% (n=6)",
+        "G10 spread: 1.951%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "22:41",
+      "time": "06:50",
+      "priority": "critical",
+      "title": "USD/JPY — Carry Support vs BoJ Verbal Intervention",
+      "text": "USD/JPY trades at 159.37, holding just below the 160.00 threshold that previously triggered MoF intervention warnings. A +275bp Fed-BoJ carry differential remains the primary driver, sustaining the pair despite hawkish rhetoric from BoJ Deputy Governor Himino regarding inflation risks. COT data shows specs are net short JPY at -73,641 (pctl 12), while the options market remains cautious with a strong 1M 25d risk reversal at -1.86, signaling high demand for JPY downside protection. The pair is currently testing its SMA20 at 158.76 as support. Trade bias: Long USD/JPY; carry dominance persists while VIX remains near 15.2. Catalyst: next BoJ meeting (mkt: 64% hike priced) 18 Sep — hike bias active. Risk: Confirmed BoJ/MoF intervention above 160.00 forcing a disorderly squeeze of spec shorts.",
+      "evidence": [
+        "Fed 3.75% vs BoJ 1.0% — +275bp",
+        "USDJPY 25d RR: -1.86 (strong put skew)",
+        "JPY COT pctl(52w): 12"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "06:48",
       "priority": "warning",
-      "title": "USD/CAD — ESI Alignment + Bank Divergence",
-      "text": "USD/CAD trades at 1.3873, positioned below its SMA20/50 cluster (1.3918/1.405) but above the SMA200 at 1.384. While CAD is currently a G10 laggard (avg -0.505%), its Economic Surprise Index (ESI) remains strong at +23.4, diverging from the USD ESI of -9.0. ING Research notes that markets is likely to be underestimating trade uncertainty for Canada, suggesting CAD could underperform despite the recent run of positive data beats. The Fed-BoC carry differential of +150bp structurally favors USD, and the correlation break vs WTI Oil (z = -1.58σ) indicates that crude's volatility is no longer the primary driver of CAD price action. Trade bias: Neutral/Bullish USD/CAD; tariff uncertainty offsets the positive domestic data surprise. Catalyst: BoC meeting 9 Sep — 100% hold priced. Risk: US 10Y yields retreat below 4.5%, narrowing the carry advantage and favoring a move toward the SMA200.",
+      "title": "AUD/USD — Positioning Extreme + Retail Divergence",
+      "text": "AUD/USD is trading at 0.7184, significantly above its SMA200 (0.6964) and SMA50 (0.7009) trend anchors. CFTC data confirms a crowded long at +49,749 contracts (pctl 94, z +1.78), indicating spec positioning is at the upper decile of its annual range. This institutional bullishness is met by an extreme retail short of 89%, creating a classic institutional-retail divergence. While a -60bp carry advantage over the USD supports the AUD, the momentum is stalling as WoW adds (+4,022) are decelerating compared to the 4W delta (+29,228). This suggests late-cycle exhaustion where retail capitulation would likely be the final push before a correction. Trade bias: Bullish AUD/USD; institutional momentum remains intact despite retail fading the trend. Catalyst: RBA meeting 29 Sep. Risk: LF net delta turns negative while retail shorts cover, signaling a trend reversal.",
       "evidence": [
-        "CAD ESI: +23.4 vs USD: -9.0",
-        "USD/CAD Carry: +150bp",
-        "CAD 1W avg: -0.505%"
+        "AUD COT LF net pctl(52w): 94 (crowded long)",
+        "Retail Sentiment: 89% short",
+        "AUD/USD SMA200: 0.6964"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "22:35",
-      "priority": "info",
-      "title": "GBP/USD — Elevated Vol Premium + COT Extreme",
-      "text": "GBP/USD at 1.3596 is characterized by an extreme volatility risk premium, with ATM IV at 11.0% vs HV30 of 5.8%, resulting in a +5.2% VRP. This suggests the options market is pricing in significantly more tail risk than recent price action justifies. Speculative positioning is crowded long (pctl 92, lev_net +46,070), leaving the pair vulnerable to an unwind if US data surprises to the upside. The 2s10s bear steepener in the US Treasury curve (+42.4bp) typically supports the USD, yet GBP holds its premium due to SONIA rates (3.73%) matching SOFR (3.65%). Trade bias: Neutral GBP/USD; extreme vol premium and crowded long positioning suggest limited upside. Catalyst: Jackson Hole Symposium 27-29 Aug. Risk: Fed's Warsh delivers a hawkish surprise, triggering a broad USD rally and squeezing the GBP speculative long.",
+      "time": "06:45",
+      "priority": "warning",
+      "title": "GBP/USD — Elevated Vol Premium + Macro Headwinds",
+      "text": "GBP/USD trades at 1.3587, navigating a heavy vol regime where IV (11.0%) exceeds HV30 (5.1%) by 5.9 points, indicating a massive volatility risk premium. This suggests the options market is pricing in significant hedging demand ahead of BoE/Fed uncertainty despite a neutral 25d risk reversal at -0.08. Speculative positioning is crowded with a GBP LF net long of +46,070 (pctl 92, z +1.22), leaving the pair vulnerable to a long-unwind if data continues to miss (ESI -9.3). The pair holds above the SMA20/50 cluster at 1.3410/1.3531. Trade bias: Neutral GBP/USD; extreme vol premium and crowded spec longs cap further upside. Catalyst: BoE meeting 17 Sep. Risk: US PCE surprise extension drives a break below 1.3531, triggering a spec long liquidation.",
       "evidence": [
-        "GBP/USD VRP: +5.2%",
-        "GBP COT pctl: 92",
-        "GBP/USD Carry: -8bp (favors GBP)"
+        "GBP/USD VRP: +5.9% (IV 11.0% vs HV30 5.1%)",
+        "GBP COT LF net pctl(52w): 92",
+        "GBP ESI Index: -9.3"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "06:42",
+      "priority": "info",
+      "title": "USD/CAD — Commodity Reversal + ESI Divergence",
+      "text": "USD/CAD is at 1.3887, currently trading below its SMA20 (1.3918) and SMA50 (1.4050) as oil prices see a war premium unwind. WTI has fallen below $81.00 following Iran-Oman diplomatic progress, which typically weakens the CAD, yet CAD ESI remains strong at +25.3. This positive data outperformance contrasts with heavy speculative shorting (pctl 3, z -2.07), creating an asymmetric setup for a CAD recovery if trade tariff fears subside. The Fed-BoC +150bp carry spread currently favors the USD, limiting the downside for the pair near 1.3840 (SMA200). Trade bias: Bearish USD/CAD; positive CAD data surprises challenge crowded spec shorts. Catalyst: BoC meeting 9 Sep — 100% hold priced. Risk: Sustained WTI breakdown below $75.00 invalidating the CAD recovery thesis.",
+      "evidence": [
+        "CAD COT LF pctl(52w): 3 (extreme short)",
+        "CAD ESI Index: +25.3",
+        "USD/CAD carry spread: +150bp"
       ],
       "_source": "engine-ai-primary"
     }
