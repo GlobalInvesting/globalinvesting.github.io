@@ -1,5 +1,12 @@
 /**
- * econ-matrix.js v2.5.8 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.9 — Native Economic Matrix panel
+ *
+ * ── v2.5.9 (2026-08-27) — Removed an internal-documentation reference
+ *    ("see GUIDELINES.md for sourcing") from the public Emp Chg proxy
+ *    tooltip. The disclosure itself (in-house estimate vs. official
+ *    headline) is correct and stays; only the pointer to internal repo
+ *    docs is removed, per the standing "no backend/architecture details
+ *    in user-facing copy" rule.
  *
  * ── v2.5.5 (2026-08-26) — Wired NOK/SEK "Emp Chg" to a new Trading
  *    Economics fallback (fetch_te_employment_change.py v1.0) — both
@@ -596,7 +603,7 @@
     { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change' },
     { key: 'conf',    label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published. PMI readings are on a 0\u2013100 scale where 50 is the expansion/contraction cutoff \u2014 non-PMI substitutes (Ifo, NAB Business Confidence, Industrial Confidence, etc.) use their own survey-specific scale with no fixed 50 threshold.' },
     { key: 'rtl',     label: 'Rtl Sales', title: 'Latest retail sales change' },
-    { key: 'ca',      label: 'Cur Acct',  title: 'Latest current account, native reporting units (see GUIDELINES \u2014 not normalized to %GDP)' },
+    { key: 'ca',      label: 'Cur Acct',  title: 'Latest current account, native reporting units \u2014 not normalized to %GDP' },
     { key: 'trade',   label: 'Trade Bal', title: 'Latest trade balance, native reporting units' },
     { key: 'pce',     label: 'PCE YoY',   title: 'Latest PCE Price Index, year-on-year \u2014 the U.S. Federal Reserve\u2019s preferred inflation gauge. US-specific; other economies target CPI/HICP-based measures shown in the CPI/Core CPI columns instead.' },
   ];
@@ -1053,8 +1060,7 @@
   // which.
   const EMP_PROXY_CCY = new Set(['JPY', 'CHF', 'NOK', 'SEK']);
   const EMP_PROXY_NOTE = 'In-house estimate, not an officially-tracked headline release ' +
-    '(unlike USD/AUD/CAD/GBP/NZD/EUR\u2019s native Employment Change-equivalent) \u2014 ' +
-    'see GUIDELINES.md for sourcing.';
+    '(unlike USD/AUD/CAD/GBP/NZD/EUR\u2019s native Employment Change-equivalent).';
 
   // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
   // Purely a display convenience so YoY/QoQ/MoM/Annualized prints are never
