@@ -1,5 +1,22 @@
 /**
- * econ-matrix.js v2.5.3 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.4 — Native Economic Matrix panel
+ *
+ * ── v2.5.4 (2026-08-26) — Documentation-only update: JPY/CHF "Emp Chg"
+ *    blank-cell comments were stale. fetch_ff_calendar.py v3.47 /
+ *    calendar-watcher.js v5.34.0 (same session) restored general calendar
+ *    coverage for two previously-filtered Low-impact events — JPY "Jobs/
+ *    applications ratio" (MHLW) and CHF "Switzerland Non Farm Payrolls"
+ *    (FSO) — which made the v2.5.3 comments ("no title found") inaccurate:
+ *    a title now does reach calendar.json for both. No column-wiring
+ *    change: JPY's newly-reachable title is a labor-tightness RATIO (jobs
+ *    offered \u00f7 applicants) and CHF's is a quarterly headcount LEVEL,
+ *    neither a net-jobs-created change/rate figure this column's "Emp Chg"
+ *    label requires — wiring either would misrepresent the column, the
+ *    same level/ratio-vs-change conflation risk already documented for
+ *    NOK/SEK. Both cells remain deliberately blank, comments updated to
+ *    explain why with the current (not stale) facts. See
+ *    fetch_ff_calendar.py v3.47 header and CHANGELOG.md for the full
+ *    incident.
  *
  * ── v2.5.3 (2026-08-26) — New "Emp Chg" column (net jobs created / employment
  *    change), added per direct feedback from an institutional-background
@@ -681,9 +698,17 @@
       // any "Japan " prefix drift the same way it does elsewhere). Fixed
       // upstream in fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29.
       ppi:   ['PPI YoY', 'PPI MoM'],
-      // v2.5.3: confirmed gap \u2014 no 'Employment Change'-equivalent title
-      // found in calendar.json for JPY. Unemployment Rate remains Japan's
-      // primary published labor-market indicator in the current source.
+      // v2.5.4: v2.5.3's "no title found" is now stale \u2014 fetch_ff_calendar.py
+      // v3.47 / calendar-watcher.js v5.34.0 restored "Jobs/applications
+      // ratio" (MHLW) to general calendar coverage, so a JPY labor-market
+      // title does now reach calendar.json. Deliberately still NOT wired
+      // here: it is a labor-market TIGHTNESS RATIO (job openings \u00f7
+      // applicants, >1 = more jobs than seekers), not a net-jobs-created
+      // flow figure \u2014 wiring it into this column would misrepresent the
+      // column's stated "net jobs created" semantics, the same
+      // level/ratio-vs-change conflation risk already flagged for NOK/SEK
+      // below. Unemployment Rate remains Japan's wired labor-market
+      // indicator in this column set.
       emp:   [],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
@@ -780,8 +805,14 @@
       // Relies on canon()'s existing "Switzerland " prefix stripping \u2014 no
       // new stripping logic needed.
       ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
-      // v2.5.3: confirmed gap \u2014 no 'Employment Change'-equivalent title
-      // found in calendar.json for CHF.
+      // v2.5.4: v2.5.3's "no title found" is now stale \u2014 fetch_ff_calendar.py
+      // v3.47 / calendar-watcher.js v5.34.0 restored "Switzerland Non Farm
+      // Payrolls" (FSO) to general calendar coverage, so a CHF labor-market
+      // title does now reach calendar.json. Deliberately still NOT wired
+      // here: it is a quarterly employment headcount LEVEL (millions, FSO),
+      // not a change/rate figure \u2014 wiring it would misrepresent this
+      // column's stated "net jobs created" semantics, the same level-vs-
+      // change conflation risk already flagged for NOK/SEK below.
       emp:   [],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
