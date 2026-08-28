@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-28T05:07:36Z",
-  "generatedAt": "2026-08-28T05:07:36Z",
+  "lastUpdate": "2026-08-28T06:00:53Z",
+  "generatedAt": "2026-08-28T06:00:53Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,23 +8,23 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-08-28",
-  "rangeTo": "2026-08-28",
-  "totalEvents": 3838,
+  "rangeTo": "2026-08-31",
+  "totalEvents": 3840,
   "currencyCounts": {
     "NZD": 88,
     "EUR": 894,
     "CHF": 129,
     "CAD": 270,
     "USD": 1285,
-    "JPY": 222,
+    "JPY": 224,
     "AUD": 263,
     "GBP": 441,
     "NOK": 85,
     "SEK": 161
   },
   "impactCounts": {
-    "medium": 1920,
-    "high": 1690,
+    "medium": 1921,
+    "high": 1691,
     "low": 228
   },
   "surpriseStats": {
@@ -47875,7 +47875,7 @@
       "flag": "🇳🇴",
       "event": "Norway Retail Sales MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.7%",
       "forecast": "-0.8%",
       "previous": "1.8%"
     },
@@ -47888,9 +47888,9 @@
       "flag": "🇸🇪",
       "event": "Sweden Retail Sales MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.2%",
       "forecast": "-0.6%",
-      "previous": "1.0%"
+      "previous": "1.4%"
     },
     {
       "date": "28 Aug",
@@ -48333,6 +48333,32 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "05:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Consumer Confidence",
+      "impact": "high",
+      "actual": null,
+      "forecast": "35.0",
+      "previous": "34.9"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "05:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Housing Starts YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "22.0%",
+      "previous": "18.6%"
     }
   ]
 }
