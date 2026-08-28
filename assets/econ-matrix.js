@@ -1,5 +1,23 @@
 /**
- * econ-matrix.js v2.5.11 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.12 — Native Economic Matrix panel
+ *
+ * ── v2.5.12 (2026-08-28) — Completed the calendar.json-verified audit for
+ *    the 5 remaining currencies (AUD, CAD, NZD, NOK, EUR), same method as
+ *    v2.5.11: freshly-downloaded calendar.json (curl, verified lastUpdate
+ *    current), never myfxbook.com directly. Confirmed-real fixes: CAD.rtl
+ *    and EUR.rtl each gained 'Retail Sales YoY' (both confirmed released
+ *    same-day as MoM, distinct titles, zero collisions); NZD.rtl gained
+ *    'Retail Sales YoY' and NZD.gdp gained 'GDP Growth Rate YoY' (both
+ *    confirmed released same-day as their QoQ counterparts, same pairing
+ *    AUD's gdp column already uses). NOK: re-verified, no changes needed —
+ *    every configured title already matches once canon()'s country-prefix
+ *    stripping and strictMatch()'s parenthetical-suffix allowance are
+ *    applied (NOK/SEK's "(Mon)" title style). Found and flagged, NOT
+ *    auto-fixed: AUD.rtl is a genuinely dead entry — the v2.2.3 comment
+ *    claimed an upstream fix (fetch_ff_calendar.py v3.44) that verifiably
+ *    exists in the scripts repo but has zero effect on the live feed (0 of
+ *    263 AUD events contain "retail"); root cause not diagnosed this
+ *    session, see the corrected comment on CATS.AUD.rtl below.
  *
  * ── v2.5.11 (2026-08-28) — Continued the live-audit Santiago requested,
  *    now cross-checked against the ACTUAL calendar.json (downloaded via
@@ -829,12 +847,26 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing \u2014 published monthly by Ai Group Australia
       conf:  ['NAB Business Confidence'],
-      // v2.2.3: NOT a genuine gap \u2014 same pipeline bug as JPY cpimom above.
-      // Myfxbook's real title is bare "Retail Sales MoM" (live page confirmed:
-      // australia/retail-sales-mom) \u2014 tagged Low impact while every other
-      // G10 currency's retail sales is medium+, so AUD's alone was silently
-      // dropped. Fixed upstream in fetch_ff_calendar.py v3.44 /
-      // calendar-watcher.js v5.30.
+      // CORRECTION (v2.5.12, 2026-08-28): the v2.2.3 comment below claimed
+      // this was fixed upstream (fetch_ff_calendar.py v3.44's "retail sales
+      // mom" impact-upgrade entry) \u2014 that code genuinely exists in the
+      // scripts repo (confirmed: line ~1090, corpus-checked, zero collisions)
+      // but a freshly-downloaded calendar.json (lastUpdate 2026-08-28, 263
+      // AUD events) has ZERO titles containing "retail" for AUD, canon-
+      // stripped or not. This is either (a) the fix hasn't actually reached
+      // a deployed run since it was written, or (b) Myfxbook's own AU retail
+      // sales page stopped publishing/changed title since v2.2.3 was
+      // written. Root cause NOT diagnosed this session \u2014 needs checking
+      // against a live GitHub Actions run of update-ff-calendar.yml before
+      // assuming either cause; flagged as a genuine open gap, not silently
+      // re-fixed. Left as ['Retail Sales MoM'] (currently a dead/no-op
+      // entry \u2014 renders identically to an empty array) rather than reverted
+      // to [], so the next audit sees exactly what title was expected and
+      // can re-check it against the live feed directly.
+      // v2.2.3 (original, now unconfirmed): Myfxbook's real title is bare
+      // "Retail Sales MoM" (live page: australia/retail-sales-mom) \u2014
+      // tagged Low impact while every other G10 currency's retail sales is
+      // medium+, so AUD's alone was silently dropped.
       rtl:   ['Retail Sales MoM'],
       ca:    ['Current Account'], // ABS BOP quarterly \u2014 injected by fetch_supplementary_indicators.py
       trade: ['Balance of Trade'],
@@ -857,7 +889,12 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) \u2014 injected by fetch_supplementary_indicators.py
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
-      rtl:   ['Retail Sales MoM', 'Retail Sales MoM Final', 'Retail Sales Ex Autos MoM'],
+      // v2.5.12 (2026-08-28): added 'Retail Sales YoY' \u2014 confirmed present
+      // in a freshly-downloaded calendar.json as a distinct title released
+      // same-day alongside MoM (e.g. 2026-08-21: MoM -0.8%, YoY 5.2%), same
+      // omission class as the USD/GBP rtl fix in v2.5.11. Listed last (lowest
+      // tie-break priority) since MoM is StatCan's own headline framing.
+      rtl:   ['Retail Sales MoM', 'Retail Sales MoM Final', 'Retail Sales Ex Autos MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
@@ -932,7 +969,12 @@
       pce:   [],
     },
     NZD: {
-      gdp:   ['GDP Growth Rate QoQ'],
+      // v2.5.12 (2026-08-28): added 'GDP Growth Rate YoY' as a secondary
+      // tie-break candidate \u2014 confirmed released same-day as QoQ in a
+      // freshly-downloaded calendar.json (e.g. 2026-06-17: QoQ 0.8%, YoY
+      // 1.5%), same QoQ/YoY pairing already used for AUD's gdp column.
+      // QoQ stays first (unchanged priority) since it's NZ's own headline framing.
+      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
       cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
       cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
       // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to
@@ -976,7 +1018,11 @@
       // GUIDELINES.md v8.231.0 for the full incident.
       prod:  ['Industrial Production YoY'],
       conf:  ['Business NZ PMI'],
-      rtl:   ['Retail Sales QoQ'],
+      // v2.5.12 (2026-08-28): added 'Retail Sales YoY' \u2014 confirmed
+      // present in a freshly-downloaded calendar.json as a distinct title
+      // released same-day alongside QoQ (2026-08-23: QoQ -0.5%, YoY 3.3%).
+      // QoQ stays first (unchanged priority) \u2014 NZ's own headline framing.
+      rtl:   ['Retail Sales QoQ', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
@@ -1122,7 +1168,12 @@
     // in FX/macro coverage (Germany being the bloc's largest economy) —
     // not an arbitrary pick among the now-available national surveys.
     conf:  ['Germany Ifo Business Climate', 'Ifo Business Climate'],
-    rtl:   ['Euro Area Retail Sales MoM'],
+    // v2.5.12 (2026-08-28): added 'Euro Area Retail Sales YoY' \u2014
+    // confirmed present in a freshly-downloaded calendar.json, already
+    // carrying the genuine EA-wide "Euro Area " prefix (not a national
+    // proxy like ppi/conf above), released same-day alongside MoM
+    // (2026-08-06: MoM -0.3%, YoY 0.7%).
+    rtl:   ['Euro Area Retail Sales MoM', 'Euro Area Retail Sales YoY'],
     ca:    ['Euro Area Current Account'],
     trade: ['Euro Area Balance of Trade'],
     pce:   [],
