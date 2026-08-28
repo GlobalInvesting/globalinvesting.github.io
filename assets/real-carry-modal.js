@@ -268,7 +268,7 @@ const _RCM_IE_SRC = {
   CAD: 'FRED CAINFIMPCPI · 5Y breakeven',
   CHF: 'CPI YoY · IMF SDMX',
   NZD: 'RBNZ survey · 2Y-ahead',
-  NOK: 'SSB CPI YoY · Statistics Norway',
+  NOK: 'Norges Bank Expectations Survey · 2Y-ahead',
   SEK: 'SCB CPIF YoY · Statistics Sweden (Riksbank target)',
 };
 
