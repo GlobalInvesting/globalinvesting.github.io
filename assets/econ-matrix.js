@@ -1,5 +1,26 @@
 /**
- * econ-matrix.js v2.5.10 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.11 — Native Economic Matrix panel
+ *
+ * ── v2.5.11 (2026-08-28) — Continued the live-audit Santiago requested,
+ *    now cross-checked against the ACTUAL calendar.json (downloaded via
+ *    bash/curl — the cached copy an earlier web_fetch returned was stale,
+ *    lastUpdate 2026-08-10 vs the real file's 2026-08-28) instead of a
+ *    secondary vendor's own site. This caught a real mistake in v2.5.10:
+ *    JPY's added 'Retail Sales MoM' was based on myfxbook.com's live page
+ *    alone and never actually appears in calendar.json (0 of 3,843
+ *    events) — REVERTED back to YoY-only. Myfxbook's own site and this
+ *    repo's actual ForexFactory-fed source don't carry an identical title
+ *    set, so a vendor's site alone is not sufficient evidence for this
+ *    codebase; calendar.json itself is the only thing that matters.
+ *    Confirmed-real fixes this session: USD.rtl and GBP.rtl both gained
+ *    'Retail Sales YoY' (confirmed present, distinct from MoM, in
+ *    calendar.json); USD.ppi/USD.prod checked and found to have NO YoY
+ *    title in the real feed (existing comments were correct, left as-is).
+ *    Also found and fixed a genuinely BROKEN cell: GBP.conf's
+ *    'S&P Global Manufacturing PMI' never matched anything (0 of 3,843
+ *    events) — the feed's real title is 'Flash Manufacturing PMI'; this
+ *    column had been silently running on the CBI Industrial Trends Orders
+ *    fallback alone. See CHANGELOG.md v8.276.0 for full detail.
  *
  * ── v2.5.10 (2026-08-28) — Fixed SEK/CHF Retail Sales columns silently
  *    ignoring live MoM releases. Both currencies' 'rtl' prefix list only
@@ -20,7 +41,9 @@
  *    identical gap for JPY's rtl (also YoY-only, MoM confirmed live) —
  *    fixed the same way. See CHANGELOG.md v8.275.0 for the fuller
  *    per-currency Myfxbook audit this triggered (USD/GBP findings
- *    pending Santiago's confirmation before wiring).
+ *    pending Santiago's confirmation before wiring). NOTE: the JPY part
+ *    of this entry was corrected in v2.5.11 above — verify against
+ *    calendar.json before trusting the "MoM confirmed live" claim here.
  *
  * ── v2.5.9 (2026-08-27) — Removed an internal-documentation reference
  *    ("see GUIDELINES.md for sourcing") from the public Emp Chg proxy
@@ -683,7 +706,15 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['ISM Manufacturing PMI'],
-      rtl:   ['Retail Sales MoM'],
+      // v2.5.11 (2026-08-28): live-audited against the actual calendar.json
+      // (the ForexFactory/Myfxbook-fed source of truth, not a secondary
+      // vendor's own site) — 'Retail Sales YoY' / 'United States Retail
+      // Sales YoY' both confirmed present as a distinct title from MoM in
+      // the live feed. Same omission class as the SEK/CHF/GBP rtl fixes
+      // this session. ppi/prod were also checked the same way and found
+      // to have NO YoY title in the real feed — those stay as-is; the
+      // existing "no PPI YoY observed" comment there is correct.
+      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade', 'Goods Trade Balance'],
       pce:   ['PCE Price Index YoY'],
@@ -713,8 +744,20 @@
       emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
-      conf:  ['S&P Global Manufacturing PMI', 'CBI Industrial Trends Orders'],
-      rtl:   ['Retail Sales MoM'],
+      // v2.5.11 (2026-08-28): 'S&P Global Manufacturing PMI' was a SILENT
+      // DEAD BRANCH — confirmed zero matches for that exact string across
+      // the entire live calendar.json (3,843 events checked). The feed's
+      // actual title is 'Flash Manufacturing PMI' (there is no separate
+      // "final" reading in this source — only the flash print). This cell
+      // had been quietly running on the CBI Industrial Trends Orders
+      // fallback alone this whole time. Same failure mode as GUIDELINES.md
+      // v8.141.0/v8.142.0 (a prefix string that looks right but was never
+      // actually checked against the live feed at the time it was added).
+      conf:  ['Flash Manufacturing PMI', 'CBI Industrial Trends Orders'],
+      // Live-audited against calendar.json: 'Retail Sales YoY' / 'United
+      // Kingdom Retail Sales YoY' confirmed present as a distinct title
+      // from MoM — same omission class as USD/SEK/CHF's rtl fixes.
+      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Goods Trade Balance', 'Balance of Trade'],
       pce:   [],
@@ -753,13 +796,18 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
-      // v2.5.10 (2026-08-28): same omission class as SEK/CHF's rtl fix
-      // this session — live myfxbook.com/forex-economic-calendar/japan
-      // confirmed a "Retail Sales MoM" title (Jul release, Aug 30 2026,
-      // -4.1% MoM vs 0.5% YoY the SAME underlying METI report) that was
-      // never in this currency's prefix list. MoM listed first per the
-      // same Bloomberg-headline convention as the other rtl fixes.
-      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
+      // CORRECTION (v2.5.11, 2026-08-28): v2.5.10 added 'Retail Sales MoM'
+      // here based on myfxbook.com's live site alone — WRONG. Checked
+      // against the actual calendar.json (ForexFactory-fed, the real
+      // source for this file) this session: zero "Retail Sales MoM"
+      // events for JPY across 3,843 live entries, only "Retail Sales
+      // YoY" / "Japan Retail Sales YoY". Myfxbook's own site and this
+      // repo's actual feed don't carry an identical title set — exactly
+      // the caveat already on record for USD/GBP's other rtl/ppi/prod
+      // findings this session, and the reason this repo's rule is to
+      // verify against calendar.json specifically, not a vendor's site.
+      // Reverted to YoY-only, the original (correct) v2.2.x state.
+      rtl:   ['Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
