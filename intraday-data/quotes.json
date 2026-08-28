@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-28T22:45:35Z",
+  "updated": "2026-08-28T22:50:39Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,13 +35,13 @@
       "pct1w_date": "2026-08-21"
     },
     "gold": {
-      "close": 4458.7332,
+      "close": 4458.8632,
       "prev_close": 4456.4406,
-      "chg": 2.2926,
-      "pct": 0.0514,
+      "chg": 2.4226,
+      "pct": 0.0544,
       "source": "twelve_data",
       "high": 4688.0,
-      "low": 4495.5,
+      "low": 4495.0,
       "open": 4656.0,
       "market_state": "REGULAR",
       "market_time": 1787950797
@@ -200,40 +200,40 @@
       "pct1w_date": "2026-08-21"
     },
     "btc": {
-      "close": 77743.03,
+      "close": 77745.34,
       "prev_close": 80261.86,
-      "chg": -2518.83,
-      "pct": -3.1383,
-      "high": 81148.51,
-      "low": 77077.59,
+      "chg": -2516.52,
+      "pct": -3.1354,
+      "high": 65713.91,
+      "low": 64182.797,
       "open": 80261.86,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787957135,
+      "market_time": 1787957440,
       "source": "yfinance",
-      "pct1w": -0.7559,
+      "pct1w": -0.753,
       "pct1w_date": "2026-08-21",
-      "session_high": 81435.09,
-      "session_low": 76880.01
+      "session_high": 81381.94,
+      "session_low": 76845.71
     },
     "eth": {
-      "close": 2440.85,
+      "close": 2440.89,
       "prev_close": 2511.308,
-      "chg": -70.458,
-      "pct": -2.8056,
-      "high": 2529.023,
-      "low": 2418.2703,
+      "chg": -70.418,
+      "pct": -2.804,
+      "high": 1907.2332,
+      "low": 1858.5846,
       "open": 2511.308,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787957128,
+      "market_time": 1787957438,
       "source": "yfinance",
-      "pct1w": -2.9592,
+      "pct1w": -2.9576,
       "pct1w_date": "2026-08-21",
-      "session_high": 2534.78,
-      "session_low": 2406.32
+      "session_high": 2535.04,
+      "session_low": 2406.07
     },
     "nasdaq": {
       "close": 29433.428,
@@ -1223,7 +1223,7 @@
       "chg": -3.149,
       "pct": -4.4833,
       "high": 72.05,
-      "low": 66.83,
+      "low": 66.875,
       "open": 70.045,
       "bid": 66.95,
       "ask": 67.485,
@@ -1234,7 +1234,7 @@
       "pct1w_date": "2026-08-21",
       "prev_bar": {
         "time": "2026-08-28",
-        "open": 70.02,
+        "open": 70.045,
         "high": 72.05,
         "low": 66.83,
         "close": 67.09
@@ -7051,18 +7051,36 @@
       "iv_pct_rank": null,
       "iv_hist_n": 1
     },
-    "audusd": null,
-    "usdchf": {
-      "iv": 14.4,
-      "expiry": "2026-09-18",
-      "atm": 109.0,
-      "source": "FXF options",
+    "audusd": {
+      "iv": 7.04,
+      "source": "Saxo Bank FX Options Analytics (1M ATM, indicative mid)",
       "iv_rank": null,
       "iv_pct_rank": null,
       "iv_hist_n": 1
     },
-    "usdcad": null,
-    "nzdusd": null
+    "usdchf": {
+      "iv": 6.77,
+      "source": "Saxo Bank FX Options Analytics (1M ATM, indicative mid)",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
+    "usdcad": {
+      "iv": 4.34,
+      "source": "Saxo Bank FX Options Analytics (1M ATM, indicative mid)",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    },
+    "nzdusd": {
+      "iv": 8.6,
+      "expiry": "09/04/26",
+      "atm": null,
+      "source": "Barchart N6*0 options (aggregate) [cached]",
+      "iv_rank": null,
+      "iv_pct_rank": null,
+      "iv_hist_n": 1
+    }
   },
   "var_cvar": {
     "eurusd": {
