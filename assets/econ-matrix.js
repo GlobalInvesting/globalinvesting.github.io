@@ -1,5 +1,23 @@
 /**
- * econ-matrix.js v2.5.9 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.10 — Native Economic Matrix panel
+ *
+ * ── v2.5.10 (2026-08-28) — Fixed SEK/CHF Retail Sales columns silently
+ *    ignoring live MoM releases. Both currencies' 'rtl' prefix list only
+ *    ever contained 'Retail Sales YoY', so once that YoY print aged (SEK:
+ *    Apr), the column stayed frozen on it and never picked up the SAME
+ *    report's intervening MoM releases — confirmed live for SEK against
+ *    today's "Sweden Retail Sales MoM" (-0.2%, 2026-08-28) sitting
+ *    unreflected in the matrix next to NOK's correctly-updated MoM cell
+ *    one row below. Same omission class as the GBP GDP QoQ gap
+ *    (GUIDELINES.md v8.141.0) — a prefix list that never included a title
+ *    the vendor genuinely publishes, not a deliberate policy choice.
+ *    findLatestGeneric() already selects whichever prefix has the most
+ *    recent dateISO, so listing both MoM and YoY (MoM first, matching the
+ *    Bloomberg-headline convention already used for USD/GBP/AUD/NOK) lets
+ *    both columns self-correct to the freshest release going forward with
+ *    no other logic change. JPY's rtl (also YoY-only) was left as-is —
+ *    unlike SEK/CHF, no live MoM title was directly confirmed against the
+ *    feed this session; flagged for a dedicated check, not assumed.
  *
  * ── v2.5.9 (2026-08-27) — Removed an internal-documentation reference
  *    ("see GUIDELINES.md for sourcing") from the public Emp Chg proxy
@@ -845,7 +863,13 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
-      rtl:   ['Retail Sales YoY'],
+      // v2.5.10 (2026-08-28): same omission class as SEK's rtl fix above —
+      // 'Retail Sales MoM' confirmed live on Myfxbook (e.g. "Switzerland
+      // Retail Sales MoM", -0.2% 2025-10-01, -0.5% 2025-09-01, both same-
+      // day releases alongside the YoY print from the same FSO report) but
+      // was never in this currency's prefix list. MoM listed first per the
+      // same Bloomberg-headline-print convention as USD/GBP/AUD/NOK.
+      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
@@ -921,6 +945,24 @@
       // any name on Myfxbook specifically.
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
+      // v2.5.10 (2026-08-28): CORRECTION — 'rtl' had only ever listed
+      // 'Retail Sales YoY', so the cell was frozen on whatever YoY print
+      // last released (Apr) and silently ignored every intervening MoM
+      // release from the SAME underlying Statistics Sweden report —
+      // confirmed live: \"Sweden Retail Sales MoM\" printed 2026-08-28
+      // (-0.2% vs -0.6% fcst, prev 1.4%) and never reached the matrix
+      // because MoM was never in this currency's prefix list at all. This
+      // is the same \"incomplete prefix list silently overrides the
+      // column's own policy\" class already documented for GBP's GDP
+      // column (GUIDELINES.md v8.141.0) — an omission, not a deliberate
+      // YoY-only choice; nothing in this file's history claims Myfxbook
+      // lacks a Sweden MoM retail sales title. findLatestGeneric() already
+      // picks whichever prefix has the most recent dateISO, so listing
+      // both here (MoM first, matching the Bloomberg-headline-print
+      // convention already used for USD/GBP/AUD/NOK) lets the column
+      // self-correct to the freshest release regardless of period, exactly
+      // like NOK's rtl already does one row below.
+      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       // v2.5.5: Myfxbook still has no genuine employment-CHANGE title for
       // SEK (only the raw-LEVEL 'Employed Persons(<Mon>)') \u2014 wired to a
       // new non-Myfxbook source instead of left blank, the same pattern
@@ -941,7 +983,6 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
-      rtl:   ['Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
