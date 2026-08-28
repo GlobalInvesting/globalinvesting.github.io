@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-28T06:35:01Z",
-  "generatedAt": "2026-08-28T06:35:01Z",
+  "lastUpdate": "2026-08-28T06:47:49Z",
+  "generatedAt": "2026-08-28T06:47:49Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1372,6 +1372,11 @@
       "n": 2,
       "mean": 0.8,
       "std": 0.707107
+    },
+    "EUR/france harmonised inflation rate mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
     }
   },
   "events": [
@@ -47919,7 +47924,7 @@
       "flag": "🇪🇺",
       "event": "France Harmonised Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.8%",
       "forecast": "0.5%",
       "previous": "0.6%"
     },
