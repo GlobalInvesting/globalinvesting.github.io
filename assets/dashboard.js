@@ -785,7 +785,22 @@ async function _corrMtxLoadPairData() {
         const r = await _fetchWithRetry('./ohlc-data/' + id + '.json');
         const bars = await r.json();
         if (Array.isArray(bars) && bars.length > 1) {
-          out[id] = bars.map(b => b.close).filter(c => typeof c === 'number');
+          // Date-keyed, not a plain trailing-order array: every pair's bars come
+          // from the same fetch_fx_ohlc_from_1h() session-boundary convention, so
+          // in practice all 32 files share identical calendar dates — verified
+          // live across the full 32-pair set for the last 90 bars. But nothing
+          // structurally guarantees that stays true (one pair losing a single
+          // day to a guard rejection some pairs don't hit is enough to desync a
+          // purely positional slice from that point forward) — the same failure
+          // class already fixed once on the backend (fetch_correlations(),
+          // GUIDELINES.md's "join by calendar date, never trailing position"
+          // rule, v8.180.0). Keying by `time` here lets every downstream
+          // consumer (_logReturnsByDate/_pearsonCorrByDate) join on real shared
+          // dates instead of trusting array position to mean the same thing
+          // across two different pairs' files.
+          const byDate = {};
+          bars.forEach(b => { if (typeof b.close === 'number' && b.time) byDate[b.time] = b.close; });
+          out[id] = byDate;
         }
       } catch (e) { /* pair unavailable after retries — matrix cells using it stay blank */ }
     }));
@@ -806,32 +821,92 @@ function _pearsonCorr(a, b) {
   return num / Math.sqrt(da * db);
 }
 
-// Builds a composite daily log-return series per G10 currency: every pair
-// containing that currency contributes its log-return (sign-flipped when the
-// currency is the quote leg), averaged across all contributing pairs per day.
+// Turns a {date: close} map into a {date: log-return} map, walking dates in
+// sorted (ascending) order and computing each day's return only against the
+// immediately-preceding date IN THIS SAME PAIR'S OWN SEQUENCE — never against
+// a neighboring pair's calendar, and never against a raw array index. A gap
+// in this pair's own history (a day this pair is missing but a sibling pair
+// has) is invisible to this function by construction: the return for the
+// next available date is simply computed against whatever the last available
+// prior date was for this pair specifically.
+function _logReturnsByDate(closesByDate) {
+  if (!closesByDate) return null;
+  const dates = _sortDateKeys(Object.keys(closesByDate));
+  if (dates.length < 2) return null;
+  const rets = {};
+  for (let i = 1; i < dates.length; i++) {
+    const prev = closesByDate[dates[i - 1]], cur = closesByDate[dates[i]];
+    rets[dates[i]] = Math.log(cur / prev);
+  }
+  return rets;
+}
+
+// Object keys built from `bar.time` are ISO date strings for daily bars
+// (e.g. "2026-08-27" — lexicographic order already equals chronological
+// order) but Unix-timestamp numbers for h1/h4 bars (e.g. 1725577200 — a
+// plain lexicographic sort only happens to equal numeric order today
+// because every such timestamp currently has the same digit count; that
+// stops being true after year 2286, and isn't a safe thing to depend on
+// regardless). Compare numerically whenever both keys parse as finite
+// numbers, falling back to lexicographic (=chronological, for ISO date
+// strings) otherwise. Used by every date-keyed join in this file — both
+// _logReturnsByDate() above and _pearsonCorrByDate() below — so the two
+// never disagree on chronological order between them.
+function _sortDateKeys(keys) {
+  return keys.sort((a, b) => {
+    const na = Number(a), nb = Number(b);
+    if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+    return a < b ? -1 : a > b ? 1 : 0;
+  });
+}
+
+// Pearson correlation between two {date: return} maps, joined on their real
+// shared dates — not on array position/length. Only dates present in BOTH
+// maps are used; from that intersection, the most recent `maxN` shared dates
+// are kept (mirroring the old behavior's "last N observations" window, but
+// computed on dates both series actually agree exist, not on however many
+// elements each series' own array happened to have). Replaces the old
+// pattern of extracting two plain arrays and trusting `.slice(-n)` on each to
+// land on the same calendar day — see the date-desync risk documented on
+// _corrMtxLoadPairData() above. Sorted via the shared _sortDateKeys() helper
+// (not a plain .sort()) so this stays numerically correct for h1/h4 bars'
+// Unix-timestamp keys, not just daily bars' ISO-date-string keys.
+function _pearsonCorrByDate(retsA, retsB, maxN) {
+  if (!retsA || !retsB) return null;
+  const shared = _sortDateKeys(Object.keys(retsA).filter(d => Object.prototype.hasOwnProperty.call(retsB, d)));
+  if (shared.length < 5) return null;
+  const window_ = maxN ? shared.slice(-maxN) : shared;
+  if (window_.length < 5) return null;
+  const a = window_.map(d => retsA[d]), b = window_.map(d => retsB[d]);
+  return _pearsonCorr(a, b);
+}
+
+// Builds a composite daily log-return series per G10 currency, keyed by
+// date: every pair containing that currency contributes its log-return for
+// each date it actually has (sign-flipped when the currency is the quote
+// leg), averaged per-date across whichever contributing pairs have that
+// date — not averaged by trailing array position, since a pair-specific gap
+// would otherwise silently shift every later element of a positional
+// average out of calendar alignment with its siblings.
 function _corrMtxBuildCcyReturns(pairCloses, windowDays) {
-  const ccyRets = {}; // ccy -> array of arrays (one per contributing pair)
-  CORR_MTX_CCYS.forEach(c => ccyRets[c] = []);
+  const ccyRetsByDate = {}; // ccy -> { date: [ret, ret, ...] } (one entry per contributing pair that has that date)
+  CORR_MTX_CCYS.forEach(c => ccyRetsByDate[c] = {});
   CORR_MTX_PAIRS.forEach(([id, base, quote]) => {
-    const closes = pairCloses[id];
-    if (!closes || closes.length < windowDays + 2) return;
-    const slice = closes.slice(-(windowDays + 1));
-    const rets = [];
-    for (let i = 1; i < slice.length; i++) rets.push(Math.log(slice[i] / slice[i - 1]));
-    ccyRets[base].push(rets);
-    ccyRets[quote].push(rets.map(v => -v));
+    const retsByDate = _logReturnsByDate(pairCloses[id]);
+    if (!retsByDate) return;
+    Object.keys(retsByDate).forEach(date => {
+      const r = retsByDate[date];
+      (ccyRetsByDate[base][date] || (ccyRetsByDate[base][date] = [])).push(r);
+      (ccyRetsByDate[quote][date] || (ccyRetsByDate[quote][date] = [])).push(-r);
+    });
   });
   const composite = {};
   CORR_MTX_CCYS.forEach(c => {
-    const series = ccyRets[c];
-    if (!series.length) { composite[c] = null; return; }
-    const len = Math.min(...series.map(s => s.length));
-    const avg = [];
-    for (let i = 0; i < len; i++) {
-      let sum = 0;
-      series.forEach(s => sum += s[s.length - len + i]);
-      avg.push(sum / series.length);
-    }
+    const byDate = ccyRetsByDate[c];
+    const dates = Object.keys(byDate);
+    if (dates.length < windowDays + 1) { composite[c] = null; return; }
+    const avg = {};
+    dates.forEach(d => { const arr = byDate[d]; avg[d] = arr.reduce((s, x) => s + x, 0) / arr.length; });
     composite[c] = avg;
   });
   return composite;
@@ -871,7 +946,7 @@ async function renderCorrMatrix() {
         return;
       }
       const a = composite[rowCcy], b = composite[colCcy];
-      const v = (a && b) ? _pearsonCorr(a, b) : null;
+      const v = (a && b) ? _pearsonCorrByDate(a, b, _corrWindow) : null;
       const s = _corrMtxCellStyle(v);
       html += `<td title="${rowCcy}/${colCcy} · ${_corrWindow}d Pearson${v == null ? ' (insufficient data)' : ': ' + (v >= 0 ? '+' : '') + v.toFixed(2)}" style="height:20px;text-align:center;border:1px solid var(--border);background:${s.bg};color:${s.color};font-size:8.5px;font-family:var(--font-mono);">${s.txt}</td>`;
     });
@@ -1001,7 +1076,19 @@ async function _corrPairsLoadCloses(tf) {
         const r = await _fetchWithRetry('./ohlc-data/' + dir + id + '.json');
         const bars = await r.json();
         if (Array.isArray(bars) && bars.length > 1) {
-          out[id] = bars.map(b => b.close).filter(c => typeof c === 'number');
+          // Date-keyed — see _corrMtxLoadPairData()'s comment above for why:
+          // same sibling fix, same underlying risk (a pair-specific gap at one
+          // timeframe silently desyncing a positional slice from every other
+          // pair's file from that point forward). Live-verified this was not
+          // just theoretical: the Hourly tab's ohlc-data/h1/*.json bar counts
+          // span 11,876–12,178 across the 32 pairs (a ~300-bar spread), and
+          // several same-currency-leg pairs (e.g. NZDUSD/NZDCAD, USDJPY/CADJPY)
+          // that should mechanically show strong correlation were reading as
+          // near-zero under the old positional slice — up to a 0.855 swing on
+          // recomputation against real exported data.
+          const byDate = {};
+          bars.forEach(b => { if (typeof b.close === 'number' && b.time) byDate[b.time] = b.close; });
+          out[id] = byDate;
         }
       } catch (e) { /* pair unavailable after retries at this timeframe — matrix cells using it stay blank */ }
     }));
@@ -1012,28 +1099,22 @@ async function _corrPairsLoadCloses(tf) {
   return promise;
 }
 
-// Last-`nBars` log-return series from a closes array, oldest→newest.
-// Returns null if there isn't even enough data for _pearsonCorr's own
-// 5-point floor once trimmed to nBars.
-function _corrPairsLogReturns(closes, nBars) {
-  if (!closes || closes.length < 6) return null;
-  const slice = closes.slice(-(nBars + 1));
-  if (slice.length < 6) return null;
-  const rets = [];
-  for (let i = 1; i < slice.length; i++) rets.push(Math.log(slice[i] / slice[i - 1]));
-  return rets;
-}
+// _corrPairsLogReturns() (positional, `.slice(-(nBars+1))`) is retired —
+// superseded by the shared _logReturnsByDate() helper above, which every
+// caller here now uses instead so both matrices go through one date-safe
+// code path rather than two independently-written positional ones.
 
 // Builds a full pairwise Pearson map ({id: {otherId: corr|null}}) from a
-// {id: returns[]} dict — the shared input both _pairsClusterOrder() and the
-// table renderer below need, computed once per render instead of twice.
-function _pairsCorrMap(ids, retsById) {
+// {id: {date: return}} dict — the shared input both _pairsClusterOrder() and
+// the table renderer below need, computed once per render instead of twice.
+// Joined by actual shared date via _pearsonCorrByDate(), not by trailing
+// array position — see _corrMtxLoadPairData()'s comment for why that matters.
+function _pairsCorrMap(ids, retsById, maxN) {
   const map = {};
   ids.forEach(id => { map[id] = {}; });
   for (let i = 0; i < ids.length; i++) {
     for (let j = i + 1; j < ids.length; j++) {
-      const a = retsById[ids[i]], b = retsById[ids[j]];
-      const v = (a && b) ? _pearsonCorr(a, b) : null;
+      const v = _pearsonCorrByDate(retsById[ids[i]], retsById[ids[j]], maxN);
       map[ids[i]][ids[j]] = v;
       map[ids[j]][ids[i]] = v;
     }
@@ -1100,13 +1181,13 @@ async function renderCorrPairsMatrix(tf) {
   const cfg = CORR_PAIRS_TF_CONFIG[tf];
   const rets = {};
   CORR_MTX_PAIRS.forEach(([id]) => {
-    rets[id] = _corrPairsLogReturns(closes[id], cfg.bars);
+    rets[id] = _logReturnsByDate(closes[id]);
   });
 
   const ids = CORR_MTX_PAIRS.map(([id]) => id);
   const lblById = {};
   CORR_MTX_PAIRS.forEach(([id, base, quote]) => { lblById[id] = base + quote; });
-  const corrMap = _pairsCorrMap(ids, rets);
+  const corrMap = _pairsCorrMap(ids, rets, cfg.bars);
   const orderedIds = _pairsClusterOrder(ids, corrMap);
 
   // Column headers stay horizontal — a vertical/rotated-text version was

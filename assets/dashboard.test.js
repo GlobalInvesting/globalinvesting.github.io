@@ -570,6 +570,106 @@ test('pearson: EUR/USD vs DXY — expected inverse relationship in sample data',
 });
 
 // ═══════════════════════════════════════════════════════════════════
+// Correlation matrices' date-safe join — mirrored from assets/dashboard.js's
+// _sortDateKeys() / _logReturnsByDate() / _pearsonCorrByDate() (v8.273.0,
+// fixing a positional-array join bug shared by both the docked currency
+// Matrix and the fullscreen Pairs matrix — see GUIDELINES.md v8.180.0's
+// original "join by calendar date, never trailing position" rule, first
+// applied to fetch_correlations() on the backend and now extended to these
+// two frontend-only correlation grids, which read ohlc-data/*.json directly
+// and never went through that backend fix).
+// ═══════════════════════════════════════════════════════════════════
+function _pearsonCorr(a, b) {
+  const n = Math.min(a.length, b.length);
+  if (n < 5) return null;
+  a = a.slice(-n); b = b.slice(-n);
+  const ma = a.reduce((s, x) => s + x, 0) / n, mb = b.reduce((s, x) => s + x, 0) / n;
+  let num = 0, da = 0, db = 0;
+  for (let i = 0; i < n; i++) { const xa = a[i] - ma, xb = b[i] - mb; num += xa * xb; da += xa * xa; db += xb * xb; }
+  if (da === 0 || db === 0) return null;
+  return num / Math.sqrt(da * db);
+}
+function _sortDateKeys(keys) {
+  return keys.sort((a, b) => {
+    const na = Number(a), nb = Number(b);
+    if (!Number.isNaN(na) && !Number.isNaN(nb)) return na - nb;
+    return a < b ? -1 : a > b ? 1 : 0;
+  });
+}
+function _logReturnsByDate(closesByDate) {
+  if (!closesByDate) return null;
+  const dates = _sortDateKeys(Object.keys(closesByDate));
+  if (dates.length < 2) return null;
+  const rets = {};
+  for (let i = 1; i < dates.length; i++) {
+    const prev = closesByDate[dates[i - 1]], cur = closesByDate[dates[i]];
+    rets[dates[i]] = Math.log(cur / prev);
+  }
+  return rets;
+}
+function _pearsonCorrByDate(retsA, retsB, maxN) {
+  if (!retsA || !retsB) return null;
+  const shared = _sortDateKeys(Object.keys(retsA).filter(d => Object.prototype.hasOwnProperty.call(retsB, d)));
+  if (shared.length < 5) return null;
+  const window_ = maxN ? shared.slice(-maxN) : shared;
+  if (window_.length < 5) return null;
+  const a = window_.map(d => retsA[d]), b = window_.map(d => retsB[d]);
+  return _pearsonCorr(a, b);
+}
+
+section('Correlation matrices — date-safe join (_sortDateKeys / _logReturnsByDate / _pearsonCorrByDate)');
+test('_sortDateKeys: sorts Unix-timestamp-number keys numerically, not lexicographically', () => {
+  // Lexicographic sort would misorder these once digit counts differ; here
+  // all three share 10 digits so a lexicographic sort would happen to look
+  // right — the real point is it must still produce true numeric order.
+  const keys = ['1725580800', '1725573600', '1725577200'];
+  assert.deepStrictEqual(_sortDateKeys(keys.slice()), ['1725573600', '1725577200', '1725580800']);
+});
+test('_sortDateKeys: sorts ISO date-string keys chronologically', () => {
+  const keys = ['2026-08-27', '2026-08-01', '2026-08-15'];
+  assert.deepStrictEqual(_sortDateKeys(keys.slice()), ['2026-08-01', '2026-08-15', '2026-08-27']);
+});
+test('_logReturnsByDate: computes each return only against its own series\' immediately-preceding date, not array position', () => {
+  const closes = { '2026-08-03': 1.10, '2026-08-01': 1.00, '2026-08-02': 1.05 }; // inserted out of order
+  const rets = _logReturnsByDate(closes);
+  assert.ok(Math.abs(rets['2026-08-02'] - Math.log(1.05 / 1.00)) < 1e-12);
+  assert.ok(Math.abs(rets['2026-08-03'] - Math.log(1.10 / 1.05)) < 1e-12);
+  assert.strictEqual(Object.keys(rets).length, 2); // no return for the first date (no prior)
+});
+test('_logReturnsByDate: null on fewer than 2 dates', () => {
+  assert.strictEqual(_logReturnsByDate({ '2026-08-01': 1.10 }), null);
+  assert.strictEqual(_logReturnsByDate(null), null);
+});
+test('_pearsonCorrByDate: joins on shared dates only, ignoring a date only one series has', () => {
+  // Series A has an extra date (08-05) that B lacks — a positional
+  // .slice(-n)-style join would have silently misaligned everything from
+  // that point on; the date-safe join must simply drop the unshared date.
+  const retsA = { '2026-08-01': 0.01, '2026-08-02': -0.02, '2026-08-03': 0.015, '2026-08-04': -0.01, '2026-08-05': 0.02, '2026-08-06': -0.005 };
+  const retsB = { '2026-08-01': 0.012, '2026-08-02': -0.018, '2026-08-03': 0.017, '2026-08-04': -0.011,                    '2026-08-06': -0.004 };
+  const result = _pearsonCorrByDate(retsA, retsB);
+  assert.ok(result !== null && result > 0.9, `expected a strong positive correlation on the 5 shared dates, got ${result}`);
+});
+test('_pearsonCorrByDate: null when fewer than 5 dates are shared', () => {
+  const retsA = { '2026-08-01': 0.01, '2026-08-02': -0.02, '2026-08-03': 0.015 };
+  const retsB = { '2026-08-01': 0.012, '2026-08-02': -0.018, '2026-08-03': 0.017 };
+  assert.strictEqual(_pearsonCorrByDate(retsA, retsB), null);
+});
+test('_pearsonCorrByDate: a pair-specific gap does not desync two otherwise-identical series (regression case)', () => {
+  // This is the exact failure class fixed in v8.273.0: series A is missing
+  // one date in the middle that series B has. A positional trailing-slice
+  // join would shift every later element of A one slot out of true
+  // calendar alignment with B; the date-safe join must instead recognize
+  // A and B are simply co-moving (both derived from the same trend) and
+  // still report a strong positive correlation.
+  const dates = ['2026-08-01','2026-08-02','2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08'];
+  const trend = [0.010, -0.015, 0.020, -0.005, 0.012, -0.018, 0.022, -0.008];
+  const retsB = {}; dates.forEach((d, i) => retsB[d] = trend[i]);
+  const retsA = {}; dates.forEach((d, i) => { if (i !== 3) retsA[d] = trend[i]; }); // A missing 08-04
+  const result = _pearsonCorrByDate(retsA, retsB);
+  assert.ok(result !== null && result > 0.95, `expected near-perfect correlation once correctly date-joined, got ${result}`);
+});
+
+// ═══════════════════════════════════════════════════════════════════
 // FX Fair Value regression — mirrored from assets/dashboard.js's
 // _solveLinearSystem() / _fvRegress() (v8.197.0, generalized to the
 // 5-variable BEER model — rate_diff, stress, ca_diff, tb_diff — v8.200.0)
