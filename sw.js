@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.276.0';
+const CACHE_VERSION = 'gi-v8.277.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -51,7 +51,7 @@ const STATIC_PRECACHE = [
   '/assets/share.js?v=1.0.0',
   '/assets/inline-panel.js?v=1.4.2',
   '/assets/calendar-panel.js?v=1.19.22',
-  '/assets/econ-matrix.js?v=2.5.9',
+  '/assets/econ-matrix.js?v=2.5.12',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
