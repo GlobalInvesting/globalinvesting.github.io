@@ -19,7 +19,7 @@
  *    263 AUD events contain "retail"); root cause not diagnosed this
  *    session, see the corrected comment on CATS.AUD.rtl below.
  *
- * ── v2.5.11 (2026-08-28) — Continued the live-audit Santiago requested,
+ * ── v2.5.11 (2026-08-28) — Continued the live-audit,
  *    now cross-checked against the ACTUAL calendar.json (downloaded via
  *    bash/curl — the cached copy an earlier web_fetch returned was stale,
  *    lastUpdate 2026-08-10 vs the real file's 2026-08-28) instead of a
@@ -59,7 +59,7 @@
  *    identical gap for JPY's rtl (also YoY-only, MoM confirmed live) —
  *    fixed the same way. See CHANGELOG.md v8.275.0 for the fuller
  *    per-currency Myfxbook audit this triggered (USD/GBP findings
- *    pending Santiago's confirmation before wiring). NOTE: the JPY part
+ *    pending confirmation before wiring). NOTE: the JPY part
  *    of this entry was corrected in v2.5.11 above — verify against
  *    calendar.json before trusting the "MoM confirmed live" claim here.
  *
@@ -797,7 +797,7 @@
       ppi:   ['PPI YoY', 'PPI MoM'],
       // v2.5.7: v2.5.4's "Deliberately still NOT wired" is now stale for
       // THIS specific approach — "Jobs/applications ratio" is still
-      // correctly excluded (a tightness ratio, not a flow). But Santiago
+      // correctly excluded (a tightness ratio, not a flow). however, on review,
       // noted TE's own chart widget for japan/employed-persons exposes a
       // Value/Chg/Chg% toggle, confirming TE itself treats a MoM delta of
       // that level as legitimate. That toggle's data isn't reachable via a
@@ -938,7 +938,7 @@
       ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
       // v2.5.6: v2.5.4's "confirmed gap" is now stale for THIS source —
       // 'Non Farm Payrolls' (FSO) is still correctly excluded as a
-      // quarterly headcount LEVEL, not a change/rate figure. But Santiago
+      // quarterly headcount LEVEL, not a change/rate figure. however, on review,
       // flagged TE's own page menu for Switzerland also lists a genuine
       // "Employment Change" indicator (distinct from Full Time
       // Employment/Job Offers, both levels, correctly not used) —
@@ -1190,7 +1190,7 @@
   };
 
   // ── Emp Chg column: official headline vs. in-house proxy ──────────────────
-  // Santiago asked why JPY's Emp Chg magnitude (-360.0K) looked so out of
+  // investigated why JPY's Emp Chg magnitude (-360.0K) looked so out of
   // line with USD's (-23.0K) given Japan's smaller population — verified
   // the two aren't comparable because they're not the same TYPE of release,
   // not because of a scaling error. USD/AUD/CAD/GBP/NZD/EUR each have an

@@ -1267,7 +1267,7 @@
        DOM order is sidebar/main/rightpanel (desktop 3-col layout), so on mobile
        (where #layout collapses to a flex column and visual order otherwise just
        follows DOM order) the sidebar's FX Liquidity/Crosses/Carry/Vol/Watchlist
-       stack used to render ABOVE the narrative+chart — Santiago flagged this via
+       stack used to render ABOVE the narrative+chart — flagged this via
        screenshot: on load, mobile showed the sidebar stack first and had to
        scroll past all of it to reach the narrative and chart. `order` reverses
        the visual stack without touching DOM/JS wiring (no ids moved, no event
@@ -1332,7 +1332,7 @@
     tv-economic-map { min-height: 260px !important; }
 
     /* Intel panel (News tab: News/Research/Analysis sub-panels) — huge empty
-       gaps reported by Santiago (screenshots, 2026-08-19). #intel-scroll's
+       gaps found via screenshots (2026-08-19). #intel-scroll's
        desktop layout (see the v8.117.18 comment above its rule in this file)
        is a CSS Grid with three `minmax(0,1fr)` tracks giving News/Research/
        Analysis an exact equal-thirds split of #intel-scroll's height — which

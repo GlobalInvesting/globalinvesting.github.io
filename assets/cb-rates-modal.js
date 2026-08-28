@@ -1,6 +1,6 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // CB RATES MODAL  v2.8 — Persistent decision markers removed; hover tooltip only
-// v2.8 (2026-08-25): Per Santiago's request, removed _buildDecisionOverlay()
+// v2.8 (2026-08-25): Per user feedback, removed _buildDecisionOverlay()
 //   entirely (was already dead code — zero call sites after this session's
 //   edit) instead of keeping the tick-mark fallback from v2.7. The Rate
 //   Chart no longer draws any on-chart decision markers at all; the

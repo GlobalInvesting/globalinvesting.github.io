@@ -11,7 +11,7 @@
  *   actual/forecast history for this event in the last year" for several
  *   G10 indicators despite a full year of Myfxbook history existing under a
  *   different vendor title — same root cause as v1.19.18, six more
- *   unconfirmed pairs. Reported by Santiago via screenshots (AUD CPI y/y
+ *   unconfirmed pairs. Reported via screenshots (AUD CPI y/y
  *   showing empty vs. USD CB Consumer Confidence showing a full year
  *   correctly). Audited every currency's ForexFactory-sourced forward event
  *   against calendar-data/calendar.json's Myfxbook history programmatically
@@ -42,7 +42,7 @@
  *   calendar-watcher.js CF Worker poll against Myfxbook, which stays as-is.
  *   Both panels now poll calendar.json on the same 90s cadence again.
  *
- * v1.19.19 (2026-08-13): Reported by Santiago — NOK and SEK never appeared
+ * v1.19.19 (2026-08-13): Reported — NOK and SEK never appeared
  *   in the Economic Calendar panel or its currency filter buttons, despite
  *   the panel's own header already saying "G10 currencies · medium & high
  *   impact." Root cause: this file's own `G8_CURRENCIES`/`G8_LIST` (the
@@ -78,7 +78,7 @@
  *   vendor. Was `${source} · G10 currencies · medium & high impact` (e.g.
  *   "Myfxbook · ForexFactory · G10 currencies..."); now just "G10 currencies
  *   · medium & high impact" — matches about.html's Data Sources table, which
- *   never named a vendor for the Economic Calendar row either. Santiago's
+ *   never named a vendor for the Economic Calendar row either. The
  *   call: institutional terminals (Bloomberg, Refinitiv) don't disclose their
  *   calendar data provider in the live UI, only the coverage. The `source`
  *   field itself is untouched in ff_calendar.json/calendar.json and still
@@ -100,7 +100,7 @@
  *   (~6 characters). At a 9px line height, more characters packed into
  *   comparable label width leaves less room per glyph, reading as denser/
  *   blockier — not a rendering defect, a legibility limit of cramming that
- *   much text that small. Santiago asked to keep the day visible rather
+ *   much text that small. kept the day visible rather
  *   than shorten the format, so fixed the other side of the trade-off
  *   instead: bumped fontSize from 9 to 10, matching econ-surprises-modal.js
  *   and cot-modal-chart.js's precedent (neither of which has ever shown
@@ -117,7 +117,7 @@
  *   `'JetBrains Mono','Courier New',monospace` (a webfont actually loaded
  *   on the page, confirmed via document.fonts in an earlier diagnostic
  *   dump). Without it, LWC falls back to its own built-in default font
- *   stack, which may not be installed on Santiago's Android device,
+ *   stack, which may not be installed on every Android device,
  *   forcing a further OS-level substitution — plausibly one with worse
  *   small-size hinting than the explicitly-loaded monospace font the other
  *   three force. Added the same explicit fontFamily here.
@@ -166,7 +166,7 @@
  *   height})`, which didn't fix anything: the modal container's width never
  *   actually changes between chart creation and these later calls, so LWC's
  *   internal diffing almost certainly treated it as a no-op. Nearest-
- *   neighbor (unsmoothed) zoom into Santiago's screenshot settled the
+ *   neighbor (unsmoothed) zoom into a screenshot settled the
  *   question this whole thread kept circling: the axis labels were never
  *   hard-clipped — no rectangular edge, nothing overlapping (checked and
  *   ruled out a border/element sitting over the text too). They're blocky
@@ -181,7 +181,7 @@
  *   read of a since-superseded diagnostic. See applyHistResize.
  *
  * v1.19.11 (2026-08-08): FIX (superseded by v1.19.12, see above) — reverted
- *   Santiago asked why calendar-panel.js was the only LWC-based chart in the
+ *   investigated why calendar-panel.js was the only LWC-based chart in the
  *   frontend showing this clipping and suggested comparing against the
  *   others instead of guessing further. econ-surprises-modal.js,
  *   cot-modal-chart.js, and corr-modal.js — three other modal charts with
@@ -200,7 +200,7 @@
  *   _calRenderHistChart / applyHistResize / _calDestroyHistChart.
  *
  * v1.19.10 (2026-08-08): FIX (superseded by v1.19.11, see above) — added
- *   after v1.19.9 (confirmed by Santiago on a fresh screenshot taken well
+ *   after v1.19.9 (confirmed on a fresh screenshot taken well
  *   after that deploy, on a different event's chart, ruling out the
  *   transitional-frame theory that justified removing the v1.19.6 resize).
  *   A repeat diagnostic dump found the axis canvas clean at rest again and
@@ -226,14 +226,14 @@
  *   rest, the resize call had no remaining justification and became a
  *   liability: it forces a second layout/redraw pass one frame after the
  *   chart's already-correct initial paint, which on a slower device
- *   (Santiago's dump was captured via Edge Android remote debugging) can
+ *   (captured via Edge Android remote debugging) can
  *   produce a visible transitional frame — a plausible source for a
  *   screenshot catching mis-rendered text not present in steady state.
  *   Removed outright rather than patched again. See _calRenderHistChart.
  *
  * v1.19.8 (2026-08-08): FOLLOW-UP FIX — v1.19.7 removed the comma after
  *   confirming (via pixel crop) it was clipped at the bottom by descender.
- *   Santiago's next screenshot showed "Jan 7 '26" still clipped — this time
+ *   the next screenshot showed "Jan 7 '26" still clipped — this time
  *   the apostrophe cut off at the TOP, same row-height-too-tight cause from
  *   the other direction (apostrophes commonly sit near/above cap-height).
  *   `_calFmtDateISO()` now drops the 2-digit-year-with-apostrophe shorthand
@@ -243,7 +243,7 @@
  *
  * v1.19.7 (2026-08-08): REAL FIX — chart X-axis clipping was never a
  *   canvas/DPR/height issue (all of v1.19.4-v1.19.6 were chasing the wrong
- *   cause). A pixel-level crop of Santiago's screenshot showed only the
+ *   cause). A pixel-level crop of a screenshot showed only the
  *   comma glyph's descender being clipped ("Jan 9, '26" losing its comma),
  *   not the whole label. Built a byte-identical repro of the chart (real
  *   lightweight-charts 5.0.7 + real theme CSS, headless Chromium
@@ -257,7 +257,7 @@
  *   left to clip regardless of font/DPR. See full note at `_calFmtDateISO`.
  *
  * v1.19.6 (2026-08-08): FIX, diagnostic-confirmed this time — chart X-axis
- *   clipping. Santiago ran a devtools dump at my request instead of another
+ *   clipping. A devtools dump was captured for verification instead of another
  *   screenshot, which ruled out the v1.19.5 hypothesis outright
  *   (`modal.scrollHeight === modal.clientHeight`, 584 === 584 — nothing was
  *   being cut by the modal's `max-height`) and revealed the real cause:
@@ -280,7 +280,7 @@
  *   been closed/reopened in the meantime via the existing `_calHistChart`
  *   identity check. Not independently confirmed visually this session
  *   (still no Chromium egress here), but for the first time this fix is
- *   built directly on a live measurement from Santiago's own browser rather
+ *   built directly on a live browser measurement rather
  *   than another guess from a screenshot.
  *
  * v1.19.5 (2026-08-08): FOURTH attempt at the chart X-axis clipping —
@@ -322,7 +322,7 @@
  *   itself is capped at `width:min(420px, 100%)` and never grew to match,
  *   so the 480px-wide table overflowed the dialog's border sideways. That
  *   read as clipped/truncated text (e.g. "Previous" header reduced to a
- *   sliver, title cut) in Santiago's screenshot — it wasn't text clipping,
+ *   sliver, title cut) in a screenshot — it wasn't text clipping,
  *   it was the table physically wider than the box it sat in. Fixed with a
  *   scoped override in dashboard.css (`#cal-hist-modal table { min-width:
  *   unset !important; width:100% !important; }`), mirroring the existing
@@ -337,7 +337,7 @@
  *   layout viewport some mobile browsers report before the address bar
  *   collapses.
  *
- * v1.19.3 (2026-08-08): Three issues from Santiago's review — two real bugs,
+ * v1.19.3 (2026-08-08): Three issues from review — two real bugs,
  *   one more attempt at the still-unresolved chart X-axis clipping:
  *   (1) BUG FIX — some events with data showed no chart at all. Root cause:
  *       LWC's setData() requires strictly ascending, UNIQUE time values;
@@ -374,8 +374,8 @@
  *       was found anywhere in the chain from `#cal-hist-chart` up to the
  *       scrollable `#cal-hist-modal`, so this still isn't a confirmed root
  *       cause, just a more generous version of the same fix that hasn't
- *       fully worked twice already — flagged below for Santiago to inspect
- *       directly (computed height / devtools) rather than iterate blind
+ *       fully worked twice already — flagged below for direct inspection
+ *       (computed height / devtools) rather than iterating blind
  *       again.
  *
  * FLAGGED, NOT FIXED — data pipeline: same-date duplicate under two title
@@ -392,7 +392,7 @@
  *   actual-vs-forecast beats/misses the same way for every event, ignoring
  *   `isInverse` (the same flag the print table above it already uses via
  *   `_calBeatClass()`). For an inverse indicator — e.g. the U-6 Unemployment
- *   Rate screenshot Santiago sent, 7.9% actual vs. 7.7% forecast — a higher
+ *   Rate screenshot, 7.9% actual vs. 7.7% forecast — a higher
  *   actual is worse, but the tooltip still showed "+0.20 vs. forecast" in
  *   green (beat color) instead of red (miss color), directly contradicting
  *   the "Inverse indicator" note and the correctly-red table row for the
@@ -405,7 +405,7 @@
  *   Applies to every inverse-keyword-matched event (`CAL_INVERSE_KW`:
  *   unemployment, unemployed, jobless, claims, deficit), not just this one.
  *
- * v1.19.1 (2026-08-08): Two follow-ups from Santiago's screenshots after the
+ * v1.19.1 (2026-08-08): Two follow-ups from screenshots after the
  *   v1.19.0 production promotion:
  *   (1) STRUCTURAL — filter-row divider replaced with space-between layout.
  *       `#cal-toolbar` (week nav + impact filter) and `#cal-ccy-filter` no
@@ -419,7 +419,7 @@
  *       moves both groups into `#cal-panel-head-actions` in split mode keeps
  *       the same left-to-right order (currency, then toolbar).
  *   (2) FIX — history-modal chart X-axis dates still clipped after the
- *       v1.18.0 attempt (110→130px + tickMarkFormatter). Santiago's
+ *       v1.18.0 attempt (110→130px + tickMarkFormatter). A
  *       follow-up screenshot showed the bottom tick-label row still cut off.
  *       Chart height increased again, 130→156px (container CSS and the LWC
  *       `createChart` option kept in sync), and `rightPriceScale`'s
@@ -491,12 +491,12 @@
  *   `cleanSourceLabel()` strips any trailing parenthetical before display,
  *   handling this case and any future one following the same "Label (pipeline
  *   detail)" convention used elsewhere in the Worker (e.g. quotes.json's
- *   DIRECT_COMMIT_SOURCE_LABEL). Found live from Santiago's screenshot.
+ *   DIRECT_COMMIT_SOURCE_LABEL). Found live from a screenshot.
  * v1.11 (2026-08-07): TWO BUG FIXES, both surfaced by the same incident.
  *   (1) Duplicate timezone label: the panel subtitle already ends in
  *   `tzLabel()` (e.g. "· GMT-3") AND the column-header row's time column
- *   (#cal-th-time) shows the same `tzLabel()` directly below it — Santiago
- *   flagged this as redundant on screen. Removed the trailing tzLabel() from
+ *   (#cal-th-time) shows the same `tzLabel()` directly below it — this
+ *   was flagged as redundant on screen. Removed the trailing tzLabel() from
  *   the subtitle; the column header is the correct single place for it since
  *   it labels what the time column itself means.
  *   (2) Missing historical events: `fetchEconomicCalendar()`'s source-fallback
@@ -516,7 +516,7 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
- * v1.19.0 (2026-08-08): Five fixes from Santiago's screenshots of the
+ * v1.19.0 (2026-08-08): Five fixes from screenshots of the
  *   v1.18.0 chart + toolbar:
  *   (1) Chart background now matches the MODAL's background token
  *       (var(--bg2, var(--bg3)), same as #cal-hist-modal itself), not the
@@ -544,8 +544,8 @@
  *       couldn't shrink below their content's natural width, so as the
  *       panel got narrower they started eating into the `1fr` Event column
  *       and eventually pushed the fixed 58px Actual/Forecast/Previous
- *       columns out of alignment with the data rows beneath — Santiago
- *       flagged this as an approaching-narrow-width failure mode, not yet
+ *       columns out of alignment with the data rows beneath — flagged
+ *       as an approaching-narrow-width failure mode, not yet
  *       an active bug at the panel's normal docked width. A flex row just
  *       wraps onto a second line instead; it can't corrupt a grid it's no
  *       longer part of. `#cal-static-col-header`'s `grid-template-columns`
@@ -553,14 +553,14 @@
  *       into `#cal-panel-head-actions` for wide-fullscreen split-column
  *       mode unchanged in spirit — just targets `#cal-filter-row` instead
  *       of the grid header as the "docked" parent.
- * v1.18.0 (2026-08-08): Two follow-ups from Santiago's review of the
+ * v1.18.0 (2026-08-08): Two follow-ups from review of the
  *   history modal's DXY reference-pair line (screenshot showed "0.58 pts
  *   vs. 0.58 pts"):
  *   (1) NEW — actual-vs-forecast history chart. Added to the history modal
  *       below the print table: solid line = actual, dashed line = forecast,
  *       last up to 8 releases, ascending left-to-right. Trading
  *       Economics/Investing.com both carry this as a standard element of
- *       their event-history views, which is what Santiago referenced.
+ *       their event-history views, which is what referenced.
  *       Reuses the exact loader/theming/destroy pattern already established
  *       in econ-surprises-modal.js (own guarded `_calEnsureLWC()` — this
  *       file has no other script tag on the page to piggyback on, since
@@ -581,10 +581,10 @@
  *       index, not a currency pair, and is quoted in index points on every
  *       real venue (ICE, Bloomberg), never pips. Applying pips uniformly
  *       would itself be the non-standard choice.
- * v1.17.0 (2026-08-08): Two follow-ups from Santiago's review of the
+ * v1.17.0 (2026-08-08): Two follow-ups from review of the
  *   v1.16.0 screenshot:
  *   (1) REMOVED the FOMC voting-member tag entirely — deleted
- *       FOMC_VOTERS_2026 and _fomcVoterTag(). Santiago flagged that a
+ *       FOMC_VOTERS_2026 and _fomcVoterTag(). noted that a
  *       hardcoded voter roster requiring manual updates (the annual Jan 1
  *       rotation, plus any Board confirmation changes) isn't worth
  *       maintaining. Nothing else in this file read that tag.
@@ -598,7 +598,7 @@
  *       parent it currently lives in) rather than duplicating that
  *       branch's logic.
  * v1.16.0 (2026-08-08): "Implement everything, industry-standard" round —
- *   Santiago asked for all viable items from the v1.15.0 idea list, with
+ *   requested for all viable items from the v1.15.0 idea list, with
  *   anything cramped for row space moved into the new click-through history
  *   modal rather than another inline badge. Implemented 6 of 7:
  *   (1) Historical reaction per pair — reference-pair (per CAL_REF_PAIR)
@@ -644,8 +644,8 @@
  *       their call sites landed) and before fetchEconomicCalendar() was
  *       wired to populate _lastFullHistory/_seriesIndex from calendar.json
  *       — both would have thrown/rendered empty on first load. Added here.
- * v1.15.0 (2026-08-08): Follow-up per Santiago's review of v1.14.0:
- *   (1) REMOVED the ESI contribution badge entirely — Santiago judged it
+ * v1.15.0 (2026-08-08): Follow-up per review of v1.14.0:
+ *   (1) REMOVED the ESI contribution badge entirely — was judged
  *       added more visual noise than value on the row. Deleted
  *       esiContribBadge(), _calCanonEsi(), _CAL_CCY_PFXS, CAL_ESI_NOISE_KW,
  *       CAL_ESI_DECAY_LAMBDA, _lastSurpriseStats, and the surpriseStats
@@ -665,7 +665,7 @@
  *       real event would show. No-op with the flag absent; never touches
  *       any fetched JSON. See getSyntheticLiveEvent() / calDebugLiveEnabled().
  * v1.14.0 (2026-08-08): Two "medium effort" enhancements from
- *   Santiago's original Bloomberg/Refinitiv gap-analysis, built on top of the
+ *   the original Bloomberg/Refinitiv gap-analysis, built on top of the
  *   v1.13.x currency-filter work (still unshipped to production). [A third,
  *   an ESI contribution badge, shipped in this version too but was removed
  *   in v1.15.0 — see above; left out of this list accordingly.]
@@ -678,7 +678,7 @@
  *       currency is isolated.
  *   (2) Event methodology tooltip: hovering a matched event title (dashed
  *       underline cue, same visual convention as the ATM IV tooltips
- *       Santiago referenced) shows what it measures and why FX desks watch
+ *       referenced) shows what it measures and why FX desks watch
  *       it. ~25 G10 headline-release patterns; unmatched titles keep the
  *       plain native tooltip that was already there. Self-contained tooltip
  *       widget (own #cal-tt id) rather than reusing dashboard.js's
@@ -692,7 +692,7 @@
  *   inside the 3h/15m windows at any given moment the harness happens to run;
  *   this fixture only lived in the ad-hoc test harness at the time — v1.15.0
  *   above makes an equivalent fixture a permanent, opt-in part of the sandbox).
- * v1.13.3 (2026-08-08): Santiago caught a real misalignment in the
+ * v1.13.3 (2026-08-08): found a real misalignment in the
  *   v1.13.2 screenshot — Actual/Forecast/Previous no longer sat directly
  *   above their own data columns. Cause: v1.13.2 appended the button-group
  *   "auto" grid track AFTER the three trailing 58px columns. Grid tracks are
@@ -708,7 +708,7 @@
  *   alignment holds. buildPanel()'s relocation logic updated to insert
  *   (not append) at that same position when moving the node back from
  *   #cal-panel-head-actions.
- * v1.13.2 (2026-08-08): Follow-up per Santiago's review of v1.13.1 —
+ * v1.13.2 (2026-08-08): Follow-up per review of v1.13.1 —
  *   two problems, both in the harness/markup, not the filter logic itself:
  *   (a) The header bar did NOT look identical to production. v1.13.1 rebuilt
  *       #cal-static-col-header as a flex wrapper (grid div + button group)
@@ -725,7 +725,7 @@
  *       now relocates the existing #cal-ccy-filter node into
  *       #cal-panel-head-actions (next to the panel title) whenever splitCols
  *       is true, and moves it back when not, so it's never simply gone.
- * v1.13.1 (2026-08-08): Follow-up per Santiago's review of v1.13.0:
+ * v1.13.1 (2026-08-08): Follow-up per review of v1.13.0:
  *   (a) Currency filter changed from multi-select-with-removal to ISOLATE
  *       semantics (click a currency → show ONLY it; click again/All → show
  *       all), and moved from its own pill row to the right edge of the
@@ -734,8 +734,8 @@
  *   (b) Font mismatch in the harness was NOT a bug in this file — index.html
  *       loads Inter/JetBrains Mono via a Google Fonts <link> that
  *       index.html was missing; fixed there, not here.
- * v1.13.0 (2026-08-08): Three "quick win" enhancements requested by
- *   Santiago to move the panel closer to Bloomberg/Refinitiv conventions, built on
+ * v1.13.0 (2026-08-08): Three "quick win" enhancements to move the
+ *   panel closer to Bloomberg/Refinitiv conventions, built on
  *   an isolated test copy (calendar-panel.js / index.html) so production
  *   dashboard.js/calendar-panel.js/index.html are untouched pending review:
  *   (1) Currency filter pills (G8) above the event list, persisted in localStorage
@@ -771,7 +771,7 @@
  *   commas, K/M/B/T and whitespace — it left leading currency symbols
  *   ($, C$, A$, €, ¥...) in place, so `parseFloat("C$3.86B")` (after strip:
  *   "C$3.86") returned NaN, the `!isNaN` guard failed, and `cls` stayed ''.
- *   Found live from Santiago's screenshots: Canada/US/Australia Balance of
+ *   Found live from screenshots: Canada/US/Australia Balance of
  *   Trade, US Imports/Exports all rendering with no green/red despite a
  *   clear actual-vs-forecast beat or miss. Same bug class dashboard.js's
  *   `_parseNum()` and fetch_economic_calendar.py's `_parse_num()` already
@@ -795,7 +795,7 @@
   // v1.13.1: changed from multi-select-with-removal (clicking a currency
   // hid it) to ISOLATE semantics (clicking a currency shows ONLY that
   // currency; clicking it again — or "All" — restores all). Matches how
-  // Santiago actually wanted to use it and how #corr-window-btns' 30d/60d/90d
+  // was needed to use it and how #corr-window-btns' 30d/60d/90d
   // group behaves (single active selection, not a multi-toggle).
   // null = "show all" (default / initial state).
   const CAL_CCY_FILTER_KEY = 'gi_cal_ccy_filter';
@@ -971,7 +971,7 @@
     // above — each confirmed by an exact or near-exact previous/forecast
     // value chain between the FF-sourced forward event and Myfxbook's
     // history (see CHANGELOG.md v1.19.21 for the per-pair verification
-    // numbers). Reported by Santiago: the drill-down modal for AUD CPI y/y
+    // numbers). Reported: the drill-down modal for AUD CPI y/y
     // (and several other G10 indicators) showed "No prior actual/forecast
     // history" despite a full year of Myfxbook history existing under a
     // different vendor title — the exact same root cause as v1.19.18, just
@@ -1002,7 +1002,7 @@
     // to a series _seriesIndex has never heard of, so its drill-down modal
     // always shows "No prior actual/forecast history" even for indicators
     // with a full year on file — confirmed live for USD Core PPI m/m, Retail
-    // Sales m/m, Core Retail Sales m/m (Santiago, 2026-08-11). Same
+    // Sales m/m, Core Retail Sales m/m (reported, 2026-08-11). Same
     // normalisation _title_keywords() already applies in fetch_ff_calendar.py
     // for its own (unrelated) fuzzy-dedup pass — reused here for the series
     // key instead. Must stay in sync with _canonEsi in dashboard.js and
@@ -1177,7 +1177,7 @@
   }
 
   // ── [v1.14.0] Event methodology tooltips ──────────────────────────────
-  // Same pattern Santiago asked to reuse from the ATM IV tooltips: a clean,
+  // Same pattern requested to reuse from the ATM IV tooltips: a clean,
   // named, plain-language explanation on hover — what the release measures
   // and why FX desks watch it — with no backend/pipeline attribution (this
   // is product copy, not sourced from any fetched document, so it carries
@@ -1325,7 +1325,7 @@
   // 8 releases of that exact series (from the
   // full-year history — see buildSeriesIndex()) with the same beat/miss
   // coloring as the main row. Deliberately a click-through, not another
-  // inline badge — Santiago flagged that per-row space is tight (this is
+  // inline badge — noted that per-row space is tight (this is
   // also why the earlier ESI contribution badge was dropped), so anything
   // beyond a 1-2 character marker belongs behind a click, not in the row.
   //
@@ -1398,7 +1398,7 @@
     //
     // NO COMMA, NO APOSTROPHE (v1.19.8): v1.19.7 removed the comma after
     // pixel-inspecting a clipped "Jan 9, '26" and confirming the comma's
-    // descender was the cause. Santiago's next screenshot showed the label
+    // descender was the cause. the next screenshot showed the label
     // ("Jan 7 '26") STILL clipped — this time the apostrophe cut off at the
     // TOP. Same root cause from the other direction: an apostrophe glyph
     // commonly sits high (near/above cap-height, sometimes into the
@@ -1485,7 +1485,7 @@
     });
     _calHistChart = chart;
 
-    // TEMP DEBUG HOOK (v1.19.13) — lets Santiago test resize/DPR hypotheses
+    // TEMP DEBUG HOOK (v1.19.13) — allows testing resize/DPR hypotheses
     // live from devtools without a redeploy cycle per attempt. Remove once
     // the axis-clipping bug is confirmed fixed and closed.
     window.__calHistDebug = {
@@ -1532,13 +1532,13 @@
     // was rendering with zero clipping at rest for that event. v1.19.9
     // removed the resize call as an unjustified liability.
     //
-    // Santiago then confirmed, on a fresh screenshot taken well after v1.19.9
+    // then confirmed, on a fresh screenshot taken well after v1.19.9
     // was live (so not a transitional-frame artifact), that a DIFFERENT
     // event's chart (DXY avg daily range) still showed a hard-edged clip —
     // and a repeat diagnostic dump against that specific chart again showed
     // the axis canvas clean at rest AND ruled out every CSS ancestor. v1.19.10
     // tried `autoSize: true`, reasoning LWC read `window.devicePixelRatio`
-    // once at creation time in a not-yet-settled moment. Santiago pointed out
+    // once at creation time in a not-yet-settled moment. noted
     // this codebase already has an answer for exactly this class of bug:
     // econ-surprises-modal.js, cot-modal-chart.js, and corr-modal.js — three
     // other LWC-based modal charts with date axes, all unaffected by this
@@ -2386,7 +2386,7 @@
     // AFTER #cal-ccy-filter's CURRENT parent (already resolved above),
     // rather than duplicating the splitCols/filterRow branching. Order
     // flipped from v1.19.0 (toolbar-then-currency) to currency-then-toolbar
-    // per Santiago's review: no visible divider between the two groups —
+    // per review: no visible divider between the two groups —
     // #cal-filter-row uses justify-content:space-between instead, so the
     // currency filter sits flush left, the toolbar sits flush right, and the
     // gap lands in the middle rather than being marked by a border.
