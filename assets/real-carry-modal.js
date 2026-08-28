@@ -367,14 +367,21 @@ async function _rcmFetchData() {
       // CB policy rate is used as fallback when OIS data is unavailable or stale.
       const oisRates   = oisRes?.rates   || {};   // { USD: 5.30, EUR: 3.90, … }
       const oisSources = oisRes?.sources  || {};   // { USD: 'SOFR', EUR: '€STR', … }
+      const oisDates   = oisRes?.dates    || {};   // { USD: '2026-08-26', EUR: '2026-08-27', … } — per-currency, not a single asOf
       const nominalRates = {};
       _RCM_G8.forEach((ccy, i) => {
         const ois = oisRates[ccy];
         if (ois != null) {
-          // OIS available — use it; record benchmark name for tooltip/footnote
+          // OIS available — use it; record benchmark name for tooltip/footnote.
+          // v5.12: ois-rates/rates.json stores a per-currency `dates` map, not
+          // a single top-level `asOf` — the old `oisRes?.asOf` read always
+          // resolved to undefined, so every OIS-sourced row's Nominal OIS
+          // tooltip silently showed no date (only the CB-policy-rate fallback
+          // path below ever had one, since it reads a real per-observation
+          // date). Fixed by reading each currency's own date from `dates`.
           nominalRates[ccy] = {
             rate:   ois,
-            date:   oisRes?.asOf || null,
+            date:   oisDates[ccy] || null,
             source: oisSources[ccy] || 'OIS',
             isOIS:  true,
           };
@@ -537,7 +544,7 @@ function _rcmRenderBreakdown() {
       ? `<span style="font-size:8px;color:${nomIsOIS ? 'var(--accent,#26a69a)' : 'var(--text3)'};margin-left:3px;vertical-align:super;">${nomSrc}</span>`
       : '';
     const nomTitle  = nom != null
-      ? `${nomIsOIS ? nomSrc + ' overnight benchmark' : 'CB policy rate (OIS unavailable)'} · ${nomEntry?.date || ''}`
+      ? `${nomIsOIS ? nomSrc + ' overnight benchmark' : 'CB policy rate (OIS unavailable)'}${nomEntry?.date ? ' · ' + nomEntry.date : ''}`
       : '';
 
     // Left border accent on top row (highest real rate)
@@ -577,7 +584,7 @@ function _rcmRenderBreakdown() {
     ? ` This run: ${cpiProxyCcys.join('/')} resolved to realized CPI YoY (backward-looking proxy) rather than a forward breakeven/survey — hover a row's Infl. Exp. cell (or its FWD/CPI badge) for the exact source used.`
     : ' This run: all currencies resolved to a forward-looking market breakeven or survey.';
   const liveNote = 'Nominal rate: OIS overnight benchmark (SOFR/€STR/SONIA/TONA/AONIA/CORRA/SARON/OCR) — institutional overnight rate standard.' + fallbackNote + ' ' +
-    'Infl. Exp. methodology: market-implied breakeven where liquid (USD/EUR/CAD), forward-looking survey where published (GBP/NZD), falling back to realized CPI YoY (IMF SDMX → OECD → FRED index → World Bank, in that order) elsewhere or whenever the primary source is unavailable.' + proxyNote + ' ' +
+    'Infl. Exp. methodology: market-implied breakeven where liquid (USD/EUR/CAD), forward-looking survey where published (GBP/AUD/CHF/SEK/JPY/NZD), falling back to realized CPI YoY (IMF SDMX → OECD → FRED index → World Bank, in that order) elsewhere or whenever the primary source is unavailable.' + proxyNote + ' ' +
     'Real rate = Nominal OIS − Inflation Expectation. OIS Bias reflects forward market consensus at next CB meeting. ' +
     'Note: real carry ≠ CIP — no FX forward adjustment applied. Nominal tenor (overnight) and inflation-expectation tenor (0–5Y depending on which source resolved) are not matched — a precision caveat on the real-rate figure, not a data error.';
 
