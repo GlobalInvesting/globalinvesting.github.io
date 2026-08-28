@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-28T13:46:56Z",
-  "generatedAt": "2026-08-28T13:46:56Z",
+  "lastUpdate": "2026-08-28T14:01:24Z",
+  "generatedAt": "2026-08-28T14:01:24Z",
   "fetchMode": "Myfxbook · ForexFactory via ff_calendar.json",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -499,9 +499,9 @@
       "std": 0.15
     },
     "USD/michigan consumer sentiment": {
-      "n": 7,
-      "mean": 0.842857,
-      "std": 2.503236
+      "n": 8,
+      "mean": 0.825,
+      "std": 2.318097
     },
     "EUR/germany wholesale prices yoy": {
       "n": 3,
@@ -1377,6 +1377,16 @@
       "n": 2,
       "mean": 0.15,
       "std": 0.212132
+    },
+    "USD/michigan 5 year inflation expectations": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
+    },
+    "USD/michigan inflation expectations": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.353553
     }
   },
   "events": [
@@ -48301,7 +48311,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Consumer Sentiment",
       "impact": "high",
-      "actual": null,
+      "actual": "51.7",
       "forecast": "51.0",
       "previous": "55.2"
     },
@@ -48314,7 +48324,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "4.0%",
       "forecast": "4.3%",
       "previous": "4.2%"
     },
@@ -48327,7 +48337,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan 5 Year Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.3%",
       "forecast": "3.3%",
       "previous": "3.3%"
     },
@@ -48340,8 +48350,8 @@
       "flag": "🇺🇸",
       "event": "United States Non Farm Payrolls Annual Revision",
       "impact": "high",
-      "actual": null,
-      "forecast": "80.0K*",
+      "actual": "-79.0K",
+      "forecast": null,
       "previous": "-911.0K"
     },
     {
