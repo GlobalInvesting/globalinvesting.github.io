@@ -15,9 +15,12 @@
  *    recent dateISO, so listing both MoM and YoY (MoM first, matching the
  *    Bloomberg-headline convention already used for USD/GBP/AUD/NOK) lets
  *    both columns self-correct to the freshest release going forward with
- *    no other logic change. JPY's rtl (also YoY-only) was left as-is —
- *    unlike SEK/CHF, no live MoM title was directly confirmed against the
- *    feed this session; flagged for a dedicated check, not assumed.
+ *    no other logic change. Same-session follow-up: live-audited
+ *    myfxbook.com/forex-economic-calendar/japan directly and found the
+ *    identical gap for JPY's rtl (also YoY-only, MoM confirmed live) —
+ *    fixed the same way. See CHANGELOG.md v8.275.0 for the fuller
+ *    per-currency Myfxbook audit this triggered (USD/GBP findings
+ *    pending Santiago's confirmation before wiring).
  *
  * ── v2.5.9 (2026-08-27) — Removed an internal-documentation reference
  *    ("see GUIDELINES.md for sourcing") from the public Emp Chg proxy
@@ -750,7 +753,13 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
-      rtl:   ['Retail Sales YoY'],
+      // v2.5.10 (2026-08-28): same omission class as SEK/CHF's rtl fix
+      // this session — live myfxbook.com/forex-economic-calendar/japan
+      // confirmed a "Retail Sales MoM" title (Jul release, Aug 30 2026,
+      // -4.1% MoM vs 0.5% YoY the SAME underlying METI report) that was
+      // never in this currency's prefix list. MoM listed first per the
+      // same Bloomberg-headline convention as the other rtl fixes.
+      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
