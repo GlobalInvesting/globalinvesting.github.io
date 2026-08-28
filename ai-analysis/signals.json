@@ -1,50 +1,50 @@
 {
-  "generated_at": "2026-08-28T15:27:09Z",
+  "generated_at": "2026-08-28T18:52:12Z",
   "signals": [
     {
-      "time": "15:26",
+      "time": "18:51",
       "priority": "critical",
-      "title": "USD/EUR — G10 Bilateral Theme + Fed Hawkish Shift",
-      "text": "The US Dollar is outperforming all G10 peers as Fed Chair Kevin Warsh delivers a hawkish tilt at Jackson Hole, reviving expectations for further tightening. EUR/USD has fallen sharply to 1.1609, testing the SMA20 support level at 1.1591 as the market reprices the Fed's stance. The 135bp carry advantage favored by the Fed's 3.75% rate versus the ECB's 2.4% is now reinforced by rising US 10Y yields, which have climbed to 4.69%. While the ECB's Dolenc has signaled arguments for a September hike, the immediate momentum is firmly with the USD as the bear-flattener yield curve regime signals dominant tightening expectations. Trade bias: Bullish USD/EUR; hawkish Fed rhetoric overrides moderate ECB hike pricing. Catalyst: ECB meeting 10 Sep — hike bias active. Risk: EUR/USD holds 1.1591 SMA20 support and Jackson Hole volatility fades without a concrete policy shift.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Carry",
+      "text": "The AUD/CHF cross has emerged as the dominant G10 trend, with the AUD 1W average outperforming at +1.297% while the CHF laggard falls -0.783%. This 2.080% leader-to-laggard spread is supported by a significant +435bp carry advantage for AUD (RBA 4.35% vs SNB 0.0%). Speculative positioning in AUD is crowded long with a 52-week percentile of 94 (z=+1.78), while CHF remains net short at the 19th percentile. Low volatility (VIX 14.5) sustains the carry-seeking environment, though the extreme AUD long positioning suggests the theme is mature. Technical support for AUD/USD sits at the SMA20/50 cluster near 0.7013-0.7094. Trade bias: Long AUD/CHF; carry advantage remains the primary driver in a low-volatility regime. Catalyst: RBA meeting 29 Sep — hold expected. Risk: VIX spikes above 20, triggering a rapid unwind of the AUD/CHF carry trade.",
       "evidence": [
-        "Fed 3.75% vs ECB 2.4% — +135bp",
-        "USD 1W avg: +0.500% (n=7)",
-        "EUR 1W avg: -0.280% (n=7)"
+        "AUD 1W avg: +1.297% (n=4)",
+        "CHF 1W avg: -0.783% (n=6)",
+        "G10 spread: 2.080%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:23",
+      "time": "18:48",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Crowded Long",
-      "text": "The AUD/CHF cross represents the most extreme divergence in the G10 complex this week with a 214bp performance spread. AUD is the clear leader, gaining 1.397% on average across peers, while CHF remains the laggard at -0.743% amid a risk-on environment and low VIX of 14.2. AUD/USD trades at 0.7178, well above its SMA20/50/200 cluster, supported by a 435bp carry premium against the SNB's 0.0% rate. However, COT data shows AUD speculative positioning is now crowded at a 94th percentile (z=+1.78), while retail sentiment is 94% short AUD/CHF, creating a heavy contrarian reversal risk if momentum stalls. Trade bias: Long AUD/CHF; carry-driven outperformance faces positioning-led exhaustion risk. Catalyst: RBNZ meeting 2 Sep. Risk: Sharp risk-off shift spikes VIX above 20, triggering a rapid unwind of the AUD carry trade.",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY trades at 160.16, holding above the 160.00 psychological level which historically triggers BoJ verbal warnings and intervention risk. Despite a +275bp Fed-BoJ carry advantage supporting the pair, the options market is pricing in heavy downside protection with a 25d Risk Reversal of -1.81. This strong put skew indicates that institutional desks are hedging for a sharp reversal despite the spot trend. BoJ's Himino recently highlighted inflation risks, reinforcing the OIS hike bias, while USD positioning remains net long (lev_net +8,110). A break back below the SMA50 at 160.86 would suggest the intervention threat is capping upside. Trade bias: Neutral USD/JPY; 160.00 level introduces asymmetric intervention risk against a crowded carry trade. Catalyst: next BoJ meeting (mkt: 69% hike priced) 18 Sep. Risk: Fed Chair Warsh at Jackson Hole delivers a hawkish surprise, driving USD/JPY higher regardless of BoJ threats.",
       "evidence": [
-        "AUD 1W avg: +1.397% (n=4)",
-        "CHF 1W avg: -0.743% (n=6)",
-        "G10 spread: 2.140%"
+        "USD/JPY: 160.16",
+        "25d RR: -1.81 (strong put skew)",
+        "USD/JPY carry: +275bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:21",
+      "time": "18:45",
       "priority": "warning",
-      "title": "USD/JPY — Carry vs Options Skew Divergence",
-      "text": "USD/JPY is testing the critical 160.00 psychological level, currently at 159.96, as the 275bp Fed-BoJ carry differential remains the dominant driver. Despite the bullish price action, the options market is pricing significant downside protection, with the 1M 25d risk reversal at -1.81, a strong put skew. This divergence suggests institutional participants are hedging for potential BoJ intervention or a Jackson Hole-induced reversal even as the carry trade remains crowded with JPY net shorts at -73k (12th percentile). Real policy rates remain deeply accommodative for JPY at -0.90%, keeping the structural pressure on the yen until a hawkish BoJ shift is realized. Trade bias: Long USD/JPY; carry-supportive while holding below 160.00 intervention risk. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: Confirmed BoJ intervention at 160.00 triggers a disorderly unwind of speculative shorts.",
+      "title": "AUD/USD — COT Extreme + Retail Divergence",
+      "text": "AUD/USD shows a significant divergence between institutional and retail participants at the 0.7160 level. Leveraged funds are heavily net long AUD at +49,749 contracts, marking the 94th percentile of the 52-week range (z=+1.78), while retail sentiment is 90% short. This extreme retail fade against institutional momentum often precedes a final trend extension or a sharp 'stop-run' before exhaustion. The RBA's restrictive real rate of +0.85% supports the AUD bid against the USD's -9.6 ESI score. However, the WoW delta of +4,022 suggests adds are still active, reducing the immediate risk of a long-unwind. Trade bias: Bullish AUD/USD, supported by institutional-retail divergence and carry. Catalyst: RBA meeting 29 Sep. Risk: A sudden shift in global risk appetite (VIX > 20) forces leveraged funds to liquidate crowded AUD longs.",
       "evidence": [
-        "USD/JPY 25d RR: -1.81 (Saxo)",
-        "Fed 3.75% vs BoJ 1.0% — +275bp",
-        "JPY LF net: -73,641 (pctl 12)"
+        "AUD COT LF pctl: 94 (z=+1.78)",
+        "Retail: 90% short AUD/USD",
+        "AUD/USD: 0.716"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:18",
-      "priority": "warning",
-      "title": "GBP/USD — Positioning + Volatility + ESI",
-      "text": "GBP/USD has tumbled to 1.3557 following hawkish Fed comments, but remains positioned above its SMA20/50/200 cluster at 1.3537/1.3418/1.3437. Speculative positioning in Sterling is highly crowded at a 92nd percentile (lev_net +46k, z+1.22), leaving the pair vulnerable to further profit-taking if US yields continue to climb. The options market is pricing in significant tail risk with a GBP/USD VRP of +6.1%, as IV at 11.0% sits far above the 4.9% realized volatility. This elevated premium, combined with a negative Economic Surprise Index of -9.3, suggests the 'Long GBP' consensus is being tested by both data disappointments and external dollar strength. Trade bias: Neutral/Bearish GBP/USD; crowded longs face technical test of SMA20. Catalyst: BoE meeting 17 Sep. Risk: US 10Y yields retreat below 4.50%, easing the pressure on the GBP/USD carry neutrality.",
+      "time": "18:40",
+      "priority": "info",
+      "title": "GBP/USD — Elevated Vol Premium + Macro Hedge",
+      "text": "GBP/USD is trading at 1.3529, underpinned by a SONIA-SOFR OIS differential that slightly favors the Pound (-9bp carry). The pair exhibits an elevated Vol Risk Premium (VRP) of +5.9%, with 1M IV at 11.0% vs a realized HV30 of 5.1%. This suggests the options market is paying a high premium for protection ahead of BoE Governor Bailey's comments on muted inflation. While COT positioning is crowded long at the 92nd percentile (z=+1.22), the negative ESI score of -9.3 for the UK provides a fundamental headwind. The technical position remains constructive as the pair holds above the SMA20/50/200 cluster (1.3418-1.3537). Trade bias: Neutral/range GBP/USD; high vol premium reflects caution despite bullish technicals. Catalyst: BoE meeting 17 Sep. Risk: US NFP benchmark revisions (down 79k) lead to a broader USD sell-off, pushing Cable through 1.3600.",
       "evidence": [
-        "GBP LF net: +46,070 (pctl 92)",
-        "GBP/USD VRP: +6.1% (IV 11.0% vs HV 4.9%)",
+        "GBP/USD VRP: +5.9% (IV 11.0% vs HV30 5.1%)",
+        "GBP COT LF pctl: 92 (z=+1.22)",
         "GBP ESI: -9.3"
       ],
       "_source": "engine-ai-primary"
