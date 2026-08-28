@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-28T08:42:13Z",
+  "generated_at": "2026-08-28T15:27:09Z",
   "signals": [
     {
-      "time": "08:41",
+      "time": "15:26",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Carry",
-      "text": "AUD/CHF is the primary G10 expression this week as the Australian Dollar outperforms its peers by an average of +1.407% while the Swiss Franc lags the basket at -0.559%. This 1.967% leader-to-laggard spread is supported by a significant +435bp nominal carry advantage for AUD and a restrictive +0.85% real rate vs CHF's accommodative -0.40%. COT data confirms the trend is backed by institutional demand, with AUD LF net long at +49,749 (pctl 94) following a massive +29,228 4W build. Despite the extreme retail short at 94%, the alignment of carry and spec flow suggests the path of least resistance remains higher. Trade bias: Bullish AUD/CHF; carry advantage and institutional flow support the bilateral divergence. Catalyst: RBNZ meeting 2 Sep for regional sentiment. Risk: Sharp risk-off reversal spikes VIX above 25, triggering a rapid unwind of the high-carry AUD/CHF cross.",
+      "title": "USD/EUR — G10 Bilateral Theme + Fed Hawkish Shift",
+      "text": "The US Dollar is outperforming all G10 peers as Fed Chair Kevin Warsh delivers a hawkish tilt at Jackson Hole, reviving expectations for further tightening. EUR/USD has fallen sharply to 1.1609, testing the SMA20 support level at 1.1591 as the market reprices the Fed's stance. The 135bp carry advantage favored by the Fed's 3.75% rate versus the ECB's 2.4% is now reinforced by rising US 10Y yields, which have climbed to 4.69%. While the ECB's Dolenc has signaled arguments for a September hike, the immediate momentum is firmly with the USD as the bear-flattener yield curve regime signals dominant tightening expectations. Trade bias: Bullish USD/EUR; hawkish Fed rhetoric overrides moderate ECB hike pricing. Catalyst: ECB meeting 10 Sep — hike bias active. Risk: EUR/USD holds 1.1591 SMA20 support and Jackson Hole volatility fades without a concrete policy shift.",
       "evidence": [
-        "AUD 1W avg: +1.407% (n=4)",
-        "CHF 1W avg: -0.559% (n=6)",
-        "G10 spread: 1.967%"
+        "Fed 3.75% vs ECB 2.4% — +135bp",
+        "USD 1W avg: +0.500% (n=7)",
+        "EUR 1W avg: -0.280% (n=7)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "08:38",
-      "priority": "warning",
-      "title": "USD/JPY — Carry vs Options Skew",
-      "text": "USD/JPY trades at 159.55, holding above its SMA20/200 cluster at 158.75/158.38 despite the Yen's 5-day decline. BoJ holds at 1.0%. This strong put skew contradicts the crowded spec short positioning (JPY LF net -73,641, pctl 12), suggesting institutional players are hedging for a potential BoJ policy shift or intervention near 160.00. Government officials' travel to the US and Switzerland from August 30 adds a layer of diplomatic monitoring to the price action. Trade bias: Long USD/JPY; carry-supportive while below the 160.00 intervention threshold. Catalyst: Fed Chair Warsh at Jackson Hole today. Risk: BoJ board members signal a definitive hike bias for the 18 Sep meeting, triggering a short-squeeze.",
+      "time": "15:23",
+      "priority": "critical",
+      "title": "AUD/CHF — G10 Bilateral Theme + Crowded Long",
+      "text": "The AUD/CHF cross represents the most extreme divergence in the G10 complex this week with a 214bp performance spread. AUD is the clear leader, gaining 1.397% on average across peers, while CHF remains the laggard at -0.743% amid a risk-on environment and low VIX of 14.2. AUD/USD trades at 0.7178, well above its SMA20/50/200 cluster, supported by a 435bp carry premium against the SNB's 0.0% rate. However, COT data shows AUD speculative positioning is now crowded at a 94th percentile (z=+1.78), while retail sentiment is 94% short AUD/CHF, creating a heavy contrarian reversal risk if momentum stalls. Trade bias: Long AUD/CHF; carry-driven outperformance faces positioning-led exhaustion risk. Catalyst: RBNZ meeting 2 Sep. Risk: Sharp risk-off shift spikes VIX above 20, triggering a rapid unwind of the AUD carry trade.",
       "evidence": [
-        "USD/JPY 25d RR: -1.81 (Strong Put Skew)",
-        "JPY LF net: -73,641 (pctl 12)",
-        "Fed-BoJ carry: +275bp"
+        "AUD 1W avg: +1.397% (n=4)",
+        "CHF 1W avg: -0.743% (n=6)",
+        "G10 spread: 2.140%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "08:35",
+      "time": "15:21",
       "priority": "warning",
-      "title": "GBP/USD — Elevated Volatility Premium",
-      "text": "GBP/USD is trading at 1.3586, maintaining a position above its SMA20/50/200 cluster (1.3537/1.3418/1.3437) despite a negative Economic Surprise Index (ESI) of -9.3. The options market is pricing in significant tail-risk, with ATM Implied Volatility at 11.0% vs a 30-day Realized Volatility of only 4.8%. This +6.2% Volatility Risk Premium (VRP) indicates the highest protection-buying demand in the G10 space ahead of today's Jackson Hole headlines. COT data shows specs remain heavily net long +46,070 (pctl 92), leaving the pair vulnerable to a long-unwind if the Fed delivers a hawkish surprise. Trade bias: Neutral/range GBP/USD; high vol premium makes directional bets expensive. Catalyst: Fed Chair Warsh speech today. Risk: US data continues to disappoint, forcing a USD-driven move through 1.3650 resistance.",
+      "title": "USD/JPY — Carry vs Options Skew Divergence",
+      "text": "USD/JPY is testing the critical 160.00 psychological level, currently at 159.96, as the 275bp Fed-BoJ carry differential remains the dominant driver. Despite the bullish price action, the options market is pricing significant downside protection, with the 1M 25d risk reversal at -1.81, a strong put skew. This divergence suggests institutional participants are hedging for potential BoJ intervention or a Jackson Hole-induced reversal even as the carry trade remains crowded with JPY net shorts at -73k (12th percentile). Real policy rates remain deeply accommodative for JPY at -0.90%, keeping the structural pressure on the yen until a hawkish BoJ shift is realized. Trade bias: Long USD/JPY; carry-supportive while holding below 160.00 intervention risk. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: Confirmed BoJ intervention at 160.00 triggers a disorderly unwind of speculative shorts.",
       "evidence": [
-        "GBP/USD VRP: +6.2% (IV 11.0% vs HV30 4.8%)",
+        "USD/JPY 25d RR: -1.81 (Saxo)",
+        "Fed 3.75% vs BoJ 1.0% — +275bp",
+        "JPY LF net: -73,641 (pctl 12)"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "15:18",
+      "priority": "warning",
+      "title": "GBP/USD — Positioning + Volatility + ESI",
+      "text": "GBP/USD has tumbled to 1.3557 following hawkish Fed comments, but remains positioned above its SMA20/50/200 cluster at 1.3537/1.3418/1.3437. Speculative positioning in Sterling is highly crowded at a 92nd percentile (lev_net +46k, z+1.22), leaving the pair vulnerable to further profit-taking if US yields continue to climb. The options market is pricing in significant tail risk with a GBP/USD VRP of +6.1%, as IV at 11.0% sits far above the 4.9% realized volatility. This elevated premium, combined with a negative Economic Surprise Index of -9.3, suggests the 'Long GBP' consensus is being tested by both data disappointments and external dollar strength. Trade bias: Neutral/Bearish GBP/USD; crowded longs face technical test of SMA20. Catalyst: BoE meeting 17 Sep. Risk: US 10Y yields retreat below 4.50%, easing the pressure on the GBP/USD carry neutrality.",
+      "evidence": [
         "GBP LF net: +46,070 (pctl 92)",
+        "GBP/USD VRP: +6.1% (IV 11.0% vs HV 4.9%)",
         "GBP ESI: -9.3"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "08:30",
-      "priority": "info",
-      "title": "USD/NOK — Retail Extreme vs ESI",
-      "text": "USD/NOK retail sentiment has hit an absolute extreme with 100% community long positioning on Myfxbook. This retail bias directly contradicts the underlying fundamental momentum, where the Norway Economic Surprise Index (ESI) is at a G10-leading +84.0 following sustained data beats. The technical picture reinforces NOK strength, with USD/NOK trading at 9.319 and positioned below its entire SMA20/50/200 stack (9.428/9.610/9.653). While oil prices are slightly lower at $83.0, the prospects of renewed US-Iran tensions and a restrictive +1.15% NOK real rate support further downside for the pair. Trade bias: Bearish USD/NOK; contrarian to the 100% retail long extreme and supported by data outperformance. Catalyst: Next Norges Bank meeting 24 Sep. Risk: A sharp collapse in WTI oil prices below $75.0 invalidates the NOK strength thesis.",
-      "evidence": [
-        "USD/NOK retail: 100% Long",
-        "NOK ESI: +84.0",
-        "NOK Real Rate: +1.15%"
       ],
       "_source": "engine-ai-primary"
     }
