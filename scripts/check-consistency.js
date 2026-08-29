@@ -145,14 +145,37 @@ function checkFaqJsonLdSync() {
     if (faqEntities.length === 0) continue;
     checkedFiles++;
 
-    // Visible pairs: each qa-q immediately followed (within a small window)
-    // by a qa-a, matched by question text.
+    // Visible pairs: two markup conventions are valid in this codebase and
+    // BOTH are checked — a page can use either (or, in principle, both).
+    // (1) access.html's static <div class="qa-q">/<div class="qa-a"> pair.
+    // (2) The <details class="faq-item"><summary>/<p> accordion used on
+    //     index.html and the guide-*.html pages (v8.297.0) — native HTML5,
+    //     no JS required, and collapsible, which the static qa-box pattern
+    //     isn't — a better fit once a page has more than a handful of FAQs.
+    // Do not treat either pattern as "the" canonical one going forward:
+    // whichever fits a given page's FAQ count/design is fine, as long as
+    // ITS OWN visible text matches its own JSON-LD entity.
+    // Visible HTML must legally escape &, <, >, " as entities; the JSON-LD
+    // string doesn't (it's JSON, not HTML) — decode before comparing, or
+    // every visible answer containing a literal "&" false-fails here.
+    const decodeEntities = (s) => s
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
     const qaRe = /<div class="qa-q">([\s\S]*?)<\/div>\s*<div class="qa-a">([\s\S]*?)<\/div>/g;
+    const detailsRe = /<details class="faq-item">\s*<summary>([\s\S]*?)<\/summary>\s*<p>([\s\S]*?)<\/p>\s*<\/details>/g;
     const visiblePairs = new Map();
     let m;
     while ((m = qaRe.exec(html))) {
-      const q = m[1].replace(/<[^>]+>/g, '').trim();
-      const a = m[2].replace(/<[^>]+>/g, '').trim();
+      const q = decodeEntities(m[1].replace(/<[^>]+>/g, '').trim());
+      const a = decodeEntities(m[2].replace(/<[^>]+>/g, '').trim());
+      visiblePairs.set(q, a);
+    }
+    while ((m = detailsRe.exec(html))) {
+      const q = decodeEntities(m[1].replace(/<[^>]+>/g, '').trim());
+      const a = decodeEntities(m[2].replace(/<[^>]+>/g, '').trim());
       visiblePairs.set(q, a);
     }
 
