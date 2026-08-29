@@ -98,7 +98,7 @@ const PAIRS = [
 // stress, ca_diff, tb_diff} rows, oldest → newest, one per business day the
 // workflow has run. No client-side estimation of missing days: below
 // FV_MIN_ROWS the panel shows an accumulation progress bar instead of a
-// z-score, per the client's explicit "don't fabricate regression history"
+// z-score, per the standing "don't fabricate regression history"
 // decision (2026-08-20) — see GUIDELINES.md § Data integrity.
 const FV_MIN_ROWS = 60; // 60 business days (~12 weeks) — not 60 calendar days
 // Rolling window matches the panel's own "60D rolling regression" subtitle —
@@ -734,7 +734,7 @@ async function populateCorrelations() {
 // the same convention Bloomberg/Refinitiv desk screens use for G10 currency
 // ordering — corrected from the prior placeholder order (which had GBP
 // ahead of JPY and NZD ahead of SEK/NOK, both backwards vs turnover) after
-// the client asked whether the panel matched industry convention.
+// a check against industry turnover convention for panel ordering.
 const CORR_MTX_CCYS = ['USD','EUR','JPY','GBP','AUD','CAD','CHF','SEK','NOK','NZD'];
 // [ohlcId, base, quote] — same 32 pairs as the G10 composite heatmap.
 const CORR_MTX_PAIRS = [
@@ -931,7 +931,7 @@ async function renderCorrMatrix() {
   // background+border as the value <td> cells below (var(--bg2)/var(--border)
   // instead of "unset"). Without it, the browser's UA default table-cell
   // border/background shows through on hover repaint — the gray square
-  // the client flagged to the left of "USD" was exactly this: the corner <td>
+  // reported to the left of "USD" was exactly this: the corner <td>
   // and the row-label <th> were the only two cells in the table with no
   // background/border declared at all.
   let html = '<tr><td style="background:var(--bg2);border:1px solid var(--border);"></td>' + CORR_MTX_CCYS.map(c =>
@@ -1027,7 +1027,7 @@ function initCorrAssetTabs() {
 }
 
 // ── Pair×Pair Correlation Matrix fullscreen — content-swap, not a DOM-lift.
-// the client's spec: the docked "Matrix" tab (#corr-matrix-wrap, currency x
+// By design: the docked "Matrix" tab (#corr-matrix-wrap, currency x
 // currency, _corrMtxCcys) stays exactly as-is — the sidebar panel is too
 // small to fit a 32x32 pairs grid. The expand button instead opens a
 // fullscreen overlay that builds an independent Par×Par matrix (every
@@ -1042,7 +1042,7 @@ function initCorrAssetTabs() {
 // fetcher needed, correcting the prior session's assumption that intraday
 // granularity was unavailable). 15min/5min are NOT available anywhere in
 // the pipeline. v8.189.0: dropped the matching caveat from the on-screen
-// footnote at the client's request (unnecessary
+// footnote (unnecessary
 // detail for the end user) — the gap itself is unchanged, just no longer
 // called out in the UI; this comment is the only place it's noted now.
 //
@@ -1125,8 +1125,8 @@ function _pairsCorrMap(ids, retsById, maxN) {
 // 1-D spectral ordering via the leading eigenvector of the pairwise
 // correlation matrix (power iteration), not a nearest-neighbor chain or a
 // plain average-correlation sort. This is what actually reproduces the
-// target visual pattern (screenshot comparison against a competitor tool,
-// the client, this session): pairs that share the grid's dominant common
+// target visual pattern (confirmed by comparison against a competitor
+// tool this session): pairs that share the grid's dominant common
 // factor cluster at the two extremes — strongly loading one way at one
 // edge, strongly loading the opposite way at the other edge — while pairs
 // with near-zero loading (genuinely uncorrelated with that dominant factor)
@@ -1191,8 +1191,8 @@ async function renderCorrPairsMatrix(tf) {
   const orderedIds = _pairsClusterOrder(ids, corrMap);
 
   // Column headers stay horizontal — a vertical/rotated-text version was
-  // tried and reverted (the client flagged a sticky-positioning regression it
-  // introduced; see GUIDELINES.md v8.186.0). The table itself is full-width
+  // tried and reverted (it introduced a sticky-positioning regression;
+  // see GUIDELINES.md v8.186.0). The table itself is full-width
   // (CSS table-layout:fixed) so all 32 columns fit without horizontal
   // scroll on a normal desktop viewport regardless of header orientation.
   // Header/row-label cells are plain <th> — position:sticky is applied
@@ -2379,7 +2379,7 @@ function _cotStrengthGridHtml(store) {
 // title/footer explicitly say "52wk"/"52 weeks" (the standard 52w-high/low
 // convention), so the window is sliced to the trailing 52 entries below —
 // it must NOT read the full `history` array, which was widened from 52 to
-// 522 weeks (~10y) on 2026-08-26 at the client's request (see save()'s
+// 522 weeks (~10y) on 2026-08-26 (see save()'s
 // `existing_history[-522:]`, engine repo). Needs >=2 points in the sliced
 // window to have a range at all; a flat range (max==min) returns null.
 //
@@ -6334,7 +6334,7 @@ async function _renderLWChart(ohlcId, label) {
   // (swing start → swing end → retracement end) is a materially bigger
   // feature — separate creation flow, a third handle, extended selection/
   // resize/serialization — and is not implemented here; flagged as a
-  // possible follow-up if the client wants full Bloomberg/MT5 parity.
+  // possible follow-up for full Bloomberg/MT5 parity.
   const FIB_EXT_LEVELS = [0, 0.382, 0.618, 1, 1.272, 1.618, 2, 2.618];
 
   function _updateDrawBtnState() {
@@ -6412,7 +6412,7 @@ async function _renderLWChart(ohlcId, label) {
       // 9 real days can be a fraction of one bar's pixel width there). An SVG
       // <rect> with width or height rounding to 0 doesn't render AT ALL per
       // spec — not even its stroke — so the shape would silently vanish
-      // exactly the way the client reported on W1/MN. TradingView/MT5 never let
+      // exactly the way it was reported to disappear on W1/MN. TradingView/MT5 never let
       // a drawn object disappear this way; they keep at least a visible
       // sliver. Fix: clamp both dimensions to a 2px floor, expanding outward
       // from the shape's own center so it stays anchored at the same
@@ -6519,8 +6519,8 @@ async function _renderLWChart(ohlcId, label) {
         // possibility once a shape can be viewed on a timeframe/zoom far
         // from where it was drawn — see _epochToXInterpolated above) simply
         // kept extending straight through pane 0's bottom edge into
-        // whatever sub-pane sat below it, which is what the client's H1/H4
-        // screenshots showed: a rectangle spilling into the oscillator's
+        // whatever sub-pane sat below it, confirmed on H1/H4: a rectangle
+        // spilling into the oscillator's
         // plot area. Fix: also clip at pane 0's own bottom edge whenever
         // more than one pane exists, using its actual HTMLElement height
         // (the ground-truth pixel height, not an assumption about layout).
@@ -7391,8 +7391,8 @@ async function _renderLWChart(ohlcId, label) {
   // on a Daily chart), EVERY bar is its own period, so there is no bar left
   // to sacrifice for a whitespace break without losing the period's only
   // data point — the result is every bar's differing level connected
-  // straight to the next, i.e. the continuous diagonal zigzag the client
-  // flagged (screenshot on an AUD/USD D1 chart with Daily Pivot on).
+  // straight to the next, i.e. the continuous diagonal zigzag reported
+  // on an AUD/USD D1 chart with Daily Pivot on.
   // Matches the standard MT5/TradingView convention of only exposing a
   // period pivot on timeframes below that period.
   const _PIVOT_TF_RANK = { H1: 0, H4: 1, D1: 2, W1: 3, MN: 4 };
@@ -7510,8 +7510,8 @@ async function _renderLWChart(ohlcId, label) {
     // on the right side of the chart gets a tag, one per level. v8.90.4
     // tagged every historical segment (matching TradingView's per-segment
     // placement literally), but with 7 levels × many periods on screen at
-    // once that reads as noise rather than signal — the client asked for a
-    // single current-value tag per line instead, so only the last start
+    // once that reads as noise rather than signal — a single current-value
+    // tag per line was chosen instead, so only the last start
     // point is kept here.
     const segStartsByField = {};
     fields.forEach(f => {
@@ -11772,6 +11772,20 @@ async function buildRichNarrative() {
                 });
               } catch { return timeStr; }
             }
+            // FIX (v8.309.0): _dshEscHtml — s.title/s.text/s.evidence[] come from
+            // ai-analysis/index.json, LLM-generated free text (trade narratives),
+            // and were being injected into innerHTML (and into the row's title=""
+            // attribute via evTooltip) unescaped. Same bug class already fixed in
+            // calendar-panel.js/econ-matrix.js/econ-surprises-modal.js/yc-modal.js/
+            // cb-rates-modal.js/heatmap-modal.js (v8.304.0-v8.305.0) — the highest-
+            // risk sink of that family since this text is model-generated prose,
+            // not a bounded numeric/enum field, so it's the least constrained of
+            // any external text this frontend renders.
+            function _dshEscHtml(s) {
+              return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            }
             // Rule 10 (engine SIGNALS_SYSTEM): title format is "PAIR — Setup Name"
             // (em dash, spaces either side). The Setup Name is NOT a fixed frontend
             // taxonomy — it's whatever the LLM named the setup that cycle, generated
@@ -11804,8 +11818,9 @@ async function buildRichNarrative() {
               const ev = Array.isArray(s.evidence) && s.evidence.length ? s.evidence : [];
               const evTooltip = ev.length ? ev.join(' · ') : '';
               const evHtml = ev.length
-                ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${e}</span>`).join('')}</div>`
+                ? `<div class="a-evidence" aria-label="Signal data sources">${ev.map(e => `<span class="a-ev-chip">${_dshEscHtml(e)}</span>`).join('')}</div>`
                 : '';
+              const evTooltipEsc = _dshEscHtml(evTooltip);
 
               const titleParts = parseTitle(s.title);
               const footerParts = parseFooter(s.text);
@@ -11815,17 +11830,17 @@ async function buildRichNarrative() {
                 // card — the mockup keeps the card clean (body + three-clause
                 // footer only). The underlying data isn't lost: it's still on the
                 // native title="" tooltip, available on hover.
-                return `<div class="alert-row" ${evTooltip ? `title="${evTooltip}"` : ''}>
+                return `<div class="alert-row" ${evTooltipEsc ? `title="${evTooltipEsc}"` : ''}>
                   <div class="a-text">
                     <div class="a-head">
-                      <span class="a-name"><span class="a-sev ${sevCls}" role="img" aria-label="${sevTitle}" title="${sevTitle}"></span><span class="a-pair">${titleParts.pair}</span></span>
-                      <span class="a-badge">Regime: ${titleParts.badge} · ${localTime}</span>
+                      <span class="a-name"><span class="a-sev ${sevCls}" role="img" aria-label="${sevTitle}" title="${sevTitle}"></span><span class="a-pair">${_dshEscHtml(titleParts.pair)}</span></span>
+                      <span class="a-badge">Regime: ${_dshEscHtml(titleParts.badge)} · ${localTime}</span>
                     </div>
-                    <span class="a-desc">${footerParts.body}</span>
+                    <span class="a-desc">${_dshEscHtml(footerParts.body)}</span>
                     <div class="a-foot">
-                      <div class="a-foot-line"><span class="a-foot-lbl">Trade bias:</span> ${footerParts.bias}</div>
-                      <div class="a-foot-line"><span class="a-foot-lbl">Catalyst:</span> ${footerParts.catalyst}</div>
-                      <div class="a-foot-line"><span class="a-foot-lbl">Risk:</span> ${footerParts.risk}</div>
+                      <div class="a-foot-line"><span class="a-foot-lbl">Trade bias:</span> ${_dshEscHtml(footerParts.bias)}</div>
+                      <div class="a-foot-line"><span class="a-foot-lbl">Catalyst:</span> ${_dshEscHtml(footerParts.catalyst)}</div>
+                      <div class="a-foot-line"><span class="a-foot-lbl">Risk:</span> ${_dshEscHtml(footerParts.risk)}</div>
                     </div>
                   </div>
                 </div>`;
@@ -11833,10 +11848,10 @@ async function buildRichNarrative() {
 
               // Fallback — for signals without the Rule 10/14 shape (e.g. legacy
               // fetch_intraday_quotes.py entries).
-              return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltip ? `title="${evTooltip}"` : ''}>
+              return `<div class="alert-row${ev.length ? ' a-has-ev' : ''}" ${evTooltipEsc ? `title="${evTooltipEsc}"` : ''}>
                 <span class="a-time">${localTime}</span>
                 <span class="a-dot ${dotCls}"></span>
-                <div class="a-text"><strong>${s.title || ''}</strong>${s.title ? ' — ' : ''}${s.text || ''}${evHtml}</div>
+                <div class="a-text"><strong>${_dshEscHtml(s.title || '')}</strong>${s.title ? ' — ' : ''}${_dshEscHtml(s.text || '')}${evHtml}</div>
               </div>`;
             }).join('');
             // Evidence chips render inline and always visible (no collapse/expand —
@@ -12434,7 +12449,7 @@ function drawLiquidityChart() {
   // (22,02,06,10,14,18,22) — correct only for a browser physically in UTC+0;
   // every other timezone (e.g. GMT-3) saw an axis that didn't match either
   // their own clock or the "Peak HH:MM"/subtitle local-time labels on the
-  // same panel. Confirmed via user screenshot: axis started at "22" while
+  // same panel. Confirmed via a fresh render: axis started at "22" while
   // the panel's own subtitle read "21:12 GMT-3".
   ctx.fillStyle=_themeColor('--text3'); ctx.font='8px Courier New'; ctx.textAlign='center';
   [0, 8, 16, 24, 32, 40, 47].forEach(ci => {
@@ -14155,8 +14170,8 @@ function giOnboardInit() {
   // this tooltip points at the alerts bell inside #gi-terminal-view, which
   // since v8.129.0 stays hidden behind the Market Overview snapshot until
   // the visitor enters the terminal. The old raw-DOMContentLoaded trigger
-  // fired regardless, so it could appear while still on the Overview page
-  // (reported by the client with a screenshot). Resolves immediately for
+  // fired regardless, so it could appear while still on the Overview page.
+  // Resolves immediately for
   // returning active users (terminal visible from load); otherwise waits
   // for the actual Overview→terminal transition.
   if (window.giOnTerminalShown) {
@@ -14925,8 +14940,8 @@ async function renderSovereignSpreads() {
       const cty2y  = _extData?.bond2y  ?? null;
       // FIX-36 (v8.98.0): fetch_bond_yields.py (v2.9.9) labels a cached bond2y
       // 'stale-cached' once it's >90d old with no live source available (e.g.
-      // CHF/EUR when SNB/ECB feeds stop publishing). This is the table the client
-      // flagged with the CHF +39bp Curve reading built on a 368-day-old 2Y —
+      // CHF/EUR when SNB/ECB feeds stop publishing). This is the table flagged
+      // with the CHF +39bp Curve reading built on a 368-day-old 2Y —
       // stale2y below excludes that value from the slope calc and flags the
       // raw 2Y cell instead of presenting it as a normal live print.
       const stale2y = ext?.sources?.bond2y === 'stale-cached';
@@ -15829,8 +15844,8 @@ function _newsSetFilter(type, value) {
 // and restored to its original position on close. #ns-filter-bar is lifted
 // separately, into #intel-group-news specifically — in the compact view it
 // lives outside #intel-scroll as a sticky bar shared visually across all
-// three stacked sub-panels, but in fullscreen (per the client's "own filters
-// per tab" choice) it belongs to the News tab alone, sitting directly under
+// three stacked sub-panels, but in fullscreen (per the "own filters
+// per tab" design) it belongs to the News tab alone, sitting directly under
 // the News header the same way #rs-filter-bar already sits under Research's.
 // Neither .intel-group wrapper exists as a layout box in the compact view —
 // they're `display:contents` there — so #intel-scroll's existing CSS Grid
@@ -15950,7 +15965,7 @@ function openIntelFullscreen() {
 
   overlay.classList.add('intel-fs-active');
   document.body.style.overflow = 'hidden';
-  _intelFsSetTab('news'); // always opens on News, per the client's choice
+  _intelFsSetTab('news'); // always opens on News, by design
   _intelRelayoutColumns(); // re-check the 1400px breakpoint now that .intel-fs-active is set
 }
 
@@ -16558,7 +16573,7 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
 // COMPARE OVERLAY — normalised % change LineSeries on secondary price scale
 // =============================================================================
 
-// MOBILE FIX (the client report, 2026-08-19): "+ Compare" did nothing on mobile.
+// MOBILE FIX (2026-08-19): "+ Compare" did nothing on mobile.
 // Root cause — #lw-cmp-dropdown was left as static HTML nested inside
 // #lw-range-bar's row-1 div, which has `overflow-x:auto` + WebKit's
 // `-webkit-overflow-scrolling:touch` (needed for iOS momentum-scroll on that
@@ -16570,7 +16585,7 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
 // dropdown stayed clipped to the toolbar's row bounds and effectively
 // invisible/untappable on iOS Safari/Chrome-iOS, while working fine on
 // desktop (no touch/overflow quirk there) and even Android in some cases —
-// consistent with the client not flagging any other browser.
+// consistent with no other browser showing the symptom.
 // The Indicators (_lw-ind-dropdown) and Draw (_lw-draw-dropdown) popups never
 // hit this because they're `document.createElement`'d and
 // `document.body.appendChild()`'d fresh on every open — never a descendant of
@@ -17076,7 +17091,7 @@ function _lwOpenFullscreen() {
   // it showed as active/highlighted inside fullscreen), but the panel body
   // was left behind in the page's normal flow, invisible underneath the
   // opaque full-viewport overlay (#lw-fullscreen-overlay is position:fixed;
-  // inset:0). Reported by the client via screenshot: button on, no panel.
+  // inset:0). Symptom as reported: button on, no panel.
   if (rangeBar)  inner.appendChild(rangeBar);
   if (sznPanel)  inner.appendChild(sznPanel);
   if (chartHdr)  inner.appendChild(chartHdr);
@@ -17603,8 +17618,8 @@ window.addEventListener('gi-theme-change', function() {
       // actually has content to draw (grid lines, series); in practice it
       // fell back to a lighter internal default gray-blue, visible as a
       // "gray box" filling the whole plot area regardless of hover (this
-      // was already there before any mouse interaction — confirmed against
-      // a screenshot with the cursor away from the chart). The main Price
+      // was already there before any mouse interaction — confirmed with
+      // the cursor away from the chart). The main Price
       // Chart never relies on 'transparent' for exactly this reason — it
       // sets its background explicitly to the real backdrop color
       // (`--bg`, the same color `body`/`#szn-panel` actually paint behind
@@ -17767,14 +17782,14 @@ window.addEventListener('gi-theme-change', function() {
   // cell's content needs two stacked lines (name + value) taller than that
   // fixed row box, the overflow doesn't reflow the grid — it just spills
   // past the row's bottom edge, visually detached below the rest of the
-  // strip. December was the visible case the client hit, but the mechanism
+  // strip. December was the visible case that surfaced it, but the mechanism
   // has nothing to do with December specifically (every month's two-line
   // stack is equally taller than the box; December's simply happened to be
   // the one whose overflow amount crossed into visibly separate territory
   // at the widths tested — a real width/font-metrics coincidence, not a
   // December-specific bug). Fixed at the root by reverting this row to
-  // month-name-only (one line, matches its `min-height:22px` box exactly)
-  // per the client's explicit instruction, rather than patching around it
+  // month-name-only (one line, matches its `min-height:22px` box exactly),
+  // rather than patching around it
   // with a taller fixed row height or an invisible spacer — the average-
   // move figures move to their own tab below instead (see
   // `_sznRenderMonthlyTable()`), where a table row has no such fixed-height
@@ -17864,8 +17879,8 @@ window.addEventListener('gi-theme-change', function() {
 
   // v8.209.0 — rebuilt as a horizontal table (months as columns, one
   // Average row + a Yearly Return column), matching the Seasonax/
-  // EquityClock "Total Percent Returns" layout convention the client
-  // referenced — this is the industry-standard shape for a compact
+  // EquityClock "Total Percent Returns" layout convention —
+  // this is the industry-standard shape for a compact
   // monthly-seasonality table, and uses far less vertical space than the
   // v8.208.0 row-per-month version. Cell backgrounds use a light tint of
   // the same --up/--down variables the rest of this app already uses for
@@ -18050,7 +18065,7 @@ window.addEventListener('gi-theme-change', function() {
     // correctly) — but the LWC canvas itself was drawn at the OLD pixel
     // height and never gets told to repaint at the new one, since neither
     // display:block/none nor a flex-basis change fires a 'resize' event.
-    // Symptom the client saw: opening Seasonality inside the fullscreen chart
+    // Symptom: opening Seasonality inside the fullscreen chart
     // overlay left the price chart candles rendered at their pre-toggle
     // (taller) height, now overflowing/clipped by the shrunk container —
     // reading as "the chart got cut in half", including its time axis at
@@ -18081,7 +18096,7 @@ window.addEventListener('gi-theme-change', function() {
   // config but, unlike the main Price Chart's own fullscreen-resize path
   // (_lwChart.resize(w, h, true)), doesn't reliably force the canvas
   // itself to repaint at the new size, nor does it touch the time scale.
-  // Net effect matching what the client saw: entering fullscreen widened
+  // Net effect: entering fullscreen widened
   // #szn-chart's container, but the chart kept rendering at its old
   // (pre-fullscreen) pixel width — visible as the curve confined to a
   // narrow strip instead of spanning the new, much wider panel. Switched
@@ -18180,7 +18195,7 @@ window.addEventListener('gi-theme-change', function() {
 
 // ── Row 1 toolbar scroll arrows (promoted to production) — same gap as Row 2 had before its
 //    own fix: overflow-x:auto with zero affordance that it can scroll.
-//    Row 1 (TF/Range/+Compare/Fullscreen) is the one the client flagged —
+//    Row 1 (TF/Range/+Compare/Fullscreen) is the one that was flagged —
 //    it's also the row that gets lifted (via #lw-range-bar) into the
 //    fullscreen chart overlay, where the narrower available width made
 //    +Compare/Fullscreen silently scroll out of reach. Identical
@@ -18231,7 +18246,7 @@ window.addEventListener('gi-theme-change', function() {
 // regime proxy version this panel used through v8.201.0 (dollar-smile-
 // data/history.json, log_dollar_smile_inputs.py, 4 RISK-ON/CAUTION/MIXED/
 // RISK-OFF buckets keyed off VIX/MOVE/gold/SPX/AUDJPY/USDJPY/HY-OAS) has
-// been REMOVED from this panel per the client's explicit instruction: having
+// been REMOVED from this panel by explicit product decision: having
 // both a proxy version and the real version stacked in one panel read as
 // if one was needed to interpret the other, and it wasn't — each stood on
 // its own, so showing both was confusing, not additive. This panel now
@@ -18254,7 +18269,7 @@ window.addEventListener('gi-theme-change', function() {
 //
 // v2.0.0 (2026-08-22) — regime scheme changed from a pure growth-
 // differential 3-way split to a combined crisis+growth classification,
-// after the client flagged the chart didn't show a U-shape and a check
+// after it was flagged that the chart didn't show a U-shape and a check
 // against Jen & Yilmaz's actual framework confirmed why: the smile's left
 // tail is a genuine global risk-off/crisis regime, not "the US grows a
 // bit slower than the G9 average" — those are different things, and a
@@ -18427,7 +18442,7 @@ function _dsmileRenderSVG(el, regimes, stats, currentRegime, fmtOpts) {
 
 // One-line status + short hover tooltip (methodology in brief, then what
 // it means for a trader) — v8.216.0 shortened from a 4-sentence paragraph
-// per the client's feedback that it read too long for a tooltip; the fuller
+// after feedback that it read too long for a tooltip; the fuller
 // methodology disclosure lives in the static line above the chart
 // (index.html, promoted from beta in v8.219.0) and the panel-title tooltip, so this one only needs
 // to orient a reader who hasn't seen those.
@@ -18455,7 +18470,7 @@ function _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear) {
   if (!tbody) return;
   // n (GDP, full 1996- history) and n_dxy (subset with a matched same-
   // quarter DXY return, limited by dxy.json's own history) are genuinely
-  // different denominators. The client flagged that showing both as bare
+  // different denominators. Showing both as bare
   // "n" in the same row reads as an inconsistency rather than two
   // disclosed sample sizes — so each gets its own coverage tag, per the
   // same "n designates a subsample, N the full population" convention
@@ -18475,7 +18490,7 @@ function _growthdiffRenderTable(tbody, rawStats, cur, dxyStartYear) {
 }
 
 // (v8.205.0 added a Stress(VIX) tab and a Rate Diff placeholder tab
-// alongside Growth here; both removed in v8.213.0 per the client's explicit
-// instruction — this panel shows Jen's original growth-differential lens
+// alongside Growth here; both removed in v8.213.0 by explicit product
+// decision — this panel shows Jen's original growth-differential lens
 // only, no tab chrome. renderDollarSmileStress()/_dsmileSwitchTab()/
 // _dsmileStressRegimeFor()/_DSMILE_STRESS_REGIMES all deleted with it.)
