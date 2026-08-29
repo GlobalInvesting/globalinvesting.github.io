@@ -1,5 +1,5 @@
 /**
- * calendar-panel.js v1.19.22 — Native economic calendar renderer
+ * calendar-panel.js v1.19.23 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  * Renders inline with terminal colors — no third-party iframes.
  *
@@ -2220,12 +2220,12 @@
           ? `<span class="fi fi-${f}" style="font-size:10px;margin-right:3px;flex-shrink:0;" title="${ccy}"></span>`
           : '';
         const holTitle  = hol.title || 'Bank Holiday';
-        const tooltipTx = `${holTitle} — ${ccy} market closed`;
+        const tooltipTx = `${_escAttr(holTitle)} — ${_escAttr(ccy)} market closed`;
         gHtml += `<div class="cal-event-row cal-holiday-row" title="${tooltipTx}">` +
           `<div class="cal-col cal-time">All Day</div>` +
-          `<div class="cal-col cal-ccy">${flagHtml}<span style="font-size:10px;">${ccy}</span></div>` +
+          `<div class="cal-col cal-ccy">${flagHtml}<span style="font-size:10px;">${_escAttr(ccy)}</span></div>` +
           `<div class="cal-col cal-impact"><span class="cal-dot" style="background:var(--text3);" title="Market holiday"></span></div>` +
-          `<div class="cal-col cal-title">${holTitle}</div>` +
+          `<div class="cal-col cal-title">${_escAttr(holTitle)}</div>` +
           `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
           `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
           `<div class="cal-col cal-num"><span style="color:var(--text3)">—</span></div>` +
@@ -2260,7 +2260,7 @@
             if (tier === 'moderate') styleAttr = ' style="font-weight:600;"';
             if (tier === 'strong')   styleAttr = ` style="font-weight:700;background:${beat ? 'rgba(38,166,154,.14)' : 'rgba(239,83,80,.14)'};border-radius:2px;padding:0 3px;"`;
           }
-          actualHtml = `<span${cls}${styleAttr}>${ev.actual}</span>`;
+          actualHtml = `<span${cls}${styleAttr}>${_escAttr(ev.actual)}</span>`;
         }
 
         // Derived forecast (suffixed "*"): render in muted color with tooltip
@@ -2269,9 +2269,9 @@
           forecastHtml = '<span style="color:var(--text3)">—</span>';
         } else if (String(ev.forecast).endsWith('*')) {
           const displayVal = String(ev.forecast).slice(0, -1); // strip "*" for display
-          forecastHtml = `<span style="color:var(--text3)" title="Last known consensus (provider estimate unavailable)">${displayVal}*</span>`;
+          forecastHtml = `<span style="color:var(--text3)" title="Last known consensus (provider estimate unavailable)">${_escAttr(displayVal)}*</span>`;
         } else {
-          forecastHtml = `<span style="color:var(--text2)">${ev.forecast}</span>`;
+          forecastHtml = `<span style="color:var(--text2)">${_escAttr(ev.forecast)}</span>`;
         }
         // [v1.13.0] Revision marker — small superscript "R" when this
         // event's `previous` doesn't match what was actually printed last
@@ -2279,10 +2279,10 @@
         // the fetched dataset, see buildRevisionIndex()/detectRevision()).
         const revision = ev.previous ? detectRevision(ev, revIdx) : null;
         const revMarkHtml = revision
-          ? ` <sup title="Revised from ${revision.old} to ${revision.new}" style="color:var(--orange);font-size:8px;cursor:help;">R</sup>`
+          ? ` <sup title="Revised from ${_escAttr(revision.old)} to ${_escAttr(revision.new)}" style="color:var(--orange);font-size:8px;cursor:help;">R</sup>`
           : '';
         const previousHtml = ev.previous
-          ? `<span style="color:var(--text3)">${ev.previous}</span>${revMarkHtml}`
+          ? `<span style="color:var(--text3)">${_escAttr(ev.previous)}</span>${revMarkHtml}`
           : '<span style="color:var(--text3)">—</span>';
 
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
@@ -2311,14 +2311,14 @@
         // object back up by index without re-serializing it into the DOM.
         const methodText  = _calMethodologyFor(ev.title);
         const histIdx     = _calRenderIndex.push(ev) - 1;
-        const titleInner  = ev.title;
+        const titleInner  = _escAttr(ev.title);
         const titleCellHtml = methodText
           ? `<div class="cal-col cal-title" data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`
           : `<div class="cal-col cal-title" title="${_escAttr(ev.title)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`;
 
         gHtml += `<div class="cal-event-row${dimmed ? ' cal-released' : ''}${liveClass}"${upcomingAttr}>
   <div class="cal-col cal-time">${timeCellHtml}</div>
-  <div class="cal-col cal-ccy">${flagHtml}${ev.currency}</div>
+  <div class="cal-col cal-ccy">${flagHtml}${_escAttr(ev.currency)}</div>
   <div class="cal-col cal-impact"><span class="cal-dot" style="background:${dot.color}" title="${dot.label} impact"></span></div>
   ${titleCellHtml}
   <div class="cal-col cal-num">${actualHtml}</div>
