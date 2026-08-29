@@ -2375,10 +2375,23 @@ function _cotStrengthGridHtml(store) {
 
 // Net Exposure % Rank — classic "COT Index" formula: where the current
 // reading sits within its own trailing range, on a 0-100% scale (0 = most
-// net-short in the lookback window, 100 = most net-long). `history` caps
-// at 52 entries (save()'s `existing_history[-52:]`, engine repo) — the max
-// lookback the data actually has, ~1 year of weekly prints. Needs >=2
-// points to have a range at all; a flat range (max==min) returns null.
+// net-short in the lookback window, 100 = most net-long). This chart's own
+// title/footer explicitly say "52wk"/"52 weeks" (the standard 52w-high/low
+// convention), so the window is sliced to the trailing 52 entries below —
+// it must NOT read the full `history` array, which was widened from 52 to
+// 522 weeks (~10y) on 2026-08-26 at the client's request (see save()'s
+// `existing_history[-522:]`, engine repo). Needs >=2 points in the sliced
+// window to have a range at all; a flat range (max==min) returns null.
+//
+// FIX: this is the same "52-week label vs. now-522-week-deep history" bug
+// already fixed in cot-modal-chart.js's "52-Week Range" stat (v8.263.2) and
+// in the COT digest generator (update-cot-cftc-all.yml) — this chart was
+// the one sibling panel missed in that pass. Before this fix, `weeks`
+// reported the FULL stored depth (up to 522) instead of the labeled 52,
+// and the percentile rank was computed against up to ~10 years of history
+// instead of the intended trailing ~1 year — e.g. a currency sitting near
+// the extreme of its real 1-year range could read as mid-range once
+// diluted against a full decade, or vice versa.
 //
 // This reproduces the reference chart's own model exactly, per explicit
 // direction — a single bar per currency floating FROM the 50%
@@ -2387,10 +2400,10 @@ function _cotStrengthGridHtml(store) {
 // box (full/26wk/13wk) reasoning from the reference image's apparent
 // per-currency box extents; that read was wrong and added a different
 // chart than what was asked for. This is deliberately the single-value
-// version: one real percentile rank (full stored history), one bar.
+// version: one real percentile rank (trailing 52-week history), one bar.
 function _cotNetExposureRankDetail(d) {
   const hist = (d && d.history) || [];
-  const nets = hist.map(h => h.levNet).filter(n => n != null);
+  const nets = hist.slice(-52).map(h => h.levNet).filter(n => n != null);
   if (nets.length < 2) return null;
   const lo = Math.min(...nets), hi = Math.max(...nets);
   if (hi === lo) return null;
@@ -2506,7 +2519,7 @@ function _cotNetExposureRankChartHtml(store) {
   });
   html += '</div>'
     + '</div></div>';
-  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s own full trailing history (up to 52 weeks, the full depth this data stores) · shaded bands mark the top/bottom 10% of the 0-100% range · hover a bar for its exact reading</div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Bar floats from the 50% (neutral) baseline to the latest reading, plotted against the symbol\'s trailing 52-week range (standard 52w-high/low convention, not the full multi-year history this data now stores) · shaded bands mark the top/bottom 10% of the 0-100% range · hover a bar for its exact reading</div>';
   return html;
 }
 
@@ -2530,7 +2543,7 @@ async function renderCotBreakdown() {
   html += _cotStrengthGridHtml(store);
   html += '<div style="margin-top:16px;font-size:11px;color:var(--text3);font-weight:600;">Net Exposure % Rank — where current LF net position sits in its own trailing range (up to 52wk history)</div>';
   html += _cotNetExposureRankChartHtml(store);
-  html += '<div style="padding:8px 0 14px;font-size:9px;color:var(--text3);">0% = most net-short leveraged-funds positioning in the lookback window, 100% = most net-long · lookback is whatever history exists per symbol, capped at 52 weeks (the full depth this data stores) · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX and equity indices, Disaggregated for commodities)</div>';
+  html += '<div style="padding:8px 0 14px;font-size:9px;color:var(--text3);">0% = most net-short leveraged-funds positioning in the lookback window, 100% = most net-long · lookback is the trailing 52 weeks per symbol (or however much history exists, if less) · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX and equity indices, Disaggregated for commodities)</div>';
   inner.innerHTML = html;
 }
 
