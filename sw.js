@@ -11,7 +11,7 @@
 // users always get fresh files after the next page load.
 // ═══════════════════════════════════════════════════════════════════
 
-const CACHE_VERSION = 'gi-v8.306.0';
+const CACHE_VERSION = 'gi-v8.307.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -35,23 +35,23 @@ const CACHE_DATA    = `${CACHE_VERSION}-data`;
 const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.191.0',
   '/assets/dashboard.js?v=8.290.0',
-  '/assets/gi-auth.js?v=1.7.5',
+  '/assets/gi-auth.js?v=1.7.6',
   '/assets/gi-overview.js?v=1.4.2',
   '/assets/fx-websocket.js?v=1.0.1',
   '/assets/cot-modal-chart.js?v=7.99.0',
   '/assets/cb-rates-modal.js?v=8.0.8',
-  '/assets/real-carry-modal.js?v=2.7.9',
+  '/assets/real-carry-modal.js?v=2.7.10',
   '/assets/corr-modal.js?v=2.6.0',
   '/assets/yc-modal.js?v=8.8.7',
   '/assets/heatmap-modal.js?v=2.6.5',
-  '/assets/econ-surprises-modal.js?v=1.3.10',
+  '/assets/econ-surprises-modal.js?v=1.3.11',
   '/assets/onboarding.js?v=7.89.12',
   '/assets/layout-resizer.js?v=1.0.0',
   '/assets/feed.js?v=1.0.0',
   '/assets/share.js?v=1.0.0',
   '/assets/inline-panel.js?v=1.4.2',
-  '/assets/calendar-panel.js?v=1.19.23',
-  '/assets/econ-matrix.js?v=2.5.12',
+  '/assets/calendar-panel.js?v=1.19.24',
+  '/assets/econ-matrix.js?v=2.5.13',
   '/assets/gdpr.js',
   '/assets/sw-register.js',
   '/favicon.ico',
