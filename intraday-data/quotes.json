@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-29T08:00:41Z",
+  "updated": "2026-08-29T08:05:37Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -40,7 +40,7 @@
       "chg": -134.1,
       "pct": -2.8752,
       "high": 4688.0,
-      "low": 4495.0,
+      "low": 4495.5,
       "open": 4656.0,
       "bid": 4495.0,
       "ask": 4518.2,
@@ -204,40 +204,40 @@
       "pct1w_date": "2026-08-21"
     },
     "btc": {
-      "close": 77591.8,
+      "close": 77504.95,
       "prev_close": 77838.39,
-      "chg": -246.59,
-      "pct": -0.3168,
-      "high": 65713.91,
-      "low": 64182.797,
+      "chg": -333.44,
+      "pct": -0.4284,
+      "high": 77897.88,
+      "low": 77408.85,
       "open": 77838.39,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787990441,
+      "market_time": 1787990740,
       "source": "yfinance",
-      "pct1w": -0.949,
+      "pct1w": -1.0599,
       "pct1w_date": "2026-08-21",
-      "session_high": 79809.31,
-      "session_low": 76845.71
+      "session_high": 79809.75,
+      "session_low": 76880.01
     },
     "eth": {
-      "close": 2434.88,
+      "close": 2433.13,
       "prev_close": 2442.7463,
-      "chg": -7.8663,
-      "pct": -0.322,
-      "high": 1907.2332,
-      "low": 1858.5846,
+      "chg": -9.6163,
+      "pct": -0.3937,
+      "high": 2445.976,
+      "low": 2431.529,
       "open": 2442.7463,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1787990436,
+      "market_time": 1787990739,
       "source": "yfinance",
-      "pct1w": -3.1965,
+      "pct1w": -3.2661,
       "pct1w_date": "2026-08-21",
-      "session_high": 2525.99,
-      "session_low": 2406.07
+      "session_high": 2525.31,
+      "session_low": 2406.32
     },
     "nasdaq": {
       "close": 29433.428,
@@ -1227,7 +1227,7 @@
       "chg": -2.453,
       "pct": -3.4924,
       "high": 72.05,
-      "low": 66.875,
+      "low": 66.83,
       "open": 70.045,
       "bid": 66.95,
       "ask": 67.485,
@@ -1238,7 +1238,7 @@
       "pct1w_date": "2026-08-21",
       "prev_bar": {
         "time": "2026-08-28",
-        "open": 70.045,
+        "open": 70.02,
         "high": 72.05,
         "low": 66.83,
         "close": 67.09
@@ -3263,7 +3263,7 @@
     {
       "a": "USD/CAD",
       "b": "WTI Oil",
-      "corr30": -0.293,
+      "corr30": -0.294,
       "n30": 30,
       "corr": -0.315,
       "n": 60,
@@ -3500,7 +3500,7 @@
         -0.325,
         -0.305,
         -0.31,
-        -0.293
+        -0.294
       ],
       "hist_dates": [
         "2025-10-16",
@@ -3730,7 +3730,7 @@
       "spread_z": null,
       "signal": null,
       "beta": null,
-      "coint_p": 0.5549
+      "coint_p": 0.556
     },
     {
       "a": "GBP/USD",
