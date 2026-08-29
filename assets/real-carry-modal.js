@@ -529,8 +529,8 @@ function _rcmRenderBreakdown() {
     // "where this number came from", a chip says "act on this". Bordered-pill
     // styling belongs to signal chips; source tags across every column should
     // share one plain-superscript convention so the row reads as one register.
-    // This was a bordered pill (mismatched with NOMINAL's plain tag) until
-    // the client flagged the inconsistency — restyled to match nomSrcTag exactly,
+    // This was a bordered pill (mismatched with NOMINAL's plain tag) —
+    // restyled to match nomSrcTag exactly,
     // same color logic (accent = forward-looking, text3 = proxy fallback).
     const ieBadge = ie != null && ieClass.tag
       ? `<span style="font-size:8px;color:${ieClass.kind === 'cpi' ? 'var(--text3)' : 'var(--accent,#26a69a)'};margin-left:3px;vertical-align:super;" title="${ieClass.title}">${ieClass.tag}</span>`

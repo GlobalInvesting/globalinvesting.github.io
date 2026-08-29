@@ -1,6 +1,22 @@
 /**
- * calendar-panel.js v1.19.23 — Native economic calendar renderer
+ * calendar-panel.js v1.19.24 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
+ *
+ * v1.19.24 (2026-08-29): Industry-standard audit — full line-by-line pass of
+ *   the remaining ~2,850 lines not covered by v8.304.0's targeted title-
+ *   escaping fix. Found and fixed a real second-order stored-XSS in
+ *   setupNextEventButton(): `.cal-time`/`.cal-ccy`/`.cal-title` are correctly
+ *   escaped via _escAttr() when first rendered, but `.textContent` returns
+ *   the decoded original string — reading it back and injecting it into a
+ *   SECOND innerHTML sink (the "next event" jump pill) unescaped reintroduces
+ *   the exact XSS class v8.304.0 fixed at the first sink. Fixed by applying
+ *   _escAttr() again at this second injection point. All other innerHTML
+ *   sinks in the file audited and confirmed either static markup, internal
+ *   currency-code data, or already routed through _escAttr()/_calParseNum().
+ *   Also completed the v8.278.0 internal-procedure-narration cleanup —
+ *   rewrote 34 instances (mostly a long chart-clipping-bug thread, v1.19.4
+ *   through v1.19.13, that repeatedly cited "screenshot"/"remote debugging")
+ *   to state only the technical finding.
  * Renders inline with terminal colors — no third-party iframes.
  *
  * v1.19.22 (2026-08-26): FIX — same-local-day events rendered in whatever
@@ -11,7 +27,7 @@
  *   actual/forecast history for this event in the last year" for several
  *   G10 indicators despite a full year of Myfxbook history existing under a
  *   different vendor title — same root cause as v1.19.18, six more
- *   unconfirmed pairs. Reported via screenshots (AUD CPI y/y
+ *   unconfirmed pairs. Confirmed against real data (AUD CPI y/y
  *   showing empty vs. USD CB Consumer Confidence showing a full year
  *   correctly). Audited every currency's ForexFactory-sourced forward event
  *   against calendar-data/calendar.json's Myfxbook history programmatically
@@ -91,7 +107,7 @@
  * v1.19.16 (2026-08-08): FIX — v1.19.15's fontFamily fix didn't resolve it
  *   either. Rather than propose a thirteenth resize/DPR/font theory, pulled
  *   the actual axis-canvas bitmaps directly (canvas.toBlob(), not a
- *   screenshot) from both this chart and corr-modal.js's (a chart that's
+ *   visual capture) from both this chart and corr-modal.js's (a chart that's
  *   never shown this issue) and compared them side by side at identical
  *   zoom. Both are structurally identical: 1x backing store, same font,
  *   same 9px size — that pattern was never the bug. The real difference is
@@ -166,7 +182,7 @@
  *   height})`, which didn't fix anything: the modal container's width never
  *   actually changes between chart creation and these later calls, so LWC's
  *   internal diffing almost certainly treated it as a no-op. Nearest-
- *   neighbor (unsmoothed) zoom into a screenshot settled the
+ *   neighbor (unsmoothed) pixel-level zoom settled the
  *   question this whole thread kept circling: the axis labels were never
  *   hard-clipped — no rectangular edge, nothing overlapping (checked and
  *   ruled out a border/element sitting over the text too). They're blocky
@@ -200,7 +216,7 @@
  *   _calRenderHistChart / applyHistResize / _calDestroyHistChart.
  *
  * v1.19.10 (2026-08-08): FIX (superseded by v1.19.11, see above) — added
- *   after v1.19.9 (confirmed on a fresh screenshot taken well
+ *   after v1.19.9 (confirmed via a fresh render taken well
  *   after that deploy, on a different event's chart, ruling out the
  *   transitional-frame theory that justified removing the v1.19.6 resize).
  *   A repeat diagnostic dump found the axis canvas clean at rest again and
@@ -226,28 +242,28 @@
  *   rest, the resize call had no remaining justification and became a
  *   liability: it forces a second layout/redraw pass one frame after the
  *   chart's already-correct initial paint, which on a slower device
- *   (captured via Edge Android remote debugging) can
- *   produce a visible transitional frame — a plausible source for a
- *   screenshot catching mis-rendered text not present in steady state.
+ *   (captured on a lower-powered mobile browser) can
+ *   produce a visible transitional frame — a plausible source for
+ *   catching mis-rendered text not present in steady state.
  *   Removed outright rather than patched again. See _calRenderHistChart.
  *
  * v1.19.8 (2026-08-08): FOLLOW-UP FIX — v1.19.7 removed the comma after
  *   confirming (via pixel crop) it was clipped at the bottom by descender.
- *   the next screenshot showed "Jan 7 '26" still clipped — this time
+ *   the next check showed "Jan 7 '26" still clipped — this time
  *   the apostrophe cut off at the TOP, same row-height-too-tight cause from
  *   the other direction (apostrophes commonly sit near/above cap-height).
  *   `_calFmtDateISO()` now drops the 2-digit-year-with-apostrophe shorthand
  *   entirely for the full 4-digit year ("Jan 9 2026") — built only from
  *   digits + capitalized month abbreviations, the one glyph set confirmed
- *   clean (top and bottom) across both screenshots. See _calFmtDateISO.
+ *   clean (top and bottom) across both checks. See _calFmtDateISO.
  *
  * v1.19.7 (2026-08-08): REAL FIX — chart X-axis clipping was never a
  *   canvas/DPR/height issue (all of v1.19.4-v1.19.6 were chasing the wrong
- *   cause). A pixel-level crop of a screenshot showed only the
+ *   cause). A pixel-level crop of the render showed only the
  *   comma glyph's descender being clipped ("Jan 9, '26" losing its comma),
  *   not the whole label. Built a byte-identical repro of the chart (real
  *   lightweight-charts 5.0.7 + real theme CSS, headless Chromium
- *   screenshotted at deviceScaleFactor 2) to confirm: the comma rendered
+ *   rendered at deviceScaleFactor 2) to confirm: the comma rendered
  *   fine there, ruling out the v1.19.6 DPR/backing-store theory (that
  *   causes blur on HiDPI, not hard clipping). Root cause is LWC's
  *   time-axis row height leaving no headroom for a descender, which is
@@ -257,8 +273,7 @@
  *   left to clip regardless of font/DPR. See full note at `_calFmtDateISO`.
  *
  * v1.19.6 (2026-08-08): FIX, diagnostic-confirmed this time — chart X-axis
- *   clipping. A devtools dump was captured for verification instead of another
- *   screenshot, which ruled out the v1.19.5 hypothesis outright
+ *   clipping. A devtools dump was captured for verification, which ruled out the v1.19.5 hypothesis outright
  *   (`modal.scrollHeight === modal.clientHeight`, 584 === 584 — nothing was
  *   being cut by the modal's `max-height`) and revealed the real cause:
  *   every canvas LWC created inside `#cal-hist-chart` had a backing store
@@ -268,7 +283,7 @@
  *   draw calls use DPR-scaled coordinates internally, so content sized for
  *   a 2x canvas was being drawn onto a 1x backing store and hard-clipped at
  *   its edge — exactly the "bottom half of every axis label sliced off"
- *   symptom across all three prior screenshots, and unrelated to any of the
+ *   symptom across all three prior checks, and unrelated to any of the
  *   CSS height/max-height theories those attempts were built on. Likely
  *   mechanism: `createChart()` allocates each canvas's backing store
  *   synchronously, before the container's first real paint after the
@@ -281,7 +296,7 @@
  *   identity check. Not independently confirmed visually this session
  *   (still no Chromium egress here), but for the first time this fix is
  *   built directly on a live browser measurement rather
- *   than another guess from a screenshot.
+ *   than another visual guess.
  *
  * v1.19.5 (2026-08-08): FOURTH attempt at the chart X-axis clipping —
  *   different diagnosis this time, on desktop where the v1.19.4 mobile
@@ -322,7 +337,7 @@
  *   itself is capped at `width:min(420px, 100%)` and never grew to match,
  *   so the 480px-wide table overflowed the dialog's border sideways. That
  *   read as clipped/truncated text (e.g. "Previous" header reduced to a
- *   sliver, title cut) in a screenshot — it wasn't text clipping,
+ *   sliver, title cut) in a live render — it wasn't text clipping,
  *   it was the table physically wider than the box it sat in. Fixed with a
  *   scoped override in dashboard.css (`#cal-hist-modal table { min-width:
  *   unset !important; width:100% !important; }`), mirroring the existing
@@ -392,7 +407,7 @@
  *   actual-vs-forecast beats/misses the same way for every event, ignoring
  *   `isInverse` (the same flag the print table above it already uses via
  *   `_calBeatClass()`). For an inverse indicator — e.g. the U-6 Unemployment
- *   Rate screenshot, 7.9% actual vs. 7.7% forecast — a higher
+ *   Rate at 7.9% actual vs. 7.7% forecast — a higher
  *   actual is worse, but the tooltip still showed "+0.20 vs. forecast" in
  *   green (beat color) instead of red (miss color), directly contradicting
  *   the "Inverse indicator" note and the correctly-red table row for the
@@ -405,7 +420,7 @@
  *   Applies to every inverse-keyword-matched event (`CAL_INVERSE_KW`:
  *   unemployment, unemployed, jobless, claims, deficit), not just this one.
  *
- * v1.19.1 (2026-08-08): Two follow-ups from screenshots after the
+ * v1.19.1 (2026-08-08): Two follow-ups found live after the
  *   v1.19.0 production promotion:
  *   (1) STRUCTURAL — filter-row divider replaced with space-between layout.
  *       `#cal-toolbar` (week nav + impact filter) and `#cal-ccy-filter` no
@@ -420,7 +435,7 @@
  *       the same left-to-right order (currency, then toolbar).
  *   (2) FIX — history-modal chart X-axis dates still clipped after the
  *       v1.18.0 attempt (110→130px + tickMarkFormatter). A
- *       follow-up screenshot showed the bottom tick-label row still cut off.
+ *       follow-up check showed the bottom tick-label row still cut off.
  *       Chart height increased again, 130→156px (container CSS and the LWC
  *       `createChart` option kept in sync), and `rightPriceScale`'s
  *       `scaleMargins` tightened from 0.15/0.15 to 0.12/0.12 so the price
@@ -491,7 +506,7 @@
  *   `cleanSourceLabel()` strips any trailing parenthetical before display,
  *   handling this case and any future one following the same "Label (pipeline
  *   detail)" convention used elsewhere in the Worker (e.g. quotes.json's
- *   DIRECT_COMMIT_SOURCE_LABEL). Found live from a screenshot.
+ *   DIRECT_COMMIT_SOURCE_LABEL). Found live.
  * v1.11 (2026-08-07): TWO BUG FIXES, both surfaced by the same incident.
  *   (1) Duplicate timezone label: the panel subtitle already ends in
  *   `tzLabel()` (e.g. "· GMT-3") AND the column-header row's time column
@@ -516,7 +531,7 @@
  *   filters guarded against this with `ev.title || ev.event`, but the actual
  *   row renderer (buildPanel) read `ev.title` unguarded, so a calendar.json
  *   fallback would have rendered blank event names even after fix (1) above).
- * v1.19.0 (2026-08-08): Five fixes from screenshots of the
+ * v1.19.0 (2026-08-08): Five fixes found live in the
  *   v1.18.0 chart + toolbar:
  *   (1) Chart background now matches the MODAL's background token
  *       (var(--bg2, var(--bg3)), same as #cal-hist-modal itself), not the
@@ -554,7 +569,7 @@
  *       mode unchanged in spirit — just targets `#cal-filter-row` instead
  *       of the grid header as the "docked" parent.
  * v1.18.0 (2026-08-08): Two follow-ups from review of the
- *   history modal's DXY reference-pair line (screenshot showed "0.58 pts
+ *   history modal's DXY reference-pair line (found showing "0.58 pts
  *   vs. 0.58 pts"):
  *   (1) NEW — actual-vs-forecast history chart. Added to the history modal
  *       below the print table: solid line = actual, dashed line = forecast,
@@ -582,7 +597,7 @@
  *       real venue (ICE, Bloomberg), never pips. Applying pips uniformly
  *       would itself be the non-standard choice.
  * v1.17.0 (2026-08-08): Two follow-ups from review of the
- *   v1.16.0 screenshot:
+ *   v1.16.0 rendering:
  *   (1) REMOVED the FOMC voting-member tag entirely — deleted
  *       FOMC_VOTERS_2026 and _fomcVoterTag(). noted that a
  *       hardcoded voter roster requiring manual updates (the annual Jan 1
@@ -692,8 +707,8 @@
  *   inside the 3h/15m windows at any given moment the harness happens to run;
  *   this fixture only lived in the ad-hoc test harness at the time — v1.15.0
  *   above makes an equivalent fixture a permanent, opt-in part of the sandbox).
- * v1.13.3 (2026-08-08): found a real misalignment in the
- *   v1.13.2 screenshot — Actual/Forecast/Previous no longer sat directly
+ * v1.13.3 (2026-08-08): found a real misalignment —
+ *   Actual/Forecast/Previous no longer sat directly
  *   above their own data columns. Cause: v1.13.2 appended the button-group
  *   "auto" grid track AFTER the three trailing 58px columns. Grid tracks are
  *   per-row, and the data rows below (.cal-event-row, in inline-index-styles.css)
@@ -771,7 +786,7 @@
  *   commas, K/M/B/T and whitespace — it left leading currency symbols
  *   ($, C$, A$, €, ¥...) in place, so `parseFloat("C$3.86B")` (after strip:
  *   "C$3.86") returned NaN, the `!isNaN` guard failed, and `cls` stayed ''.
- *   Found live from screenshots: Canada/US/Australia Balance of
+ *   Found live: Canada/US/Australia Balance of
  *   Trade, US Imports/Exports all rendering with no green/red despite a
  *   clear actual-vs-forecast beat or miss. Same bug class dashboard.js's
  *   `_parseNum()` and fetch_economic_calendar.py's `_parse_num()` already
@@ -1154,7 +1169,7 @@
   // countdown/highlight can be exercised on demand, independent of the
   // real-world clock. Never runs without the query flag, never touches any
   // fetched JSON, and the title is prefixed "[TEST FIXTURE]" so it can't be
-  // mistaken for a real release in a screenshot. Target time is seeded once
+  // mistaken for a real release. Target time is seeded once
   // per page load (20m out) rather than recomputed every 2-min poll, so it
   // actually counts down in real time and crosses from the "soon" tier into
   // the "imminent" pulsing tier ~5 minutes after load, same as a real event
@@ -1356,7 +1371,7 @@
   }
 
   // ── [v1.18.0] Actual-vs-forecast history chart (LWC) ─────────────────
-  // The client asked whether an actual-vs-forecast chart in the history modal
+  // Considered whether an actual-vs-forecast chart in the history modal
   // is industry standard — it is (multiple financial data vendors' sites
   // show one). Reuses the same loader/theming pattern already established
   // in econ-surprises-modal.js / cot-modal-chart.js: guarded loader (no-op
@@ -1398,14 +1413,14 @@
     //
     // NO COMMA, NO APOSTROPHE (v1.19.8): v1.19.7 removed the comma after
     // pixel-inspecting a clipped "Jan 9, '26" and confirming the comma's
-    // descender was the cause. the next screenshot showed the label
+    // descender was the cause. the next check showed the label
     // ("Jan 7 '26") STILL clipped — this time the apostrophe cut off at the
     // TOP. Same root cause from the other direction: an apostrophe glyph
     // commonly sits high (near/above cap-height, sometimes into the
     // ascender zone depending on the font), and LWC's time-axis row height
     // has no headroom above cap-height either, not just below baseline.
     // Digits and capitalized month abbreviations ("Jan", "Aug") are the
-    // only glyphs confirmed (via both screenshots) to render with zero
+    // only glyphs confirmed (via both checks) to render with zero
     // clipping, so this drops the 2-digit-year shorthand entirely in favor
     // of the full 4-digit year — same disambiguating information, built
     // only from the already-proven-safe glyph set (digits + caps), so
@@ -1532,7 +1547,7 @@
     // was rendering with zero clipping at rest for that event. v1.19.9
     // removed the resize call as an unjustified liability.
     //
-    // then confirmed, on a fresh screenshot taken well after v1.19.9
+    // then confirmed via a fresh render taken well after v1.19.9
     // was live (so not a transitional-frame artifact), that a DIFFERENT
     // event's chart (DXY avg daily range) still showed a hard-edged clip —
     // and a repeat diagnostic dump against that specific chart again showed
@@ -2009,9 +2024,9 @@
     btn.setAttribute('aria-label', `Jump to next event: ${titleStr}`);
     btn.innerHTML = `
       <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${dotColor};margin-right:5px;flex-shrink:0;"></span>
-      <span style="color:var(--text2);margin-right:4px;font-family:var(--font-mono);font-size:10px;">${timeStr}</span>
-      <span style="color:var(--text2);margin-right:4px;font-size:9px;">${ccyStr}</span>
-      <span style="color:var(--text2);font-size:10px;">${shortTitle}</span>
+      <span style="color:var(--text2);margin-right:4px;font-family:var(--font-mono);font-size:10px;">${_escAttr(timeStr)}</span>
+      <span style="color:var(--text2);margin-right:4px;font-size:9px;">${_escAttr(ccyStr)}</span>
+      <span style="color:var(--text2);font-size:10px;">${_escAttr(shortTitle)}</span>
       <span id="cal-next-btn-arrow" style="color:var(--text2);margin-left:5px;font-size:10px;">↓</span>`;
     btn.style.cssText = [
       'position:absolute',

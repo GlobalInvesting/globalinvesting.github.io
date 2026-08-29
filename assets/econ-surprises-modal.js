@@ -1,6 +1,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.8
+// ECONOMIC SURPRISES MODAL  v1.3.9
 // File: assets/econ-surprises-modal.js
+//
+// v1.3.9 (2026-08-29) — Industry-standard audit: real stored-XSS fixed in
+//   _esmRenderTable() — r.event/r.actual/r.forecast (calendar.json's external
+//   free-text fields, same source as the identical bug already fixed in
+//   calendar-panel.js/econ-matrix.js) were injected into innerHTML content
+//   and a title attribute unescaped. Fixed with a new _esmEscHtml() helper
+//   applied at all 4 sites.
 //
 // Triggered by clicking any row in the Economic Surprises sidebar table.
 // Mounts into #split-lower (right inline panel) via inline-panel.js intercept —
@@ -277,6 +284,15 @@ const _ESM_NOISE_KW = [
 
 // ── LWC loader ───────────────────────────────────────────────────────────────
 let _esmLwcPromise = null;
+// Full HTML-entity escape for externally-sourced free-text fields
+// (calendar.json's event/actual/forecast) before they reach an innerHTML
+// sink — same convention as calendar-panel.js's _escAttr().
+function _esmEscHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function _esmEnsureLWC() {
   if (window.LightweightCharts) return Promise.resolve();
   if (_esmLwcPromise) return _esmLwcPromise;
@@ -728,12 +744,12 @@ function _esmRenderTable(ccy) {
     const impCls   = r.impact === 'high' ? 'esm-impact-h' : 'esm-impact-m';
     const actCls   = r.outcome === 'beat' ? 'esm-beat' : r.outcome === 'miss' ? 'esm-miss' : '';
     return `<tr>
-      <td style="color:var(--text2,#787b86)">${r.dateISO.slice(5).replace('-','/')}</td>
-      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.event}">
-        <span class="${impCls}" style="font-size:8px;margin-right:4px;">${r.impact === 'high' ? 'H' : 'M'}</span>${r.event}
+      <td style="color:var(--text2,#787b86)">${_esmEscHtml(r.dateISO.slice(5).replace('-','/'))}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${_esmEscHtml(r.event)}">
+        <span class="${impCls}" style="font-size:8px;margin-right:4px;">${r.impact === 'high' ? 'H' : 'M'}</span>${_esmEscHtml(r.event)}
       </td>
-      <td class="${actCls}">${r.actual}</td>
-      <td style="color:var(--text2,#787b86)">${r.forecast}</td>
+      <td class="${actCls}">${_esmEscHtml(r.actual)}</td>
+      <td style="color:var(--text2,#787b86)">${_esmEscHtml(r.forecast)}</td>
       <td><span class="${badgeCls}">${badgeTxt}</span></td>
     </tr>`;
   }).join('');

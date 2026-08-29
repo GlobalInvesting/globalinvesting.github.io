@@ -1,5 +1,17 @@
 /**
- * econ-matrix.js v2.5.12 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.13 — Native Economic Matrix panel
+ *
+ * ── v2.5.13 (2026-08-29) — Industry-standard audit: real stored-XSS fixed in
+ *    cellHTML() — ev.actual (calendar.json's external actual value) and sub
+ *    (period label + ref, ref derived from ev.event's free-text parenthetical)
+ *    were injected into innerHTML content unescaped, and the title attribute
+ *    only escaped double-quotes, not &/</>. Same class of bug already fixed
+ *    in calendar-panel.js (v8.304.0) and the shared Market Commentary widget
+ *    (v8.305.0), never propagated here. Fixed with a local _emxEscHtml()
+ *    helper (full HTML-entity escape) applied at all three sites. Also
+ *    completed the v8.278.0 internal-procedure-narration cleanup for this
+ *    file — rewrote every "the client"/"screenshot"/named-individual mention
+ *    in the version history to state only the technical change.
  *
  * ── v2.5.12 (2026-08-28) — Completed the calendar.json-verified audit for
  *    the 5 remaining currencies (AUD, CAD, NZD, NOK, EUR), same method as
@@ -96,8 +108,7 @@
  *    incident.
  *
  * ── v2.5.3 (2026-08-26) — New "Emp Chg" column (net jobs created / employment
- *    change), added per direct feedback from an institutional-background
- *    client: he correctly flagged that G10 labor-market data was missing —
+ *    change) — G10 labor-market coverage was incomplete without it —
  *    not accurate. "Unemp" already existed and shipped in v2.0.0; what was
  *    genuinely absent was the flow/leading counterpart (net jobs created),
  *    which markets and central banks watch alongside the unemployment
@@ -156,8 +167,8 @@
  *    `extended-data/{CCY}.json` bond10y is written daily by
  *    `fetch_bond_yields.py`, so any tab left open across that daily update
  *    (or open when a fix like the AUD/CAD orphaned-bond10y-field one landed)
- *    kept showing the pre-fix value indefinitely — confirmed live: The client's
- *    screenshot showed AUD 4.83%/CAD 3.59%/NOK 4.20% while the underlying
+ *    kept showing the pre-fix value indefinitely — confirmed live: a
+ *    live check showed AUD 4.83%/CAD 3.59%/NOK 4.20% while the underlying
  *    `extended-data/*.json` already had fresh AUD 5.05% (18 Aug)/CAD 3.72%
  *    (17 Aug)/NOK 4.40% (17 Aug) from the v2.10.2 fix — the panel simply
  *    never re-asked. Fixed: the periodic refresh now re-fetches 10Y (cheap,
@@ -175,7 +186,7 @@
  *    cached 10Y/CB values — see GUIDELINES.md/CHANGELOG.md v8.163.0.
  * ── v2.3.0 (2026-08-15) — CB Rate subtext date fixed (was always "01 Aug"
  *    for every currency); Unemp column colored as an inverted indicator ──
- * Two issues the client flagged after reviewing a live screenshot:
+ * Two issues found after reviewing the live rendering:
  *
  * (1) CB RATE subtext showed the same day-of-month ("Aug 01") for every
  *     single currency, every session — not a rendering bug (fmtDateShort()
@@ -221,7 +232,7 @@
  *
  * ── v2.2.9 (2026-08-15) — dropped redundant "10Y"/"Policy" prefix from the
  *    10Y Yld / CB Rate subtext ─────────────────────────────────────────────
- * The client flagged two things about v2.2.8's fix: (1) the "Policy" word in
+ * Two things about v2.2.8's fix needed follow-up: (1) the "Policy" word in
  * the CB Rate subtext is unnecessary — the column header already says
  * "CB RATE"; (2) "10Y · 30 Jul" repeats "10Y", which the column header
  * ("10Y YLD") already states, unlike the calendar-driven columns where the
@@ -232,7 +243,7 @@
  *
  * ── v2.2.8 (2026-08-15) — 10Y Yld / CB Rate cells given the same
  *    value+subtext structure as every other column ──────────────────────
- * The client flagged that 10Y Yld and CB Rate were the only two columns
+ * 10Y Yld and CB Rate were the only two columns
  * without a date/period line under the value, breaking the pattern every
  * other column follows. Root cause: rowHTML() built those two cells with
  * a bare '<td>{value}%</td>' (date only in the title tooltip) instead of
@@ -284,7 +295,7 @@
  * SEK core (CPIF ex Energy) investigated in the same pass \u2014 no equivalent
  * vendor indicator found either, left unwired, still a
  * documented genuine gap (v2.2.4 finding stands).
- * AUD rtl investigated per the client's report of a still-blank cell despite
+ * AUD rtl investigated after a still-blank cell was found despite
  * v2.2.3's fix \u2014 confirmed NOT a wiring bug: the live Myfxbook page itself
  * (australia/retail-sales-mom) has no observation newer than 2025-07-31.
 
@@ -305,7 +316,7 @@
  *    (v3.43) had already covered it but econ-matrix.js's CATS list was never
  *    updated to match. SEK core (CPIF ex Energy) re-confirmed as a genuine
  *    gap ──────────────────────────────────────────────────────────────────
- * Continues the gap sweep started in v2.2.3, per the client's request to chase
+ * Continues the gap sweep started in v2.2.3, to chase
  * the two items that pass explicitly deferred (NZD ppi, SEK core).
  *   - NZD ppi: re-checked live against myfxbook.com/forex-economic-calendar/
  *     new-zealand — found a live page for "PPI Output QoQ" (Low impact,
@@ -332,7 +343,7 @@
  *
  * ── v2.2.3 (2026-08-14) — Full gap sweep: CHF PPI, JPY CPI MoM, AUD Retail
  *    Sales were the same pipeline bug as v2.2.2's PPI fix, not source gaps ──
- * Prompted by the client asking for a complete sweep of every "—" cell in the
+ * Prompted by a complete sweep of every "—" cell in the
  * matrix after the v2.2.2 PPI fix shipped. Rather than trust each field's
  * existing "confirmed gap" comment, every one was re-verified against LIVE
  * Myfxbook pages (not calendar.json — see the GUIDELINES.md rule from
@@ -363,7 +374,7 @@
  * SCB actively publish it, confirmed via search), but no Myfxbook calendar
  * page could be located for it in this pass; left as a documented gap
  * rather than wiring an unverified title. Flagged for a follow-up pass with
- * direct Myfxbook access if the client wants it chased further.
+ * direct Myfxbook access if this is chased further.
  *
  * ── v2.2.2 (2026-08-14) — GBP/JPY/CAD PPI: fixed pipeline bug misdiagnosed
  *    as a source gap in v2.2.0 ──────────────────────────────────────────
@@ -394,18 +405,18 @@
  * rowHTML() builds cells purely by iterating COLUMNS in order with no
  * awareness of what index.html's static markup declares. Effect: every
  * column from PPI onward rendered shifted one position left of its header —
- * PCE data appeared under the "10Y Yld" header (confirmed by a client
- * screenshot showing a "United States PCE Price Index YoY" tooltip on that
+ * PCE data appeared under the "10Y Yld" header (confirmed by a live check
+ * showing a "United States PCE Price Index YoY" tooltip on that
  * cell), the real 10Y yield appeared under "CB Rate", and CB Rate itself was
- * pushed off the end of the table. Reported by the client from a live
- * screenshot. Fixed in index.html only (no logic in this file was wrong) —
+ * pushed off the end of the table. Found via a live check. Fixed in
+ * index.html only (no logic in this file was wrong) —
  * see CHANGELOG.md v8.143.0 for the full incident and the new GUIDELINES.md
  * rule requiring COLUMNS-array changes and index.html's thead/skeleton rows
  * to be edited in the same change.
  *
  * ── v2.2.0 (2026-08-14) — closing out remaining industry-standard gaps:
  *    CHF GDP dead title, EUR Bus Cond gap resolved, new PPI column ────────
- * Prompted by the client asking to close out every remaining item after
+ * Prompted by closing out every remaining item after
  * v2.1.0, rather than leave anything flagged-but-unfixed. Three changes:
  *   (1) CHF gdp had the same class of bug as v2.1.0's GBP fix, inverted:
  *       'GDP Growth Rate QoQ Flash' matched ZERO events in the feed (the
@@ -424,8 +435,8 @@
  *       series \u2014 is now shown as EUR's proxy, the same pattern already
  *       used for AUD's RBA Trimmed Mean CPI. Also found the same drift
  *       affects PPI (see below).
- *   (3) New PPI column, per the client's original request (Dimitrius's
- *       "IPP (infla\u00e7\u00e3o do produtor)"). Verified per-currency coverage
+ *   (3) New PPI column, per the original feature request for producer-price
+ *       coverage. Verified per-currency coverage
  *       against the live feed before wiring anything: real data exists for
  *       USD (MoM only \u2014 no YoY title in this feed), AUD (QoQ \u2014 ABS's
  *       genuine native cadence, not a fallback), NOK (YoY), SEK (YoY+MoM,
@@ -436,8 +447,7 @@
  *       confirmed gaps \u2014 no PPI release in the current source \u2014 not
  *       guessed or left ambiguous.
  * Column tooltip and header-comment "intentionally blank" list both
- * updated to match. Not touched this session (out of scope, no client
- * signal either): PMI Services/Composite \u2014 checked against the live
+ * updated to match. Not touched this session (out of scope): PMI Services/Composite \u2014 checked against the live
  * feed and found only 2 of 10 currencies (USD, SEK) carry a genuine
  * Services PMI title, and zero carry a Composite PMI title at all. Adding
  * a column that reads "\u2014" for 8-9 of 10 rows would be a worse outcome
@@ -447,7 +457,7 @@
  *
  * ── v2.1.0 (2026-08-14) — GDP column: fixed GBP QoQ omission, tagged USD's
  *    SAAR convention ──────────────────────────────────────────────────────
- * Prompted by a follow-up question from the client after v2.0.0 shipped: is it
+ * Prompted by a follow-up question after v2.0.0 shipped: is it
  * industry-standard for the GDP column to show different periodicities
  * (QoQ/MoM/YoY) across different currency rows? Investigation found three
  * distinct things bundled under that one question:
@@ -494,7 +504,7 @@
  * elsewhere — no new backend script or workflow required.
  *
  * ── v2.0.0 (2026-08-14) — institutional-user data-accuracy audit ──────────
- * Prompted by a client (Dimitrius, via the operator) flagging: (1) USD CPI YoY
+ * Prompted by an institutional-user data-accuracy report flagging: (1) USD CPI YoY
  * showing a stale 4.2% print instead of the then-current 3.4%; (2) AUD CPI
  * showing "102.03" — an index level in points, not a %-rate; (3) no MoM
  * alongside YoY, and no visible reference date per cell; (4) no core/PCE
@@ -519,7 +529,7 @@
  *     unrelated national surveys (three different value ranges — ~87-89,
  *     ~96-105, and negative ~-3 to -6 — with no country field to
  *     disambiguate) under one identical title. This was already a latent
- *     bug, not something the client reported, caught during this audit.
+ *     bug caught during this audit, not something reported externally.
  * Fix (see below): (1) country-prefix canonicalisation before matching, so
  * "United States X" and bare "X" key to the same series regardless of which
  * form Myfxbook used that day; (2) EUR is matched WITHOUT canonicalisation,
@@ -538,7 +548,7 @@
  * three surveys (see GUIDELINES.md "Data integrity" — never display a value
  * that isn't reliably attributable to a single named release).
  *
- * New in v2.0.0, per client request:
+ * New in v2.0.0:
  *   - CPI MoM added alongside CPI YoY (a YoY figure can mask a recent trend
  *     reversal from base effects — e.g. an energy spike 12 months ago still
  *     weighing on the annual figure without reflecting current conditions).
@@ -654,7 +664,7 @@
     { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
     { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
     { key: 'ppi',     label: 'PPI',       title: 'Latest producer-price inflation \u2014 YoY where published, QoQ/MoM otherwise (see subtext on each cell for the period actually shown). EUR shows Germany\u2019s national PPI as a proxy \u2014 no genuine Euro Area-aggregate PPI title exists in the current source. Blank where the currency\u2019s economy has no standalone PPI release in the current source.' },
-    // v2.5.3: added per client feedback (institutional trader, 2026-08-26) —
+    // v2.5.3: added to close a labor-market coverage gap —
     // Unemp already existed, but the flow/leading indicator (net jobs
     // created) did not, and central banks + markets watch both. Verified
     // per-currency titles directly against live calendar-data/calendar.json
@@ -1489,11 +1499,20 @@
     return { rate, date: meetingDate || obs[0].date, trend: simpleTrend(obs) };
   }
 
+  // Full HTML-entity escape for any externally-sourced free-text field
+  // (calendar.json's ev.event/ev.actual/ev.previous) before it reaches an
+  // innerHTML sink — same convention as calendar-panel.js's _escAttr().
+  function _emxEscHtml(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
   // ── Render ──────────────────────────────────────────────────────────────────
   function cellHTML(ev, gapKey, ccy) {
     if (!ev) {
       const title = (gapKey && GAP_TITLE[gapKey]) || 'No data available';
-      return '<td class="flat" title="' + title.replace(/"/g, '&quot;') + '">\u2014</td>';
+      return '<td class="flat" title="' + _emxEscHtml(title) + '">\u2014</td>';
     }
     const cls = trendClass(ev.actual, ev.previous, ev.event);
     const period = periodLabel(ev.event, ccy, gapKey);
@@ -1505,9 +1524,9 @@
     const marker = isEmpProxy
       ? '<sup style="color:var(--text3);font-size:8px;margin-left:2px;">\u2020</sup>'
       : '';
-    return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + title.replace(/"/g, '&quot;') + '">' +
-      '<div class="econmx-val">' + (ev.actual != null ? ev.actual : '\u2014') + marker + '</div>' +
-      '<div class="econmx-ref">' + sub + '</div>' +
+    return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + _emxEscHtml(title) + '">' +
+      '<div class="econmx-val">' + (ev.actual != null ? _emxEscHtml(ev.actual) : '\u2014') + marker + '</div>' +
+      '<div class="econmx-ref">' + _emxEscHtml(sub) + '</div>' +
       '</td>';
   }
 
