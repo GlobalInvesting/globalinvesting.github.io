@@ -1,25 +1,22 @@
 {
-  "netPosition": 324,
-  "longPositions": 954,
-  "shortPositions": 630,
+  "netPosition": -55311,
+  "longPositions": 78786,
+  "shortPositions": 134097,
   "positionCategory": "Leveraged Funds (speculative)",
-  "assetManagerNet": -2058,
-  "assetManagerLong": 481655,
-  "assetManagerShort": 215195,
-  "dealerNet": -4550,
-  "dealerLong": 55508,
-  "dealerShort": 291022,
-  "wowNetChange": -258,
-  "levNetPctOI": 20.5,
+  "secondaryCategory": "Asset Manager/Institutional",
+  "tertiaryCategory": "Dealer/Intermediary",
+  "assetClass": "currency",
+  "displayName": null,
+  "openInterestTotal": 958532,
+  "contractMultiplier": 125000,
+  "contractUnit": "EUR",
+  "assetManagerNet": 287400,
+  "assetManagerLong": 489955,
+  "assetManagerShort": 202555,
+  "dealerNet": -278422,
+  "dealerLong": 54735,
+  "dealerShort": 333157,
   "history": [
-    {
-      "weekEnding": "2016-08-23",
-      "levNet": -94306,
-      "levLong": 25197,
-      "levShort": 119503,
-      "assetManagerNet": 29979,
-      "dealerNet": 95672
-    },
     {
       "weekEnding": "2016-08-30",
       "levNet": -2319,
@@ -4187,12 +4184,20 @@
       "levShort": 630,
       "assetManagerNet": -2058,
       "dealerNet": -4550
+    },
+    {
+      "weekEnding": "2026-08-25",
+      "levNet": -55311,
+      "levLong": 78786,
+      "levShort": 134097,
+      "assetManagerNet": 287400,
+      "dealerNet": -278422
     }
   ],
   "sourceType": "options_futures_combined",
   "source": "CFTC Official",
   "sourceUrl": "https://www.cftc.gov/dea/options/financial_lof.htm",
-  "reportDate": "2026-08-26",
-  "lastUpdate": "2026-08-26",
-  "weekEnding": "2026-08-18"
+  "reportDate": "2026-08-29",
+  "lastUpdate": "2026-08-29",
+  "weekEnding": "2026-08-25"
 }
