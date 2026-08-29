@@ -58,6 +58,21 @@ gtag('consent', 'default', {
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CJLGQET9KJ"></script>
 <script src="assets/analytics.js" defer></script>
 <meta charset="UTF-8">
+<!-- Referrer-Policy (v8.293.0) — strips the query string (and, on a
+     cross-origin request, the path) from the Referer header sent to any
+     third-party resource this page loads (GA4, TradingView, Google Fonts,
+     etc.). Exists specifically so a one-click grant/promo link
+     (?grant=<jwt>) never reaches a third party's server logs via Referer in
+     the brief window before gi-auth.js's replaceState() strips it from the
+     visible URL — a JWT is a bearer credential, and Referer leakage to an
+     unrelated origin is a real, if narrow, exposure path for it that a URL
+     rewrite alone does not close. strict-origin-when-cross-origin is the
+     browser default already, but is stated explicitly rather than relied
+     on implicitly, since a future third-party script embed could otherwise
+     silently widen the effective default. Does not affect already-issued
+     token validity — this only governs what leaves the browser on future
+     page loads, not how the Worker validates a token it receives. -->
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Global Investing FX Terminal — COT, Rates &amp; AI Narrative</title>
 
