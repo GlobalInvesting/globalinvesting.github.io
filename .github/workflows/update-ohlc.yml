@@ -107,7 +107,15 @@ jobs:
         # significance t-test (scipy.stats.ttest_1samp) — see that
         # file's header and GUIDELINES.md's "new runtime dependency
         # must ship with its CI installer" rule.
-        run: pip install yfinance scipy --break-system-packages
+        # requests added explicitly (industry-standard audit,
+        # 2026-08-29): fetch_ohlc.py's FRED fallback (used when
+        # yfinance fails outright for a symbol) and
+        # fetch_credit_spreads.py both import requests unconditionally
+        # at module level — this job only ever "worked" because
+        # yfinance happens to pull requests in as its own transitive
+        # dependency, which is fragile and violates the same explicit-
+        # install rule already followed for scipy above.
+        run: pip install yfinance scipy requests --break-system-packages
 
       - name: Create output directories
         run: mkdir -p ohlc-data ohlc-data/h1 ohlc-data/h4
