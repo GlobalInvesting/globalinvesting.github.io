@@ -1,6 +1,6 @@
 /**
  * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.11 — production build
+ * v7.89.12 — production build
  *
  * Changes vs v7.89.10:
  *   - Gated init() on window.giOnTerminalShown() (gi-overview.js v1.1.0)
@@ -777,7 +777,7 @@
   // has a valid license already or clicks "Open full terminal". The old
   // DOMContentLoaded+DELAY_MS trigger fired regardless, so first-time
   // visitors saw the tour pointing at a hidden terminal while still on the
-  // Overview page (reported by the client with a screenshot). giOnTerminalShown
+  // Overview page. giOnTerminalShown
   // resolves immediately for returning active users (terminal visible from
   // load) and otherwise waits for the actual Overview→terminal transition,
   // whenever that happens.
