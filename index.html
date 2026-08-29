@@ -11,8 +11,8 @@
      has already parsed and painted the body (#gi-overview visible,
      #gi-terminal-view display:none are the static, no-JS defaults) — so
      every visitor, including fully-activated ones, saw the snapshot flash
-     for one frame before the terminal appeared (reported by the client,
-     screenshot, 2026-08-13).
+     for one frame before the terminal appeared (confirmed against a fresh
+     capture, 2026-08-13).
      This performs the SAME check as gi-auth.js's isJWTValid()/JWT_KEY — kept
      as a small, self-contained, inline duplicate on purpose: an anti-flash
      guard has to run before any external script loads, so it cannot import
@@ -541,7 +541,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    below the actual visible top of the scrollport while that padding is
    still in view — table rows scrolling underneath render inside that gap,
    which is exactly the "content visible above the frozen header" artifact
-   The client kept seeing regardless of which element the sticky rule was on.
+   that kept recurring regardless of which element the sticky rule was on.
    Fix: the scrolling container now has zero padding (position:sticky's
    reference point is flush with the real top edge), and the 16px/20px of
    breathing room moved to #corr-pairs-fs-wrap, a plain non-scrolling div
@@ -576,7 +576,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
      this just confirms the fallback fixed-width layout doesn't fight them:
      with 32 columns and no room to show them all at once on a phone,
      keeping both axes' labels pinned while scrolling is what actually
-     makes the grid usable at this size, matching the client's request. */
+     makes the grid usable at this size. */
 }
 #corr-mtx-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #corr-mtx-fs-close:hover{border-color:var(--down);color:var(--down)}
@@ -603,7 +603,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    the active group renders, at full available height, with its own filter
    bar (if any) pinned above its own independently-scrolling feed. #ns-filter-bar
    is DOM-lifted into #intel-group-news here (own currency filter per tab,
-   rather than one shared across all three — the client's choice) so it sits
+   rather than one shared across all three, by design) so it sits
    directly under the News header the same way #rs-filter-bar already sits
    under Research's. */
 #intel-fullscreen-overlay.intel-fs-active #intel-scroll{display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
@@ -611,8 +611,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 /* v8.170.0: capped + centered, same pattern as #section-tvcalendar above
    (max-width, width:100%, margin:0 auto, left/right border) — without it,
    article excerpts stretched edge-to-edge on wide monitors, producing
-   unreadably long lines (180+ characters on a 1920px+ screen in the client's
-   test). 880px targets a ~90-100 char line at the default 10px article
+   unreadably long lines (180+ characters on a 1920px+ screen in testing).
+   880px targets a ~90-100 char line at the default 10px article
    font — comfortable prose measure — while still leaving room for the
    currency/source filter pills above it to sit on one row without
    wrapping at common desktop widths. Narrower than the calendar's 1180px
@@ -768,8 +768,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
      min-height here so their skeleton→populated swap causes no layout shift.
 
      v8.156.0: reverted the v8.155.0 "Desk Briefing" hero layout back to the
-     original stacked layout at the client's request (didn't like how it
-     looked) — only the "Read full note" link on the narrative box survives
+     original stacked layout (didn't read as well visually) — only the "Read full note" link on the narrative box survives
      from that iteration. See CHANGELOG.md v8.156.0. */
   #gi-overview { background: var(--bg); }
   .gi-ov-inner { max-width: 1040px; margin: 0 auto; padding: 26px 20px 40px; }
@@ -968,7 +967,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
      CHANGELOG.md v8.129.0 for the full context.
 
      v8.156.0: reverted the v8.155.0 "Desk Briefing" hero back to this
-     original stacked layout at the client's request — only the "Read full
+     original stacked layout — only the "Read full
      note" link on the narrative box (added in v8.155.0) was kept. See
      CHANGELOG.md v8.156.0. -->
 <section id="gi-overview" aria-label="Market overview">
@@ -1439,7 +1438,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <!-- MONTHLY AVG TAB — v8.209.0: horizontal layout (months as
                columns, one Average row + Yearly Return), matching the
                industry-standard Seasonax/EquityClock "Total Percent
-               Returns" table format the client referenced, instead of the
+               Returns" table format, instead of the
                v8.208.0 vertical row-per-month table (which read fine but
                cost far more vertical space than this panel should spend
                on a secondary tab). Same descriptive-only figures as
@@ -1664,7 +1663,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <!-- Dollar Smile Panel — full width, below VaR/CVaR.
            Promoted from index-beta.html to production (v8.219.0) — panel
            copy/labels were already off "beta" wording since v8.216.0
-           (the client: panel itself is done, reads as the final production
+           (panel itself was done, reading as the final production
            view); hover tooltip is methodology-in-brief + what it means
            for a trader.
            v5 (2026-08-22): regime scheme changed from a pure growth-
@@ -1672,7 +1671,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
            crisis/risk-off check (max quarterly VIX close >= 40 overrides
            the growth differential, matching Jen's own left-tail logic —
            see fetch_growth_differential.py v2.0.0 module docstring for
-           the full reasoning; the client caught that the old scheme's chart
+           the full reasoning; a check against Jen's actual framework confirmed the old scheme's chart
            didn't show a U-shape and this is the root-cause fix, not a
            second independent tab like the removed v8.205.0 Stress tab).
            Still one lens, no tab chrome. Data:
