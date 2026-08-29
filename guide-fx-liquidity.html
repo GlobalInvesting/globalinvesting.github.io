@@ -125,6 +125,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section h3 { font-size: 13.2px; font-weight: 700; color: var(--text); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
 .guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 15.4px; line-height: 1.8; }
 .guide-section p:last-child { margin-bottom: 0; }
+.faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
+.faq-item summary { padding: 13px 16px; font-size: 14.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--blue); }
+.faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 14px; line-height: 1.75; }
+
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 
@@ -565,6 +573,26 @@ a { color: inherit; text-decoration: none; }
         <a href="/" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
         <a href="access.html" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.4);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
       </div>
+    </div>
+
+    <div class="guide-section" id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <details class="faq-item">
+        <summary>When is the FX market most liquid?</summary>
+        <p>FX liquidity peaks during the London session (08:00–17:00 UTC) and reaches its daily maximum during the London-New York overlap (13:00–17:00 UTC). EUR/USD, GBP/USD, and USD/JPY see the tightest spreads and deepest order books during this window. Tokyo overlaps Sydney from 00:00–07:00 UTC, a period of elevated JPY and AUD activity as Asian institutional participants come online. The quietest period is the Tokyo-London gap (06:00–08:00 UTC), after Tokyo desks wind down and before London opens.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the FX Liquidity panel and how is it calculated?</summary>
+        <p>The FX Liquidity panel shows an hourly activity proxy based on the average High-Low range across major FX pairs, compared against a 30-day historical baseline. Each bar represents one hour of the trading day. Hours where the current range exceeds the 30-day average are shown as elevated activity. This is a price-based proxy — the standard approach for non-institutional tools — since true order book depth data requires institutional-grade feeds.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the London-New York overlap and why does it matter?</summary>
+        <p>The London-New York overlap (approximately 13:00–17:00 UTC) is the most liquid window in the FX trading day. Both the world's two largest FX hubs are simultaneously active, which concentrates order flow, tightens spreads, and produces the largest intraday price moves. Major US economic data releases (NFP, CPI, FOMC) fall within this window, making it the highest-volatility period for USD pairs.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does each FX pair behave differently across trading sessions?</summary>
+        <p>JPY pairs (USD/JPY, GBP/JPY, EUR/JPY) are most active during the Tokyo session (00:00–09:00 GMT) due to Bank of Japan activity and Japanese economic data. AUD and NZD pairs peak during Sydney-Tokyo hours. EUR and GBP pairs are most active during London hours. During the Asian session, GBP/JPY specifically tends to be choppy and illiquid with wider spreads, becoming directional only at the London open.</p>
+      </details>
     </div>
 
   </div><!-- /.guide-content -->

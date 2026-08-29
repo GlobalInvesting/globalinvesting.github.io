@@ -282,6 +282,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section h3 { font-size: 13.2px; font-weight: 700; color: var(--text); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
 .guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 15.4px; line-height: 1.8; }
 .guide-section p:last-child { margin-bottom: 0; }
+.faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
+.faq-item summary { padding: 13px 16px; font-size: 14.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--blue); }
+.faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 14px; line-height: 1.75; }
+
 .guide-section ul, .guide-section ol { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 
@@ -731,6 +739,34 @@ a { color: inherit; text-decoration: none; }
         <a href="/" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
         <a href="access.html" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.4);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
       </div>
+    </div>
+
+    <div class="guide-section" id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <details class="faq-item">
+        <summary>What are the main factors that drive GBP/JPY directional bias?</summary>
+        <p>GBP/JPY directional bias is driven by five primary factors: (1) CFTC COT net positioning for GBP futures by leveraged funds; (2) CFTC COT net positioning for JPY futures by leveraged funds — read directly, since JPY is the base currency of its CME futures contract; (3) the BoE vs BoJ rate differential — GBP/JPY is structurally sensitive to the interest rate gap between the two central banks; (4) the cross-asset risk regime — GBP/JPY is a high-beta pair that rallies in risk-on environments (low VIX, SPX strength) and sells off sharply in risk-off; (5) retail FX positioning, used as a contrarian confirmation signal at extremes.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What could change the GBP/JPY bias right now?</summary>
+        <p>The most common catalysts that change GBP/JPY bias are: a surprise BoJ rate hike or hawkish pivot (JPY bullish, GBP/JPY bearish); a UK CPI or labor market print that changes BoE rate expectations; a VIX spike above 20–25 triggering risk-off flows that unwind carry positions; and a sharp shift in CFTC leveraged fund net positioning — especially JPY positioning flipping from extreme short to long. The terminal updates COT data weekly so you can track positioning shifts as they happen.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Why does JPY COT positioning need to be inverted when reading GBP/JPY?</summary>
+        <p>JPY futures on the CME are quoted as US dollars per Japanese yen — the opposite convention from the interbank USD/JPY quote, which is yen per dollar. Because JPY is the base currency of the futures contract, a net long position in JPY futures is directly a bullish JPY view, with no sign inversion needed to read it. A bullish JPY view is bearish for GBP/JPY, since JPY strength means fewer yen are needed to buy one pound, pushing the pair lower. The terminal displays the JPY leg's CFTC net position as-is for this reason; readers should apply the direction (long JPY = bearish GBP/JPY, short JPY = bullish GBP/JPY) when cross-referencing the two COT legs.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the cross-asset risk regime affect GBP/JPY?</summary>
+        <p>GBP/JPY is one of the most risk-sensitive major currency pairs. In risk-on regimes (low VIX, rising equities, tight credit spreads), GBP/JPY tends to rally as carry appetite increases and JPY is sold. In risk-off regimes (elevated VIX, equity drawdowns, flight to safety), JPY strengthens sharply as carry trades unwind, driving GBP/JPY lower. The cross-asset risk score in the terminal aggregates VIX, MOVE Index, gold, SPX, credit spreads, and yield curve signals into a single RISK-ON / RISK-OFF reading.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What GBP COT data matters most for GBP/JPY analysis?</summary>
+        <p>The most important GBP COT metrics for GBP/JPY are: net position (longs minus shorts held by leveraged funds), Long% (proportion of open interest on the long side — above 60% signals crowding), and the week-over-week change in net positioning. A sustained increase in net GBP longs combined with a decrease in net JPY longs (or increase in net JPY shorts) is the strongest COT confirmation of a bullish GBP/JPY setup.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What does GBP/JPY do during the Asian session?</summary>
+        <p>GBP/JPY is characteristically illiquid during the Asian session, particularly in the Tokyo-London gap. Price action tends to be choppy and range-bound with wider spreads. The pair becomes most liquid and directional during the London open (07:00–09:00 GMT) and the London-New York overlap (12:00–17:00 GMT). The FX Liquidity panel in the terminal shows the H-L range proxy by hour, confirming these session dynamics.</p>
+      </details>
     </div>
 
   </div><!-- /.guide-content -->

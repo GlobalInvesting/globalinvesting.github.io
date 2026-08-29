@@ -321,7 +321,7 @@ gtag('consent', 'default', {
       "name": "How does the AI market narrative work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each."
+        "text": "The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each."
       }
     },
     {
@@ -811,6 +811,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   .gi-ov-lock-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; color: var(--text2); }
   .gi-ov-lock-text { font-size: 10px; color: var(--text2); font-weight: 600; text-align: center; padding: 0 8px; }
   .gi-ov-cta { margin-top: 26px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+  .gi-ov-faq { margin-top: 26px; }
+  .gi-ov-faq-h2 { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
+  .faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
+  .faq-item summary { padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+  .faq-item[open] summary::after { transform: rotate(45deg); }
+  .faq-item summary:hover { color: var(--blue); }
+  .faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 13px; line-height: 1.7; }
+
   .gi-ov-cta-copy { font-size: 12.5px; color: var(--text); line-height: 1.5; max-width: 640px; }
   .gi-ov-cta-copy strong { color: var(--text); font-weight: 600; }
   .gi-ov-cta-actions { display: flex; gap: 10px; flex-shrink: 0; }
@@ -1020,6 +1030,50 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="gi-ov-pill gi-ov-pill-filled" id="gi-ov-open-terminal">Open full terminal</button>
       </div>
     </div>
+    <div class="gi-ov-faq" id="faq">
+      <h2 class="gi-ov-faq-h2">Frequently Asked Questions</h2>
+      <details class="faq-item">
+        <summary>How real-time is the forex data?</summary>
+        <p>FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What does the Currency Strength Heatmap show?</summary>
+        <p>It shows the relative strength of major currencies (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) computed from ECB cross rates, helping traders identify the strongest and weakest currencies at a glance.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the COT positioning data?</summary>
+        <p>COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, updated weekly. The CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the AI market narrative work?</summary>
+        <p>The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What are the OIS-implied central bank rate expectations?</summary>
+        <p>The CB Rate Expectations panel shows the market-consensus forward direction for all eight major central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTER for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, and RBNZ OCR OIS for NZD. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points — the same OIS-implied probability methodology as CME FedWatch.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the 25-delta Risk Reversal and why does it matter?</summary>
+        <p>The 25-delta Risk Reversal (25d RR) measures the difference in implied volatility between 25-delta calls and 25-delta puts for the same expiry. A negative 25d RR indicates the options market is pricing a higher premium for downside protection than for upside moves. The terminal shows 1-month tenor 25d RR for all major pairs from Saxo Bank indicative quotes, updated daily on business days.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the cross-asset risk monitor?</summary>
+        <p>The Cross-Asset Risk Monitor aggregates stress signals from equities (SPX), volatility (VIX, MOVE index), safe-haven assets (Gold), credit spreads (US HY OAS 20-day change), FX (AUD/JPY, USD/JPY), and the US Treasury yield curve to produce a real-time regime score mapping to four regimes: RISK-ON (score 0), MIXED (1), CAUTION (2-3), and RISK-OFF (4+). Thresholds follow institutional conventions — VIX above 30 signals crisis-level stress, yield curve inversion signals recession risk.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the carry trade ranking?</summary>
+        <p>The Carry Trade Ranking shows the net interest rate differential for all major currency pairs, adjusted for Covered Interest Parity (CIP) — the same methodology used by institutional FX desks. It ranks all 45 G10 pairs from highest to lowest carry, displaying benchmark OIS rates for both currencies and the net spread in basis points.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the Economic Surprise Index and how is it calculated?</summary>
+        <p>The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each major currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring so recent releases count more than older ones, and normalises each event series using a 90-day rolling z-score — the same methodology used by institutional economic research desks. The ESI panel shows a running score per currency and a 90-day chart you can inspect by pair, updated within minutes of each data release.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the Economic Calendar work in the terminal?</summary>
+        <p>The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically.</p>
+      </details>
+    </div>
+
   </div>
 </section>
 

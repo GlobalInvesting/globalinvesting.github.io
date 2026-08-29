@@ -125,6 +125,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section h3 { font-size: 13.2px; font-weight: 700; color: var(--text); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
 .guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 15.4px; line-height: 1.8; }
 .guide-section p:last-child { margin-bottom: 0; }
+.faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
+.faq-item summary { padding: 13px 16px; font-size: 14.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--blue); }
+.faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 14px; line-height: 1.75; }
+
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 .scr-hero-wrap { margin: 18px 0 24px; }
@@ -639,6 +647,30 @@ a { color: inherit; text-decoration: none; }
         <a href="/" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
         <a href="access.html" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.4);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
       </div>
+    </div>
+
+    <div class="guide-section" id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <details class="faq-item">
+        <summary>What is the CFTC COT report and how is it used in FX trading?</summary>
+        <p>The Commitments of Traders (COT) report is a weekly publication from the US Commodity Futures Trading Commission (CFTC). It shows the aggregate open positions of different trader categories in futures markets, including currency futures on the CME. FX traders use it to read the positioning of leveraged funds (hedge funds, CTAs) as a proxy for institutional directional bias in each major currency.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do you read net COT positioning for currency pairs?</summary>
+        <p>Net positioning is the difference between long and short contracts held by leveraged funds. A positive net means more longs than shorts (bullish institutional bias); a negative net means more shorts (bearish bias). For cross pairs like GBP/JPY, you compare net GBP positioning against net JPY positioning — noting that JPY futures are quoted as JPY/USD, so the sign must be inverted relative to USD/JPY.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is Long% in the COT terminal and what does it signal?</summary>
+        <p>Long% is the share of total leveraged-fund open interest held on the long side: Long% = longs / (longs + shorts) × 100. It gives a quick read of the current split, but the terminal does not flag crowding from a fixed Long% cutoff — the COT detail modal instead scores each currency's net position as a z-score against its trailing 52-week history: beyond ±1.5σ is labelled Crowded, beyond ±2σ is labelled Extreme. These extremes are contrarian warning signals — not directional calls — indicating elevated reversal risk when a catalyst appears.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How often is COT data updated and what is the reporting lag?</summary>
+        <p>The CFTC publishes COT data every Friday at 3:30 PM Eastern Time, reflecting positions as of the previous Tuesday close. This creates a 3-day reporting lag. The Global Investing FX Terminal updates the COT panel weekly; updated data is typically available on the terminal the same Friday evening after the CFTC release.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is Open Interest (OI) in the COT report and why does it matter?</summary>
+        <p>Open Interest is the total number of outstanding futures contracts that have not been settled. In the COT context, rising OI alongside increasing net longs confirms institutional conviction behind a directional move. Falling OI while positioning stays extreme often signals that the crowded trade is being unwound — a leading indicator of potential trend exhaustion.</p>
+      </details>
     </div>
 
   </div><!-- /.guide-content -->

@@ -125,6 +125,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section h3 { font-size: 13.2px; font-weight: 700; color: var(--text); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
 .guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 15.4px; line-height: 1.8; }
 .guide-section p:last-child { margin-bottom: 0; }
+.faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
+.faq-item summary { padding: 13px 16px; font-size: 14.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--blue); }
+.faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 14px; line-height: 1.75; }
+
 .scr-hero-wrap { margin: 18px 0 24px; }
 .scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
 .scr-hero:hover { border-color: var(--border2); }
@@ -660,6 +668,38 @@ a { color: inherit; text-decoration: none; }
         <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.4);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">View on MQL5 Market &rarr;</a>
         <a href="/" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
       </div>
+    </div>
+
+    <div class="guide-section" id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <details class="faq-item">
+        <summary>What does the Global Investing MT5 Expert Advisor do?</summary>
+        <p>It is a MetaTrader 5 Expert Advisor that renders a multi-panel FX analytics dashboard as a native canvas overlay inside your MT5 chart window — covering CB rate bias, CFTC COT positioning, carry trade ranking, currency strength, an economic calendar, retail sentiment, correlation, volatility, and an AI-generated market narrative, without requiring a browser.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is this MT5 EA an automated trading robot?</summary>
+        <p>No. It does not place trades or manage positions. It is an analytical overlay — a forex dashboard that displays institutional-style market data panels inside MetaTrader 5 so the trader can make their own discretionary decisions.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How do I install the MT5 EA on my chart?</summary>
+        <p>Rent or purchase the EA from MQL5 Market, download it from the MQL5 Market tab inside MetaTrader 5, then drag it onto any chart. The EA renders its panels as a dashboard overlay; no further configuration is required for the default layout.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Does the MT5 EA work with any broker?</summary>
+        <p>Yes. The EA runs inside MetaTrader 5 regardless of broker, since it does not place trades. Panels that reference swap rates or open positions (such as the Carry Monitor) read live values directly from your broker's own MT5 feed.</p>
+      </details>
+      <details class="faq-item">
+        <summary>How does the Carry Monitor flag yen carry trade unwind risk?</summary>
+        <p>The Carry Monitor does not read nominal swap points on their own, since a wide swap can look identical whether the underlying pair is calm or already unwinding. It annualizes each pair's live broker swap and divides by its trailing 30-day realized volatility, producing a Sharpe-adjusted carry score. When a funding-currency pair such as a JPY cross shows elevated volatility against a shrinking or negative Sharpe-adjusted carry, that combination is the same pattern institutional desks associate with a carry trade unwind, and the panel ranks it accordingly rather than showing a flat swap figure.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is a carry trade unwind, and can the MT5 EA warn me about one?</summary>
+        <p>A carry trade unwind is a rapid reversal of positions built to collect interest-rate differential (commonly funded in yen), typically triggered by a spike in volatility or a shift in central bank policy expectations that erases the trade's risk-adjusted return. The EA does not predict the trigger event itself, but its Carry Monitor, CB Rates &amp; Bias, and Volatility panels update from the same live data on the same chart, so a volatility spike alongside a deteriorating carry ranking and a shift in policy bias is visible together rather than requiring three separate tools.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between the MT5 EA and the web terminal?</summary>
+        <p>Both share the same underlying data pipelines for CB bias, COT, carry, sentiment, and news. The Economic Surprise Index is the exception — the EA scores it from MT5's own native calendar, the web terminal from its own calendar feed, so readings for the same currency can diverge between the two. The MT5 EA adds account-specific panels not possible in a browser — live broker swap rates, an open positions panel, and native MT5 popup and mobile push alerts. The web terminal adds panels not present in the EA, such as the Cross-Asset Risk Monitor, the yield curve, and the derivatives suite. A single subscription unlocks both.</p>
+      </details>
     </div>
 
   </div><!-- /.guide-content -->

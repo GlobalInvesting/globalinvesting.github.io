@@ -288,6 +288,14 @@ a { color: inherit; text-decoration: none; }
 .guide-section h3 { font-size: 13.2px; font-weight: 700; color: var(--text); margin: 20px 0 8px; text-transform: uppercase; letter-spacing: .06em; }
 .guide-section p { color: var(--text2); margin-bottom: 12px; font-size: 15.4px; line-height: 1.8; }
 .guide-section p:last-child { margin-bottom: 0; }
+.faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
+.faq-item summary { padding: 13px 16px; font-size: 14.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--blue); }
+.faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 14px; line-height: 1.75; }
+
 .guide-section ul, .guide-section ol { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
 
@@ -660,6 +668,34 @@ a { color: inherit; text-decoration: none; }
         <a href="/" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
         <a href="access.html" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.4);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
       </div>
+    </div>
+
+    <div class="guide-section" id="faq">
+      <h2>Frequently Asked Questions</h2>
+      <details class="faq-item">
+        <summary>What is fundamental analysis in forex?</summary>
+        <p>Fundamental analysis in forex is the practice of forecasting a currency's direction from the economic, monetary policy, and positioning conditions of its underlying economy, rather than from historical price patterns. It asks which currency's conditions justify capital flowing toward it going forward — driven mainly by relative interest-rate expectations between two economies, since capital tends to flow toward the currency offering the more attractive forward-looking return once risk is accounted for.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the difference between fundamental and technical analysis in forex?</summary>
+        <p>Fundamental analysis looks at the economic and policy conditions behind a currency — central bank rate bias, growth and inflation data relative to forecasts, institutional positioning, and risk appetite — to form a medium-term directional view. Technical analysis looks at historical price action and chart patterns to time entries and exits within that view. The two are complementary rather than competing: a fundamental view identifies which direction has an edge, while technical analysis is commonly used to decide when to act on it.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What data is used in forex fundamental analysis?</summary>
+        <p>Institutional fundamental analysis for FX generally combines four inputs: central bank policy rates and forward guidance (including what interest-rate markets are already pricing for the next meeting), institutional positioning data such as the CFTC Commitments of Traders report, economic data releases scored against consensus forecasts rather than in absolute terms, and the prevailing cross-asset risk regime, which determines whether carry trades are being rewarded or unwound. No single input is sufficient on its own; the framework is built from reading all four together.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Can beginners learn forex fundamental analysis without a paid course?</summary>
+        <p>The core framework is a small, learnable set of concepts: relative interest-rate expectations between two economies, whether incoming data is beating or missing forecasts, how institutional players are already positioned, and the current risk appetite regime. What a course typically adds is packaged data and worked examples rather than a fundamentally different method. A dashboard that already aggregates rate bias, positioning, data surprises, and risk regime in one place removes most of the manual data-gathering that otherwise makes the subject feel more complex than the underlying logic actually is.</p>
+      </details>
+      <details class="faq-item">
+        <summary>Is fundamental analysis or technical analysis more reliable for forex trading?</summary>
+        <p>Neither is categorically more reliable; they answer different questions on different time horizons. Fundamental analysis is better suited to medium-term directional bias, since interest-rate and policy divergence tends to play out over weeks and months. Technical analysis is better suited to shorter-term entry and exit timing, since it reacts to price action directly. Institutional desks typically use fundamental analysis to decide which currency pairs to focus on and in which direction, then use technical or execution-level tools to time the trade itself — treating the two as sequential steps rather than substitutes for one another.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is the institutional framework for fundamental analysis in FX?</summary>
+        <p>Institutional macro desks generally structure fundamental analysis around four pillars evaluated together: central bank rate bias and policy divergence between two currencies, institutional positioning from sources like the CFTC COT report, economic data momentum measured as surprises relative to consensus rather than absolute levels, and the prevailing cross-asset risk regime that governs carry and funding flows. A currency view built from two or more of these pillars aligning carries materially more weight than any single pillar in isolation.</p>
+      </details>
     </div>
 
   </div><!-- /.guide-content -->
