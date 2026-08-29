@@ -1,51 +1,52 @@
 {
-  "generated_at": "2026-08-28T22:30:54Z",
+  "generated_at": "2026-08-29T21:01:21Z",
   "signals": [
     {
-      "time": "22:30",
+      "time": "20:49",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Geopolitical Friction",
-      "text": "The 2.071% G10 strength spread between AUD and CHF creates a dominant bilateral theme for the open as IRGC threats to close the Strait of Hormuz escalate geopolitical risk. AUD COT LF long +49.7k (75.2% long, pctl 94) reflects a crowded long that faces liquidation risk if trade friction intensifies, despite its +1.301% 1W performance lead. CHF remains the G10 laggard (1W avg -0.770%) but attracts haven bids under the current bear flattener regime and restrictive NOK/USD yield spreads. Trade bias: Bearish AUD/CHF on geopolitical escalation; AUD's 435bp OIS carry advantage is secondary to crowded-long unwind risk. Catalyst: Sydney open and IRGC headline developments. Risk: De-escalation of Strait of Hormuz tensions restores the AUD carry bid.",
+      "title": "USD/JPY — Geopolitical Safe-Haven + Hawkish Fed Shift",
+      "text": "Iran's closure of the Strait of Hormuz creates an immediate safe-haven bid for JPY, though USD/JPY closed Friday at 160.04 following hawkish comments from Fed Chair Warsh. While JPY COT leveraged funds are net short -81,619 (pctl 9), the geopolitical escalation risks a sharp short-covering squeeze against the +266bp USD carry advantage. Fed holds at 3.75%. Trade bias: Bullish JPY (Bearish USD/JPY) on geopolitical escalation; hawkish Fed rhetoric caps the downside. Catalyst: Sydney open response to Strait of Hormuz closure. Risk: De-escalation headlines or focus shifting entirely to the US yield advantage above 4.72%.",
+      "evidence": [
+        "IRGC Navy: Strait of Hormuz closed",
+        "Fed Chair Warsh: September hike odds 57%",
+        "JPY COT lev_net -81,619 (pctl 9)"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "20:49",
+      "priority": "critical",
+      "title": "AUD/CHF — G10 Bilateral Theme + Risk-Off Divergence",
+      "text": "AUD outperformed all G10 peers this week (1W avg +1.301%) while CHF remained the laggard (-0.623%), creating a significant 1.924% bilateral spread. Despite the AUD strength, the weekend's geopolitical TIER-1 event favors the CHF safe-haven over the high-beta AUD, especially with AUD/CHF retail sentiment at an extreme 95% short. The +435bp carry advantage for AUD faces a major stress test as risk-off flows typically trigger rapid carry unwinds in CHF crosses. Trade bias: Bearish AUD/CHF into the open; safe-haven demand overrides the weekly momentum. Catalyst: Sydney open response to geopolitical risk. Risk: Markets ignore geopolitics and extend the G10 scorecard momentum trend.",
       "evidence": [
         "AUD 1W avg: +1.301% (n=4)",
-        "CHF 1W avg: -0.770% (n=6)",
-        "G10 spread: 2.071%"
+        "CHF 1W avg: -0.623% (n=6)",
+        "G10 spread: 1.924%",
+        "AUD/CHF retail 95% short"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "21:18",
-      "priority": "critical",
-      "title": "USD/JPY — Jackson Hole Hawkishness + Yield Divergence",
-      "text": "Fed Chair Warsh's hawkish shift at Jackson Hole boosts the USD toward the 160.04 Friday close as the US 10Y yield rises to 4.72%. JPY COT net short -73.6k (lev_net) reinforces the upside bias, while the 266bp SOFR-TONA carry spread sustains long USD/JPY positioning. BOJ Board Member Tamura attending Jackson Hole instead of Governor Ueda reduces the immediate risk of a hawkish counter-signal from Tokyo. Trade bias: Bullish USD/JPY; hawkish Warsh rhetoric and the 175bp US-JGB yield gap favor the dollar. Catalyst: Tokyo open and follow-through from Warsh speech. Risk: Direct BOJ intervention if 161.00 is breached or a sharp rise in JGB yields.",
-      "evidence": [
-        "JPY COT net short -73.6k",
-        "US 10Y yield 4.72%",
-        "USD/JPY Friday close 160.04"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "10:30",
+      "time": "20:30",
       "priority": "warning",
-      "title": "USD/CAD — Bullish Momentum + ESI Support",
-      "text": "USD/CAD closed Friday at 1.3902, supported by a 139bp SOFR-CORRA carry advantage and a bearish flattener US yield curve regime. CAD COT LF net short -89.8k (pctl 3, z -2.07) reflects extreme bearishness, yet CAD's positive ESI (+20.8) suggests domestic data remains resilient. The upcoming 9 September BoC meeting determines if Governor Macklem pivots to protect growth against the Fed's hawkish stance. Trade bias: Bullish USD/CAD; extreme CAD shorts are supported by the widening US-CA 10Y spread (-97bp). Catalyst: next BoC meeting (mkt: 100% hold priced) on 9 September. Risk: BoC delivers a hawkish hold surprise, triggering a squeeze of the pctl 3 CAD shorts.",
+      "title": "EUR/USD — Hawkish Divergence + Momentum Breakdown",
+      "text": "EUR COT leveraged funds shifted heavily net short (-55,311, pctl 3) after EUR/USD fell -0.86% this week to close at 1.1587. The pair is now trading below its SMA20 (1.1593) and SMA200 (1.1637), signaling a technical breakdown as the SOFR-ESTR carry spread (+145bp) favors the USD. Although the ECB has a hike bias for the September 10th meeting, the Fed's 57% hike probability for September maintains downward pressure on the pair. Trade bias: Bearish EUR/USD; momentum and yield spread favor the downside toward the SMA50 at 1.149. Catalyst: next ECB meeting (mkt: 75% hike priced). Risk: ESI outperformance (Index +13.1) triggers a relief rally if U.S. data misses.",
       "evidence": [
-        "CAD COT pctl(52w): 3",
-        "USD/CAD 1W: +0.88%",
-        "CAD ESI: +20.8"
+        "EUR COT lev_net -55,311 (pctl 3)",
+        "EUR/USD below SMA20/SMA200",
+        "Fed hike probability 57%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:50",
+      "time": "19:34",
       "priority": "info",
-      "title": "AUD/USD — Retail Sentiment Extreme vs COT Alignment",
-      "text": "Retail sentiment on AUD/USD is 89% short, providing a contrarian bullish signal that conflicts with the crowded LF net long +49.7k. The 71bp OIS carry advantage for AUD (AONIA 4.35% vs SOFR 3.64%) supports the long-term bid, but immediate technical resistance remains as the pair closed at 0.7164. Neutral AUD ESI (+1.4) provides little fundamental impetus to break the current Jackson Hole-driven USD strength. Trade bias: Neutral AUD/USD; retail and institutional positioning are diametrically opposed. Catalyst: next RBA meeting (mkt: 100% hold priced) on 29 September. Risk: Further geopolitical tension in the Strait of Hormuz triggers risk-off AUD selling.",
+      "title": "GBP/USD — Positioning Exhaustion + Carry Buffer",
+      "text": "GBP COT leveraged funds are net long +56,839 (pctl 96), indicating a crowded long position that is vulnerable to a reversal following Friday's -0.41% decline. The GBP/USD closed at 1.3537, sitting just below its SMA20 (1.354), as the Fed's hawkish pivot erodes the GBP carry advantage (SONIA 3.73% vs SOFR 3.64%). Elevated options hedging demand (VRP +6.0%) suggests traders are increasingly buying protection against further downside. Trade bias: Bearish GBP/USD on positioning unwind; high IV (11.0%) vs HV30 (5.0%) confirms bearish anxiety. Catalyst: next BoE meeting (mkt: 100% hold priced). Risk: UK 10Y yield premium (+43bp vs US) widens further, attracting defensive flows.",
       "evidence": [
-        "Retail: 89% short AUD/USD",
-        "AUD LF long +49.7k",
-        "AUD/USD 1W: +0.63%"
+        "GBP COT pctl(52w)=96",
+        "GBP/USD IV 11.0% vs HV30 5.0%",
+        "GBP/USD closed 1.3537"
       ],
       "_source": "engine-ai-primary"
     }
