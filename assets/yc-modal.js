@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.6 — _ycShape() Flat-band ordering fixed (v8.263.0):
+// YIELD CURVE MODAL  v2.7 — _ycShape() Flat-band ordering fixed (v8.263.0):
 //   see the comment inside _ycShape() below for the full incident writeup.
 // v2.5 — #ycm-bd now actually stretches in the real
 //   (inline-panel.js) render path, so the v2.4 min-height:100% fix has a
@@ -131,6 +131,14 @@
 })();
 
 let _ycChart = null;
+// HTML-escape externally-sourced free text (news-data/news.json article title/
+// source) before it goes into innerHTML content. Same class of gap already
+// fixed once in calendar-panel.js (v8.304.0, _escAttr) — this file's Market
+// Commentary block reused cb-rates-modal.js's pattern but never inherited the
+// escaping discipline, since the two files don't share any module/import.
+function _escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 function _ycChg(chg) {
   if (chg == null || isNaN(chg)) return { txt: '\u2014', cls: '' };
   const sign = chg > 0 ? '+' : '';
@@ -326,16 +334,17 @@ async function _ycLoadPolicySummary(){
         const lastPeriod=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('? '),cut.lastIndexOf('! '));
         body=(lastPeriod>200?cut.slice(0,lastPeriod+1):cut)+'…';
       }
-      const titleHtml=a.link
-        ?`<a href="${a.link}" target="_blank" rel="noopener noreferrer">${a.title||''}</a>`
-        :(a.title||'');
+      const safeLink=(a.link||'').startsWith('https://')?a.link:'';
+      const titleHtml=safeLink
+        ?`<a href="${_escHtml(safeLink)}" target="_blank" rel="noopener noreferrer">${_escHtml(a.title||'')}</a>`
+        :_escHtml(a.title||'');
       return`<div class="ycm-ps-article">
         <div class="ycm-ps-art-meta">
-          <span class="ycm-ps-art-source">${a.source||''}</span>
-          <span class="ycm-ps-art-time">${timeStr}</span>
+          <span class="ycm-ps-art-source">${_escHtml(a.source||'')}</span>
+          <span class="ycm-ps-art-time">${_escHtml(timeStr)}</span>
         </div>
         <div class="ycm-ps-art-title">${titleHtml}</div>
-        <div class="ycm-ps-art-body">${body}</div>
+        <div class="ycm-ps-art-body">${_escHtml(body)}</div>
       </div>`;
     }).join('');
 

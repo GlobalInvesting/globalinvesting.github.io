@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.8 — Persistent decision markers removed; hover tooltip only
+// CB RATES MODAL  v2.9 — Persistent decision markers removed; hover tooltip only
 // v2.8 (2026-08-25): Per user feedback, removed _buildDecisionOverlay()
 //   entirely (was already dead code — zero call sites after this session's
 //   edit) instead of keeping the tick-mark fallback from v2.7. The Rate
@@ -20,8 +20,8 @@
 //   exact decision on hover at any zoom level, so no information is lost,
 //   only the persistent on-chart label at high density. See CHANGELOG.md.
 // CB RATES MODAL  v2.6 — Fix: Rate Chart grew oversized after the v2.5 fix
-// v2.6 (2026-08-02): The client reported the chart taking up far more room than
-//   before, right after v2.5. Root cause: v2.5's #cbr-bd{flex:1;min-height:0}
+// v2.6 (2026-08-02): The chart took up far more room than before, right after
+//   v2.5. Root cause: v2.5's #cbr-bd{flex:1;min-height:0}
 //   fix worked as intended — #cbr-bd now genuinely stretches inside
 //   inline-panel.js's flex-column body — but that gave #cbr-modal's inline
 //   height:100% (set by _transplant()) a much larger real height to resolve
@@ -460,6 +460,15 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   setTimeout(()=>_cbrLoadPolicySummary(ccy, bankShort), 100);
 }
 
+// HTML-escape externally-sourced free text (news-data/news.json article title/
+// source) before it goes into innerHTML content. Same class of gap already
+// fixed once in calendar-panel.js (v8.304.0, _escAttr) — this file's own
+// Market Commentary block never inherited that escaping discipline, since
+// the two files don't share any module/import.
+function _escHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
 // Policy Summary — Bloomberg/TE-style text block rendered inline below the context strip.
 // Fetches news-data/news.json, selects up to 3 most recent high-quality articles tagged
 // with the selected CB's currency, and renders title + full expand paragraph for each.
@@ -507,16 +516,17 @@ async function _cbrLoadPolicySummary(ccy, bankShort){
         const lastPeriod=Math.max(cut.lastIndexOf('. '),cut.lastIndexOf('? '),cut.lastIndexOf('! '));
         body=(lastPeriod>200?cut.slice(0,lastPeriod+1):cut)+'…';
       }
-      const titleHtml=a.link
-        ?`<a href="${a.link}" target="_blank" rel="noopener noreferrer">${a.title||''}</a>`
-        :(a.title||'');
+      const safeLink=(a.link||'').startsWith('https://')?a.link:'';
+      const titleHtml=safeLink
+        ?`<a href="${_escHtml(safeLink)}" target="_blank" rel="noopener noreferrer">${_escHtml(a.title||'')}</a>`
+        :_escHtml(a.title||'');
       return`<div class="cbr-ps-article">
         <div class="cbr-ps-art-meta">
-          <span class="cbr-ps-art-source">${a.source||''}</span>
-          <span class="cbr-ps-art-time">${timeStr}</span>
+          <span class="cbr-ps-art-source">${_escHtml(a.source||'')}</span>
+          <span class="cbr-ps-art-time">${_escHtml(timeStr)}</span>
         </div>
         <div class="cbr-ps-art-title">${titleHtml}</div>
-        <div class="cbr-ps-art-body">${body}</div>
+        <div class="cbr-ps-art-body">${_escHtml(body)}</div>
       </div>`;
     }).join('');
 
