@@ -1,5 +1,5 @@
 /**
- * fx-websocket.js — Real-time FX tick feed via Cloudflare Worker proxy v1.0
+ * fx-websocket.js — Real-time FX tick feed via Cloudflare Worker proxy v1.0.1
  *
  * WHAT THIS DOES
  *   Connects to the globalinvesting-fx-ws-proxy Cloudflare Worker, which holds
@@ -272,7 +272,7 @@ function _updateSourceLabel(pairId) {
   }
 
   // WebSocket is delivering ticks — set both labels to live state
-  if (qbLabel)   qbLabel.textContent = "Finnhub · live";
+  if (qbLabel)   qbLabel.textContent = "Live";
   if (delayChip) {
     delayChip.textContent = "LIVE";
     delayChip.style.color = "var(--up)";
