@@ -2947,6 +2947,25 @@ async function fetchQuoteBarRT() {
         low:   (q.low   != null && q.low   > 0) ? q.low   : null,
         session_high: (q.session_high != null && q.session_high > 0) ? q.session_high : null,
         session_low:  (q.session_low  != null && q.session_low  > 0) ? q.session_low  : null,
+        // prev_bar: the previous COMPLETED FX session's real O/H/L/C, computed by
+        // fetch_fx_prev_session() over the exact 21:00 UTC boundary (fetch_intraday_quotes.py).
+        // Root-cause fix (v8.322.0): this field was already correctly computed and written
+        // into quotes.json, but this is the ONLY code path that copies quotes.json's per-pair
+        // fields into STOOQ_RT_CACHE for FX pairs, and it never included prev_bar in the
+        // field list above — every other field (session_high/session_low/hv30/pct1w/etc.)
+        // was copied, prev_bar silently was not. _lwBuildTodayBar()'s FX open-anchor
+        // (`q.prev_bar && q.prev_bar.close`, dashboard.js ~line 5059) and the gap-window
+        // prev-bar injector (~line 5717) both read STOOQ_RT_CACHE, not quotes.json directly,
+        // so `q.prev_bar` was always undefined at both call sites regardless of how correct
+        // the backend computation was — silently falling back to Yahoo's regularMarketPreviousClose
+        // (q.prev_close), the exact unreliable-at-reopen field fetch_fx_prev_session() was built
+        // to replace (see fetch_intraday_quotes.py's fetch_fx_prev_session() docstring / FIX-42).
+        // This is why the "opening bar anchored to the prior session's extreme, reading as a
+        // duplicated candle" symptom could resurface at every Sydney reopen (Sun 21:00 UTC)
+        // even though the root-cause fix (v3.18) was genuinely present and correct server-side —
+        // same class of gap as GUIDELINES.md's v8.220.0/v8.256.0 rule: a passing fix that never
+        // reaches its actual consumer.
+        prev_bar: (q.prev_bar && q.prev_bar.close != null) ? q.prev_bar : null,
         hv30:  (q.hv30  != null) ? q.hv30 : (intradayData.hv30?.[pair.id] ?? null),
         pct1w: (q.pct1w != null) ? q.pct1w : null,
         pct1w_date: q.pct1w_date ?? null,
@@ -5026,7 +5045,10 @@ function _lwBuildTodayBar(ohlcId) {
   // close is treated as unusable rather than trusted at face value — this is
   // what actually deformed the Sunday-reopen candle every week (root cause:
   // fetch_fx_prev_session() bailing out over the weekend, see
-  // fetch_intraday_quotes.py v3.18). The root cause is fixed there; this
+  // fetch_intraday_quotes.py v3.18). The backend root cause is fixed there;
+  // separately, that fix's own delivery to this exact call site was broken
+  // until v8.322.0 (fetchQuoteBarRT() never copied quotes.json's prev_bar
+  // field into STOOQ_RT_CACHE — see the comment at that copy site). This
   // guard is a second, independent line of defense so that any OTHER stale/
   // wrong single-field anchor (e.g. a future yfinance hiccup) can't
   // reproduce the same deformed-body symptom silently. Hoisted to function
