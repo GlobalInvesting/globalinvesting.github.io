@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-30T14:57:53Z",
+  "updated": "2026-08-30T15:00:41Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,13 +35,13 @@
       "pct1w_date": "2026-08-21"
     },
     "gold": {
-      "close": 4458.8311,
+      "close": 4458.8816,
       "prev_close": 4458.8808,
-      "chg": -0.0497,
-      "pct": -0.0011,
+      "chg": 0.0008,
+      "pct": 0.0,
       "source": "twelve_data",
       "high": 4688.0,
-      "low": 4495.0,
+      "low": 4495.5,
       "open": 4656.0,
       "market_state": "REGULAR",
       "market_time": 1787950797
@@ -88,7 +88,7 @@
       "open": 66104.49,
       "bid": null,
       "ask": null,
-      "market_state": "CLOSED",
+      "market_state": "PREPRE",
       "market_time": 1787899503,
       "source": "quote-pipeline-primary",
       "pct1w": 0.5896,
@@ -200,40 +200,40 @@
       "pct1w_date": "2026-08-21"
     },
     "btc": {
-      "close": 78772.21,
+      "close": 78768.12,
       "prev_close": 78234.75,
-      "chg": 537.46,
-      "pct": 0.687,
-      "high": 65713.91,
-      "low": 64182.797,
+      "chg": 533.37,
+      "pct": 0.6818,
+      "high": 78940.305,
+      "low": 77972.53,
       "open": 78234.75,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1788101876,
+      "market_time": 1788102041,
       "source": "quote-pipeline-primary",
-      "pct1w": 0.5579,
+      "pct1w": 0.5527,
       "pct1w_date": "2026-08-21",
-      "session_high": 78963.99,
-      "session_low": 77797.46
+      "session_high": 78963.72,
+      "session_low": 77845.97
     },
     "eth": {
-      "close": 2475.76,
+      "close": 2477.01,
       "prev_close": 2457.449,
-      "chg": 18.311,
-      "pct": 0.7451,
-      "high": 1907.2332,
-      "low": 1858.5846,
+      "chg": 19.561,
+      "pct": 0.796,
+      "high": 2478.3972,
+      "low": 2452.7202,
       "open": 2457.449,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1788101871,
+      "market_time": 1788102043,
       "source": "quote-pipeline-primary",
-      "pct1w": -1.5713,
+      "pct1w": -1.5216,
       "pct1w_date": "2026-08-21",
-      "session_high": 2479.6,
-      "session_low": 2441.62
+      "session_high": 2479.69,
+      "session_low": 2444.6
     },
     "nasdaq": {
       "close": 29433.428,
@@ -1169,7 +1169,7 @@
       "chg": -2.453,
       "pct": -3.4924,
       "high": 72.05,
-      "low": 66.875,
+      "low": 66.83,
       "open": 70.045,
       "bid": 66.95,
       "ask": 67.485,
@@ -1180,7 +1180,7 @@
       "pct1w_date": "2026-08-21",
       "prev_bar": {
         "time": "2026-08-28",
-        "open": 70.045,
+        "open": 70.02,
         "high": 72.05,
         "low": 66.83,
         "close": 67.786
