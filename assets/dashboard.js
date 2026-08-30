@@ -12275,8 +12275,10 @@ async function fetchLiquidityData() {
   // "MARKET CLOSED — WEEKEND" label stayed on for a full extra hour after every
   // Sunday reopen, out of sync with the rest of the site (confirmed live:
   // 2026-08-30 21:43 UTC, LIVE badge on and ticking, this panel still closed).
-  // The canvas's OFFSET=44 slot layout is a separate, purely cosmetic x-axis
-  // choice (where slot 0 sits) and does not need to match this boundary.
+  // The canvas's slot-0 layout offset was OFFSET=44 (22:00 UTC) at the time of
+  // that fix — a separate, cosmetic x-axis choice that didn't need to match
+  // this boundary. v8.325.0 later aligned it to OFFSET=42 (21:00 UTC) anyway,
+  // for an unrelated reason (see drawLiquidityChart()'s OFFSET comment below).
   const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
 
   // ── Primary: fx-liquidity.json (yfinance H-L range proxy, updated hourly) ──
@@ -12360,8 +12362,10 @@ function drawLiquidityChart() {
   // FX market open/close boundary: fixed 21:00 UTC year-round, matching
   // fetchLiquidityData()'s isWeekend and updateSessions() (v8.323.0 — was
   // asymmetric here, Sunday <22 vs Friday >=21, a leftover conflation with
-  // the OFFSET=44 canvas layout constant below, which is a separate, purely
-  // cosmetic x-axis choice and does not need to match this boundary).
+  // the canvas layout constant below, OFFSET=44 [22:00 UTC] at that time).
+  // v8.325.0 later moved OFFSET to 42 [21:00 UTC] anyway, so both constants
+  // now happen to agree — coincidentally, not because one depends on the
+  // other; see the OFFSET comment below for that separate reason.
   const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
 
   const hours = _liqData || _liqTo48(isWeekend ? Array(24).fill(2) : LIQ_BASE);
@@ -12371,11 +12375,20 @@ function drawLiquidityChart() {
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const maxV=Math.max(...hours, ...baseline, 10);
 
-  // ── Canvas x-axis origin: slot 0 = 22:00 UTC ──────────────────────────────
-  // Purely cosmetic layout choice (where the chart starts drawing from left),
-  // independent of the isWeekend market-open boundary above (21:00 UTC).
-  // OFFSET=44 slots (22h × 2). Canvas slot i → array slot (i+OFFSET)%48
-  const OFFSET = 44; // 22:00 UTC in half-hour slots
+  // ── Canvas x-axis origin: slot 0 = 21:00 UTC ──────────────────────────────
+  // v8.325.0: was 44 (22:00 UTC), described as "purely cosmetic and independent
+  // of the 21:00 UTC market boundary" — that description was the bug. 22:00 UTC
+  // sits ~1h *inside* the NY-close→Sydney-open inter-session gap (today: NY
+  // close 21:00 UTC EDT, Sydney open 22:00 UTC AEST), so the gap was split by
+  // the canvas wrap point: most of it rendered at the far-right edge, right up
+  // against the "now" line, reading as "after NY close" with nothing legible
+  // before Sydney's band at the opposite edge of the same canvas. Anchoring at
+  // 21:00 UTC instead — the same FX-day-rollover boundary already used by
+  // isWeekend above, updateSessions(), and every other market-open check in
+  // this file — puts the entire gap in one contiguous block at the very start
+  // of the window, immediately before Sydney's band, matching how the
+  // interbank FX day is actually delimited industry-wide.
+  const OFFSET = 42; // 21:00 UTC in half-hour slots
   const sa = i => (i + OFFSET) % 48;            // slot in array from canvas position
   const sc = i => (i - OFFSET + 48) % 48;       // canvas position from array slot
 
@@ -12583,10 +12596,11 @@ window.addEventListener('resize', drawLiquidityChart);
     const mouseX = (e.clientX - rect.left) * scaleX;
     if (mouseX < PAD_L || mouseX > W - PAD_R) { tooltip.style.display = 'none'; return; }
 
-    // Map x → canvas slot (0–47). Canvas slot 0 = 22:00 UTC (OFFSET=44 array slots)
+    // Map x → canvas slot (0–47). Canvas slot 0 = 21:00 UTC (OFFSET=42 array
+    // slots) — v8.325.0, kept in sync with drawLiquidityChart()'s own OFFSET.
     const frac = (mouseX - PAD_L) / cW;
     const canvasSlot = Math.max(0, Math.min(47, Math.round(frac * 47)));
-    const OFFSET = 44;
+    const OFFSET = 42;
     const slot = (canvasSlot + OFFSET) % 48;  // array slot = UTC index
     const utcH = slot / 2;
 
