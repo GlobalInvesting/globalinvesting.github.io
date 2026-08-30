@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-08-30T18:07:30Z",
+  "generated_at": "2026-08-30T21:01:30Z",
   "signals": [
     {
-      "time": "22:48",
+      "time": "21:00",
       "priority": "critical",
-      "title": "USD/JPY — GEOPOLITICAL Escalation + Hawkish Fed Pivot",
-      "text": "The IRGC closure of the Strait of Hormuz and Chair Warsh’s hawkish Jackson Hole pivot (57% hike probability) drive safe-haven and yield-seeking flows into the USD open. USD/JPY closed at 160.04 Friday, but the bear flattener regime (2s10s +52bp) and JPY COT net short -81.61k (9th percentile) create significant squeeze risk if energy disruptions trigger a broad risk-off rotation. High US-JGB yield spreads (+179bp) provide structural support, though JPY 10Y yields at 2.93% and a positive JPY ESI (+20.1) signal domestic resistance. Trade bias: Bullish USD/JPY into the open; geopolitical shocks favor USD liquidity over JPY carry. Catalyst: Sydney/Tokyo open — Strait of Hormuz closure headlines. Risk: Direct BoJ or MoF intervention triggered by the 160.00 breach.",
+      "title": "USD/JPY — Geopolitical Risk + BoJ Intervention Risk",
+      "text": "USD/JPY is trading at 160.01, testing the psychologically significant 160.00 handle as Middle East tensions escalate following reports of IRGC forces readying sea mines in the Strait of Hormuz. The pair remains supported by a 275bp Fed-BoJ carry differential, yet the current spot level of 160.01 is the historically sensitive threshold that previously triggered Ministry of Finance intervention. Options markets are aggressively pricing downside protection, with 25d Risk Reversals at -1.74 showing a strong put skew that contradicts the bid in spot. COT data shows JPY net short at -81,619 (pctl 9), confirming that the carry trade remains crowded and vulnerable to a disorderly unwind if geopolitical risk forces a VIX spike above 25. Trade bias: Long USD/JPY; carry advantage persists but intervention risk at 160.00 caps the immediate upside. Catalyst: China official PMIs on 31 August. Risk: Direct BoJ/MoF intervention or a VIX spike above 25 triggers a carry unwind toward SMA20 at 158.87.",
       "evidence": [
-        "JPY COT net short -81.61k (pctl 9)",
-        "US-JGB 10Y spread +179bp",
-        "IRGC Strait of Hormuz closure"
+        "USD/JPY: 160.01",
+        "USD/JPY 25d RR: -1.74",
+        "Fed 3.75% vs BoJ 1.0%: +275bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:49",
+      "time": "20:57",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + IRGC Geopolitical Risk",
-      "text": "AUD outperformance (1W avg +1.295%) vs CHF weakness (1W avg -0.623%) creates a 1.919% G10 spread that faces immediate exhaustion risk from the Strait of Hormuz closure. AUD/CHF carry (+435bp) and extreme retail shorting (95%) support the uptrend, but the pair is vulnerable to a safe-haven CHF reversal given the geopolitical Tier-1 event. AUD COT net long +53.5k (95th percentile) reflects a crowded long position susceptible to liquidation on risk-off headlines. Trade bias: Bearish AUD/CHF from the open; geopolitical escalation favors laggard CHF recovery over crowded AUD longs. Catalyst: Sydney/Tokyo open. Risk: Sustained risk-on sentiment if the Strait of Hormuz situation de-escalates rapidly.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Carry Divergence",
+      "text": "AUD/CHF is the primary G10 bilateral theme this week as the Australian Dollar outperforms G10 peers by an average of +1.181% while the Swiss Franc lags the complex at -0.658%. The leader-to-laggard spread has reached a critical 1.839% across available pairs, driven by a massive +435bp carry advantage in favor of AUD (RBA 4.35% vs SNB 0.0%). While retail sentiment is extremely short AUD/CHF at 95%, COT data shows AUD leveraged funds are net long +53,578 with a pctl(52w) of 95, indicating a crowded institutional long. The divergence between retail fading the move and institutions chasing the carry suggests trend continuation unless risk-off sentiment intensifies. Trade bias: Bullish AUD/CHF; carry-driven outperformance dominates while VIX remains at 14.4. Catalyst: RBNZ meeting on 2 September for broader Oceania sentiment. Risk: Sharp risk-off shift (VIX > 25) triggers a flight to CHF, rapidly compressing the carry spread.",
       "evidence": [
-        "AUD 1W avg: +1.295% (n=4)",
-        "CHF 1W avg: -0.623% (n=6)",
-        "G10 spread: 1.919%"
+        "G10 spread (AUD/CHF): 1.839%",
+        "AUD/CHF carry: +435bp",
+        "AUD COT LF pctl: 95"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:30",
+      "time": "20:55",
       "priority": "warning",
-      "title": "NZD/USD — RBNZ Hike Bias vs Crowded COT Short",
-      "text": "NZD COT LF net short -32.4k (0th percentile) represents the most crowded short in the G10, setting up a major squeeze ahead of the RBNZ meeting. The RBNZ hike bias (2 September) and neutral ESI (+2.6) contrast with the USD's -10.0 ESI, suggesting NZD resilience despite the hawkish Warsh speech. NZD/USD closed at 0.5913 Friday, remaining above its SMA20, SMA50, and SMA200, which confirms a bullish technical posture. Trade bias: Bullish NZD/USD; record-crowded shorts face liquidation risk into the RBNZ decision. Catalyst: next RBNZ meeting (mkt: 94% hike priced) on 2 Sep. Risk: Geopolitical flight to USD liquidity overrides the RBNZ yield attraction.",
+      "title": "EUR/USD — COT Extreme + Volatility Premium",
+      "text": "EUR/USD is trading at 1.1586, positioned below its SMA20 (1.1593) following hawkish Jackson Hole commentary from Fed Chair Warsh. COT positioning for EUR has collapsed to a net short of -55,311, representing a 3rd percentile extreme (z-score -2.28) within its 52-week range. Options markets are pricing a 2.4-point Vol Risk Premium (IV 7.1% vs HV30 4.7%), signaling elevated demand for protection despite the spot decline. Fed holds at 3.75%. Trade bias: Bearish EUR/USD; extreme spec shorts and carry disadvantage favor a test of the SMA50 at 1.149. Catalyst: ECB meeting 10 September. Risk: A soft US jobs print on Friday leads to a repricing of Fed hike odds, triggering a short squeeze in the crowded EUR short.",
       "evidence": [
-        "NZD COT net short -32.4k (pctl 0)",
-        "RBNZ hike bias",
-        "NZD/USD above SMA20/50/200"
+        "EUR COT LF pctl: 3",
+        "EUR/USD VRP: +2.4%",
+        "Fed 3.75% vs ECB 2.4%: +135bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "19:40",
+      "time": "20:50",
       "priority": "warning",
-      "title": "EUR/USD — Hawkish Fed vs Crowded COT Short",
-      "text": "EUR COT LF net short -55.3k (3rd percentile) and a -55.6k WoW decline signal an extreme bearish consensus following Chair Warsh’s hawkish Jackson Hole guidance. The EUR/USD closed at 1.1587, below its SMA20, as the Fed's 3.75% rate and 57% hike probability reinforce the +145bp OIS carry advantage for the USD. Despite positive EUR ESI (+12.7), the bear flattener regime in the US curve favors USD dominance. Trade bias: Bearish EUR/USD; extreme COT short positioning limits further aggressive downside without a fresh catalyst. Catalyst: ECB meeting on 10 Sep. Risk: EUR short-squeeze if US economic data (NFP) misses expectations.",
+      "title": "GBP/USD — Positioning Exhaustion + ESI Divergence",
+      "text": "GBP/USD trades at 1.3534, holding just below the SMA20 at 1.3540 as technical momentum stalls. Speculative positioning is currently at a 96th percentile extreme (lev_net +56,839), suggesting the bullish Cable trend is reaching a point of exhaustion. This crowded long is increasingly at odds with the Economic Surprise Index (ESI) for GBP, which has fallen to -8.8 as UK data begins to underperform expectations. While the 10Y UK-US yield spread of +43bp provides a nominal buffer, the GBP real policy rate of +0.35% is significantly lower than the USD real rate of +1.45%. Trade bias: Neutral/Bearish GBP/USD; crowded positioning and negative ESI signal risk of a long-unwind. Catalyst: US August jobs data on 4 September. Risk: US data misses, weakening the USD and allowing the GBP long to extend toward 1.3600.",
       "evidence": [
-        "EUR COT net short -55.3k (pctl 3)",
-        "EUR/USD 1D -0.61%",
-        "OIS carry favors USD +145bp"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "15:50",
-      "priority": "info",
-      "title": "GBP/USD — Carry Advantage vs Negative ESI",
-      "text": "GBP COT LF net long +56.8k (96th percentile) creates unwind risk as the BoE market bias remains on hold while the Fed shifts hawkish. Although GBP/USD carry favors GBP by 9bp (SONIA vs SOFR), a negative GBP ESI (-8.8) and moderate negative bias suggest fundamental data is lagging. The pair closed at 1.3534, hovering just below its SMA20 (1.354), indicating a loss of short-term momentum. Trade bias: Neutral/Bearish GBP/USD; crowded long positioning is vulnerable to a hawkish Fed repricing. Catalyst: next BoE meeting (mkt: 100% hold priced) on 17 Sep. Risk: UK 10Y yield outperformance (5.15%) maintains the GBP bid against USD.",
-      "evidence": [
-        "GBP COT net long +56.8k (pctl 96)",
-        "GBP ESI -8.8",
-        "US-UK 10Y spread +43bp"
+        "GBP COT LF pctl: 96",
+        "GBP ESI: -8.8",
+        "GBP Real Rate: +0.35% vs USD +1.45%"
       ],
       "_source": "engine-ai-primary"
     }
