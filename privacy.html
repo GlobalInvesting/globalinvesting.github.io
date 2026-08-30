@@ -559,9 +559,10 @@ li { font-size: 14.3px; color: var(--text2); line-height: 1.75; margin-bottom: 5
     <thead><tr><th scope="col">Key</th><th scope="col">Purpose</th><th scope="col">Expiry</th></tr></thead>
     <tbody>
       <tr><td>gdpr_consent_v2</td><td>Stores your cookie consent preference (accepted / rejected)</td><td>13 months</td></tr>
-      <tr><td>tv_chart_symbol</td><td>Remembers your last selected chart symbol (TradingView)</td><td>Session</td></tr>
       <tr><td>gi_license_token</td><td>Your license access token, after activating a paid license (Section 3)</td><td>Up to 35 days (token lifetime), sooner if you clear browser storage</td></tr>
       <tr><td>gi_session_id</td><td>A random per-device identifier, after activating a paid license, so two devices sharing one license show as separate sessions (Section 3)</td><td>Persists until browser storage is cleared</td></tr>
+      <tr><td>gi_alerts</td><td>Your configured price alerts (currency pair and threshold), so they persist between visits. Stored only on your device; never sent to us</td><td>Persists until browser storage is cleared</td></tr>
+      <tr><td>gi_welcome_done</td><td>Whether you've dismissed the welcome/onboarding panel, so it doesn't reappear on your next visit</td><td>Persists until browser storage is cleared</td></tr>
     </tbody>
   </table>
   <p>No tracking cookies are set by us directly. Google Analytics cookies are only set after you accept via the cookie banner (see Section 5 below); TradingView does not set tracking cookies and loads regardless of your cookie choice, as it is essential to core Terminal functionality. The two license-related entries above are set only if you activate a paid license and are not present for general visitors.</p>
