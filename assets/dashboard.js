@@ -12266,9 +12266,18 @@ function _liqTo48(arr24) {
 
 async function fetchLiquidityData() {
   const utcDay = new Date().getUTCDay(), utcHour = new Date().getUTCHours();
-  // Canvas OFFSET=44 means left edge = 22:00 UTC. Keep weekend mode until 22:00 UTC Sunday
-  // so that nowCanvasSlot starts at 0 (far left) when the chart begins — not 47 (far right).
-  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 22) || (utcDay === 5 && utcHour >= 21);
+  // FX market open/close boundary: fixed 21:00 UTC year-round — same source of
+  // truth as updateSessions() (line ~421) and every other FX-open check in this
+  // file. v8.323.0 fix: this copy was asymmetric (Sunday used <22, Friday used
+  // >=21) — a leftover from an OFFSET=44 canvas-layout rationale ("keep weekend
+  // mode until 22:00 UTC so nowCanvasSlot starts at 0") that had nothing to do
+  // with when the market actually reopens. Result: the liquidity chart and its
+  // "MARKET CLOSED — WEEKEND" label stayed on for a full extra hour after every
+  // Sunday reopen, out of sync with the rest of the site (confirmed live:
+  // 2026-08-30 21:43 UTC, LIVE badge on and ticking, this panel still closed).
+  // The canvas's OFFSET=44 slot layout is a separate, purely cosmetic x-axis
+  // choice (where slot 0 sits) and does not need to match this boundary.
+  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
 
   // ── Primary: fx-liquidity.json (yfinance H-L range proxy, updated hourly) ──
   try {
@@ -12348,9 +12357,12 @@ function drawLiquidityChart() {
 
   const utcDay = new Date().getUTCDay();
   const utcHour = new Date().getUTCHours();
-  // Canvas left edge = 22:00 UTC (OFFSET=44 slots). Keep weekend mode until 22:00 UTC Sunday
-  // so nowCanvasSlot starts at 0 (far left) on market open, not 47 (far right).
-  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 22) || (utcDay === 5 && utcHour >= 21);
+  // FX market open/close boundary: fixed 21:00 UTC year-round, matching
+  // fetchLiquidityData()'s isWeekend and updateSessions() (v8.323.0 — was
+  // asymmetric here, Sunday <22 vs Friday >=21, a leftover conflation with
+  // the OFFSET=44 canvas layout constant below, which is a separate, purely
+  // cosmetic x-axis choice and does not need to match this boundary).
+  const isWeekend = utcDay === 6 || (utcDay === 0 && utcHour < 21) || (utcDay === 5 && utcHour >= 21);
 
   const hours = _liqData || _liqTo48(isWeekend ? Array(24).fill(2) : LIQ_BASE);
   const baseline = _liqBaseline || hours;
@@ -12359,7 +12371,9 @@ function drawLiquidityChart() {
   const cW=W-PAD_L-PAD_R, cH=H-PAD_T-PAD_B;
   const maxV=Math.max(...hours, ...baseline, 10);
 
-  // ── FX day starts at 22:00 UTC (Sydney open) ─────────────────────────────
+  // ── Canvas x-axis origin: slot 0 = 22:00 UTC ──────────────────────────────
+  // Purely cosmetic layout choice (where the chart starts drawing from left),
+  // independent of the isWeekend market-open boundary above (21:00 UTC).
   // OFFSET=44 slots (22h × 2). Canvas slot i → array slot (i+OFFSET)%48
   const OFFSET = 44; // 22:00 UTC in half-hour slots
   const sa = i => (i + OFFSET) % 48;            // slot in array from canvas position
