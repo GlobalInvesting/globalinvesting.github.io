@@ -71,6 +71,41 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Sync version tag from CACHE_VERSION
+        # Single source of truth: sw.js's CACHE_VERSION constant, which is
+        # already bumped on every deploy that changes static assets (see
+        # GUIDELINES.md "Any new fetch(...) call ... must bump CACHE_VERSION
+        # in the same change"). Every HTML page's statusbar tag
+        # (`<span class="sb-v">FX Terminal {{CACHE_VERSION}}</span>`)
+        # carries a literal `{{CACHE_VERSION}}` placeholder in the committed
+        # source — never a real number — and this step substitutes it with
+        # the real value ONLY in this ephemeral runner checkout, right
+        # before packaging, never committing the substituted value back to
+        # the repo. This closes a real drift incident: 18 pages carried a
+        # hand-edited version tag last synced in April 2026 (v7.39.6),
+        # ranging v8.1.1–v8.72.7 by the time CACHE_VERSION had reached
+        # v8.309.0 — no mechanism ever forced them to agree. Runs on every
+        # deploy (i.e. every push to main), so it can never go stale again.
+        shell: bash
+        run: |
+          set -euo pipefail
+          RAW=$(grep -oE "CACHE_VERSION = '[^']+'" sw.js | sed -E "s/CACHE_VERSION = '(.*)'/\1/")
+          # sw.js format is "gi-vX.Y.Z" — the statusbar tag only ever showed
+          # the bare "vX.Y.Z" part, so strip the "gi-" prefix.
+          VERSION="${RAW#gi-}"
+          if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::CACHE_VERSION in sw.js did not match the expected 'gi-vX.Y.Z' format (got '$RAW') — refusing to deploy with an unparsed version tag."
+            exit 1
+          fi
+          COUNT=$(grep -l '{{CACHE_VERSION}}' *.html | wc -l)
+          echo "Substituting {{CACHE_VERSION}} -> $VERSION in $COUNT HTML page(s)"
+          sed -i "s/{{CACHE_VERSION}}/${VERSION}/g" *.html
+          # Verify no placeholder survived and no page was missed.
+          if grep -rl '{{CACHE_VERSION}}' *.html; then
+            echo "::error::Placeholder survived substitution in the file(s) listed above."
+            exit 1
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
