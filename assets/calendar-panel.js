@@ -1,5 +1,5 @@
 /**
- * calendar-panel.js v1.19.24 — Native economic calendar renderer
+ * calendar-panel.js v1.19.25 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
  *
  * v1.19.24 (2026-08-29): Industry-standard audit — full line-by-line pass of
@@ -1004,6 +1004,22 @@
     'revised uom consumer sentiment': 'michigan consumer sentiment',
     'revised uom inflation expectations': 'michigan inflation expectations',
     'prelim gdp price index qoq': 'gdp price index qoq',
+    // [v8.326.0] Five more pairs, found via the same chained forecast/previous
+    // value verification as v1.19.21 above, plus a live cross-check confirming
+    // no currency has actual-bearing history under the bare FF-sourced title
+    // (would have caused a false merge across an unrelated series). Reported:
+    // AUD GDP, CAD Ivey PMI, USD ADP/NFP and NZD Official Cash Rate all showed
+    // "No prior actual/forecast history" despite Myfxbook history existing
+    // under a different vendor title.
+    'gdp qoq': 'gdp growth rate qoq',
+    // CAD "Ivey PMI" (FF) == Myfxbook "Ivey PMI S.A" — same seasonally-adjusted
+    // headline release, Myfxbook just appends the seasonal-adjustment suffix.
+    'ivey pmi': 'ivey pmi s.a',
+    'adp non-farm employment change': 'adp employment change',
+    'non-farm employment change': 'non farm payrolls',
+    // NZD "Official Cash Rate" (FF) == Myfxbook "RBNZ Interest Rate Decision"
+    // — same release, RBNZ's policy rate is literally named the OCR.
+    'official cash rate': 'rbnz interest rate decision',
   };
   function _calCanonTitle(t) {
     let s = (t || '').toLowerCase().replace(/\s*\([^)]*\)/g, '').trim();
