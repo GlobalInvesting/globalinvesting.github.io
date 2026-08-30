@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-30T21:01:30Z",
+  "generated_at": "2026-08-30T22:27:52Z",
   "signals": [
     {
-      "time": "21:00",
+      "time": "22:27",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + BoJ Intervention Risk",
-      "text": "USD/JPY is trading at 160.01, testing the psychologically significant 160.00 handle as Middle East tensions escalate following reports of IRGC forces readying sea mines in the Strait of Hormuz. The pair remains supported by a 275bp Fed-BoJ carry differential, yet the current spot level of 160.01 is the historically sensitive threshold that previously triggered Ministry of Finance intervention. Options markets are aggressively pricing downside protection, with 25d Risk Reversals at -1.74 showing a strong put skew that contradicts the bid in spot. COT data shows JPY net short at -81,619 (pctl 9), confirming that the carry trade remains crowded and vulnerable to a disorderly unwind if geopolitical risk forces a VIX spike above 25. Trade bias: Long USD/JPY; carry advantage persists but intervention risk at 160.00 caps the immediate upside. Catalyst: China official PMIs on 31 August. Risk: Direct BoJ/MoF intervention or a VIX spike above 25 triggers a carry unwind toward SMA20 at 158.87.",
+      "title": "USD/JPY — Geopolitical Risk + Jackson Hole Shift",
+      "text": "USD/JPY trades at 160.14, testing the critical 160.00 psychological and policy threshold following hawkish Jackson Hole remarks from Fed Chair Kevin Warsh that pushed September hike odds to 57%. Geopolitical tensions are simultaneously escalating as IRGC navy forces report full control over the Strait of Hormuz, closing the waterway to transiting ships. While JPY COT LF net short of -81,619 (pctl 9) reflects a crowded carry trade, the VIX at 14.4 (low volatility) prevents a broad safe-haven bid from overriding the 275bp Fed-BoJ carry advantage. Options markets indicate a strong downside bias with 25d RR at -1.74, signaling the market is paying for protection against a sharp JPY reversal or intervention. Trade bias: Bullish USD/JPY; hawkish Fed divergence and carry advantage dominate until VIX clears 25. Catalyst: China Official PMIs on 31 August. Risk: Direct BoJ/MoF intervention on a sustained break above 160.00 triggers a disorderly unwind of crowded speculative shorts.",
       "evidence": [
-        "USD/JPY: 160.01",
-        "USD/JPY 25d RR: -1.74",
-        "Fed 3.75% vs BoJ 1.0%: +275bp"
+        "USD/JPY: 160.14",
+        "Fed-BoJ Carry: +275bp",
+        "USDJPY 25d RR: -1.74"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:57",
+      "time": "22:24",
       "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Carry Divergence",
-      "text": "AUD/CHF is the primary G10 bilateral theme this week as the Australian Dollar outperforms G10 peers by an average of +1.181% while the Swiss Franc lags the complex at -0.658%. The leader-to-laggard spread has reached a critical 1.839% across available pairs, driven by a massive +435bp carry advantage in favor of AUD (RBA 4.35% vs SNB 0.0%). While retail sentiment is extremely short AUD/CHF at 95%, COT data shows AUD leveraged funds are net long +53,578 with a pctl(52w) of 95, indicating a crowded institutional long. The divergence between retail fading the move and institutions chasing the carry suggests trend continuation unless risk-off sentiment intensifies. Trade bias: Bullish AUD/CHF; carry-driven outperformance dominates while VIX remains at 14.4. Catalyst: RBNZ meeting on 2 September for broader Oceania sentiment. Risk: Sharp risk-off shift (VIX > 25) triggers a flight to CHF, rapidly compressing the carry spread.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Commodity Leader",
+      "text": "The G10 scorecard identifies a critical bilateral divergence with AUD outperforming peers by +1.327% (n=4) while CHF lags at -0.786% (n=6), creating a massive 2.113% weekly spread. AUD/USD holds a bullish technical posture above its SMA20/50/200 cluster (0.7101/0.7016/0.6971) supported by a restrictive -71bp OIS carry premium against the USD. The AUD/CHF cross specifically benefits from a 435bp carry advantage as the SNB remains at 0.00% versus the RBA's 4.35%. Retail sentiment shows an extreme 95% short position on AUD/CHF, diverging from the institutional trend and suggesting a high risk of a retail short-squeeze. Trade bias: Long AUD/CHF; massive carry premium and strong G10 outperformance support trend extension. Catalyst: RBNZ Meeting 2 September for regional cross-asset spillover. Risk: Sharp rise in VIX above 25 triggers a flight to CHF safe-haven assets, rapidly compressing the carry spread.",
       "evidence": [
-        "G10 spread (AUD/CHF): 1.839%",
-        "AUD/CHF carry: +435bp",
-        "AUD COT LF pctl: 95"
+        "AUD 1W avg: +1.327% (n=4)",
+        "CHF 1W avg: -0.786% (n=6)",
+        "G10 spread: 2.113%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:55",
+      "time": "22:22",
       "priority": "warning",
-      "title": "EUR/USD — COT Extreme + Volatility Premium",
-      "text": "EUR/USD is trading at 1.1586, positioned below its SMA20 (1.1593) following hawkish Jackson Hole commentary from Fed Chair Warsh. COT positioning for EUR has collapsed to a net short of -55,311, representing a 3rd percentile extreme (z-score -2.28) within its 52-week range. Options markets are pricing a 2.4-point Vol Risk Premium (IV 7.1% vs HV30 4.7%), signaling elevated demand for protection despite the spot decline. Fed holds at 3.75%. Trade bias: Bearish EUR/USD; extreme spec shorts and carry disadvantage favor a test of the SMA50 at 1.149. Catalyst: ECB meeting 10 September. Risk: A soft US jobs print on Friday leads to a repricing of Fed hike odds, triggering a short squeeze in the crowded EUR short.",
+      "title": "GBP/USD — Positioning Extreme + Options VRP",
+      "text": "GBP/USD trades at 1.3532, holding just below its SMA20 at 1.3540 after failing to maintain its recent upside momentum. COT LF net long positioning has reached +56,839, placing it in the 96th percentile (z +1.58) of its 52-week range—a crowded institutional long that leaves the pair vulnerable to profit-taking. Despite this positioning, the options market shows a significant Volatility Risk Premium (VRP) of +6.0%, with IV at 11.0% vs HV30 of 5.0%, indicating heavy demand for downside protection. The pair's carry profile is neutral at +0bp (SONIA vs SOFR), removing a key structural support for further gains if the Fed's Warsh-led hawkishness persists. Trade bias: Neutral/Bearish GBP/USD; crowded long positioning and elevated hedging costs suggest a near-term ceiling. Catalyst: US August Jobs data on Friday. Risk: A clean break and daily close above the SMA20 (1.3540) invalidates the exhaustion thesis.",
       "evidence": [
-        "EUR COT LF pctl: 3",
-        "EUR/USD VRP: +2.4%",
-        "Fed 3.75% vs ECB 2.4%: +135bp"
+        "GBP COT LF pctl: 96 (Crowded Long)",
+        "GBP/USD VRP: +6.0%",
+        "Fed 3.75% vs BoE 3.75%: 0bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:50",
+      "time": "22:18",
       "priority": "warning",
-      "title": "GBP/USD — Positioning Exhaustion + ESI Divergence",
-      "text": "GBP/USD trades at 1.3534, holding just below the SMA20 at 1.3540 as technical momentum stalls. Speculative positioning is currently at a 96th percentile extreme (lev_net +56,839), suggesting the bullish Cable trend is reaching a point of exhaustion. This crowded long is increasingly at odds with the Economic Surprise Index (ESI) for GBP, which has fallen to -8.8 as UK data begins to underperform expectations. While the 10Y UK-US yield spread of +43bp provides a nominal buffer, the GBP real policy rate of +0.35% is significantly lower than the USD real rate of +1.45%. Trade bias: Neutral/Bearish GBP/USD; crowded positioning and negative ESI signal risk of a long-unwind. Catalyst: US August jobs data on 4 September. Risk: US data misses, weakening the USD and allowing the GBP long to extend toward 1.3600.",
+      "title": "EUR/USD — COT vs ESI Divergence",
+      "text": "EUR/USD has declined to 1.1585, moving below its SMA20 (1.1593) following the shift in Fed policy expectations at Jackson Hole. COT data shows a massive WoW reduction in positioning, with LF net falling -55,635 to -55,311, pushing the currency into the 3rd percentile (z -2.28) of its 52-week range. This extreme speculative shorting contradicts a moderately positive Economic Surprise Index (ESI) of +12.7, where Eurozone data continues to outperform expectations relative to the USD ESI of -10.0. The 135bp carry advantage in favor of the USD remains the primary driver of the pair's downward pressure despite the resilient macro data. Trade bias: Bearish EUR/USD; extreme spec selling and USD carry advantage outweigh local data beats. Catalyst: ECB Meeting 10 September. Risk: Short covering triggered by an upside miss in US macro data, targeting the SMA200 at 1.1637.",
       "evidence": [
-        "GBP COT LF pctl: 96",
-        "GBP ESI: -8.8",
-        "GBP Real Rate: +0.35% vs USD +1.45%"
+        "EUR COT LF pctl: 3 (Crowded Short)",
+        "EUR ESI: +12.7 vs USD ESI: -10.0",
+        "USD/EUR Carry: +135bp"
       ],
       "_source": "engine-ai-primary"
     }
