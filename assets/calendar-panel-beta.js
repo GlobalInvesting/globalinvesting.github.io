@@ -2561,8 +2561,12 @@
     setupCcyFilterUI(); // [v1.13.0]
     setupImpactFilterUI(); // [v1.16.0]
     setupWeekNavUI(); // [v1.16.0]
-    setupBriefingToggleUI(); // [BETA v1.20.0] Weekly Briefing tab
-    renderBriefing(); // keep the briefing view's content current on every data refresh, even while it's hidden — avoids a stale render the moment the user (or fullscreen auto-open) switches into it
+    setupBriefingToggleUI(); // [BETA v1.21.0] Weekly Briefing tab/sidebar
+    // Keep BOTH briefing containers current on every data refresh, even
+    // while hidden — avoids a stale render the moment the user (docked
+    // toggle) or fullscreen open/toggle makes either one visible.
+    renderBriefing('cal-briefing-body');
+    renderBriefing('cal-briefing-sidebar');
     setupMethodologyTooltipDelegation(container); // [v1.14.0] — delegated, no-op after first call
     setupHistModalDelegation(container); // [v1.16.0] — delegated, no-op after first call
     tickLiveCountdown(); // [v1.14.0] — paint the correct value immediately, don't wait for the 20s tick
@@ -2662,16 +2666,31 @@
     if (btn) btn.style.color = _impactHighOnly ? '#fff' : 'var(--text3)';
   }
 
-  // ── [BETA v1.20.0] Weekly Briefing tab toggle ─────────────────────────
+  // ── [BETA v1.21.0] Weekly Briefing tab toggle ─────────────────────────
   // Same single-toggle button pattern as #cal-impact-filter above (active =
-  // white text, inactive = text3). Docked: starts OFF, user-toggled, no
-  // persistence (matches the week-nav convention below — always resets on
-  // reload, since "this week" is itself a moving target day to day).
-  // Fullscreen: forced ON every time openCalFullscreen() runs, regardless of
-  // this button's last docked-mode state — see the call in openCalFullscreen()
-  // below. The button itself still works normally inside fullscreen so the
-  // user can switch back to the full event list without leaving fullscreen.
-  let _briefingActive = false;
+  // white text, inactive = text3), but the button now means two different
+  // things depending on where it's clicked, because the docked panel and
+  // the fullscreen view have genuinely different amounts of room:
+  //   - Docked (narrow, ~330px tall panel): the original swap behavior —
+  //     replaces the full event list with the briefing, since there's no
+  //     room to show both. Starts OFF, no persistence (same convention as
+  //     the week-nav below — always resets on reload).
+  //   - Fullscreen: the full event list (one or two chronological columns,
+  //     unchanged) always stays on screen — per live feedback, hiding the
+  //     complete list to show only ~8 curated rows wasn't what a
+  //     "briefing" should do inside a view that already has the room to
+  //     show everything. The briefing instead renders as a narrow sidebar
+  //     column (#cal-briefing-sidebar) alongside the list, matching a
+  //     newspaper-style "key events this week" rail. Defaults ON every
+  //     time openCalFullscreen() runs; this same button collapses/restores
+  //     it without leaving fullscreen or losing the event list underneath.
+  let _briefingActive     = false; // docked-mode swap state
+  let _briefingSidebarOn  = true;  // fullscreen-mode sidebar visibility
+
+  function _calIsFullscreen() {
+    const overlay = document.getElementById('cal-fullscreen-overlay');
+    return !!(overlay && overlay.classList.contains('cal-fs-active'));
+  }
 
   function setupBriefingToggleUI() {
     const box = document.getElementById('cal-briefing-toggle');
@@ -2685,12 +2704,13 @@
       box.dataset.calBriefInit = '1';
       box.innerHTML =
         `<button type="button" id="cal-briefing-btn" style="${btnStyle(_briefingActive)}" ` +
-        `title="Weekly briefing — this week's highest-impact releases, one line each">Briefing</button>`;
+        `title="Key events this week — curated shortlist alongside the full list in fullscreen">Briefing</button>`;
 
       box.addEventListener('click', (e) => {
         const btn = e.target.closest('button');
         if (!btn || btn.id !== 'cal-briefing-btn') return;
-        setBriefingActive(!_briefingActive);
+        const current = _calIsFullscreen() ? _briefingSidebarOn : _briefingActive;
+        setBriefingActive(!current);
       });
     } else {
       updateBriefingToggleButtonState();
@@ -2699,10 +2719,25 @@
 
   function updateBriefingToggleButtonState() {
     const btn = document.getElementById('cal-briefing-btn');
-    if (btn) btn.style.color = _briefingActive ? '#fff' : 'var(--text3)';
+    if (!btn) return;
+    const active = _calIsFullscreen() ? _briefingSidebarOn : _briefingActive;
+    btn.style.color = active ? '#fff' : 'var(--text3)';
   }
 
   function setBriefingActive(on) {
+    if (_calIsFullscreen()) {
+      // Fullscreen: toggle the narrow sidebar only — the event list (and
+      // its column-split layout, driven independently by relayoutCalendar())
+      // is never hidden here.
+      _briefingSidebarOn = !!on;
+      updateBriefingToggleButtonState();
+      const sidebar = document.getElementById('cal-briefing-sidebar');
+      if (sidebar) sidebar.style.display = _briefingSidebarOn ? '' : 'none';
+      document.getElementById('section-tvcalendar')?.classList.toggle('cal-fs-briefing-on', _briefingSidebarOn);
+      if (_briefingSidebarOn) renderBriefing('cal-briefing-sidebar');
+      return;
+    }
+    // Docked: original full-width swap behavior.
     _briefingActive = !!on;
     updateBriefingToggleButtonState();
     const eventsBody   = document.getElementById('cal-events-body');
@@ -2711,7 +2746,7 @@
     if (eventsBody)   eventsBody.style.display   = _briefingActive ? 'none' : '';
     if (colHeader)    colHeader.style.display    = _briefingActive ? 'none' : '';
     if (briefingBody) briefingBody.style.display = _briefingActive ? '' : 'none';
-    if (_briefingActive) renderBriefing();
+    if (_briefingActive) renderBriefing('cal-briefing-body');
   }
 
   // ── [BETA v1.20.0] Weekly Briefing content ────────────────────────────
@@ -2723,11 +2758,29 @@
   // tooltip (ensureMethodologyTooltip() below) — deliberately not a second,
   // independently-maintained copy of the same explanations.
   //
-  // Selection rule (2026-08-30): high-impact events, backfilled
-  // with medium-impact ones (chronological) only when high-impact alone
-  // falls short of BRIEF_MIN_TARGET for that week — a quiet week (or a
-  // holiday-shortened one) still surfaces a useful list instead of 2-3 rows.
+  // Selection rule (2026-08-30, revised): a briefing is a curated shortlist,
+  // not a filtered dump — the original version returned EVERY high-impact
+  // event uncapped once the count passed BRIEF_MIN_TARGET, which on a busy
+  // week (CPI prints, PMI batches, central-bank speakers) produced 30+ rows,
+  // no different from just turning on "High only" on the full list. Reuters'
+  // own "key events next week" format caps at a small, hand-pickable set.
+  // Two independent knobs now apply:
+  //   - BRIEF_MAX_TARGET: hard cap on total rows shown, regardless of how
+  //     many high-impact events exist that week.
+  //   - BRIEF_MIN_TARGET: floor — backfilled with the next tier down when a
+  //     quiet/holiday-shortened week has fewer than this many candidates.
+  // Ranking tiers (best first): high-impact events with a genuine
+  // methodology match (_calMethodologyFor() — the same headline-data
+  // categories used for the row tooltip: CPI, GDP, PMI, NFP, rate decisions,
+  // etc.) rank above high-impact events with no match (speeches, minutes,
+  // press conferences — real market movers but not a distinct "what it
+  // measures" explanation), which rank above medium-impact events with a
+  // match, which rank above medium-impact events with no match. This keeps
+  // the shortlist dominated by rows that get a specific "why it matters"
+  // line instead of the generic fallback, without ever hiding a genuinely
+  // high-impact speech/decision entirely.
   const BRIEF_MIN_TARGET = 6;
+  const BRIEF_MAX_TARGET = 8;
 
   // Monday 00:00 → Sunday 23:59, LOCAL time (tzLabel()'s zone, same as every
   // other date shown in this panel) — always the REAL current week,
@@ -2758,11 +2811,27 @@
       return d >= monday && d <= sunday;
     });
     const byTime = (a, b) => (a.dateISO + (a.timeUTC || '')).localeCompare(b.dateISO + (b.timeUTC || ''));
-    const highs = inWeek.filter(ev => ev.impact === 'high').sort(byTime);
-    if (highs.length >= BRIEF_MIN_TARGET) return highs;
-    const mediums = inWeek.filter(ev => ev.impact !== 'high').sort(byTime);
-    const need = BRIEF_MIN_TARGET - highs.length;
-    return highs.concat(mediums.slice(0, Math.max(0, need))).sort(byTime);
+    const hasMethod = ev => !!_calMethodologyFor(ev.title);
+    const tierOf = ev => {
+      if (ev.impact === 'high' && hasMethod(ev)) return 0;
+      if (ev.impact === 'high') return 1;
+      if (hasMethod(ev)) return 2;
+      return 3;
+    };
+    const ranked = inWeek.slice().sort((a, b) => {
+      const ta = tierOf(a), tb = tierOf(b);
+      if (ta !== tb) return ta - tb;
+      return byTime(a, b);
+    });
+    // Cap first (never exceed BRIEF_MAX_TARGET), then apply the floor only
+    // if capping left fewer candidates than BRIEF_MIN_TARGET actually exist
+    // — i.e. the floor can only raise the count back up on a genuinely
+    // quiet week, never lower it below the cap on a busy one.
+    const capped = ranked.slice(0, BRIEF_MAX_TARGET);
+    const selected = (capped.length < BRIEF_MIN_TARGET && ranked.length > capped.length)
+      ? ranked.slice(0, Math.min(BRIEF_MIN_TARGET, ranked.length))
+      : capped;
+    return selected.sort(byTime);
   }
 
   function _briefGroupByDay(events) {
@@ -2775,8 +2844,13 @@
     return [...groups.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   }
 
-  function renderBriefing() {
-    const container = document.getElementById('cal-briefing-body');
+  // containerId: which DOM node to paint into — the docked/fullscreen
+  // full-width swap view (#cal-briefing-body) and the fullscreen narrow
+  // sidebar column (#cal-briefing-sidebar) both render the exact same
+  // selection/markup, just at different container widths, so both are kept
+  // current on every call rather than maintaining two render paths.
+  function renderBriefing(containerId) {
+    const container = document.getElementById(containerId || 'cal-briefing-body');
     if (!container) return;
     ensureBriefingStyles();
 
@@ -2789,7 +2863,7 @@
     }
 
     const grouped = _briefGroupByDay(selected);
-    let html = `<div class="cal-brief-header">This week's key releases · ${grouped.reduce((n, [, ev]) => n + ev.length, 0)} events · ${tzLabel()}</div>`;
+    let html = `<div class="cal-brief-header">Key events this week · ${tzLabel()}</div>`;
 
     for (const [localISO, dayEvents] of grouped) {
       html += `<div class="cal-brief-day">${_escAttr(formatDate(localISO))}</div>`;
@@ -2800,11 +2874,17 @@
         const fcst = (ev.forecast === null || ev.forecast === undefined || ev.forecast === '') ? '—' : ev.forecast;
         const prev = (ev.previous === null || ev.previous === undefined || ev.previous === '') ? '—' : ev.previous;
         const dotClass = ev.impact === 'high' ? 'cal-brief-dot-high' : 'cal-brief-dot-med';
+        // Same FLAG lookup + "fi fi-<code>" flag-icons markup already used by
+        // the main event list (see dayEvs.forEach() above) — not a second,
+        // independently-maintained flag rendering path.
+        const flag = FLAG[ev.currency] || '';
+        const flagHtml = flag ? `<span class="fi fi-${flag}" style="margin-right:4px;font-size:11px;flex-shrink:0;"></span>` : '';
         html +=
           `<div class="cal-brief-row">` +
             `<div class="cal-brief-row-head">` +
               `<span class="${dotClass}"></span>` +
               `<span class="cal-brief-time">${_escAttr(local)}</span>` +
+              flagHtml +
               `<span class="cal-brief-ccy">${_escAttr(ev.currency)}</span>` +
               `<span class="cal-brief-title">${_escAttr(ev.title)}</span>` +
             `</div>` +
@@ -3036,10 +3116,11 @@
     overlay.classList.add('cal-fs-active');
     document.body.style.overflow = 'hidden';
     relayoutCalendar();
-    // [BETA v1.20.0] Spec: fullscreen opens directly into the
-    // Briefing view, every time — independent of whatever the docked panel's
-    // toggle state was. The button stays live inside fullscreen so the user
-    // can switch to the full event list without closing fullscreen first.
+    // [BETA v1.21.0] Fullscreen always opens with the Briefing sidebar
+    // shown alongside the full event list (never replacing it — see
+    // setBriefingActive()), independent of the docked panel's own toggle
+    // state. The button stays live inside fullscreen so the user can
+    // collapse the sidebar without losing the event list.
     setBriefingActive(true);
   }
 
@@ -3057,10 +3138,11 @@
     _calFsOriginalParent = null;
     _calFsOriginalNext   = null;
     relayoutCalendar();
-    // [BETA v1.20.0] Fullscreen always force-opens into Briefing (see
-    // openCalFullscreen()) — undo that on close so the small docked panel
-    // reverts to its normal default (full event list), not stuck showing
-    // Briefing just because fullscreen happened to force it on.
+    // [BETA v1.21.0] Resets the DOCKED panel's own toggle state (this call
+    // runs after 'cal-fs-active' was already removed above, so
+    // setBriefingActive() resolves to the docked branch) — the docked panel
+    // always reverts to its normal default (full event list) on exit,
+    // independent of whatever state the fullscreen sidebar was left in.
     setBriefingActive(false);
   }
 
