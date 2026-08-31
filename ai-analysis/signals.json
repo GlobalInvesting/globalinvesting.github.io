@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-08-30T22:27:52Z",
+  "generated_at": "2026-08-31T00:01:34Z",
   "signals": [
     {
-      "time": "22:27",
+      "time": "00:01",
       "priority": "critical",
-      "title": "USD/JPY — Geopolitical Risk + Jackson Hole Shift",
-      "text": "USD/JPY trades at 160.14, testing the critical 160.00 psychological and policy threshold following hawkish Jackson Hole remarks from Fed Chair Kevin Warsh that pushed September hike odds to 57%. Geopolitical tensions are simultaneously escalating as IRGC navy forces report full control over the Strait of Hormuz, closing the waterway to transiting ships. While JPY COT LF net short of -81,619 (pctl 9) reflects a crowded carry trade, the VIX at 14.4 (low volatility) prevents a broad safe-haven bid from overriding the 275bp Fed-BoJ carry advantage. Options markets indicate a strong downside bias with 25d RR at -1.74, signaling the market is paying for protection against a sharp JPY reversal or intervention. Trade bias: Bullish USD/JPY; hawkish Fed divergence and carry advantage dominate until VIX clears 25. Catalyst: China Official PMIs on 31 August. Risk: Direct BoJ/MoF intervention on a sustained break above 160.00 triggers a disorderly unwind of crowded speculative shorts.",
+      "title": "AUD/CHF — G10 Bilateral Theme + Commodity Bid",
+      "text": "AUD/CHF reflects a dominant G10 bilateral theme as AUD outperforms with a +1.294% weekly average while CHF lags at -0.764%. US military strikes in the Middle East and Strait of Hormuz shipping disruptions have failed to ignite CHF safe-haven demand, with VIX at 14.4 signaling a low-volatility regime that favors carry. The AONIA-SARON carry differential provides a massive +442bp advantage for AUD/CHF, further supported by AUD COT LF net long positioning at the 95th percentile (z +1.92). AUD/USD remains technically robust, holding above its SMA20/50/200 cluster (0.7101/0.7016/0.6971), while USD/CHF tests resistance above its own SMA cluster at 0.8073/0.8087. Retail sentiment for AUD/CHF is at a 95% short extreme, providing a contrarian tailwind as the institutional long trend remains intact. Trade bias: Bullish AUD/CHF; carry advantage and low VIX support trend continuation. Catalyst: RBNZ meeting 2 Sep for regional risk proxy. Risk: VIX spike above 25 triggers a sharp CHF safe-haven reversal.",
       "evidence": [
-        "USD/JPY: 160.14",
-        "Fed-BoJ Carry: +275bp",
-        "USDJPY 25d RR: -1.74"
+        "AUD 1W avg: +1.294% (n=4)",
+        "CHF 1W avg: -0.764% (n=6)",
+        "G10 spread: 2.058%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "22:24",
-      "priority": "critical",
-      "title": "AUD/CHF — G10 Bilateral Theme + Commodity Leader",
-      "text": "The G10 scorecard identifies a critical bilateral divergence with AUD outperforming peers by +1.327% (n=4) while CHF lags at -0.786% (n=6), creating a massive 2.113% weekly spread. AUD/USD holds a bullish technical posture above its SMA20/50/200 cluster (0.7101/0.7016/0.6971) supported by a restrictive -71bp OIS carry premium against the USD. The AUD/CHF cross specifically benefits from a 435bp carry advantage as the SNB remains at 0.00% versus the RBA's 4.35%. Retail sentiment shows an extreme 95% short position on AUD/CHF, diverging from the institutional trend and suggesting a high risk of a retail short-squeeze. Trade bias: Long AUD/CHF; massive carry premium and strong G10 outperformance support trend extension. Catalyst: RBNZ Meeting 2 September for regional cross-asset spillover. Risk: Sharp rise in VIX above 25 triggers a flight to CHF safe-haven assets, rapidly compressing the carry spread.",
-      "evidence": [
-        "AUD 1W avg: +1.327% (n=4)",
-        "CHF 1W avg: -0.786% (n=6)",
-        "G10 spread: 2.113%"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "22:22",
+      "time": "00:04",
       "priority": "warning",
-      "title": "GBP/USD — Positioning Extreme + Options VRP",
-      "text": "GBP/USD trades at 1.3532, holding just below its SMA20 at 1.3540 after failing to maintain its recent upside momentum. COT LF net long positioning has reached +56,839, placing it in the 96th percentile (z +1.58) of its 52-week range—a crowded institutional long that leaves the pair vulnerable to profit-taking. Despite this positioning, the options market shows a significant Volatility Risk Premium (VRP) of +6.0%, with IV at 11.0% vs HV30 of 5.0%, indicating heavy demand for downside protection. The pair's carry profile is neutral at +0bp (SONIA vs SOFR), removing a key structural support for further gains if the Fed's Warsh-led hawkishness persists. Trade bias: Neutral/Bearish GBP/USD; crowded long positioning and elevated hedging costs suggest a near-term ceiling. Catalyst: US August Jobs data on Friday. Risk: A clean break and daily close above the SMA20 (1.3540) invalidates the exhaustion thesis.",
+      "title": "USD/JPY — Intervention Risk + Bessent Signal",
+      "text": "USD/JPY trades at 160.12, breaching the critical 160.00 psychological level that has historically triggered BoJ/MoF action. Scott Bessent has recently described the yen slide as contained and expressed support for BoJ Governor Ueda, potentially signaling a coordinated policy stance ahead of the G20 summit. Despite the breach, the options market shows significant caution with a 1M 25d risk reversal at -1.74, signaling strong demand for JPY calls (USD/JPY downside protection). This options skew contradicts the flat spot momentum and the massive +275bp Fed-BoJ carry advantage. Technicals show USD/JPY holding above the SMA20 (158.87) but remaining below the SMA50 (160.84), suggesting a period of consolidation or policy-induced reversal. Trade bias: Neutral USD/JPY; intervention risk at 160.00+ offsets carry advantage. Catalyst: G20 Finance Leaders' summit sidelines. Risk: BoJ holds and Fed's Warsh delivers a hawkish surprise, forcing a break toward 162.00.",
       "evidence": [
-        "GBP COT LF pctl: 96 (Crowded Long)",
-        "GBP/USD VRP: +6.0%",
-        "Fed 3.75% vs BoE 3.75%: 0bp"
+        "USD/JPY: 160.12",
+        "USD/JPY 25d RR: -1.74",
+        "Fed-BoJ OIS Spread: +266bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "22:18",
+      "time": "00:07",
       "priority": "warning",
-      "title": "EUR/USD — COT vs ESI Divergence",
-      "text": "EUR/USD has declined to 1.1585, moving below its SMA20 (1.1593) following the shift in Fed policy expectations at Jackson Hole. COT data shows a massive WoW reduction in positioning, with LF net falling -55,635 to -55,311, pushing the currency into the 3rd percentile (z -2.28) of its 52-week range. This extreme speculative shorting contradicts a moderately positive Economic Surprise Index (ESI) of +12.7, where Eurozone data continues to outperform expectations relative to the USD ESI of -10.0. The 135bp carry advantage in favor of the USD remains the primary driver of the pair's downward pressure despite the resilient macro data. Trade bias: Bearish EUR/USD; extreme spec selling and USD carry advantage outweigh local data beats. Catalyst: ECB Meeting 10 September. Risk: Short covering triggered by an upside miss in US macro data, targeting the SMA200 at 1.1637.",
+      "title": "NZD/USD — COT-OIS Divergence",
+      "text": "NZD/USD trades at 0.5920, positioned above its SMA20/50/200 cluster (0.5910/0.5817/0.5850) ahead of this week's RBNZ decision. Speculative positioning is at a bearish extreme with COT LF net short -32,496, marking the 0 percentile of the 52-week range (z -2.60). This crowded short position directly contradicts the OIS market and bank research expectations for a 25bp hike on 2 September. RBNZ holds at 2.5%. The pair's resilience despite a 125bp Fed-RBNZ carry disadvantage suggests the market is already pricing the hawkish domestic data outlook. Trade bias: Long NZD/USD; asymmetric squeeze setup against a 0-percentile spec short. Catalyst: RBNZ meeting 2 Sep — 25bp hike expected. Risk: RBNZ holds rates steady, validating the crowded short and pressuring the 0.5850 support.",
       "evidence": [
-        "EUR COT LF pctl: 3 (Crowded Short)",
-        "EUR ESI: +12.7 vs USD ESI: -10.0",
-        "USD/EUR Carry: +135bp"
+        "NZD COT LF net: -32,496 (pctl 0)",
+        "NZD/USD: 0.5920",
+        "RBNZ Bias: Hike"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "00:12",
+      "priority": "info",
+      "title": "GBP/USD — Elevated Volatility Risk Premium",
+      "text": "GBP/USD trades at 1.3540, effectively pinned to its SMA20 at 1.3540 and well above the SMA50/200 cluster near 1.3430. The options market is pricing significant tail risk, with 1M IV at 11.0% vs a 30-day realized volatility of only 4.9%. This creates a massive +6.1% Volatility Risk Premium (VRP), the highest among G10 majors, indicating that traders are paying a heavy premium for protection despite relatively stable spot price action. COT data shows GBP longs are crowded at the 96th percentile (lev_net +56,839, z +1.58), leaving the pair vulnerable to any dovish shift in BoE expectations or US data beats. The negative ESI for the UK (-9.2) further suggests the fundamental data is beginning to disappoint relative to high spec expectations. Trade bias: Neutral/Bearish GBP/USD; high VRP and crowded longs suggest upside is expensive. Catalyst: US NFP on Friday. Risk: BoE shifts to a hawkish bias, justifying the crowded long positioning.",
+      "evidence": [
+        "GBP/USD VRP: +6.1% (IV 11.0% / HV30 4.9%)",
+        "GBP COT LF pctl: 96",
+        "UK ESI: -9.2"
       ],
       "_source": "engine-ai-primary"
     }
