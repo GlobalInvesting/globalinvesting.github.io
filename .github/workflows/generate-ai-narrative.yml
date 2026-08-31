@@ -38,11 +38,18 @@ name: Generate AI Narrative & Market Signals
 #   Change detection skips the AI fallback provider when market data is unchanged —
 #   actual spend is lower.
 #
-# Required secrets (all in the ENGINE private repo):
+# Required secrets:
 #   AI provider (fallback) — narrative primary/secondary + signals primary/secondary +
-#     narrative overflow (5 keys total)
-#   AI provider (primary) — signals auditor (closed-market only) + rotation pool (3 keys total)
-#   PAT_TOKEN — GitHub PAT with repo write access to public site
+#     narrative overflow (5 keys total). Live in this repo (public site).
+#   AI provider (primary) — signals auditor (closed-market only) + rotation pool (3 keys total).
+#     Live in this repo (public site).
+#   PAT_TOKEN — GitHub PAT with READ access to the private globalinvesting-engine repo
+#     (checkout of engine/scripts/generate_narrative_signals.py, which stays private —
+#     only this .yml moved to the public repo). Push access to THIS repo comes from the
+#     default GITHUB_TOKEN via `permissions: contents: write` below, not from PAT_TOKEN —
+#     PAT_TOKEN's role flipped direction when this workflow moved here; it used to grant
+#     write access to what was then an external public site, now it grants read access
+#     to what is now an external private engine.
 #   (Secret names still reveal the underlying vendors — see the known-residual note in
 #   docs/ops-runbook.md; renaming them is a coordinated Santiago-side change across this
 #   workflow and generate_narrative_signals.py, not attempted in this pass.)
@@ -112,16 +119,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout PUBLIC site repo
+      - name: Checkout THIS public site repo
         uses: actions/checkout@v6
         with:
-          repository: GlobalInvesting/globalinvesting.github.io
-          token: ${{ secrets.PAT_TOKEN }}
           path: site
 
-      - name: Checkout THIS private engine repo (scripts)
+      - name: Checkout private engine repo (scripts)
         uses: actions/checkout@v6
         with:
+          repository: GlobalInvesting/globalinvesting-engine
+          token: ${{ secrets.PAT_TOKEN }}
           path: engine
 
       # IDEMPOTENCY GUARD (v8.288.0): this workflow has two independent trigger sources —
