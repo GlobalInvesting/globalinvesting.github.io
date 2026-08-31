@@ -1,6 +1,20 @@
 /**
- * calendar-panel.js v1.19.26 — Native economic calendar renderer
+ * calendar-panel.js v1.19.27 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
+ *
+ * v1.19.27 (2026-08-30): FIX — stale corrected-date placeholder duplicates: the
+ *   same event (e.g. JPY "Japan Consumer Confidence"/"Japan Housing Starts YoY")
+ *   showing twice under two different dates, one an elapsed entry that never got
+ *   an actual because Myfxbook had since moved the real event a few days later
+ *   (2026-08-28 ghost vs. the real 2026-08-31 copy). Root cause: `released` is
+ *   set true purely from elapsed scheduled time (independent of the backend),
+ *   and the existing cross-day dedup only ever looks forward (an unreleased
+ *   duplicate appearing AFTER a released copy) and treats any `released:true`
+ *   row as unconditionally kept — neither catches a backward, date-corrected
+ *   ghost. Added a mirror-image dedup pass: drop an elapsed, actual-less row
+ *   when a same title+currency+timeUTC row exists at a later date within 7
+ *   days. Mirrors fetch_ff_calendar.py's new Step 2f (v3.48) — same live bug,
+ *   fixed in both places per the project's standing dual-parser-drift rule.
  *
  * v1.19.26 (2026-08-30): FIX — the "High only" impact filter persists across
  *   sessions via localStorage with no reminder it's still active. A day whose
@@ -2851,6 +2865,45 @@
         const prior = _relIdx[k] || [];
         const evMs = new Date(ev.dateISO).getTime();
         return !prior.some(d => { const diff = (evMs - new Date(d).getTime()) / 86400000; return diff > 0 && diff <= 7; });
+      });
+
+      // Stale corrected-date placeholder dedup — mirror-image of the cross-day dedup
+      // above (that one drops a forward phantom appearing AFTER a released copy; this
+      // drops a backward ghost sitting BEFORE a corrected, later real copy). Mirrors
+      // fetch_ff_calendar.py's Step 2f (v3.48): when Myfxbook's RSS revises an event's
+      // own dateISO a few days forward after an earlier fetch already carried the old
+      // date into a 21-day history window, the old slot's `released` can flip true
+      // purely from elapsed time (`actual` stays null forever, since the real print
+      // only ever lands on the corrected date) — invisible to the dedup above, which
+      // treats any `released:true` row as unconditionally kept. Drop an elapsed,
+      // actual-less row when a same title+currency+timeUTC row exists at a later
+      // dateISO within 7 days; the tight window only catches a short date correction,
+      // never two genuinely distinct monthly/quarterly occurrences of the same series.
+      // Restricted to events with a real forecast (numeric-consensus releases, known
+      // monthly+ cadence): a speech/symposium/accounts release has no forecast and can
+      // legitimately repeat across consecutive days as separate real entries (a first
+      // version of this pass wrongly dropped 2 of 3 real "Jackson Hole Symposium" days)
+      // — a numeric-consensus indicator, by contrast, can never legitimately recur
+      // within 7 days, so requiring forecast on both sides scopes this correctly.
+      const _laterIdx = {};
+      for (const ev of events) {
+        const k = (ev.title || ev.event || '') + '|' + ev.currency + '|' + (ev.timeUTC || ev.hourUTC || '');
+        (_laterIdx[k] = _laterIdx[k] || []).push(ev);
+      }
+      const _nowMs = Date.now();
+      events = events.filter(ev => {
+        if (ev.actual != null || ev.forecast == null) return true;
+        const timeStr = ev.timeUTC || ev.hourUTC || '00:00';
+        const evMs = new Date(`${ev.dateISO}T${timeStr}:00Z`).getTime();
+        if (evMs >= _nowMs) return true; // not yet elapsed — genuinely upcoming
+        const k = (ev.title || ev.event || '') + '|' + ev.currency + '|' + timeStr;
+        const later = _laterIdx[k] || [];
+        const isStale = later.some(other => {
+          if (other.dateISO === ev.dateISO || other.forecast == null) return false;
+          const diff = (new Date(other.dateISO).getTime() - new Date(ev.dateISO).getTime()) / 86400000;
+          return diff > 0 && diff <= 7;
+        });
+        return !isStale;
       });
 
       // [v1.15.0] Opt-in synthetic fixture for the live-countdown feature —
