@@ -1,5 +1,24 @@
 /**
- * econ-matrix.js v2.5.13 — Native Economic Matrix panel
+ * econ-matrix.js v2.5.14 — Native Economic Matrix panel
+ *
+ * ── v2.5.14 (2026-08-30) — Industry-standard cadence audit: JPY Retail Sales
+ *    and SEK Industrial Production were both missing their MoM title,
+ *    silently stuck on YoY-only despite a same-day MoM release existing in
+ *    the live feed. JPY.rtl: the v2.5.11 "zero MoM events" finding was
+ *    correct at the time but went stale once 'Japan Retail Sales MoM'
+ *    printed for the first time ever on 2026-08-30 — re-verified against a
+ *    freshly-downloaded calendar.json (not assumed), MoM now added ahead of
+ *    YoY. SEK.prod: 'Industrial Production MoM' was never in this
+ *    currency's prefix list at all (not a staleness issue like JPY, a pure
+ *    omission), confirmed live releasing same-day as YoY every month —
+ *    added ahead of YoY, matching the column's existing MoM-first
+ *    momentum-indicator convention (USD/GBP/JPY/NOK/EUR). Full systematic
+ *    sweep of every currency's rtl/prod/ppi cadence arrays against a fresh
+ *    calendar.json this session found no further gaps: CHF/NZD Ind Prod
+ *    confirmed genuinely YoY-only in the live feed (no MoM title exists),
+ *    USD PPI confirmed genuinely MoM-only (no YoY title exists), NOK
+ *    PPI/AUD PPI confirmed genuinely single-cadence — all four correctly
+ *    already reflect their real native availability, not further bugs.
  *
  * ── v2.5.13 (2026-08-29) — Industry-standard audit: real stored-XSS fixed in
  *    cellHTML() — ev.actual (calendar.json's external actual value) and sub
@@ -824,18 +843,21 @@
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
-      // CORRECTION (v2.5.11, 2026-08-28): v2.5.10 added 'Retail Sales MoM'
-      // here based on myfxbook.com's live site alone — WRONG. Checked
-      // against the actual calendar.json (ForexFactory-fed, the real
-      // source for this file) this session: zero "Retail Sales MoM"
-      // events for JPY across 3,843 live entries, only "Retail Sales
-      // YoY" / "Japan Retail Sales YoY". Myfxbook's own site and this
-      // repo's actual feed don't carry an identical title set — exactly
-      // the caveat already on record for USD/GBP's other rtl/ppi/prod
-      // findings this session, and the reason this repo's rule is to
-      // verify against calendar.json specifically, not a vendor's site.
-      // Reverted to YoY-only, the original (correct) v2.2.x state.
-      rtl:   ['Retail Sales YoY'],
+      // CORRECTION (v2.5.14, 2026-08-30): v2.5.11's "zero MoM events"
+      // finding was correct AT THE TIME (0 of 3,843 events that session)
+      // but the premise went stale — 'Japan Retail Sales MoM' printed for
+      // the first time ever on 2026-08-30 (actual 2.4%, fcst 3.1%, prev
+      // -4.1%), same-day as 'Japan Retail Sales YoY' (actual 4.0%),
+      // confirmed against a freshly-downloaded calendar.json. Same
+      // omission class as the SEK/CHF/USD/GBP/CAD rtl fixes and SEK's
+      // prod fix, same session: a title with zero historical prints is
+      // correctly left out, but that absence must be re-checked once a
+      // real print exists, not treated as permanently settled (see
+      // GUIDELINES.md v8.142.0's "a confirmed gap must be periodically
+      // re-checked" rule). MoM listed first, matching this column's
+      // Bloomberg-headline-print convention already used for
+      // USD/GBP/CAD/CHF/SEK/NOK.
+      rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
@@ -1094,7 +1116,15 @@
       // assuming it's broken.
       emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production YoY'],
+      // v2.5.14 (2026-08-30): CORRECTION — 'prod' had only ever listed
+      // 'Industrial Production YoY', same omission class as this
+      // session's JPY rtl fix and this file's own rtl fix above (v2.5.10):
+      // 'Industrial Production MoM' is confirmed live, released same-day
+      // as YoY every month (e.g. 2026-06-10: MoM 4.2%/YoY 7.1%; 2026-05-08:
+      // MoM -2%/YoY 3%), never previously in this currency's prod prefix
+      // list. MoM listed first per this column's own momentum-indicator
+      // convention (USD/GBP/JPY/NOK/EUR all MoM-first for Ind Prod).
+      prod:  ['Industrial Production MoM', 'Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
