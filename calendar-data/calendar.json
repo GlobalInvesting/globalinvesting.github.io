@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-30T23:51:35Z",
-  "generatedAt": "2026-08-30T23:51:35Z",
+  "lastUpdate": "2026-08-31T00:02:08Z",
+  "generatedAt": "2026-08-31T00:02:08Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,75 +9,25 @@
   "fetchErrors": [],
   "rangeFrom": "2025-08-31",
   "rangeTo": "2026-09-04",
-  "totalEvents": 3815,
+  "totalEvents": 3838,
   "currencyCounts": {
     "JPY": 222,
-    "AUD": 264,
+    "AUD": 265,
     "GBP": 442,
     "CHF": 128,
-    "EUR": 874,
-    "USD": 1275,
+    "EUR": 894,
+    "USD": 1276,
     "CAD": 272,
-    "NZD": 91,
+    "NZD": 92,
     "NOK": 85,
     "SEK": 162
   },
   "impactCounts": {
-    "medium": 1910,
-    "high": 1677,
+    "medium": 1918,
+    "high": 1692,
     "low": 228
   },
   "surpriseStats": {
-    "EUR/retail sales mom": {
-      "n": 5,
-      "mean": -0.14,
-      "std": 0.181659
-    },
-    "EUR/retail sales yoy": {
-      "n": 5,
-      "mean": -0.02,
-      "std": 1.042593
-    },
-    "GBP/nationwide housing prices mom": {
-      "n": 3,
-      "mean": -0.166667,
-      "std": 0.288675
-    },
-    "GBP/nationwide housing prices yoy": {
-      "n": 3,
-      "mean": -0.5,
-      "std": 0.608276
-    },
-    "CHF/retail sales yoy": {
-      "n": 3,
-      "mean": 0.8,
-      "std": 2.260531
-    },
-    "CHF/retail sales mom": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.737111
-    },
-    "CHF/procure.ch manufacturing pmi": {
-      "n": 3,
-      "mean": -0.233333,
-      "std": 3.066486
-    },
-    "EUR/unemployment rate": {
-      "n": 4,
-      "mean": 0.125,
-      "std": 0.170783
-    },
-    "USD/ism manufacturing employment": {
-      "n": 3,
-      "mean": 1.9,
-      "std": 1.153256
-    },
-    "USD/ism manufacturing pmi": {
-      "n": 3,
-      "mean": 0.633333,
-      "std": 1.193035
-    },
     "AUD/building permits mom": {
       "n": 3,
       "mean": 1.4,
@@ -197,6 +147,16 @@
       "n": 3,
       "mean": 0.0,
       "std": 0.173205
+    },
+    "EUR/retail sales mom": {
+      "n": 4,
+      "mean": -0.2,
+      "std": 0.141421
+    },
+    "EUR/retail sales yoy": {
+      "n": 4,
+      "mean": -0.3,
+      "std": 0.962635
     },
     "USD/initial jobless claims": {
       "n": 16,
@@ -697,6 +657,11 @@
       "n": 2,
       "mean": -0.1,
       "std": 0.0
+    },
+    "EUR/unemployment rate": {
+      "n": 3,
+      "mean": 0.066667,
+      "std": 0.152753
     },
     "EUR/netherlands unemployment rate": {
       "n": 3,
@@ -1228,6 +1193,31 @@
       "mean": 0.25,
       "std": 0.636396
     },
+    "GBP/nationwide housing prices mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
+    },
+    "GBP/nationwide housing prices yoy": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.070711
+    },
+    "CHF/retail sales yoy": {
+      "n": 2,
+      "mean": 0.5,
+      "std": 3.11127
+    },
+    "CHF/retail sales mom": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.989949
+    },
+    "CHF/procure.ch manufacturing pmi": {
+      "n": 2,
+      "mean": -2.0,
+      "std": 0.282843
+    },
     "EUR/austria unemployment rate": {
       "n": 2,
       "mean": -0.05,
@@ -1237,6 +1227,16 @@
       "n": 2,
       "mean": 0.55,
       "std": 1.343503
+    },
+    "USD/ism manufacturing pmi": {
+      "n": 2,
+      "mean": 0.45,
+      "std": 1.626346
+    },
+    "USD/ism manufacturing employment": {
+      "n": 2,
+      "mean": 1.85,
+      "std": 1.626346
     },
     "EUR/spain unemployment change": {
       "n": 2,
@@ -43848,19 +43848,6 @@
       "previous": "¥3968.0B"
     },
     {
-      "date": "9 Aug",
-      "dateISO": "2026-08-09",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan BoJ Summary of Opinions",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
       "date": "10 Aug",
       "dateISO": "2026-08-10",
       "timeUTC": "06:00",
@@ -47748,6 +47735,32 @@
     {
       "date": "31 Aug",
       "dateISO": "2026-08-31",
+      "timeUTC": "01:00",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand ANZ Business Confidence",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "55.7",
+      "previous": "56.1"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "01:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Company Gross Profits QoQ",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.0%",
+      "previous": "-1.3%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
       "timeUTC": "05:00",
       "country": "JPY",
       "currency": "JPY",
@@ -47768,7 +47781,7 @@
       "event": "Japan Housing Starts YoY",
       "impact": "medium",
       "actual": null,
-      "forecast": "22.0%",
+      "forecast": "7.9%",
       "previous": "18.6%"
     },
     {
@@ -47787,6 +47800,201 @@
     {
       "date": "31 Aug",
       "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Current Account",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "€3.6B",
+      "previous": "€1.84B"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Baden Wuerttemberg CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.5"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Baden Wuerttemberg CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.8%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Hesse CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.7%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Hesse CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.7"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Bavaria CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.8"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Bavaria CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.6%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Brandenburg CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.7"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Brandenburg CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.7%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany North Rhine Westphalia CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.9%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany North Rhine Westphalia CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.7"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Saxony CPI MoM",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "0.7%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Saxony CPI YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": "2.8"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Greece Unemployment Rate",
+      "impact": "high",
+      "actual": null,
+      "forecast": "7.9%",
+      "previous": "8.0%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Greece Retail Sales YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "4.7%",
+      "previous": "6.8%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
       "timeUTC": "09:30",
       "country": "EUR",
       "currency": "EUR",
@@ -47796,6 +48004,97 @@
       "actual": null,
       "forecast": "9.6%",
       "previous": "9.1%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Ireland Harmonised Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "10:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Portugal Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.1%",
+      "previous": "-0.5%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Harmonised Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.9%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Inflation Rate YoY",
+      "impact": "high",
+      "actual": null,
+      "forecast": "2.9%",
+      "previous": "2.8%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Inflation Rate MoM",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Dallas Fed Manufacturing Index",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.7",
+      "previous": "1.3"
+    },
+    {
+      "date": "31 Aug",
+      "dateISO": "2026-08-31",
+      "timeUTC": "23:50",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Capital Spending YoY",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.0%"
     },
     {
       "date": "1 Sep",
