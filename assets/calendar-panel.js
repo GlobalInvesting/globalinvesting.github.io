@@ -1,6 +1,20 @@
 /**
- * calendar-panel.js v1.19.25 — Native economic calendar renderer
+ * calendar-panel.js v1.19.26 — Native economic calendar renderer
  * Reads calendar-data/ff_calendar.json (ForexFactory, G10 currencies, medium+high impact)
+ *
+ * v1.19.26 (2026-08-30): FIX — the "High only" impact filter persists across
+ *   sessions via localStorage with no reminder it's still active. A day whose
+ *   only events are medium/low impact (e.g. a Sunday carrying just JPY
+ *   Retail Sales YoY/MoM + Industrial Production MoM) disappeared from the
+ *   list entirely once the filter was on, reading identically to "no data /
+ *   feed broken". Live-reported on 2026-08-30 — calendar.json/ff_calendar.json
+ *   confirmed complete and correct for that date via direct fetch before any
+ *   code was touched; the filter (left on from an earlier session) was
+ *   working exactly as designed, just silently. Fixed with a small banner —
+ *   "Showing high-impact only — N medium/low-impact events hidden this
+ *   window" — shown whenever the filter actually hides something, plus the
+ *   same disclosure in the empty-state message for the edge case where it
+ *   hides the whole window. No change to filter semantics or default state.
  *
  * v1.19.24 (2026-08-29): Industry-standard audit — full line-by-line pass of
  *   the remaining ~2,850 lines not covered by v8.304.0's targeted title-
@@ -2150,6 +2164,30 @@
       ev.dateISO >= _yISO && ev.dateISO <= _mISO
     );
 
+    // [v1.19.23] Transparency guard for the "High only" toggle: it persists
+    // across sessions via localStorage (loadImpactFilter()), with no
+    // reminder anywhere that it's still on. A day whose ONLY events are
+    // medium/low impact (a real, common case — e.g. a Sunday carrying just
+    // JPY Retail Sales YoY/MoM + Industrial Production MoM, all
+    // impact:"medium") disappears from the list ENTIRELY once "High only"
+    // is active, with the exact same visual result as the day having no
+    // data at all. Live-reported: on 2026-08-30 (a Sunday), this read as
+    // "the calendar stopped showing today's events" — the underlying data
+    // (calendar.json / ff_calendar.json) was confirmed complete and correct
+    // for that date; the filter, left on from an earlier session, was
+    // silently doing exactly what it's designed to do. Computed here (same
+    // window/currency scope as `filtered`, impact gate only removed) so a
+    // banner can disclose the hidden count instead of the day just vanishing.
+    let _hiddenByImpactCount = 0;
+    if (_impactHighOnly) {
+      const _withoutImpactGate = events.filter(ev =>
+        G10_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact) &&
+        (_ccyFilter == null || ev.currency === _ccyFilter) &&
+        ev.dateISO >= _yISO && ev.dateISO <= _mISO
+      );
+      _hiddenByImpactCount = _withoutImpactGate.length - filtered.length;
+    }
+
     // [v1.13.0] Revision index — built from the FULL unfiltered dataset
     // (not `filtered`) so history outside the display window / currency
     // filter still counts as "the last known actual" for detection.
@@ -2196,7 +2234,15 @@
     ]);
 
     if (!allDates.size) {
-      container.innerHTML = '<div style="padding:12px 10px;color:var(--text3);font-size:11px;">No events available.</div>';
+      // [v1.19.23] Same transparency guard as the per-render banner below,
+      // for the edge case where "High only" hides the ENTIRE window (every
+      // currency, not just one day) — otherwise this reads identically to
+      // "the feed is broken", the exact live-reported symptom this version
+      // fixes.
+      const emptyMsg = (_impactHighOnly && _hiddenByImpactCount > 0)
+        ? `No high-impact events in this window (${_hiddenByImpactCount} medium/low-impact event${_hiddenByImpactCount === 1 ? '' : 's'} hidden — toggle "High only" off to see them).`
+        : 'No events available.';
+      container.innerHTML = `<div style="padding:12px 10px;color:var(--text3);font-size:11px;">${emptyMsg}</div>`;
       return;
     }
 
@@ -2486,7 +2532,16 @@
       ? []
       : (scrollRootsBefore.length ? Array.from(scrollRootsBefore).map(r => r.scrollTop) : [container.scrollTop]);
 
-    container.innerHTML = html;
+    // [v1.19.23] Same banner regardless of 1-col/2-col layout — prepended
+    // outside `.cal-events-cols` so it always spans full width above both
+    // columns rather than living inside either one.
+    const impactNoteHtml = (_impactHighOnly && _hiddenByImpactCount > 0)
+      ? `<div class="cal-impact-hidden-note" style="padding:5px 10px;font-size:10px;` +
+        `color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border2);">` +
+        `Showing high-impact only — ${_hiddenByImpactCount} medium/low-impact event` +
+        `${_hiddenByImpactCount === 1 ? '' : 's'} hidden this window.</div>`
+      : '';
+    container.innerHTML = impactNoteHtml + html;
 
     // ── Scroll logic ──────────────────────────────────────────────────────
     // Uses direct scrollTop on the relevant scroll container (cal-events-body,
