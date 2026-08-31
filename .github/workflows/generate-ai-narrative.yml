@@ -3,7 +3,7 @@ name: Generate AI Narrative & Market Signals
 # Runs 4×/day covering the 4 major FX session transitions, plus a Friday post-COT run.
 # MODE: intraday — generates narrative + signals only.
 # Structural outputs (session context + currency drivers) are handled by
-# generate-structural-context.yml (1×/day, keys 5–6) — Tiered Refresh Architecture.
+# generate-structural-context.yml (1×/day, separate key pool) — Tiered Refresh Architecture.
 #
 # Writes to the PUBLIC site repo:
 #   ai-analysis/index.json           ← Narrative bar + regime label
@@ -13,8 +13,8 @@ name: Generate AI Narrative & Market Signals
 #                                       reflect live intraday data at each session open.
 #
 # Schedule (UTC) — 5 runs/week-mix covering all 4 session opens/transitions + a post-COT
-# refresh (v7.80.0, reduced from the earlier 6-run schedule to stay within the private-repo
-# Actions-minutes budget — see the `on.schedule` block below for the live cron list). Times
+# refresh (v7.80.0, reduced from the earlier 6-run schedule to stay within the Actions-minutes
+# budget — see the `on.schedule` block below for the live cron list). Times
 # below are corrected as of v8.337.0 to match the site's own canonical session-open source
 # of truth (`SESSION_DEFS`/`localHourToUTC()` in dashboard.js — DST-aware via Intl), verified
 # for today's date (2026-08-31, both US/EDT and UK/BST in effect):
@@ -31,18 +31,17 @@ name: Generate AI Narrative & Market Signals
 # cron-job.org backup (see TRIGGER STRATEGY below) has the same limitation and needs the same
 # manual seasonal correction — neither clock self-adjusts.
 #
-# Token budget (keys 1–4 + key 6 dedicated to this workflow):
-#   ~14,583 tokens/run × 4-5 runs/day = ~60,000-73,000 tokens/day worst case
-#   5 keys × 500k tokens/key/day = 2,500,000 tokens/day capacity
-#   Key pool split: narrative uses keys 1–2–6 (retry-heavy), signals uses keys 3–4.
-#   Change detection skips the AI fallback provider when market data is unchanged —
-#   actual spend is lower.
+# Token/quota budget: see docs/ops-runbook.md "Data vendors by workflow" for the
+# real per-key capacity numbers and narrative/signals key-pool split. Change detection
+# skips the AI fallback provider entirely when market data is unchanged, so actual
+# spend runs below the theoretical worst case documented there.
 #
 # Required secrets:
 #   AI provider (fallback) — narrative primary/secondary + signals primary/secondary +
-#     narrative overflow (5 keys total). Live in this repo (public site).
-#   AI provider (primary) — signals auditor (closed-market only) + rotation pool (3 keys total).
-#     Live in this repo (public site).
+#     narrative overflow. Live in this repo (public site). Exact key count: see
+#     docs/ops-runbook.md "Data vendors by workflow".
+#   AI provider (primary) — signals auditor (closed-market only) + rotation pool.
+#     Live in this repo (public site). Exact key count: see docs/ops-runbook.md.
 #   PAT_TOKEN — GitHub PAT with READ access to the private globalinvesting-engine repo
 #     (checkout of engine/scripts/generate_narrative_signals.py, which stays private —
 #     only this .yml moved to the public repo). Push access to THIS repo comes from the
@@ -60,40 +59,22 @@ name: Generate AI Narrative & Market Signals
 #         var the deprecation warning appears in every run and the forced upgrade to
 #         Node.js 24 on 2026-06-02 may cause unexpected behaviour.
 
-# TRIGGER STRATEGY (v8.282.0): this is the highest-visibility workflow in the engine
-# (Narrative bar, Alerts & Market Signals, Session tab), yet was the only one of the
-# repo's 4 native-schedule workflows with no external backup — GitHub documents that
-# schedule triggers can be delayed or silently skipped under platform load, most often
-# at popular slots like session-open minutes where many repos fire cron in the same
-# window. Native `schedule` stays as fallback; cron-job.org is added as the reliable
-# external clock, same pattern as generate-structural-context.yml/monitor-data-health.yml/
-# update-saxo-rr.yml/workflow_meetings.yml.
+# TRIGGER STRATEGY: two independent trigger sources — native `schedule` (below) and
+# cron-job.org's `repository_dispatch` — are deliberate defense-in-depth against GitHub's
+# own documented schedule-trigger delays/skips under platform load. Don't remove either
+# without replacing the redundancy it provides.
 #
-# INCIDENT (2026-08-31, v8.336.0 → corrected v8.337.0): the account exhausted its 2,000
-# Actions-minutes/month private-repo budget mid-cycle. This workflow's cron-job.org job
-# fires at 00:00 / 07:00 / 12:00 / 21:00 UTC + Fri 22:30 — deliberately timed to real FX
-# session opens (confirmed against the site's own SESSION_DEFS/localHourToUTC(), the
-# project's single source of truth), NOT a misconfiguration. The bug was on THIS side: the
-# native `schedule` below had drifted to rough, non-session-aligned times (06:30/14:30/20:00
-# — none of which match a real session open), most likely dating to the v7.80.0 schedule
-# reduction. Because native and cron-job.org landed 30min-2h30 apart on 3 of 5 slots, the
-# 15-20min idempotency guard below never caught the pair, so each ran as a fully independent
-# job (2 repo checkouts, AI-generation calls, a commit attempt) — turning ~4-5 intended daily
-# runs into ~7-8, on the single heaviest workflow in the only private repo.
-#
-# FIXED (v8.337.0): re-derived the native `on.schedule` cron entries below from
-# SESSION_DEFS' real session-open times (5 min ahead of the matching cron-job.org slot,
-# preserving this repo's "native fires first" convention) — see the Schedule (UTC) block
-# above for the full reasoning. No cron-job.org dashboard change needed; that side was
-# already correct. v8.336.0's instruction to change cron-job.org was wrong-directioned and
-# is superseded by this entry — if it was applied, cron-job.org's 4 daily jobs should be
-# reverted to 00:00/07:00/12:00/21:00 UTC (unchanged from before v8.336.0).
+# Both clocks must agree with SESSION_DEFS (dashboard.js) before either is edited — a past
+# incident (native and external clocks drifting ~30min-2h30 apart) caused duplicate runs
+# and a real Actions-minutes overage. Full incident writeup and the correction history:
+# CHANGELOG.md v8.288.0 (idempotency guard added), v8.336.0/v8.337.0 (schedule drift +
+# correction). Current cron-job.org dispatch times: 00:00/07:00/12:00/21:00 UTC + Fri 22:30.
 
 on:
   repository_dispatch:
     types: [trigger-ai-narrative]   # ← dispatched by cron-job.org, one job per slot below
   schedule:
-    # 4×/day — reduced from 6 in v7.80.0 to stay within GitHub Actions private-repo budget.
+    # 4×/day — reduced from 6 in v7.80.0 to stay within the Actions-minutes budget.
     # Covers all 4 major FX session transitions; change detection skips the AI calls when
     # market data is materially unchanged between runs (gaps ≤ 8h at most).
     # Re-derived v8.337.0 from SESSION_DEFS' real session-open times (dashboard.js), 5 min
@@ -132,19 +113,11 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           path: engine
 
-      # IDEMPOTENCY GUARD (v8.288.0): this workflow has two independent trigger sources —
-      # native `schedule` and cron-job.org's `repository_dispatch` — kept as deliberate
-      # defense-in-depth (see TRIGGER STRATEGY above) in case either one has an outage.
-      # When both are healthy they can land close together (some slots are offset by only
-      # 30-60min, two overlap exactly), which without this guard means a full duplicate
-      # run: Python setup, the narrative/signals generation call, and a commit attempt —
-      # not just a wasted Actions-minute, but a second AI-generation pass on data that
-      # hasn't changed. `concurrency: cancel-in-progress:false` above already serializes
-      # overlapping runs (the second waits, it doesn't run in parallel), so by the time a
-      # second trigger's job actually starts, a just-finished sibling run's commit has
-      # already landed — this guard reads that fresh commit's timestamp and skips the
-      # rest of the job if it's newer than the window below. workflow_dispatch (manual)
-      # always bypasses it, matching the existing --force behavior a few steps down.
+      # IDEMPOTENCY GUARD: skips a full duplicate run when the two trigger sources (see
+      # TRIGGER STRATEGY above) land close together — `concurrency: cancel-in-progress:false`
+      # above already serializes overlapping runs, so this reads the just-finished sibling
+      # run's commit timestamp and skips if it's within the window below. workflow_dispatch
+      # (manual) always bypasses it. Full rationale: CHANGELOG.md v8.288.0.
       - name: Idempotency guard — skip if a sibling trigger already ran this cycle
         id: guard
         run: |
@@ -158,15 +131,11 @@ jobs:
           age = (datetime.now(timezone.utc) - datetime.fromisoformat(ts)).total_seconds() / 60
           print(int(age))
           " 2>/dev/null || echo 9999)
-              # 20 min (widened from 15 in v8.336.0): the intended sibling-trigger offset
-              # is ~5 min (cron-job.org fires shortly after each native slot, matching this
-              # repo's own convention — see the cron-job.org times in the TRIGGER STRATEGY
-              # comment above), so 20 min leaves real margin for GitHub's own documented
-              # schedule-trigger delays under platform load, without ever risking suppression
-              # of a genuine later slot (the schedule's own gaps are 4h+ at minimum). This
-              # window only helps when both triggers are actually configured close together
-              # — it cannot compensate for a cron-job.org job set far from its native slot,
-              # which is a dashboard misconfiguration to fix directly, not a guard-window problem.
+              # 20 min: intended sibling-trigger offset is ~5 min by design, so this leaves
+              # margin for GitHub's own documented schedule-trigger delays without risking
+              # suppression of a genuine later slot (schedule gaps are 4h+ minimum). Only
+              # helps if both triggers are actually configured close together — see
+              # CHANGELOG.md v8.336.0.
               if [ "$AGE_MIN" -lt 20 ] 2>/dev/null; then
                 echo "site/ai-analysis/index.json was generated ${AGE_MIN} min ago (< 20 min) — a sibling trigger already completed this cycle. Skipping the rest of this run."
                 SKIP=true
