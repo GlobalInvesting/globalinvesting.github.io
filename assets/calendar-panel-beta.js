@@ -2740,10 +2740,16 @@
     // Docked: original full-width swap behavior.
     _briefingActive = !!on;
     updateBriefingToggleButtonState();
-    const eventsBody   = document.getElementById('cal-events-body');
+    const bodyRow      = document.getElementById('cal-body-row');
     const colHeader    = document.getElementById('cal-static-col-header');
     const briefingBody = document.getElementById('cal-briefing-body');
-    if (eventsBody)   eventsBody.style.display   = _briefingActive ? 'none' : '';
+    // [v1.22.0] Hide the whole #cal-body-row wrapper, not just
+    // #cal-events-body inside it — #cal-body-row is itself a flex:1 item of
+    // #section-tvcalendar's fixed-height column, so leaving it displayed
+    // (even with its only visible child hidden) still claims half the
+    // panel's flex space, squeezing #cal-briefing-body (also flex:1) into
+    // the other half instead of the full height it had pre-sidebar.
+    if (bodyRow)      bodyRow.style.display      = _briefingActive ? 'none' : '';
     if (colHeader)    colHeader.style.display    = _briefingActive ? 'none' : '';
     if (briefingBody) briefingBody.style.display = _briefingActive ? '' : 'none';
     if (_briefingActive) renderBriefing('cal-briefing-body');
@@ -2783,15 +2789,37 @@
   const BRIEF_MAX_TARGET = 8;
 
   // Monday 00:00 → Sunday 23:59, LOCAL time (tzLabel()'s zone, same as every
-  // other date shown in this panel) — always the REAL current week,
-  // independent of _calWeekOffsetDays (the main list's Prev/Next nav has no
-  // effect on the briefing; it is always "this week", matching how it will
-  // actually be read: generated/first-viewed Sunday once the week's
-  // calendar is fully populated, still valid to re-open any day that week).
+  // other date shown in this panel) — independent of _calWeekOffsetDays
+  // (the main list's Prev/Next nav has no effect on the briefing).
+  //
+  // [BETA v1.23.0 — live-reported bug fix] This feature's own stated spec
+  // (see the v1.20.0 block comment above) is "generated Sunday once the
+  // week's calendar is fully populated, showing the week AHEAD, still valid
+  // to re-open any day that week" — i.e. Reuters' own "key events NEXT
+  // week" framing. The original day===0 branch (`mondayOffset = -6`) instead
+  // resolved Sunday to the Monday of the week that is ENDING that same day
+  // — the wrong direction — so on the one day this feature is meant to
+  // regenerate for the upcoming week, it instead kept showing the outgoing
+  // one. Live-reported: opened on a Sunday, the briefing's day headers and
+  // every event in it (e.g. "Tuesday, August 25") were already 3-5 days in
+  // the past relative to that same Sunday, and — since the main event list
+  // only keeps a rolling recent-past-plus-future window rather than the
+  // full month — none of those already-elapsed days were still visible
+  // anywhere in the calendar to cross-check against, reading as "the
+  // briefing's events don't exist in the calendar" rather than what it
+  // actually was: a stale, backward-looking window. Confirmed against the
+  // live report and reproduced with today's real date (a Sunday). Fixed by
+  // resolving day===0 to TOMORROW's Monday (mondayOffset = 1) instead of
+  // the prior Monday — every other weekday (1-6) is unchanged, since the
+  // spec's own "still valid to re-open any day that week" only needs the
+  // Monday→Saturday days to keep resolving to that same week's Monday,
+  // which they already did correctly; Sunday was the sole broken case,
+  // being simultaneously "the last day of the outgoing week" and "the
+  // generation day for the incoming one".
   function _briefWeekWindow() {
     const now = new Date();
     const day = now.getDay(); // 0=Sun..6=Sat
-    const mondayOffset = day === 0 ? -6 : 1 - day;
+    const mondayOffset = day === 0 ? 1 : 1 - day;
     const monday = new Date(now);
     monday.setHours(0, 0, 0, 0);
     monday.setDate(now.getDate() + mondayOffset);
