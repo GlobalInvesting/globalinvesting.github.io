@@ -447,6 +447,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
    in calendar-panel-beta.js for when .cal-fs-briefing-on is toggled. */
 #cal-fullscreen-overlay.cal-fs-active #section-tvcalendar.cal-fs-briefing-on{max-width:1500px}
 #cal-fullscreen-overlay.cal-fs-active #section-tvcalendar.cal-fs-split.cal-fs-briefing-on{max-width:2500px}
+/* [BETA v1.23.0] Wider sidebar on large monitors, per live feedback — the
+   300px width above stays the floor for any fullscreen viewport, widening
+   to 380px once there's genuinely spare room (>=1800px, comfortably above
+   the 1400px two-column-split breakpoint so both can coexist without
+   squeezing the event list). The panel's own max-width budget grows by the
+   same +80px delta in both single- and two-column configurations so the
+   wider rail doesn't eat into the list's width. */
+@media (min-width:1800px){
+  #cal-fullscreen-overlay.cal-fs-active #cal-briefing-sidebar{width:380px!important}
+  #cal-fullscreen-overlay.cal-fs-active #section-tvcalendar.cal-fs-briefing-on{max-width:1580px}
+  #cal-fullscreen-overlay.cal-fs-active #section-tvcalendar.cal-fs-split.cal-fs-briefing-on{max-width:2580px}
+}
 #cal-fullscreen-overlay.cal-fs-active #cal-events-body{max-height:none!important}
 #cal-fullscreen-overlay.cal-fs-active #cal-briefing-body{max-height:none!important}
 #cal-fullscreen-overlay.cal-fs-active #cal-body-row{height:100%}
@@ -1619,35 +1631,48 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Forecast</span>
         <span style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;text-align:right;">Previous</span>
       </div>
-      <!-- [BETA v1.21.0] #cal-body-row: flex row wrapping the scrollable
-           events list and the fullscreen-only Briefing sidebar side by
-           side. Docked/narrow-fullscreen: sidebar stays display:none (see
+      <!-- [BETA v1.22.0] #cal-body-row: flex row wrapping the fullscreen-only
+           Briefing sidebar and the scrollable events list side by side.
+           Docked/narrow-fullscreen: sidebar stays display:none (see
            #cal-briefing-sidebar below) so this row behaves exactly like the
            old single #cal-events-body did. Wide fullscreen: sidebar shows
            as a narrow rail alongside the (possibly two-column) event list,
            per setBriefingActive()/openCalFullscreen() in
            calendar-panel-beta.js — the full list is never hidden to make
-           room for it. -->
+           room for it. Sidebar is the FIRST child (reads left-to-right as
+           "this week's highlights, then the full calendar") per live
+           feedback — a plain DOM order, not a CSS `order:` trick, so the
+           visual and source order always match. -->
       <div id="cal-body-row" style="display:flex;flex:1;min-height:0;overflow:hidden;">
-        <!-- Scrollable events body -->
-        <div id="cal-events-body" style="overflow-y:auto;flex:1;min-width:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
-          <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar…</div>
-        </div>
         <!-- [BETA v1.21.0] Weekly Briefing — fullscreen sidebar. Narrow,
              fixed-width rail shown ONLY while fullscreen (see the
              #cal-fullscreen-overlay.cal-fs-active rule in the <style>
              block) — hidden here by default so it never affects the
-             docked panel's layout. -->
-        <div id="cal-briefing-sidebar" style="width:300px;flex-shrink:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-left:1px solid var(--border);display:none;">
+             docked panel's layout. [BETA v1.23.0] Width grows 300px→380px
+             on wide monitors (>=1800px) via the matching min-width media
+             query in the <style> block. -->
+        <div id="cal-briefing-sidebar" style="width:300px;flex-shrink:0;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;border-right:1px solid var(--border);display:none;">
           <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading briefing…</div>
+        </div>
+        <!-- Scrollable events body -->
+        <div id="cal-events-body" style="overflow-y:auto;flex:1;min-width:0;min-height:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;">
+          <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading calendar…</div>
         </div>
       </div>
       <!-- [BETA] Weekly Briefing view — docked-only full-width swap (see
            setBriefingActive() in calendar-panel-beta.js), toggled via
            inline display alongside #cal-body-row/#cal-static-col-header.
            Not used in fullscreen — fullscreen uses #cal-briefing-sidebar
-           above instead, alongside the full list rather than replacing it. -->
-      <div id="cal-briefing-body" style="overflow-y:auto;flex:1;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;display:none;">
+           above instead, alongside the full list rather than replacing it.
+           [BETA v1.22.0] min-height:0 added — without it, this flex item
+           (direct child of #section-tvcalendar, itself a fixed-height flex
+           column) refuses to shrink below its own unclamped content height,
+           which pushed the docked panel's real rendered height past its
+           declared 180px and visually overlapped the Cross-Asset/Risk
+           panels stacked directly below it — max-height/overflow-y alone
+           don't fix this, min-height:0 is what lets the flexbox algorithm
+           actually honor them. -->
+      <div id="cal-briefing-body" style="overflow-y:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;max-height:330px;display:none;">
         <div style="padding:12px 10px;color:var(--text3);font-size:11px;">Loading briefing…</div>
       </div>
     </div>
