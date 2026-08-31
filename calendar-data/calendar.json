@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-08-31T01:01:01Z",
-  "generatedAt": "2026-08-31T01:01:01Z",
+  "lastUpdate": "2026-08-31T01:31:10Z",
+  "generatedAt": "2026-08-31T01:31:10Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -32,6 +32,11 @@
       "n": 3,
       "mean": 1.4,
       "std": 5.889822
+    },
+    "AUD/company gross profits qoq": {
+      "n": 2,
+      "mean": -1.0,
+      "std": 1.131371
     },
     "EUR/inflation rate yoy": {
       "n": 3,
@@ -47754,7 +47759,7 @@
       "flag": "🇦🇺",
       "event": "Australia Company Gross Profits QoQ",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.8%",
       "forecast": "2.0%",
       "previous": "-1.3%"
     },
