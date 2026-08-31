@@ -50,9 +50,10 @@ name: Generate AI Narrative & Market Signals
 #     PAT_TOKEN's role flipped direction when this workflow moved here; it used to grant
 #     write access to what was then an external public site, now it grants read access
 #     to what is now an external private engine.
-#   (Secret names still reveal the underlying vendors — see the known-residual note in
-#   docs/ops-runbook.md; renaming them is a coordinated Santiago-side change across this
-#   workflow and generate_narrative_signals.py, not attempted in this pass.)
+#   (v8.340.0: secret names genericized — AI_FALLBACK_KEY[_N] / AI_PRIMARY_KEY[_N] /
+#   WEB_SEARCH_KEY — closing the residual flagged since v8.166.0. Old vendor-named
+#   secrets [GROQ_API_KEY*, GEMINI_API_KEY*, TAVILY_API_KEY] can be deleted from this
+#   repo's Settings → Secrets once a live run off the new names is confirmed green.)
 
 # FIX-19: Added FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 to suppress Node.js 20 deprecation
 #         warnings from actions/checkout@v4, actions/setup-python@v5. Without this env
@@ -192,16 +193,16 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         working-directory: site
         env:
-          GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
-          GROQ_API_KEY_2: ${{ secrets.GROQ_API_KEY_2 }}
-          GROQ_API_KEY_3: ${{ secrets.GROQ_API_KEY_3 }}
-          GROQ_API_KEY_4: ${{ secrets.GROQ_API_KEY_4 }}
-          GROQ_API_KEY_6: ${{ secrets.GROQ_API_KEY_6 }}
-          GEMINI_API_KEY:   ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_API_KEY_2: ${{ secrets.GEMINI_API_KEY_2 }}
-          GEMINI_API_KEY_5: ${{ secrets.GEMINI_API_KEY_5 }}
+          AI_FALLBACK_KEY:   ${{ secrets.AI_FALLBACK_KEY }}
+          AI_FALLBACK_KEY_2: ${{ secrets.AI_FALLBACK_KEY_2 }}
+          AI_FALLBACK_KEY_3: ${{ secrets.AI_FALLBACK_KEY_3 }}
+          AI_FALLBACK_KEY_4: ${{ secrets.AI_FALLBACK_KEY_4 }}
+          AI_FALLBACK_KEY_6: ${{ secrets.AI_FALLBACK_KEY_6 }}
+          AI_PRIMARY_KEY:   ${{ secrets.AI_PRIMARY_KEY }}
+          AI_PRIMARY_KEY_2: ${{ secrets.AI_PRIMARY_KEY_2 }}
+          AI_PRIMARY_KEY_5: ${{ secrets.AI_PRIMARY_KEY_5 }}
           # v8.37.0: external web search (primary search path, ahead of AI-native grounding).
-          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+          WEB_SEARCH_KEY: ${{ secrets.WEB_SEARCH_KEY }}
         run: |
           # Manual trigger (workflow_dispatch) always regenerates — skip change detection.
           # Scheduled runs use change detection to avoid redundant AI-generation calls.
