@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-01T06:43:11Z",
-  "generatedAt": "2026-09-01T06:43:11Z",
+  "lastUpdate": "2026-09-01T07:03:15Z",
+  "generatedAt": "2026-09-01T07:03:15Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-01",
   "rangeTo": "2026-09-04",
-  "totalEvents": 3868,
+  "totalEvents": 3869,
   "currencyCounts": {
     "AUD": 270,
     "GBP": 448,
@@ -18,12 +18,12 @@
     "USD": 1276,
     "CAD": 273,
     "JPY": 220,
-    "NZD": 93,
+    "NZD": 94,
     "NOK": 85,
     "SEK": 162
   },
   "impactCounts": {
-    "medium": 1937,
+    "medium": 1938,
     "high": 1703,
     "low": 228
   },
@@ -1397,6 +1397,16 @@
       "n": 2,
       "mean": -0.05,
       "std": 0.353553
+    },
+    "EUR/austria inflation rate mom": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.141421
+    },
+    "EUR/austria harmonised inflation rate mom": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
     }
   },
   "events": [
@@ -48129,7 +48139,7 @@
       "impact": "medium",
       "actual": "-4.2%",
       "forecast": "1.0%",
-      "previous": "0.4%"
+      "previous": "0.8%"
     },
     {
       "date": "1 Sep",
@@ -48194,7 +48204,7 @@
       "impact": "high",
       "actual": "-3.4%",
       "forecast": "0.4%",
-      "previous": "-1.1%"
+      "previous": "0.0%"
     },
     {
       "date": "1 Sep",
@@ -48207,7 +48217,7 @@
       "impact": "high",
       "actual": "-2.5%",
       "forecast": "0.2%",
-      "previous": "-0.2%"
+      "previous": "0.6%"
     },
     {
       "date": "1 Sep",
@@ -48259,7 +48269,7 @@
       "impact": "high",
       "actual": "2.3%",
       "forecast": "1.3%",
-      "previous": "1.5%"
+      "previous": "1.9%"
     },
     {
       "date": "1 Sep",
@@ -48270,7 +48280,7 @@
       "flag": "🇪🇺",
       "event": "Austria Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.6%",
       "forecast": "0.3%",
       "previous": "0.0%"
     },
@@ -48283,7 +48293,7 @@
       "flag": "🇪🇺",
       "event": "Austria Harmonised Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.5%",
       "forecast": "0.3%",
       "previous": "-0.4%"
     },
@@ -48647,6 +48657,19 @@
       "flag": "🇨🇦",
       "event": "BOC Press Conference",
       "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "2 Sep",
+      "dateISO": "2026-09-02",
+      "timeUTC": "20:10",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "RBNZ Gov Breman Speaks",
+      "impact": "medium",
       "actual": null,
       "forecast": null,
       "previous": null
