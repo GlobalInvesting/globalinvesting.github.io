@@ -12292,16 +12292,26 @@ async function fetchLiquidityData() {
     // Baseline: 30-day rolling average (always shown as reference)
     _liqBaseline = _liqTo48(isWeekend ? Array(24).fill(2) : d.baseline_30d);
 
-    // Today: real H-L data for completed hours, baseline for future hours
+    // Today: real H-L data for hours the backend actually populated, baseline elsewhere.
+    // v8.340.1: dropped the old `h < hoursComplete` gate. hoursComplete was
+    // `now_utc.hour + 1` — a cutoff scoped to the UTC CALENDAR date, while this
+    // chart's own x-axis (drawLiquidityChart()'s OFFSET=42, v8.325.0) is scoped to
+    // the FX TRADING day (21:00 UTC rollover, this file's single source of truth
+    // for "day" everywhere else). Canvas slot 0 — the chart's own left edge — is
+    // UTC hour 21, which belongs to YESTERDAY's calendar date for all but a ~3h
+    // window after each rollover; `h < hoursComplete` excluded it almost every
+    // time it was checked, forcing the chart's opening segment onto baseline_30d
+    // even when fetch_fx_liquidity.py had genuine same-session real data for it.
+    // fetch_fx_liquidity.py v1.3 now scopes `today` to the FX trading day itself
+    // (see that script's `fx_day_start()`), so todayRaw[h] > 0 alone is now a
+    // reliable "this hour has real, current-FX-day data" signal — no separate
+    // hour-of-day cutoff needed on top of it.
     const todayRaw = (d.today && d.today.length === 24) ? d.today : d.baseline_30d;
-    const hoursComplete = d.hours_complete || 0;
-    const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
 
     const today24 = Array.from({length:24}, (_,h) => {
       if (isWeekend) return 2;
-      if (h < hoursComplete && todayRaw[h] > 0) return todayRaw[h];   // real data
-      if (h >= Math.floor(nowH)) return d.baseline_30d[h];             // future: 30d real baseline
-      return d.baseline_30d[h];                                          // past gap: use baseline
+      if (todayRaw[h] > 0) return todayRaw[h];   // real data, current FX trading day
+      return d.baseline_30d[h];                   // no real data yet for this hour — use baseline
     });
 
     _liqData   = _liqTo48(today24);
