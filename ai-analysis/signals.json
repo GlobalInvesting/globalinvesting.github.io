@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-01T07:01:21Z",
+  "generated_at": "2026-09-01T12:01:48Z",
   "signals": [
     {
-      "time": "07:00",
+      "time": "12:00",
       "priority": "critical",
-      "title": "USD/JPY — Intervention Risk + Carry Divergence",
-      "text": "USD/JPY is testing the 160.00 psychological barrier, trading at 159.96 just below the level that has historically triggered BoJ verbal and physical intervention. While the 275bp Fed-BoJ carry advantage remains the structural driver, the options market is aggressively pricing downside protection with the 25d risk reversal at -1.74 (indicative mid). This strong put skew contrasts with a COT LF net short of -81,619, suggesting professional hedgers are preparing for a policy-driven reversal that futures speculators haven't yet exited. The pair holds above the SMA20 (159.00) and SMA200 (158.42) cluster, but VRP at -1.6% indicates a lack of premium in vanilla options despite the proximity to the intervention zone. Trade bias: Long USD/JPY; carry dominance persists but intervention risk is acute at 160.00. Catalyst: BoJ meeting 18 Sep — hike bias remains. Risk: Immediate MoF intervention on a break above 160.00 triggers a disorderly unwind of the -81k spec short position.",
+      "title": "USD/JPY — Intervention Risk + Options Skew",
+      "text": "USD/JPY trades at 160.09, breaching the 160.00 psychological handle that previously triggered Japanese authorities to act. BoJ Governor Ueda reportedly met US Treasury Secretary Bessent on Sunday, a high-level engagement that intensifies market scrutiny of coordinated policy action as the pair tests new highs. While a 267bp SOFR-TONA carry advantage structurally favors the USD, the options market is aggressively pricing downside protection, evidenced by a strong USD/JPY 25d risk reversal of -1.74. This divergence between spot momentum and institutional hedging suggests a crowded carry trade vulnerable to a policy-induced shock. Trade bias: Neutral USD/JPY; 160.00 level invites intervention risk. Catalyst: BoJ meeting 18 Sep — hike bias remains. Risk: Lack of imminent BoJ/MoF action allows carry-driven momentum to extend toward 162.00.",
       "evidence": [
-        "USD/JPY: 159.96",
-        "25d RR: -1.74",
-        "JPY COT LF net: -81,619"
+        "USD/JPY: 160.09",
+        "25d RR (USDJPY): -1.74",
+        "Fed-BoJ OIS Spread: +267bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:57",
+      "time": "11:57",
       "priority": "warning",
-      "title": "NZD/USD — G10 Bilateral Theme",
-      "text": "NZD/USD trades at 0.5907, with the pair functioning as the primary G10 bilateral theme as the USD leader (1W avg +0.462%) faces the NZD laggard (1W avg -0.417%). Despite the weekly weakness, NZD positioning is at a 52-week extreme with a COT LF net short of -32,496 (pctl 0, z -2.60), creating a massive short-squeeze vulnerability ahead of tomorrow's RBNZ decision. The RBNZ holds a market hike bias, and a 125bp USD/NZD carry advantage is insufficient to justify a record spec short if the central bank delivers a hawkish surprise. Price is currently holding just above the SMA20/50/200 cluster (0.5821–0.5912), suggesting a technical floor is in place. Trade bias: Bullish NZD/USD; record spec shorts are vulnerable to a hawkish RBNZ repricing. Catalyst: RBNZ meeting 2 Sep — hike bias 100% priced. Risk: RBNZ adopts a dovish hold, validating the record short and pushing price through the 0.5821 support.",
+      "title": "NZD/USD — G10 Bilateral Theme + RBNZ",
+      "text": "The USD/NZD spread has expanded to 1.117% over the past week, marking a dominant bilateral theme as the USD outperforms (+0.580%) and the NZD lags (-0.537%) across G10 peers. NZD/USD trades at 0.5897, currently testing its SMA20 at 0.5912 as spec positioning hits a 52-week extreme with a COT LF net short pctl of 0 and z-score of -2.60. RBNZ holds at 2.5%. A 125bp SOFR-OCR carry advantage for the USD supports the current trend, but the extreme spec positioning leaves the pair highly sensitive to any NZD data beats. Trade bias: Bearish NZD/USD; G10 divergence and carry favor USD. Catalyst: RBNZ meeting 2 Sep — hike bias priced. Risk: RBNZ hike triggers a short-squeeze in the crowded spec net-short position.",
       "evidence": [
-        "NZD COT LF pctl: 0",
-        "G10 spread: 0.880%",
-        "NZD/USD: 0.5907"
+        "USD 1W avg: +0.580% (n=7)",
+        "NZD 1W avg: -0.537% (n=4)",
+        "NZD COT pctl: 0 (z -2.60)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:55",
+      "time": "11:55",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long + Retail Divergence",
-      "text": "AUD/USD is trading at 0.7167, well above its SMA20/50/200 cluster (0.6975–0.7110), but multiple layers signal trend exhaustion. Speculative positioning is crowded with a COT LF net long of +53,578 (pctl 95, z +1.92), while retail sentiment is at a 88% short extreme, providing a classic institutional-vs-retail divergence. While the 60bp AUD carry advantage supports the pair, WTI crude oil climbing above $86.00 on Middle East tensions introduces a complex geopolitical risk premium that is likely to cap further upside. The negative real rate of -0.55% for the AUD also suggests the RBA is less restrictive than the nominal 4.35% rate implies. Trade bias: Neutral AUD/USD; crowded spec longs and retail fading suggest limited upside momentum. Catalyst: RBA meeting 29 Sep — hold bias. Risk: A sharp reversal in crude oil prices triggers a liquidation of the +53k spec long position.",
-      "evidence": [
-        "AUD COT LF pctl: 95",
-        "Retail: 88% short",
-        "AUD/USD: 0.7167"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "06:52",
-      "priority": "info",
-      "title": "GBP/USD — High Volatility Premium + ESI Divergence",
-      "text": "GBP/USD trades at 1.3541, maintaining its position above the SMA20/50/200 cluster despite a moderate negative data bias with an ESI of -9.0. The options market is pricing a significant risk premium, with GBP/USD IV at 11.0% vs HV30 of 4.9%, resulting in a +6.1% VRP—the highest in the G10 space. This elevated hedging demand suggests institutional players are paying up for protection ahead of the September central bank meetings, even as the spot price remains relatively stable. The Fed-BoE carry spread is currently neutral at 0bp, leaving the pair highly sensitive to shifting US yield dynamics. Trade bias: Neutral/range GBP/USD; high vol premium makes directional bets expensive. Catalyst: BoE meeting 17 Sep — hold bias. Risk: A significant beat in UK macro data reverses the -9.0 ESI trend and compresses the vol premium.",
+      "title": "GBP/USD — Elevated Vol Premium + Real Rates",
+      "text": "GBP/USD trades at 1.3535, holding just below its SMA20 at 1.3546. The options market is pricing an extreme volatility risk premium, with 1M ATM IV at 11.0% vs a realized HV30 of 4.9%, a 6.1-point spread that reflects significant hedging demand ahead of September policy meetings. While the BoE-Fed nominal spread is neutral at 0bp, the real policy rate differential favors the USD (+1.45%) over the GBP (+0.35%) due to higher UK inflation expectations. COT data shows specs are heavily long GBP (pctl 96, z +1.58), suggesting a 'crowded long' setup that is failing to push price above moving average resistance. Trade bias: Bearish GBP/USD; crowded long positioning meets negative real rate differential. Catalyst: BoE meeting 17 Sep. Risk: Fed shifts to a neutral bias, narrowing the real rate gap and relieving pressure on Cable.",
       "evidence": [
         "GBP/USD VRP: +6.1%",
-        "GBP ESI: -9.0",
-        "GBP/USD: 1.3541"
+        "GBP COT pctl: 96 (z +1.58)",
+        "UK Real Rate: +0.35%"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "11:50",
+      "priority": "info",
+      "title": "AUD/USD — Retail vs Institutional Divergence",
+      "text": "AUD/USD trades at 0.7148, remaining above its SMA20/50/200 cluster despite a 1W decline of 0.65%. A significant sentiment divergence has emerged, as retail traders are 88% short (an extreme contrarian signal) while institutional COT LF positioning remains heavily net long at +53,578 (pctl 95, z +1.92). The 70bp AONIA-SOFR carry premium continues to support the AUD, and with an RBA hold expected, the institutional bias remains focused on the yield advantage. However, the lack of further WoW adds to the COT long position suggests the bullish move is losing momentum. Trade bias: Neutral/Bullish AUD/USD; retail extreme short provides a contrarian floor. Catalyst: RBA meeting 29 Sep. Risk: A sharp drop in iron ore or copper prices invalidates the institutional long thesis.",
+      "evidence": [
+        "Retail Sentiment: 88% Short",
+        "AUD COT pctl: 95 (z +1.92)",
+        "AUD/USD OIS Carry: +70bp"
       ],
       "_source": "engine-ai-primary"
     }
