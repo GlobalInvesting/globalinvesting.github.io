@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-01T06:32:15Z",
-  "generatedAt": "2026-09-01T06:32:15Z",
+  "lastUpdate": "2026-09-01T06:37:19Z",
+  "generatedAt": "2026-09-01T06:37:19Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1190,13 +1190,13 @@
     },
     "CHF/retail sales yoy": {
       "n": 3,
-      "mean": 0.666667,
-      "std": 2.218859
+      "mean": 0.466667,
+      "std": 2.200757
     },
     "CHF/retail sales mom": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.989949
+      "n": 3,
+      "mean": -0.133333,
+      "std": 0.702377
     },
     "CHF/procure.ch manufacturing pmi": {
       "n": 2,
@@ -48244,9 +48244,9 @@
       "flag": "🇨🇭",
       "event": "Switzerland Retail Sales MoM",
       "impact": "high",
-      "actual": null,
+      "actual": "0.1%",
       "forecast": "0.3%",
-      "previous": "0.2%"
+      "previous": "0.3%"
     },
     {
       "date": "1 Sep",
@@ -48257,9 +48257,9 @@
       "flag": "🇨🇭",
       "event": "Switzerland Retail Sales YoY",
       "impact": "high",
-      "actual": "2.3%",
+      "actual": "1.7%",
       "forecast": "1.3%",
-      "previous": "1.9%"
+      "previous": "1.5%"
     },
     {
       "date": "1 Sep",
