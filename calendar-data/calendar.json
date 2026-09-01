@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-01T05:01:09Z",
-  "generatedAt": "2026-09-01T05:01:09Z",
+  "lastUpdate": "2026-09-01T05:07:05Z",
+  "generatedAt": "2026-09-01T05:07:05Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1377,6 +1377,11 @@
       "n": 2,
       "mean": 0.2,
       "std": 0.0
+    },
+    "EUR/finland harmonised inflation rate mom": {
+      "n": 2,
+      "mean": -0.3,
+      "std": 0.424264
     },
     "EUR/france harmonised inflation rate mom": {
       "n": 2,
@@ -48161,7 +48166,7 @@
       "flag": "🇪🇺",
       "event": "Finland Harmonised Inflation Rate MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.4%",
       "forecast": "0.2%",
       "previous": "0.2%"
     },
