@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-01T17:21:03Z",
-  "generatedAt": "2026-09-01T17:21:03Z",
+  "lastUpdate": "2026-09-01T20:53:59Z",
+  "generatedAt": "2026-09-01T20:53:59Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,13 +9,13 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-01",
   "rangeTo": "2026-09-04",
-  "totalEvents": 3871,
+  "totalEvents": 3872,
   "currencyCounts": {
     "AUD": 270,
     "GBP": 448,
     "CHF": 132,
     "EUR": 909,
-    "USD": 1276,
+    "USD": 1277,
     "CAD": 273,
     "JPY": 221,
     "NZD": 94,
@@ -23,7 +23,7 @@
     "SEK": 162
   },
   "impactCounts": {
-    "medium": 1940,
+    "medium": 1941,
     "high": 1703,
     "low": 228
   },
@@ -294,9 +294,9 @@
       "std": 0.105357
     },
     "USD/api crude oil stock change": {
-      "n": 11,
-      "mean": 1.359545,
-      "std": 4.728763
+      "n": 12,
+      "mean": 1.09625,
+      "std": 4.600028
     },
     "USD/cpi s.a": {
       "n": 3,
@@ -48558,6 +48558,19 @@
       "actual": "54.6",
       "forecast": "55.2",
       "previous": "55.6"
+    },
+    {
+      "date": "1 Sep",
+      "dateISO": "2026-09-01",
+      "timeUTC": "20:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States API Crude Oil Stock Change",
+      "impact": "medium",
+      "actual": "-2.6M",
+      "forecast": "-0.8M",
+      "previous": "4.2M"
     },
     {
       "date": "1 Sep",
