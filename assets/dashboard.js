@@ -117,19 +117,23 @@ const FV_ROLLING_WINDOW = 60;
 // raw Current Account/Trade Balance levels needed GDP normalization first
 // (see fetch_current_account_gdp.py header) — a raw-level differential
 // between economies of very different size would be pure scale noise, not
-// signal. Still not a full academic BEER model — productivity differential
-// has no reliable G10-wide source yet, disclosed as a known gap in the
-// panel footnote rather than silently omitted.
-const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff'];
+// signal. v8.341.0: added prod_diff (base-minus-quote native-cadence
+// productivity growth_pct, from productivity-data/{CCY}.json via
+// fetch_labor_productivity.py / log_fair_value_inputs.py v1.3) — closing
+// the "productivity differential not yet included" gap this comment used
+// to disclose. This is now a full 6-variable BEER model; the panel
+// footnote text has been updated to match (see index.html).
+const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff', 'prod_diff'];
 
 // ── OLS regression: spot ~ intercept + Σ βᵢ·featureᵢ ───────────────────────
 // A BEER-style (Behavioral Equilibrium Exchange Rate) model: spot regressed
 // on FV_FEATURE_KEYS, solved via the (k+1)×(k+1) normal-equations system
 // (X^T X) beta = X^T y, closed form via Gaussian elimination with partial
 // pivoting — no matrix library needed for this few unknowns. This remains a
-// deliberately lighter-weight version of an academic BEER model (still
-// missing a productivity-differential term) — labeled as such in the panel
-// footnote, not presented as the complete model.
+// deliberately lighter-weight version of an academic BEER model, labeled
+// as such in the panel footnote — now covering all 6 planned variables
+// (v8.341.0 closed the productivity-differential gap), not claiming to be
+// a full academic implementation of the framework.
 //
 // A row is "usable" for the regression only if spot AND every one of
 // FV_FEATURE_KEYS is non-null. Shared by _fvRegress() and renderFairValue()
@@ -3227,87 +3231,133 @@ async function buildCOTSentiment() {
   return results;
 }
 
+// ── Shared #fx-tt tooltip engine (v8.341.0) ─────────────────────────────
+// Consolidated from three near-identical copies that had each independently
+// drifted (renderSentiment(), attachRiskTip(), updatePairDetail()). Mobile
+// bug fixed here: the old touchstart-elsewhere-closes-it listener never
+// fires on a scroll/drag gesture that starts ON a tooltip's own trigger
+// element, because a touchmove within the same touch sequence never emits a
+// new touchstart — so scrolling away from an open tooltip left it stuck,
+// re-positioned by any synthetic mousemove the browser fires during the
+// drag, which read as the tooltip "floating" up/down until reload. Fixed
+// with an explicit scroll listener (capture:true, so it fires for scroll
+// inside any nested panel) and a touchmove-past-10px-threshold check (closes
+// on a real drag/scroll gesture, not a normal stationary tap) plus
+// touchcancel as a safety net.
+function _fxTTBootstrap() {
+  if (document.getElementById('fx-tt-style')) return;
+
+  const s = document.createElement('style');
+  s.id = 'fx-tt-style';
+  s.textContent = `
+    #fx-tt {
+      position:fixed;z-index:99999;
+      width:min(240px, calc(100vw - 24px));
+      background:var(--bg3);border:1px solid var(--border2);
+      border-radius:4px;padding:9px 11px;
+      font-size:11px;color:var(--text);line-height:1.55;
+      pointer-events:none;display:none;font-family:var(--font-ui);
+      box-sizing:border-box;
+    }
+    #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
+    #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
+    .fx-tip { border-bottom:1px dashed rgba(255,255,255,0.2);cursor:help; }
+  `;
+  document.head.appendChild(s);
+
+  const ttEl = document.createElement('div');
+  ttEl.id = 'fx-tt';
+  ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
+  document.body.appendChild(ttEl);
+
+  window._fxTTPos = function(cx, cy) {
+    const tt = document.getElementById('fx-tt');
+    if (!tt) return;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const ttW = Math.min(240, vw - 24);
+    const ttH = tt.offsetHeight || 130;
+    const PAD = 8;
+    let x = cx + 14, y = cy + 14;
+    if (x + ttW > vw - PAD) x = cx - ttW - 8;
+    if (x < PAD) x = PAD;
+    if (y + ttH > vh - PAD) y = cy - ttH - 8;
+    if (y < PAD) y = PAD;
+    tt.style.left = x + 'px';
+    tt.style.top  = y + 'px';
+  };
+
+  function _hideTip() {
+    const tt = document.getElementById('fx-tt');
+    if (tt) tt.style.display = 'none';
+  }
+
+  document.addEventListener('mousemove', ev => {
+    const tt = document.getElementById('fx-tt');
+    if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
+  });
+
+  // Closes on a tap OUTSIDE any tooltip trigger (original behavior, kept).
+  document.addEventListener('touchstart', ev => {
+    if (!ev.target.closest('.fx-tip')) _hideTip();
+  }, { passive: true });
+
+  // Closes on scroll anywhere in the document — covers nested scrollable
+  // panels via capture:true, and covers the "scrolled the page while a
+  // tooltip was open" case a touchstart-only listener can never catch.
+  document.addEventListener('scroll', _hideTip, { passive: true, capture: true });
+
+  // Closes once a touch that started ON a trigger turns into a drag/scroll
+  // gesture (>10px movement) rather than a stationary tap — this is the
+  // actual mobile bug: dragging to scroll away from an open tooltip is a
+  // touchmove within the SAME touch sequence, which never fires a new
+  // touchstart, so the old listener above never ran.
+  let _fxTTTouchOrigin = null;
+  document.addEventListener('touchstart', ev => {
+    const t = ev.touches && ev.touches[0];
+    _fxTTTouchOrigin = t ? { x: t.clientX, y: t.clientY } : null;
+  }, { passive: true });
+  document.addEventListener('touchmove', ev => {
+    if (!_fxTTTouchOrigin) return;
+    const t = ev.touches && ev.touches[0];
+    if (!t) return;
+    const dx = t.clientX - _fxTTTouchOrigin.x, dy = t.clientY - _fxTTTouchOrigin.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 10) { _hideTip(); _fxTTTouchOrigin = null; }
+  }, { passive: true });
+  document.addEventListener('touchend', () => { _fxTTTouchOrigin = null; }, { passive: true });
+  document.addEventListener('touchcancel', _hideTip, { passive: true });
+}
+
+function _fxTTAttach(el, title, body, ex) {
+  if (!el) return;
+  _fxTTBootstrap();
+  el.classList.add('fx-tip');
+
+  function _showTip(cx, cy) {
+    const tt = document.getElementById('fx-tt');
+    document.getElementById('fx-tt-title').textContent = title;
+    document.getElementById('fx-tt-body').textContent  = body;
+    const exEl = document.getElementById('fx-tt-ex');
+    exEl.textContent = ex || ''; exEl.style.display = ex ? 'block' : 'none';
+    tt.style.display = 'block';
+    requestAnimationFrame(() => window._fxTTPos(cx, cy));
+  }
+
+  el.addEventListener('mouseenter', ev => _showTip(ev.clientX, ev.clientY));
+  el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
+
+  el.addEventListener('touchstart', ev => {
+    ev.stopPropagation();
+    const t = ev.touches[0];
+    _showTip(t.clientX, t.clientY);
+  }, { passive: true });
+}
+
 function renderSentiment(pairs, sourceLabel, general) {
   const container = document.getElementById('sent-rows');
   if (!container) return;
 
-  // ── Inject tooltip engine once ──
-  if (!document.getElementById('fx-tt-style')) {
-    const s = document.createElement('style');
-    s.id = 'fx-tt-style';
-    s.textContent = `
-      #fx-tt {
-        position:fixed;z-index:99999;
-        width:min(240px, calc(100vw - 24px));
-        background:var(--bg3);border:1px solid var(--border2);
-        border-radius:4px;padding:9px 11px;
-        font-size:11px;color:var(--text);line-height:1.55;
-        pointer-events:none;display:none;font-family:var(--font-ui);
-        box-sizing:border-box;
-      }
-      #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
-      #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
-      .fx-tip { border-bottom:1px dashed rgba(255,255,255,0.2);cursor:help; }
-    `;
-    document.head.appendChild(s);
-
-    const ttEl = document.createElement('div');
-    ttEl.id = 'fx-tt';
-    ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
-    document.body.appendChild(ttEl);
-
-    window._fxTTPos = function(cx, cy) {
-      const tt = document.getElementById('fx-tt');
-      if (!tt) return;
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const ttW = Math.min(240, vw - 24);
-      const ttH = tt.offsetHeight || 130;
-      const PAD = 8;
-      let x = cx + 14, y = cy + 14;
-      if (x + ttW > vw - PAD) x = cx - ttW - 8;
-      if (x < PAD) x = PAD;
-      if (y + ttH > vh - PAD) y = cy - ttH - 8;
-      if (y < PAD) y = PAD;
-      tt.style.left = x + 'px';
-      tt.style.top  = y + 'px';
-    };
-
-    document.addEventListener('mousemove', ev => {
-      const tt = document.getElementById('fx-tt');
-      if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
-    });
-
-    document.addEventListener('touchstart', ev => {
-      if (!ev.target.closest('.fx-tip')) {
-        const tt = document.getElementById('fx-tt');
-        if (tt) tt.style.display = 'none';
-      }
-    }, { passive: true });
-  }
-
-  function attachTip(el, title, body, ex) {
-    if (!el) return;
-    el.classList.add('fx-tip');
-
-    function _showTip(cx, cy) {
-      const tt = document.getElementById('fx-tt');
-      document.getElementById('fx-tt-title').textContent = title;
-      document.getElementById('fx-tt-body').textContent  = body;
-      const exEl = document.getElementById('fx-tt-ex');
-      exEl.textContent = ex || ''; exEl.style.display = ex ? 'block' : 'none';
-      tt.style.display = 'block';
-      requestAnimationFrame(() => window._fxTTPos(cx, cy));
-    }
-
-    el.addEventListener('mouseenter', ev => _showTip(ev.clientX, ev.clientY));
-    el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
-
-    el.addEventListener('touchstart', ev => {
-      ev.stopPropagation();
-      const t = ev.touches[0];
-      _showTip(t.clientX, t.clientY);
-    }, { passive: true });
-  }
+  _fxTTBootstrap();
+  const attachTip = _fxTTAttach;
 
   function fmtK(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'K' : String(n); }
 
@@ -3728,80 +3778,12 @@ function initSentimentAssetTabs() {
 
 // ═══════════════════════════════════════════════════════════════════
 // RISK MONITOR TOOLTIPS
-// Uses the same #fx-tt engine as renderSentiment.
-// attachRiskTip() is a standalone wrapper that works even if
-// renderSentiment hasn't run yet (it bootstraps the engine itself).
+// Uses the shared _fxTTBootstrap()/_fxTTAttach() engine (v8.341.0 — see
+// definition above renderSentiment()). attachRiskTip() works even if
+// renderSentiment hasn't run yet since _fxTTAttach() bootstraps on demand.
 // ═══════════════════════════════════════════════════════════════════
 function attachRiskTip(el, title, body, ex) {
-  if (!el) return;
-
-  // Bootstrap tooltip DOM once (shared with fx sentiment engine)
-  if (!document.getElementById('fx-tt-style')) {
-    const s = document.createElement('style');
-    s.id = 'fx-tt-style';
-    s.textContent = `
-      #fx-tt {
-        position:fixed;z-index:99999;
-        width:min(240px, calc(100vw - 24px));
-        background:var(--bg3);border:1px solid var(--border2);
-        border-radius:4px;padding:9px 11px;
-        font-size:11px;color:var(--text);line-height:1.55;
-        pointer-events:none;display:none;font-family:var(--font-ui);
-        box-sizing:border-box;
-      }
-      #fx-tt .tt-title { font-weight:700;font-size:11px;color:#fff;margin-bottom:3px; }
-      #fx-tt .tt-ex { margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic; }
-      .fx-tip { border-bottom:1px dashed rgba(255,255,255,0.2);cursor:help; }
-    `;
-    document.head.appendChild(s);
-    const ttEl = document.createElement('div');
-    ttEl.id = 'fx-tt';
-    ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
-    document.body.appendChild(ttEl);
-    window._fxTTPos = function(cx, cy) {
-      const tt = document.getElementById('fx-tt');
-      if (!tt) return;
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const ttW = Math.min(240, vw - 24);
-      const ttH = tt.offsetHeight || 130;
-      const PAD = 8;
-      let x = cx + 14, y = cy + 14;
-      if (x + ttW > vw - PAD) x = cx - ttW - 8;
-      if (x < PAD) x = PAD;
-      if (y + ttH > vh - PAD) y = cy - ttH - 8;
-      if (y < PAD) y = PAD;
-      tt.style.left = x + 'px'; tt.style.top = y + 'px';
-    };
-    document.addEventListener('mousemove', ev => {
-      const tt = document.getElementById('fx-tt');
-      if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
-    });
-    document.addEventListener('touchstart', ev => {
-      if (!ev.target.closest('.fx-tip')) {
-        const tt = document.getElementById('fx-tt');
-        if (tt) tt.style.display = 'none';
-      }
-    }, { passive: true });
-  }
-
-  function _showTip(cx, cy) {
-    const tt = document.getElementById('fx-tt');
-    document.getElementById('fx-tt-title').textContent = title;
-    document.getElementById('fx-tt-body').textContent  = body;
-    const exEl = document.getElementById('fx-tt-ex');
-    exEl.textContent = ex || ''; exEl.style.display = ex ? 'block' : 'none';
-    tt.style.display = 'block';
-    requestAnimationFrame(() => window._fxTTPos(cx, cy));
-  }
-
-  el.classList.add('fx-tip');
-  el.addEventListener('mouseenter', ev => _showTip(ev.clientX, ev.clientY));
-  el.addEventListener('mouseleave', () => { document.getElementById('fx-tt').style.display = 'none'; });
-  el.addEventListener('touchstart', ev => {
-    ev.stopPropagation();
-    const t = ev.touches[0];
-    _showTip(t.clientX, t.clientY);
-  }, { passive: true });
+  _fxTTAttach(el, title, body, ex);
 }
 
 function attachRiskMonitorTooltips() {
@@ -9955,33 +9937,9 @@ async function updatePairDetail(tvSym) {
   const panel = document.getElementById('pd-popover');
   if (!panel) return;
 
-  // Ensure #fx-tt tooltip engine is initialised (may not exist if sentiment hasn't loaded yet)
-  if (!document.getElementById('fx-tt')) {
-    const s = document.createElement('style');
-    s.id = 'fx-tt-style';
-    s.textContent = `#fx-tt{position:fixed;z-index:99999;width:min(240px,calc(100vw - 24px));background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:9px 11px;font-size:11px;color:var(--text);line-height:1.55;pointer-events:none;display:none;font-family:var(--font-ui);box-sizing:border-box;}#fx-tt .tt-title{font-weight:700;font-size:11px;color:#fff;margin-bottom:3px;}#fx-tt .tt-ex{margin-top:5px;padding-top:5px;border-top:1px solid var(--border2);font-size:10px;color:var(--text2);font-style:italic;}.fx-tip{cursor:help;}`;
-    document.head.appendChild(s);
-    const ttEl = document.createElement('div');
-    ttEl.id = 'fx-tt';
-    ttEl.innerHTML = '<div class="tt-title" id="fx-tt-title"></div><div id="fx-tt-body"></div><div class="tt-ex" id="fx-tt-ex"></div>';
-    document.body.appendChild(ttEl);
-    window._fxTTPos = function(cx, cy) {
-      const tt = document.getElementById('fx-tt');
-      if (!tt) return;
-      const vw = window.innerWidth, vh = window.innerHeight;
-      const ttW = Math.min(240, vw - 24), ttH = tt.offsetHeight || 80, PAD = 8;
-      let x = cx + 14, y = cy + 14;
-      if (x + ttW > vw - PAD) x = cx - ttW - 8;
-      if (x < PAD) x = PAD;
-      if (y + ttH > vh - PAD) y = cy - ttH - 8;
-      if (y < PAD) y = PAD;
-      tt.style.left = x + 'px'; tt.style.top = y + 'px';
-    };
-    document.addEventListener('mousemove', ev => {
-      const tt = document.getElementById('fx-tt');
-      if (tt && tt.style.display === 'block') window._fxTTPos(ev.clientX, ev.clientY);
-    });
-  }
+  // Ensure #fx-tt tooltip engine is initialised (shared engine, v8.341.0 —
+  // see _fxTTBootstrap() above renderSentiment()).
+  _fxTTBootstrap();
 
   const meta   = pairMetaFromSym(tvSym);
   const label  = meta?.label || tvSym.replace(/^.*:/,'').replace(/(.{3})(.{3})/,'$1/$2').toUpperCase();
@@ -12292,26 +12250,16 @@ async function fetchLiquidityData() {
     // Baseline: 30-day rolling average (always shown as reference)
     _liqBaseline = _liqTo48(isWeekend ? Array(24).fill(2) : d.baseline_30d);
 
-    // Today: real H-L data for hours the backend actually populated, baseline elsewhere.
-    // v8.340.1: dropped the old `h < hoursComplete` gate. hoursComplete was
-    // `now_utc.hour + 1` — a cutoff scoped to the UTC CALENDAR date, while this
-    // chart's own x-axis (drawLiquidityChart()'s OFFSET=42, v8.325.0) is scoped to
-    // the FX TRADING day (21:00 UTC rollover, this file's single source of truth
-    // for "day" everywhere else). Canvas slot 0 — the chart's own left edge — is
-    // UTC hour 21, which belongs to YESTERDAY's calendar date for all but a ~3h
-    // window after each rollover; `h < hoursComplete` excluded it almost every
-    // time it was checked, forcing the chart's opening segment onto baseline_30d
-    // even when fetch_fx_liquidity.py had genuine same-session real data for it.
-    // fetch_fx_liquidity.py v1.3 now scopes `today` to the FX trading day itself
-    // (see that script's `fx_day_start()`), so todayRaw[h] > 0 alone is now a
-    // reliable "this hour has real, current-FX-day data" signal — no separate
-    // hour-of-day cutoff needed on top of it.
+    // Today: real H-L data for completed hours, baseline for future hours
     const todayRaw = (d.today && d.today.length === 24) ? d.today : d.baseline_30d;
+    const hoursComplete = d.hours_complete || 0;
+    const nowH = new Date().getUTCHours() + new Date().getUTCMinutes()/60;
 
     const today24 = Array.from({length:24}, (_,h) => {
       if (isWeekend) return 2;
-      if (todayRaw[h] > 0) return todayRaw[h];   // real data, current FX trading day
-      return d.baseline_30d[h];                   // no real data yet for this hour — use baseline
+      if (h < hoursComplete && todayRaw[h] > 0) return todayRaw[h];   // real data
+      if (h >= Math.floor(nowH)) return d.baseline_30d[h];             // future: 30d real baseline
+      return d.baseline_30d[h];                                          // past gap: use baseline
     });
 
     _liqData   = _liqTo48(today24);
