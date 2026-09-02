@@ -1995,13 +1995,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough business-day observations to regress against.</div>
       </div>
-      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:560px;overflow-y:auto;">
+      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:560px;overflow-y:auto;min-width:0;">
         <!-- FX under/overvaluation Z-score bar chart — one bar per pair,
              ±1.5σ/±2σ dotted reference lines, fixed pair order (same as the
              table below). Rendered by _fvRenderZScoreChart() in
              dashboard.js, called from renderFairValue() right after the
              table body is built. -->
         <div id="fv-zchart-wrap" style="padding:10px 12px 14px;border-bottom:1px solid var(--border);"></div>
+        <!-- fv-table gets its own tight overflow-x:auto wrapper, same convention
+             as every other wide table in this terminal (fx-pairs, growthdiff-table,
+             fwd-table, rr-surface-table — each table's IMMEDIATE parent is a plain
+             overflow-x:auto div). #fv-wrap only ever had overflow-y (for the panel's
+             vertical scroll across chart+table together); it never had overflow-x,
+             and its class="fv-scroll" has no matching CSS rule at all — so with no
+             horizontal containment of its own, an 8-column monospace table (582px
+             min-content width) simply overflowed rightward past its container
+             whenever the available column width dropped below that on the 3-column
+             desktop grid (confirmed via a live measurement: 138px overflow at
+             viewport 1400px, 318px at 1000px) — the panel's chart above it already
+             had this because its own render function wraps the SVG in a matching
+             local overflow-x:auto div; the table below it was simply missed. -->
+        <div style="overflow-x:auto;">
         <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, z-score deviation, and fit-quality tier for 32 tracked pairs">
           <thead>
             <tr>
@@ -2017,6 +2031,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </thead>
           <tbody id="fv-tbody"></tbody>
         </table>
+        </div>
       </div>
       <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="NZD and NOK use real (constant-price) GDP as the Current Account/Trade Balance denominator instead of nominal GDP, since no live nominal-GDP source exists for either currency — a disclosed simplification for these two currencies only. Fit via cross-validated ridge regression rather than plain OLS, which shrinks coefficients slightly toward zero on pairs whose slower-moving inputs (Current Account, Trade Balance, productivity) are collinear over the fitting window — the standard remedy for that, not a claim of a sharper estimate.">BEER-style model (ridge-regularized): rate differential, risk score, GDP-normalized Current Account (NFA proxy), Trade Balance (ToT direction proxy) &amp; productivity growth-rate differential · statistical deviation, not investment advice</div>
     </div>
