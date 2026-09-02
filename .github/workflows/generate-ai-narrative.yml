@@ -88,6 +88,12 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # FIX-19: Node.js 20 → 24 opt-in
+  # v8.343.0: without this, Python's default block-buffering (stdout isn't a TTY
+  # inside a GH Actions run: step) means print()/safe_print() output can sit
+  # unflushed for minutes during a slow network call (e.g. a Gemini timeout),
+  # making the job LOOK hung in the live log even though it's actively retrying
+  # keys in the background. Forces line-by-line flushing instead.
+  PYTHONUNBUFFERED: "1"
 
 concurrency:
   group: generate-ai-narrative
