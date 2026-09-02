@@ -1996,7 +1996,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough business-day observations to regress against.</div>
       </div>
       <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:280px;overflow-y:auto;">
-        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, and z-score deviation for 32 tracked pairs">
+        <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, z-score deviation, and fit-quality tier for 32 tracked pairs">
           <thead>
             <tr>
               <th scope="col" style="text-align:left;">Pair</th>
@@ -2005,13 +2005,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <th scope="col" title="Cross-Asset Risk composite score for that day (same formula as the Regime badge)">Risk Score</th>
               <th scope="col" title="Regression estimate: spot as predicted by today's rate differential + risk score, fit on the trailing 60 business-day window">Fair Value</th>
               <th scope="col" title="How many residual standard deviations spot sits from the regression fair value over the trailing window — not a trade signal, a statistical deviation measure">Z-score</th>
+              <th scope="col" title="Data quality behind this pair's Fair Value/Z-score. Solid = this pair's own data (rate differential, risk score, Current Account, Trade Balance, productivity) fully identifies the model with no real collinearity. Regularized = this pair's slower-moving inputs (often EUR-cross Current Account/Trade Balance, or sparse productivity releases) don't vary enough on their own — the fit relies more on ridge regularization and less on this pair's own data. Hover a cell for the exact cross-validated λ.">Fit</th>
               <th scope="col">History</th>
             </tr>
           </thead>
           <tbody id="fv-tbody"></tbody>
         </table>
       </div>
-      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="NZD and NOK use real (constant-price) GDP as the Current Account/Trade Balance denominator instead of nominal GDP, since no live nominal-GDP source exists for either currency — a disclosed simplification for these two currencies only.">BEER-style model: rate differential, risk score, GDP-normalized Current Account (NFA proxy), Trade Balance (ToT direction proxy) &amp; productivity growth-rate differential · statistical deviation, not investment advice</div>
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="NZD and NOK use real (constant-price) GDP as the Current Account/Trade Balance denominator instead of nominal GDP, since no live nominal-GDP source exists for either currency — a disclosed simplification for these two currencies only. Fit via cross-validated ridge regression rather than plain OLS, which shrinks coefficients slightly toward zero on pairs whose slower-moving inputs (Current Account, Trade Balance, productivity) are collinear over the fitting window — the standard remedy for that, not a claim of a sharper estimate.">BEER-style model (ridge-regularized): rate differential, risk score, GDP-normalized Current Account (NFA proxy), Trade Balance (ToT direction proxy) &amp; productivity growth-rate differential · statistical deviation, not investment advice</div>
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
@@ -2587,7 +2588,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.6" defer></script>
-<script src="assets/dashboard.js?v=8.341.4" defer></script>
+<script src="assets/dashboard.js?v=8.341.6" defer></script>
 <script src="assets/gi-overview.js?v=1.4.2" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
