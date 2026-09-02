@@ -1995,7 +1995,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough business-day observations to regress against.</div>
       </div>
-      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:280px;overflow-y:auto;">
+      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:560px;overflow-y:auto;">
+        <!-- BETA (Z-score bar chart, prototype) — same layout idea as the
+             Credit Agricole FAST FX under/overvaluation chart: one bar per
+             pair, ±1.5σ/±2σ dotted reference lines, sorted most-undervalued
+             to most-overvalued. Rendered by _fvRenderZScoreChart() in
+             dashboard-beta.js, called from renderFairValue() right after
+             the table body is built. Not wired into production dashboard.js. -->
+        <div id="fv-zchart-wrap" style="padding:10px 12px 14px;border-bottom:1px solid var(--border);"></div>
         <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, z-score deviation, and fit-quality tier for 32 tracked pairs">
           <thead>
             <tr>
@@ -2588,7 +2595,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.6" defer></script>
-<script src="assets/dashboard.js?v=8.341.7" defer></script>
+<script src="assets/dashboard-beta.js?v=8.341.7-beta1" defer></script>
 <script src="assets/gi-overview.js?v=1.4.2" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
