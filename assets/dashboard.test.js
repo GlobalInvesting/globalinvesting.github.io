@@ -671,10 +671,18 @@ test('_pearsonCorrByDate: a pair-specific gap does not desync two otherwise-iden
 
 // ═══════════════════════════════════════════════════════════════════
 // FX Fair Value regression — mirrored from assets/dashboard.js's
-// _solveLinearSystem() / _fvRegress() (v8.197.0, generalized to the
-// 5-variable BEER model — rate_diff, stress, ca_diff, tb_diff — v8.200.0)
+// _solveLinearSystem() / _fvStandardize() / _fvBuildDesign() /
+// _fvRidgeSolve() / _fvChooseLambda() / _fvRegress() (v8.197.0 →
+// v8.200.0 5-var → v8.341.0 6-var [prod_diff] → v8.341.5 switched
+// OLS → cross-validated ridge). Per this repo's dual-implementation-
+// drift rule, this mirror must be updated in the SAME change as the
+// production logic — kept out of sync since v8.341.0 (never picked up
+// prod_diff) until this pass closed both gaps together.
 // ═══════════════════════════════════════════════════════════════════
-const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff'];
+const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff', 'prod_diff'];
+const FV_RIDGE_LAMBDA_GRID = [0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100];
+const FV_RIDGE_FOLDS = 5;
+
 function _solveLinearSystem(A, b) {
   const k = A.length;
   const M = A.map((row, i) => [...row, b[i]]);
@@ -694,84 +702,163 @@ function _solveLinearSystem(A, b) {
   }
   return M.map((row, i) => row[k] / row[i]);
 }
+function _fvUsableRows(rows) {
+  return rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
+}
+function _fvStandardize(rows) {
+  const mu = {}, sigma = {};
+  FV_FEATURE_KEYS.forEach(key => {
+    const vals = rows.map(r => r[key]);
+    const m = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const v = vals.reduce((a, b) => a + (b - m) * (b - m), 0) / vals.length;
+    mu[key] = m;
+    sigma[key] = Math.sqrt(v) || 1;
+  });
+  return { mu, sigma };
+}
+function _fvBuildDesign(rows, mu, sigma) {
+  return rows.map(r => [1, ...FV_FEATURE_KEYS.map(key => (r[key] - mu[key]) / sigma[key])]);
+}
+function _fvRidgeSolve(X, y, lambda) {
+  const k = X[0].length;
+  let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
+  let Sxy = new Array(k).fill(0);
+  X.forEach((x, i) => {
+    for (let a = 0; a < k; a++) {
+      Sxy[a] += x[a] * y[i];
+      for (let b = 0; b < k; b++) Sxx[a][b] += x[a] * x[b];
+    }
+  });
+  for (let d = 1; d < k; d++) Sxx[d][d] += lambda;
+  return _solveLinearSystem(Sxx, Sxy);
+}
+function _fvChooseLambda(usable) {
+  const n = usable.length;
+  const foldSize = Math.floor(n / FV_RIDGE_FOLDS);
+  let bestLambda = null, bestMSE = Infinity;
+  FV_RIDGE_LAMBDA_GRID.forEach(lambda => {
+    let totalSE = 0, totalN = 0;
+    for (let f = 0; f < FV_RIDGE_FOLDS; f++) {
+      const testStart = f * foldSize;
+      const testEnd = (f === FV_RIDGE_FOLDS - 1) ? n : testStart + foldSize;
+      const trainRows = usable.filter((_, i) => i < testStart || i >= testEnd);
+      const testRows = usable.slice(testStart, testEnd);
+      if (trainRows.length < (FV_FEATURE_KEYS.length + 1) * 2 || testRows.length === 0) continue;
+      const { mu, sigma } = _fvStandardize(trainRows);
+      const Xtr = _fvBuildDesign(trainRows, mu, sigma);
+      const ytr = trainRows.map(r => r.spot);
+      const beta = _fvRidgeSolve(Xtr, ytr, lambda);
+      if (!beta) continue;
+      const Xte = _fvBuildDesign(testRows, mu, sigma);
+      testRows.forEach((r, i) => {
+        const pred = Xte[i].reduce((s, x, j) => s + x * beta[j], 0);
+        const err = r.spot - pred;
+        totalSE += err * err;
+        totalN++;
+      });
+    }
+    if (totalN === 0) return;
+    const mse = totalSE / totalN;
+    if (mse < bestMSE) { bestMSE = mse; bestLambda = lambda; }
+  });
+  return bestLambda != null ? bestLambda : FV_RIDGE_LAMBDA_GRID[FV_RIDGE_LAMBDA_GRID.length - 1];
+}
 function _fvRegress(rows) {
-  const usable = rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
+  const usable = _fvUsableRows(rows);
   const k = FV_FEATURE_KEYS.length + 1;
   if (usable.length < k * 2) return null;
   const n = usable.length;
-  let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
-  let Sxy = new Array(k).fill(0);
-  usable.forEach(r => {
-    const x = [1, ...FV_FEATURE_KEYS.map(key => r[key])];
-    for (let i = 0; i < k; i++) {
-      Sxy[i] += x[i] * r.spot;
-      for (let j = 0; j < k; j++) Sxx[i][j] += x[i] * x[j];
-    }
-  });
-  const beta = _solveLinearSystem(Sxx, Sxy);
-  if (!beta) return null;
-  const fitted = usable.map(r => beta[0] + FV_FEATURE_KEYS.reduce((s, key, i) => s + beta[i + 1] * r[key], 0));
+  const lambda = _fvChooseLambda(usable);
+  const { mu, sigma } = _fvStandardize(usable);
+  const X = _fvBuildDesign(usable, mu, sigma);
+  const y = usable.map(r => r.spot);
+  const betaStd = _fvRidgeSolve(X, y, lambda);
+  if (!betaStd) return null;
+  const fitted = X.map(x => x.reduce((s, xi, i) => s + xi * betaStd[i], 0));
   const residuals = usable.map((r, i) => r.spot - fitted[i]);
   const residMean = residuals.reduce((a, b) => a + b, 0) / n;
-  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - k);
+  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / Math.max(1, n - k);
   const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
-  return { beta, n, residStd, usable };
+  const beta = new Array(k).fill(0);
+  let intercept = betaStd[0];
+  FV_FEATURE_KEYS.forEach((key, idx) => {
+    const raw = betaStd[idx + 1] / sigma[key];
+    beta[idx + 1] = raw;
+    intercept -= raw * mu[key];
+  });
+  beta[0] = intercept;
+  return { beta, n, residStd, usable, lambda };
 }
 
-test('_fvRegress: recovers known linear coefficients from synthetic data (5-var BEER)', () => {
+test('_fvRegress: recovers known linear coefficients from synthetic data (6-var BEER, well-conditioned → CV picks a near-zero λ)', () => {
   const rows = [];
   for (let i = 0; i < 60; i++) {
     const rate_diff = Math.sin(i / 5) * 2;
     const stress = Math.cos(i / 7) * 30 + 20;
     const ca_diff = Math.sin(i / 9) * 3;
     const tb_diff = Math.cos(i / 11) * 1.5;
+    const prod_diff = Math.sin(i / 13) * 0.8;
     const noise = ((i * 37) % 13 - 6) * 0.0005;
-    const spot = 1.10 + 0.01 * rate_diff - 0.002 * stress + 0.004 * ca_diff - 0.003 * tb_diff + noise;
-    rows.push({ date: `d${i}`, spot, rate_diff, stress, ca_diff, tb_diff });
+    const spot = 1.10 + 0.01 * rate_diff - 0.002 * stress + 0.004 * ca_diff - 0.003 * tb_diff + 0.005 * prod_diff + noise;
+    rows.push({ date: `d${i}`, spot, rate_diff, stress, ca_diff, tb_diff, prod_diff });
   }
   const reg = _fvRegress(rows);
   assert.ok(reg, 'regression should succeed with 60 varied rows');
+  // A well-conditioned design should land on the low end of the grid, but
+  // CV over finite, noisy data can legitimately prefer a small nonzero λ
+  // over exactly 0 (a slight bias/variance trade-off, not a collinearity
+  // signal) — assert "small", not "exactly 0", to avoid a brittle test
+  // that fails on correct ridge behavior. The v8.341.4-era singular case
+  // (below) is what actually needs a large λ; this test's job is to
+  // confirm coefficient recovery stays accurate at whatever λ CV picks.
+  assert.ok(reg.lambda <= 0.03, `expected CV to pick a small λ for a well-conditioned design, got ${reg.lambda}`);
   assert.ok(Math.abs(reg.beta[0] - 1.10) < 0.01, `intercept off: ${reg.beta[0]}`);
   assert.ok(Math.abs(reg.beta[1] - 0.01) < 0.01, `rate_diff coef off: ${reg.beta[1]}`);
   assert.ok(Math.abs(reg.beta[2] - (-0.002)) < 0.001, `stress coef off: ${reg.beta[2]}`);
   assert.ok(Math.abs(reg.beta[3] - 0.004) < 0.001, `ca_diff coef off: ${reg.beta[3]}`);
   assert.ok(Math.abs(reg.beta[4] - (-0.003)) < 0.001, `tb_diff coef off: ${reg.beta[4]}`);
+  assert.ok(Math.abs(reg.beta[5] - 0.005) < 0.001, `prod_diff coef off: ${reg.beta[5]}`);
   assert.ok(reg.residStd > 0 && reg.residStd < 0.01, `residStd out of expected range: ${reg.residStd}`);
 });
-test('_fvRegress: singular input (constant regressor) → null, not garbage', () => {
+test('_fvRegress: a constant regressor is genuinely collinear — ridge still returns a real, non-null fit (not the old "singular → null" behavior)', () => {
   const rows = Array.from({ length: 60 }, (_, i) => ({
-    date: `d${i}`, spot: 1.10 + i * 0.0001, rate_diff: 1.0, stress: 20, ca_diff: -1.5, tb_diff: 0.5,
+    date: `d${i}`, spot: 1.10 + i * 0.0001, rate_diff: 1.0, stress: 20, ca_diff: -1.5, tb_diff: 0.5, prod_diff: 0.1,
   }));
-  assert.strictEqual(_fvRegress(rows), null);
+  const reg = _fvRegress(rows);
+  assert.ok(reg, 'v8.341.5: ridge must return a real fit here, not null — this is the exact case OLS used to refuse');
+  assert.ok(reg.lambda > 0, `expected a positive CV-selected λ for a fully-collinear design, got ${reg.lambda}`);
+  assert.ok(Number.isFinite(reg.beta[0]), 'intercept must be a finite number');
 });
-test('_fvRegress: fewer than 2×params usable rows → null', () => {
+test('_fvRegress: fewer than 2×params usable rows → null (unchanged by the ridge switch — this gate is about sample size, not collinearity)', () => {
   const rows = [
-    { spot: 1.1, rate_diff: 1, stress: 20, ca_diff: 0.5, tb_diff: -0.2 },
-    { spot: 1.11, rate_diff: 1.1, stress: 21, ca_diff: 0.6, tb_diff: -0.1 },
+    { spot: 1.1, rate_diff: 1, stress: 20, ca_diff: 0.5, tb_diff: -0.2, prod_diff: 0.05 },
+    { spot: 1.11, rate_diff: 1.1, stress: 21, ca_diff: 0.6, tb_diff: -0.1, prod_diff: 0.06 },
   ];
   assert.strictEqual(_fvRegress(rows), null);
 });
-test('_fvRegress: rows missing a required field (incl. new ca_diff/tb_diff) are excluded from the usable set', () => {
-  // At least 10 usable rows needed (k=5 params, gate is 2×k) — 14 built,
-  // 3 excluded via a missing field each, leaving 11. Features vary via
+test('_fvRegress: rows missing a required field (incl. prod_diff) are excluded from the usable set', () => {
+  // At least 12 usable rows needed (k=6 params, gate is 2×k) — 16 built,
+  // 4 excluded via a missing field each, leaving 12. Features vary via
   // index-derived offsets so the remaining system after exclusions isn't
-  // singular purely from this test's own setup.
+  // trivially degenerate purely from this test's own setup.
   const rows = [];
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 16; i++) {
     rows.push({
       spot: 1.10 + i * 0.001,
       rate_diff: 1.0 + (i % 5) * 0.2,
       stress: 5 + (i % 4) * 3,
       ca_diff: -1 + (i % 3) * 0.7,
       tb_diff: 0.2 + (i % 6) * 0.15,
+      prod_diff: -0.2 + (i % 4) * 0.1,
     });
   }
-  rows[2].rate_diff = null; // excluded
-  rows[5].ca_diff = null;   // excluded
-  rows[8].tb_diff = null;   // excluded
+  rows[2].rate_diff = null;  // excluded
+  rows[5].ca_diff = null;    // excluded
+  rows[8].tb_diff = null;    // excluded
+  rows[11].prod_diff = null; // excluded
   const reg = _fvRegress(rows);
-  assert.ok(reg, 'regression should succeed on the 11 remaining valid rows');
-  assert.strictEqual(reg.n, 11);
+  assert.ok(reg, 'regression should succeed on the 12 remaining valid rows');
+  assert.strictEqual(reg.n, 12);
 });
 
 // ═══════════════════════════════════════════════════════════════════

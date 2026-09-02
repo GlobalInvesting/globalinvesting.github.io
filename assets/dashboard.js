@@ -125,15 +125,32 @@ const FV_ROLLING_WINDOW = 60;
 // footnote text has been updated to match (see index.html).
 const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff', 'prod_diff'];
 
-// ── OLS regression: spot ~ intercept + Σ βᵢ·featureᵢ ───────────────────────
+// ── Ridge (Tikhonov) regression: spot ~ intercept + Σ βᵢ·featureᵢ ──────────
 // A BEER-style (Behavioral Equilibrium Exchange Rate) model: spot regressed
-// on FV_FEATURE_KEYS, solved via the (k+1)×(k+1) normal-equations system
-// (X^T X) beta = X^T y, closed form via Gaussian elimination with partial
-// pivoting — no matrix library needed for this few unknowns. This remains a
-// deliberately lighter-weight version of an academic BEER model, labeled
-// as such in the panel footnote — now covering all 6 planned variables
-// (v8.341.0 closed the productivity-differential gap), not claiming to be
-// a full academic implementation of the framework.
+// on FV_FEATURE_KEYS. v8.341.5 switched the solver from plain OLS to ridge
+// regression, standardized-features convention (glmnet/sklearn RidgeCV
+// default: z-score every feature, fit, then transform β back to raw scale;
+// intercept is never penalized) — see GUIDELINES.md's v8.341.5 rule for the
+// full rationale. This remains a deliberately lighter-weight version of an
+// academic BEER model, labeled as such in the panel footnote — now covering
+// all 6 planned variables (v8.341.0 closed the productivity-differential
+// gap) and, as of v8.341.5, ridge-regularized rather than a claim to be a
+// full academic implementation of the framework.
+//
+// WHY RIDGE, NOT OLS: with 5 feature columns this coarse (rate_diff moves
+// daily; stress moves in small integer steps; ca_diff/tb_diff/prod_diff
+// update weekly-to-quarterly, so each has only 2-4 real distinct values
+// across a ~59-row window), some linear combination of the slower columns
+// can become exactly collinear with another column even when every column
+// individually has >1 unique value — v8.341.3/v8.341.4 confirmed this via
+// dashboard.js's own real solver: 11 of 32 pairs returned null from plain
+// OLS's _solveLinearSystem() for exactly this reason, not from a genuinely
+// missing data point. Ridge adds λ to the (standardized) design matrix's
+// diagonal, which is guaranteed to make the matrix positive-definite (and
+// therefore solvable) for any λ>0, at the cost of a small, disclosed bias
+// shrinking coefficients toward zero — the standard industry remedy for
+// real (not fabricated) multicollinearity in a multi-factor macro model,
+// not a numerical hack to force a "—" cell to show a number.
 //
 // A row is "usable" for the regression only if spot AND every one of
 // FV_FEATURE_KEYS is non-null. Shared by _fvRegress() and renderFairValue()
@@ -145,18 +162,136 @@ function _fvUsableRows(rows) {
   return rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
 }
 
+// λ grid searched by _fvChooseLambda() below, on the STANDARDIZED-feature
+// scale (so one grid is meaningful across every pair/currency regardless of
+// each raw feature's native units). 0 is included so a pair with no real
+// collinearity still gets the unbiased OLS answer when it scores best under
+// cross-validation — ridge is applied only where the data actually calls
+// for it, never unconditionally.
+const FV_RIDGE_LAMBDA_GRID = [0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100];
+const FV_RIDGE_FOLDS = 5; // 5-fold CV, same convention as sklearn's RidgeCV default
+
+// Per-feature mean/std over `rows`, used to standardize before ridge and to
+// un-standardize β back to raw-feature scale afterward. σ falls back to 1
+// for a column that's genuinely constant WITHIN this particular subset
+// (e.g. one CV fold) so standardization doesn't divide by zero — that
+// column simply contributes nothing to the fit for that fold, which is the
+// correct behavior (no information in a constant column).
+function _fvStandardize(rows) {
+  const mu = {}, sigma = {};
+  FV_FEATURE_KEYS.forEach(key => {
+    const vals = rows.map(r => r[key]);
+    const m = vals.reduce((a, b) => a + b, 0) / vals.length;
+    const v = vals.reduce((a, b) => a + (b - m) * (b - m), 0) / vals.length;
+    mu[key] = m;
+    sigma[key] = Math.sqrt(v) || 1;
+  });
+  return { mu, sigma };
+}
+
+// Builds the design matrix: intercept column of 1s + standardized features,
+// using the mu/sigma passed in (always computed from the TRAINING subset,
+// never the subset being predicted — see _fvChooseLambda()'s fold loop).
+function _fvBuildDesign(rows, mu, sigma) {
+  return rows.map(r => [1, ...FV_FEATURE_KEYS.map(key => (r[key] - mu[key]) / sigma[key])]);
+}
+
+// Ridge normal equations: (X'X + λD)β = X'y, where D is the identity matrix
+// with D[0][0]=0 — the intercept (column 0) is never penalized, standard
+// ridge convention (glmnet, sklearn Ridge/RidgeCV both default to this).
+// Reuses the same Gaussian-elimination solver OLS always used; for λ>0 the
+// matrix is guaranteed positive-definite (X'X is PSD, +λI on the penalized
+// block makes it PD), so this returns null only if EVERY λ in the grid
+// (including the strongest) still fails — effectively never in practice.
+function _fvRidgeSolve(X, y, lambda) {
+  const k = X[0].length;
+  let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
+  let Sxy = new Array(k).fill(0);
+  X.forEach((x, i) => {
+    for (let a = 0; a < k; a++) {
+      Sxy[a] += x[a] * y[i];
+      for (let b = 0; b < k; b++) Sxx[a][b] += x[a] * x[b];
+    }
+  });
+  for (let d = 1; d < k; d++) Sxx[d][d] += lambda; // skip index 0 — the intercept
+  return _solveLinearSystem(Sxx, Sxy);
+}
+
+// Chooses λ objectively via blocked (contiguous, not shuffled — these are
+// time-ordered business-day rows) 5-fold cross-validation: for each
+// candidate λ, hold out each block in turn, fit ridge on the rest
+// (standardizing from the training block only, never the held-out one —
+// same look-ahead discipline as the walk-forward split already used
+// elsewhere in this file), score out-of-sample squared error on the held-
+// out block, and keep whichever λ minimizes total CV error. This is the
+// same criterion sklearn's RidgeCV/glmnet's cv.glmnet use — not a value
+// picked because it "makes the singular pairs show a number".
+function _fvChooseLambda(usable) {
+  const n = usable.length;
+  const foldSize = Math.floor(n / FV_RIDGE_FOLDS);
+  let bestLambda = null, bestMSE = Infinity;
+
+  FV_RIDGE_LAMBDA_GRID.forEach(lambda => {
+    let totalSE = 0, totalN = 0;
+    for (let f = 0; f < FV_RIDGE_FOLDS; f++) {
+      const testStart = f * foldSize;
+      const testEnd = (f === FV_RIDGE_FOLDS - 1) ? n : testStart + foldSize;
+      const trainRows = usable.filter((_, i) => i < testStart || i >= testEnd);
+      const testRows = usable.slice(testStart, testEnd);
+      if (trainRows.length < (FV_FEATURE_KEYS.length + 1) * 2 || testRows.length === 0) continue;
+
+      const { mu, sigma } = _fvStandardize(trainRows);
+      const Xtr = _fvBuildDesign(trainRows, mu, sigma);
+      const ytr = trainRows.map(r => r.spot);
+      const beta = _fvRidgeSolve(Xtr, ytr, lambda);
+      if (!beta) continue;
+
+      const Xte = _fvBuildDesign(testRows, mu, sigma);
+      testRows.forEach((r, i) => {
+        const pred = Xte[i].reduce((s, x, j) => s + x * beta[j], 0);
+        const err = r.spot - pred;
+        totalSE += err * err;
+        totalN++;
+      });
+    }
+    if (totalN === 0) return;
+    const mse = totalSE / totalN;
+    if (mse < bestMSE) { bestMSE = mse; bestLambda = lambda; }
+  });
+
+  // Fallback: every λ failed on every fold (only possible with pathologically
+  // few rows) — use the strongest grid value, which is mathematically
+  // guaranteed solvable on the full sample even if CV itself couldn't score it.
+  return bestLambda != null ? bestLambda : FV_RIDGE_LAMBDA_GRID[FV_RIDGE_LAMBDA_GRID.length - 1];
+}
+
 // Returns null if there are fewer usable rows than 2× the number of free
 // parameters (need real headroom above the parameter count for a
-// meaningful residual std, not just one more row than parameters) or the
-// input matrix is singular (e.g. a feature is constant across the whole
-// window — no variation to regress against).
-function _fvRegress(rows) {
+// meaningful residual std, not just one more row than parameters). Unlike
+// the pre-v8.341.5 OLS version, does NOT return null for a collinear design
+// — ridge (see above) resolves that case with a disclosed, cross-validated
+// λ instead of refusing to fit.
+// Checks whether `rows` alone (no regularization) identify the full
+// 6-variable design — i.e. whether plain OLS would have found a real
+// (non-singular) fit. This is intentionally kept separate from the
+// CV-selected λ in _fvRegress()/_fvChooseLambda(): those two signals mean
+// different things. CV can pick a large λ purely because daily FX spot is
+// noisy relative to 6 macro regressors — a bias/variance trade-off that
+// applies to almost every pair, well-conditioned or not (confirmed live:
+// audusd/usdjpy/gbpusd/cadjpy — all OLS-identifiable with zero
+// collinearity — still get CV-selected λ=100, same as genuinely singular
+// EUR crosses). Using λ magnitude alone as a "confidence" signal would
+// have mislabeled well-conditioned pairs as low-confidence. THIS check
+// isolates the thing that actually varies pair-to-pair: whether the
+// pair's own slower-moving inputs (ca_diff/tb_diff/prod_diff) had enough
+// real within-window variation to identify the model without ridge's
+// help at all. See v8.341.6 CHANGELOG for the full reasoning and the
+// live audit (21 identifiable / 11 genuinely singular, unchanged from
+// v8.341.4's OLS-era diagnosis).
+function _fvOlsIdentifiable(rows) {
   const usable = _fvUsableRows(rows);
-  const k = FV_FEATURE_KEYS.length + 1; // +1 for the intercept
-  if (usable.length < k * 2) return null;
-
-  const n = usable.length;
-  // X columns: [1, ...FV_FEATURE_KEYS], y: spot
+  const k = FV_FEATURE_KEYS.length + 1;
+  if (usable.length < k * 2) return null; // not applicable — caller already gates on this
   let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
   let Sxy = new Array(k).fill(0);
   usable.forEach(r => {
@@ -166,17 +301,46 @@ function _fvRegress(rows) {
       for (let j = 0; j < k; j++) Sxx[i][j] += x[i] * x[j];
     }
   });
+  return _solveLinearSystem(Sxx, Sxy) !== null;
+}
 
-  const beta = _solveLinearSystem(Sxx, Sxy);
-  if (!beta) return null; // singular — no variation in an input to regress against
+function _fvRegress(rows) {
+  const usable = _fvUsableRows(rows);
+  const k = FV_FEATURE_KEYS.length + 1; // +1 for the intercept
+  if (usable.length < k * 2) return null;
 
-  const fitted = usable.map(r => beta[0] + FV_FEATURE_KEYS.reduce((s, key, i) => s + beta[i + 1] * r[key], 0));
+  const n = usable.length;
+  const lambda = _fvChooseLambda(usable);
+  const { mu, sigma } = _fvStandardize(usable);
+  const X = _fvBuildDesign(usable, mu, sigma);
+  const y = usable.map(r => r.spot);
+
+  const betaStd = _fvRidgeSolve(X, y, lambda);
+  if (!betaStd) return null; // only if the strongest λ in the grid still fails
+
+  const fitted = X.map(x => x.reduce((s, xi, i) => s + xi * betaStd[i], 0));
   const residuals = usable.map((r, i) => r.spot - fitted[i]);
   const residMean = residuals.reduce((a, b) => a + b, 0) / n;
-  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / (n - k); // k fitted params
+  // Ridge's effective degrees of freedom are slightly below k when λ>0, but
+  // using k here (same as the OLS-era denominator) keeps residStd on the
+  // conservative (slightly wider, never narrower) side rather than
+  // overstating precision — disclosed simplification, not hidden.
+  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / Math.max(1, n - k);
   const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
 
-  return { beta, n, residStd, usable };
+  // Un-standardize β so renderFairValue()'s existing
+  // `beta[0] + Σ beta[i+1]*last[key]` code keeps working against raw
+  // (non-standardized) feature values, unchanged by this switch to ridge.
+  const beta = new Array(k).fill(0);
+  let intercept = betaStd[0];
+  FV_FEATURE_KEYS.forEach((key, idx) => {
+    const raw = betaStd[idx + 1] / sigma[key];
+    beta[idx + 1] = raw;
+    intercept -= raw * mu[key];
+  });
+  beta[0] = intercept;
+
+  return { beta, n, residStd, usable, lambda };
 }
 
 // Solves the k×k linear system A·x = b via Gaussian elimination with
@@ -184,7 +348,8 @@ function _fvRegress(rows) {
 // epsilon can be found) rather than dividing by ~0 and returning garbage.
 // Generalized (v8.200.0) from a fixed 3x3 solver to arbitrary k so the Fair
 // Value BEER model can grow its variable count without a second solver
-// needing to be hand-written each time.
+// needing to be hand-written each time. Reused unchanged by ridge (v8.341.5)
+// — only the matrix fed into it changed (X'X+λD instead of plain X'X).
 function _solveLinearSystem(A, b) {
   const k = A.length;
   const M = A.map((row, i) => [...row, b[i]]);
@@ -258,6 +423,7 @@ async function renderFairValue() {
     const stTxt   = last.stress != null ? last.stress.toFixed(0) : '—';
 
     let fvTxt = '—', zTxt = '—', zColor = 'var(--text3)';
+    let fitTxt = '—', fitColor = 'var(--text3)', fitTitle = '';
     const usableForPair = _fvUsableRows(rows);
     if (usableForPair.length >= FV_MIN_ROWS) {
       // v8.262.0 FIX: walk-forward split, same principle as fetch_correlations()'s
@@ -284,6 +450,20 @@ async function renderFairValue() {
         // (shown as 'down' color — same convention as the rest of the terminal
         // uses for "expect mean reversion downward"); spot BELOW = cheap.
         zColor = Math.abs(z) < 1 ? 'var(--text3)' : (z > 0 ? 'var(--down)' : 'var(--up)');
+
+        // Fit-quality tier — see _fvOlsIdentifiable() above for why this is
+        // based on whether the pair's own data identifies the model at
+        // all (genuine collinearity), not on the CV-selected λ magnitude
+        // (which mostly reflects ordinary bias/variance shrinkage that
+        // applies broadly across pairs, identifiable or not).
+        const identifiable = _fvOlsIdentifiable(trainRows);
+        if (identifiable) {
+          fitTxt = 'Solid'; fitColor = 'var(--up)';
+          fitTitle = `This pair's own data (rate differential, risk score, Current Account, Trade Balance, productivity) fully identifies the 6-variable model on its own — no genuine collinearity. Cross-validation additionally applies \u03bb=${reg.lambda} of ridge shrinkage, the same routine bias/variance treatment used for every pair given how noisy daily FX spot is relative to 6 macro regressors — this is not a data-quality flag.`;
+        } else {
+          fitTxt = 'Regularized'; fitColor = 'var(--down)';
+          fitTitle = `This pair's slower-moving inputs (Current Account, Trade Balance, and/or productivity differential — often sparse for EUR crosses or currencies with few recent releases) don't have enough real within-window variation to identify the 6-variable model without ridge regularization (\u03bb=${reg.lambda}). The fit exists and is real, but leans more on regularization and less on this specific pair's own data than a pair marked Solid — treat Fair Value/Z-score here as lower-confidence.`;
+        }
       }
     }
 
@@ -294,6 +474,7 @@ async function renderFairValue() {
       <td>${stTxt}</td>
       <td>${fvTxt}</td>
       <td style="color:${zColor};">${zTxt}</td>
+      <td style="color:${fitColor};" title="${fitTitle}">${fitTxt}</td>
       <td style="color:var(--text3);">${rows.length}d</td>
     </tr>`;
   });
