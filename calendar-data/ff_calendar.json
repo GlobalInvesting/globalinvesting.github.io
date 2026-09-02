@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-02T14:00:53Z",
+  "generated_at": "2026-09-02T14:30:53Z",
   "source": "Myfxbook · ForexFactory",
   "holidays": [],
   "events": [
@@ -4328,7 +4328,31 @@
       "forecast": null,
       "previous": null,
       "actual": null,
-      "released": false,
+      "released": true,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States EIA Crude Oil Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-09-02",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-1.1M",
+      "previous": "0.095M",
+      "actual": "-4.45M",
+      "released": true,
+      "vendor": "myfxbook"
+    },
+    {
+      "title": "United States EIA Gasoline Stocks Change",
+      "currency": "USD",
+      "dateISO": "2026-09-02",
+      "timeUTC": "14:30",
+      "impact": "medium",
+      "forecast": "-1.9M",
+      "previous": "-2.536M",
+      "actual": "-1.173M",
+      "released": true,
       "vendor": "myfxbook"
     },
     {
