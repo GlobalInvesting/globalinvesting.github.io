@@ -18232,14 +18232,25 @@ window.addEventListener('gi-theme-change', function() {
   // under raw p<0.05, collapsing to 1 window in 1 pair (Nasdaq Feb->Jul,
   // p=0.0001) once Benjamini-Hochberg FDR correction is applied across
   // each pair's full candidate set — see compute_seasonality.py v4.0.
-  // The selection gate is now q_value < 0.05 (BH-adjusted), not raw
-  // p_value < 0.05; both are still shown so a user can see the individual
-  // test result alongside the corrected one.
+  //
+  // v5.0 (2026-09-02 industry-standard audit): v4.0's own "industry-
+  // standard" framing was checked against the wrong industry — verified
+  // live against Seasonax (the engine behind Bloomberg's own APP SEASONS
+  // GO) and independent TradingView seasonality tools, none of which gate
+  // on a multiple-comparisons-corrected figure; they surface win rate/avg
+  // return/raw significance as context and leave the judgment call to the
+  // trader. The v4.0 gate technically worked as designed but left 50 of 51
+  // symbols empty, which doesn't match what the actual reference tools
+  // show for the same underlying data. Gate reverted to raw p_value <
+  // 0.05 (see compute_seasonality.py v5.0) — q_value (BH-adjusted) is
+  // still computed and shown alongside for a sophisticated user, it's
+  // just no longer the thing that decides whether a window is shown at
+  // all.
   function _sznRenderWindows(windows) {
     const tbody = document.getElementById('szn-windows-tbody');
     if (!tbody) return;
     if (!windows || !windows.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:4px 0;">No window reached FDR-corrected statistical significance (q&lt;0.05, Benjamini-Hochberg) for this pair over the available history.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);padding:4px 0;">No window reached statistical significance (one-sample t-test, p&lt;0.05) for this pair over the available history.</td></tr>';
       return;
     }
     const M = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -18260,7 +18271,7 @@ window.addEventListener('gi-theme-change', function() {
     const top = data.windows && data.windows[0];
     const label = _sznPairLabel(pair);
     if (!top) {
-      insight.textContent = `${label} has ${data.years} years of history but no window reached FDR-corrected statistical significance (q<0.05, Benjamini-Hochberg across the ~78 candidate windows tested) over that period \u2014 no strong recurring seasonal pattern found.`;
+      insight.textContent = `${label} has ${data.years} years of history but no window reached statistical significance (one-sample t-test, p<0.05) over that period \u2014 no strong recurring seasonal pattern found.`;
       return;
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -18278,7 +18289,7 @@ window.addEventListener('gi-theme-change', function() {
     } else {
       sampleNote = `${data.years}y of history exceeds the 15-25y sample size seasonality research typically recommends`;
     }
-    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value}, q=${top.q_value} FDR-adjusted; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
+    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value} [q=${top.q_value} FDR-adjusted, shown for context]; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
   }
 
   async function _sznLoad(pair) {
