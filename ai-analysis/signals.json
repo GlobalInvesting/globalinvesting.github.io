@@ -1,39 +1,51 @@
 {
-  "generated_at": "2026-09-02T07:01:12Z",
+  "generated_at": "2026-09-02T11:47:18Z",
   "signals": [
     {
-      "time": "06:57",
+      "time": "11:45",
       "priority": "critical",
-      "title": "NZD/USD — G10 Bilateral Theme + RBNZ Hike",
-      "text": "NZD/USD has fallen to 0.5843, breaking below its SMA200 at 0.5852 as the G10 laggard theme dominates the pair. Despite the RBNZ delivering a second consecutive interest rate hike to 2.75% today, the NZD is the weakest G10 performer with a 1W average of -1.384% against a strong USD at +0.835%. Speculative positioning is extremely crowded with NZD COT LF net short at -32,496 (pctl 0, z -2.60), yet the currency continues to underperform even after hawkish policy action. This suggests a classic 'sell the fact' reaction where the hiking cycle was already fully priced, leaving the currency vulnerable to broad USD strength. Trade bias: Bearish NZD/USD; weak G10 momentum outweighs RBNZ hiking cycle. Catalyst: US August Inflation data next week. Risk: NZD short-covering squeeze if US data misses, given the 0-percentile positioning extreme.",
+      "title": "USD/JPY — Geopolitical Risk + BoJ Hawkishness",
+      "text": "USD/JPY trades at 159.66, testing the SMA20 at 159.12 as risk-off flows intensify following reports of an Iranian attack on a Saudi vessel in the Strait of Hormuz. While the 270bp Fed-BoJ OIS carry advantage traditionally supports the pair, the BoJ chief's confirmation that rate hikes are 'on the table' for this month's meeting introduces a hawkish policy floor. Options markets show a clear bias for JPY strength, with the USD/JPY 25d Risk Reversal at -1.79 (strong put skew), signaling institutional demand for downside protection against potential intervention or carry unwinds. Despite the VIX at 16.5, the yen's correlation with the VIX has turned positive (+0.382 vs -0.159 norm), suggesting the JPY is currently trading more on policy repricing and geopolitical shock than broad safe-haven beta. Trade bias: Bearish USD/JPY; hawkish BoJ pivot and Middle East escalation threaten the 160.00 ceiling. Catalyst: US ADP Employment data at 12:15 UTC. Risk: De-escalation in the Strait of Hormuz restores carry-first dominance.",
       "evidence": [
-        "USD 1W avg: +0.835% (n=7)",
-        "NZD 1W avg: -1.384% (n=4)",
-        "G10 spread: 2.219%"
+        "Strait of Hormuz: Vessel Attack",
+        "USD/JPY 25d RR: -1.79 (Put Skew)",
+        "USD/JPY OIS Carry: +270bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:55",
-      "priority": "warning",
-      "title": "EUR/USD — COT Extreme + Volatility Premium",
-      "text": "EUR/USD is trading at 1.1574, sitting below its SMA20 (1.1602) and SMA200 (1.1637) as downside pressure mounts. COT positioning has hit a bearish extreme with LF net short at -55,311 (pctl 3, z -2.28), marking a sharp WoW delta of -55,635. The options market is pricing in significant tail risk, with 1M IV at 7.1% vs HV30 of 4.8%, creating a +2.3% Vol Risk Premium. While ECB's Nagel notes a 95% probability of a September hike, the +150bp OIS carry advantage for USD and the bear flattener yield curve regime continue to favor the greenback. Trade bias: Bearish EUR/USD; aggressive spec selling and USD carry advantage cap upside. Catalyst: ECB meeting 10 Sep — 95% hike probability. Risk: ECB delivers a 'hawkish hold' that fails to meet market hike expectations, triggering a deeper move toward 1.1500.",
+      "time": "11:42",
+      "priority": "critical",
+      "title": "NZD/USD — G10 Bilateral Theme + RBNZ Sell-the-Fact",
+      "text": "NZD/USD has plunged to 0.5824, breaking below its SMA200 (0.5853) following a 'sell-the-fact' reaction to the RBNZ interest rate hike. While the RBNZ raised rates to 2.75%, the market has characterized the move as part of a 'gradual path' that fails to support the Kiwi against a surging US Dollar. The USD 1W average performance sits at +0.923%, while the NZD has lagged G10 peers by -1.680%, creating a massive 2.603% leader-to-laggard spread. COT positioning for NZD is at a 52-week extreme (pctl 0, z -2.60), yet the failure of the rate hike to trigger a short-squeeze highlights the dominance of the USD's bear-flattener yield curve regime. Trade bias: Bearish NZD/USD; gradual RBNZ path offers no relief against USD outperformance. Catalyst: US ADP Employment data today. Risk: USD bear-flattener reverses on a significant ADP miss.",
       "evidence": [
-        "EUR COT pctl: 3 (extreme short)",
-        "EUR/USD VRP: +2.3%",
-        "USD/EUR OIS Carry: +150bp"
+        "NZD 1W avg: -1.680% (n=4)",
+        "G10 spread: 2.603%",
+        "NZD COT pctl: 0 (Extreme Short)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:50",
+      "time": "11:40",
       "priority": "warning",
-      "title": "AUD/USD — Positioning vs Retail Divergence",
-      "text": "AUD/USD is holding at 0.7142, supported by its position above the SMA20/50/200 cluster (0.7114/0.7024/0.6978). A clear institutional vs. retail divergence has emerged: COT LF positioning is a crowded long at +53,578 (pctl 95, z +1.92) while retail traders are 84% short. The -60bp carry disadvantage for USD vs. AUD (RBA 4.35%) remains a structural floor for the pair, though the AUD/USD vs ASX 200 correlation has broken (z = -1.96σ). This divergence suggests that retail is fading the institutional trend, which often results in a final squeeze higher before a meaningful reversal. Trade bias: Bullish AUD/USD; supported by carry and retail contrarian signals. Catalyst: next RBA meeting (mkt: 100% hold priced) 29 Sep. Risk: Broad risk-off move (VIX > 25) triggers an unwind of the crowded institutional long.",
+      "title": "GBP/USD — Positioning Extreme + Vol Risk Premium",
+      "text": "GBP/USD trades at 1.3483, holding just above its SMA50/200 cluster (1.3436/1.3443) as the pair faces pressure from a crowded speculative long. CFTC data shows GBP leveraged funds are net long +56,839 (pctl 96, z +1.58), marking a significant positioning extreme that leaves the pound vulnerable to unwinding on data misses. Options markets are pricing in substantial uncertainty, with GBP/USD Implied Volatility (IV) at 11.0% against a Realized Volatility (HV30) of 5.0%, resulting in a massive +6.0% Vol Risk Premium (VRP). This elevated premium suggests that while price action has been relatively stable, the cost of hedging downside risk is at an extreme. Trade bias: Bearish GBP/USD; crowded long positioning meets an expensive vol floor. Catalyst: next BoE meeting (mkt: 100% hold priced). Risk: US 10Y yields retreat, allowing the neutral 0bp GBP/USD carry to attract dip-buyers.",
       "evidence": [
-        "AUD COT LF pctl: 95 (crowded long)",
-        "Retail Sentiment: 84% Short",
-        "AUD real rate: -0.55% vs USD +1.45%"
+        "GBP COT pctl: 96 (Extreme Long)",
+        "GBP/USD VRP: +6.0%",
+        "GBP/USD SMA200: 1.3443"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "11:35",
+      "priority": "info",
+      "title": "AUD/JPY — Carry vs Retail Extreme Divergence",
+      "text": "AUD/JPY is trading at 114.007, supported by a significant +335bp nominal carry advantage (RBA 4.35% vs BoJ 1.0%) despite recent yen strength. Retail sentiment via Myfxbook shows an extreme 86% short position, which traditionally serves as a contrarian indicator for upside continuation. However, this retail short-bias is currently aligned with institutional flows (JPY COT pctl 9) and the BoJ's hawkish policy shift, creating a rare institutional-retail alignment rather than a divergence. AUD's own real rate remains mildly accommodative at -0.55%, contrasting with the JPY's deeply accommodative -1.70%. Trade bias: Neutral AUD/JPY; retail extreme short is neutralized by BoJ policy hawkishness and geopolitical risk. Catalyst: BoJ meeting 18 Sep. Risk: Sharp risk-on recovery in equities forces a retail short-squeeze higher.",
+      "evidence": [
+        "AUD/JPY Carry: +335bp",
+        "Retail Sentiment: 86% Short",
+        "AUD Real Rate: -0.55%"
       ],
       "_source": "engine-ai-primary"
     }
