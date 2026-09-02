@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-02T14:01:16Z",
-  "generatedAt": "2026-09-02T14:01:16Z",
+  "lastUpdate": "2026-09-02T14:31:21Z",
+  "generatedAt": "2026-09-02T14:31:21Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,11 +9,11 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-02",
   "rangeTo": "2026-09-04",
-  "totalEvents": 3864,
+  "totalEvents": 3866,
   "currencyCounts": {
     "AUD": 268,
     "EUR": 911,
-    "USD": 1280,
+    "USD": 1282,
     "CHF": 129,
     "GBP": 443,
     "CAD": 272,
@@ -23,7 +23,7 @@
     "SEK": 162
   },
   "impactCounts": {
-    "medium": 1940,
+    "medium": 1942,
     "high": 1696,
     "low": 228
   },
@@ -309,14 +309,14 @@
       "std": 0.0
     },
     "USD/eia gasoline stocks change": {
-      "n": 14,
-      "mean": 0.481071,
-      "std": 1.438595
+      "n": 15,
+      "mean": 0.497467,
+      "std": 1.387718
     },
     "USD/eia crude oil stocks change": {
-      "n": 14,
-      "mean": 1.328357,
-      "std": 6.137891
+      "n": 15,
+      "mean": 1.016467,
+      "std": 6.036709
     },
     "USD/monthly budget statement": {
       "n": 3,
@@ -48598,6 +48598,32 @@
       "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "2 Sep",
+      "dateISO": "2026-09-02",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Crude Oil Stocks Change",
+      "impact": "medium",
+      "actual": "-4.45M",
+      "forecast": "-1.1M",
+      "previous": "0.095M"
+    },
+    {
+      "date": "2 Sep",
+      "dateISO": "2026-09-02",
+      "timeUTC": "14:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States EIA Gasoline Stocks Change",
+      "impact": "medium",
+      "actual": "-1.173M",
+      "forecast": "-1.9M",
+      "previous": "-2.536M"
     },
     {
       "date": "2 Sep",
