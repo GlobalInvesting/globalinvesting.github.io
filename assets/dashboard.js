@@ -413,6 +413,12 @@ async function renderFairValue() {
   accWrap.style.display = 'none';
   tblWrap.style.display = '';
 
+  // Collected alongside the existing table-row loop, not a second pass over
+  // the data — one entry per pair that actually has a real regression fit
+  // this render (mirrors the table's own gating exactly, so the chart can
+  // never show a pair the table itself couldn't).
+  const zEntries = [];
+
   let html = '';
   results.forEach(({ pair, rows }) => {
     if (!rows.length) return;
@@ -464,6 +470,14 @@ async function renderFairValue() {
           fitTxt = 'Regularized'; fitColor = 'var(--down)';
           fitTitle = `This pair's slower-moving inputs (Current Account, Trade Balance, and/or productivity differential — often sparse for EUR crosses or currencies with few recent releases) don't have enough real within-window variation to identify the 6-variable model without ridge regularization (\u03bb=${reg.lambda}). The fit exists and is real, but leans more on regularization and less on this specific pair's own data than a pair marked Solid — treat Fair Value/Z-score here as lower-confidence.`;
         }
+
+        // Same z value already computed above for the table cell — reused,
+        // not recomputed, so the chart and table can never disagree.
+        zEntries.push({
+          label: pair.label || (pair.base + '/' + pair.quote),
+          z,
+          regularized: !identifiable
+        });
       }
     }
 
@@ -479,6 +493,96 @@ async function renderFairValue() {
     </tr>`;
   });
   tbody.innerHTML = html;
+  _fvRenderZScoreChart(zEntries);
+}
+
+// FX under/overvaluation Z-score bar chart, above the Fair Value table —
+// layout modeled on the Credit Agricole FAST FX under/overvaluation chart:
+// one bar per pair, dotted ±1.5σ/±2σ reference lines.
+//
+// ORDER — the reference chart's own bar order is NOT sorted by z-score (its
+// real values, read off the reference table, are -1.496/-1.14/-0.76/+0.04/
+// -2.85/-1.12/-1.61/-0.95/+0.35/-0.71 — not ascending) — it's a fixed pair
+// list, the same order as the summary table beneath it. That's the correct
+// convention here too, for a concrete reason beyond "matches the reference":
+// if a "last week" bar series is added later (deliberately deferred, see the
+// render call site), both bars for the same pair must sit at the same x
+// position to be comparable — impossible if the x-axis order reshuffles
+// every day based on today's values. Uses each pair's position in the
+// existing PAIRS array (already a deliberate, documented order — majors
+// first, then EUR/GBP/etc. crosses — the same order the table itself
+// renders in), not a z-sort.
+//
+// LABELS — horizontal, centered under each bar (font-size 7). Verified via
+// a live Playwright render that this fits inside each column's own 40px
+// slot (barW 30 + gap 10) with zero adjacent-label overlap across a 15-pair
+// test set; an earlier -55°-rotated version needed a taller reserved label
+// band (56px) to avoid the SVG's default viewBox clipping — no longer
+// needed at horizontal orientation (24px band).
+function _fvRenderZScoreChart(entries) {
+  const wrap = document.getElementById('fv-zchart-wrap');
+  if (!wrap) return;
+  if (!entries.length) { wrap.innerHTML = ''; return; }
+
+  // Fixed order = each pair's own index in PAIRS (see note above) — entries
+  // were pushed in that same order already, so this is a no-op stable copy,
+  // not a resort; kept explicit so a future edit that reorders the push
+  // site doesn't silently break this chart's ordering guarantee.
+  const ordered = entries.slice();
+
+  const barW = 30, gap = 10;
+  const plotH = 170;   // bars + sigma reference lines
+  const labelH = 24;   // reserved band for horizontal pair labels below the plot
+  const chartH = plotH + labelH;
+  const chartW = Math.max(560, ordered.length * (barW + gap) + gap);
+  const midY = plotH / 2;
+  // Keep at least 3σ of headroom so the ±2σ lines are never at the very
+  // edge, even if every pair happens to sit inside ±1.5σ today.
+  const maxAbs = Math.max(3.0, ...ordered.map(e => Math.abs(e.z)));
+  const scale = (plotH / 2 - 16) / maxAbs; // px per 1.0σ
+
+  function refLines(sigma) {
+    const yTop = midY - sigma * scale;
+    const yBot = midY + sigma * scale;
+    return `<line x1="0" y1="${yTop}" x2="${chartW}" y2="${yTop}" stroke="var(--text3)" stroke-width="1" stroke-dasharray="3,3" opacity="0.55"/>` +
+           `<line x1="0" y1="${yBot}" x2="${chartW}" y2="${yBot}" stroke="var(--text3)" stroke-width="1" stroke-dasharray="3,3" opacity="0.55"/>` +
+           `<text x="2" y="${yTop - 3}" font-size="8" fill="var(--text3)" font-family="var(--font-ui)">+${sigma.toFixed(1)}\u03c3</text>` +
+           `<text x="2" y="${yBot + 9}" font-size="8" fill="var(--text3)" font-family="var(--font-ui)">-${sigma.toFixed(1)}\u03c3</text>`;
+  }
+
+  let bars = '';
+  ordered.forEach((e, i) => {
+    const x = gap + i * (barW + gap);
+    const len = Math.max(1, Math.abs(e.z) * scale);
+    const y = e.z >= 0 ? midY - len : midY;
+    // Same convention as the table's own zColor: spot above fair value
+    // (z>0, overvalued) = down/red; spot below (z<0, undervalued) = up/green.
+    const color = e.z >= 0 ? 'var(--down)' : 'var(--up)';
+    const opacity = e.regularized ? 0.4 : 0.9;
+    const zLabel = (e.z >= 0 ? '+' : '') + e.z.toFixed(2) + '\u03c3';
+    const labelY = plotH + 12;
+    bars += `<g>
+      <rect x="${x}" y="${y}" width="${barW}" height="${len}" fill="${color}" opacity="${opacity}"><title>${e.label}: ${zLabel}${e.regularized ? ' \u2014 Regularized fit, lower confidence' : ''}</title></rect>
+      <text x="${x + barW / 2}" y="${labelY}" font-size="7" fill="var(--text2)" font-family="var(--font-mono)" text-anchor="middle">${e.label}</text>
+    </g>`;
+  });
+
+  wrap.innerHTML = `
+    <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);font-family:var(--font-ui);margin-bottom:2px;">
+      <span>Overvalued</span>
+      <span>FX under/overvaluation \u2014 Z-scores</span>
+      <span>Undervalued</span>
+    </div>
+    <div style="overflow-x:auto;overflow-y:hidden;">
+      <svg width="${chartW}" height="${chartH}" viewBox="0 0 ${chartW} ${chartH}" style="display:block;">
+        ${refLines(2.0)}
+        ${refLines(1.5)}
+        <line x1="0" y1="${midY}" x2="${chartW}" y2="${midY}" stroke="var(--border)" stroke-width="1"/>
+        ${bars}
+      </svg>
+    </div>
+    <div style="font-size:8px;color:var(--text3);font-family:var(--font-ui);margin-top:2px;">Fixed pair order (same as the table below) \u00b7 dotted lines mark \u00b11.5\u03c3 and \u00b12.0\u03c3 \u00b7 faded bars = Regularized fit (see Fit column) \u00b7 hover a bar for the exact value</div>
+  `;
 }
 
 // CB rate config
