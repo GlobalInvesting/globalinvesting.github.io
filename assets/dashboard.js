@@ -17314,15 +17314,28 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
 
     // ── Render series ──────────────────────────────────────────────────────
     // All types use LineSeries: ohlc → % change, cot → net contracts, rate → step-line, esi → index
+    // BUGFIX (2026-09-02): every compare type used to share one hidden
+    // 'cmp' price scale. That's fine for two overlays of the SAME type
+    // (e.g. two rate step-lines, or two OHLC % comparisons) — sharing an
+    // axis is what makes them comparable — but across types the magnitudes
+    // are wildly different (rate ~0.5-5.5%, COT net position tens of
+    // thousands, ESI index tens). Autoscaling them together left whatever
+    // series had the smallest range (confirmed: CB Rate, once a COT overlay
+    // was also active) squashed flat near one edge. Each cmpType now gets
+    // its own scale id ('cmp-rate', 'cmp-cot', etc.) — still invisible/
+    // non-rendering (custom scale ids never attach to a visible axis panel
+    // in LWC unless explicitly shown, same as the old shared 'cmp' id was),
+    // just no longer cross-contaminating other types' autoscale range.
+    const cmpScaleId = 'cmp-' + cmpType;
     const cmpSeries = LWC.LineSeries
       ? _lwChart.addSeries(LWC.LineSeries, {
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
-          priceScaleId: 'cmp', priceFormat,
+          priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' })
       : _lwChart.addLineSeries({
           color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
-          priceScaleId: 'cmp', priceFormat,
+          priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' });
 
@@ -17356,7 +17369,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
       }
 
     try {
-      _lwChart.priceScale('cmp').applyOptions({
+      _lwChart.priceScale(cmpScaleId).applyOptions({
         scaleMargins: { top: 0.1, bottom: 0.1 },
         borderVisible: false, textColor: CMP_COLOR,
       });
