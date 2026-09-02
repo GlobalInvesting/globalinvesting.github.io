@@ -89,286 +89,39 @@ const PAIRS = [
 ];
 
 // ── FX Fair Value (v8.191.0, regression added v8.197.0, generalized to a
-// 5-variable BEER model v8.200.0) ──────────────────────────────────────────
-// Reads fair-value-data/{pair}.json (written on business days only by
-// log_fair_value_inputs.py in globalinvesting-scripts — see
-// log-fair-value-inputs.yml, v1.2: skips Sat/Sun so every logged row is a
-// genuinely distinct market observation, not a repeated weekend snapshot of
-// Friday's close). Each file is an array of real {date, spot, rate_diff,
-// stress, ca_diff, tb_diff} rows, oldest → newest, one per business day the
-// workflow has run. No client-side estimation of missing days: below
-// FV_MIN_ROWS the panel shows an accumulation progress bar instead of a
-// z-score, per the standing "don't fabricate regression history"
-// decision (2026-08-20) — see GUIDELINES.md § Data integrity.
-const FV_MIN_ROWS = 60; // 60 business days (~12 weeks) — not 60 calendar days
-// Rolling window matches the panel's own "60D rolling regression" subtitle —
-// once more than FV_ROLLING_WINDOW real rows exist, the regression refits on
-// only the most recent window rather than the whole growing history, so the
-// fair-value estimate tracks the current regime instead of averaging over
-// years of stale relationships (same rolling-window principle as any BEER-
-// style desk model). Below that count, it uses every row available.
-const FV_ROLLING_WINDOW = 60;
-
-// Feature columns beyond the intercept, in the order they're fit —
-// rate_diff (real rate differential), stress (risk-sentiment score),
-// ca_diff (GDP-normalized Current Account differential — NFA proxy),
-// tb_diff (GDP-normalized Trade Balance differential — ToT direction
-// proxy). v8.200.0: added ca_diff/tb_diff after confirming calendar.json's
-// raw Current Account/Trade Balance levels needed GDP normalization first
-// (see fetch_current_account_gdp.py header) — a raw-level differential
-// between economies of very different size would be pure scale noise, not
-// signal. v8.341.0: added prod_diff (base-minus-quote native-cadence
-// productivity growth_pct, from productivity-data/{CCY}.json via
-// fetch_labor_productivity.py / log_fair_value_inputs.py v1.3) — closing
-// the "productivity differential not yet included" gap this comment used
-// to disclose. This is now a full 6-variable BEER model; the panel
-// footnote text has been updated to match (see index.html).
-const FV_FEATURE_KEYS = ['rate_diff', 'stress', 'ca_diff', 'tb_diff', 'prod_diff'];
-
-// ── Ridge (Tikhonov) regression: spot ~ intercept + Σ βᵢ·featureᵢ ──────────
-// A BEER-style (Behavioral Equilibrium Exchange Rate) model: spot regressed
-// on FV_FEATURE_KEYS. v8.341.5 switched the solver from plain OLS to ridge
-// regression, standardized-features convention (glmnet/sklearn RidgeCV
-// default: z-score every feature, fit, then transform β back to raw scale;
-// intercept is never penalized) — see GUIDELINES.md's v8.341.5 rule for the
-// full rationale. This remains a deliberately lighter-weight version of an
-// academic BEER model, labeled as such in the panel footnote — now covering
-// all 6 planned variables (v8.341.0 closed the productivity-differential
-// gap) and, as of v8.341.5, ridge-regularized rather than a claim to be a
-// full academic implementation of the framework.
+// 6-variable BEER model v8.341.0, server-side computation v8.349.0) ────────
+// The ridge regression (BEER model: spot ~ rate_diff + stress + ca_diff +
+// tb_diff + prod_diff) used to be computed entirely client-side, in this
+// exact block, on every page load — and mirrored a second time in
+// dashboard.test.js purely for testing. As of v8.349.0 it is computed ONCE
+// server-side by globalinvesting-scripts/compute_fair_value.py, immediately
+// after log_fair_value_inputs.py in the same log-fair-value-inputs.yml
+// workflow job, and written to fair-value-data/summary.json. This file now
+// reads that summary directly instead of recomputing the regression —
+// closing the dual-implementation-drift risk between this file and its own
+// test mirror (both independently computed the identical regression until
+// this change), and — the actual reason this was done — giving the AI
+// narrative pipeline (generate_narrative_signals.py's
+// build_fair_value_context()) a real, single source of truth to read from
+// for the first time. Before this change Fair Value existed only inside a
+// user's browser tab and never reached any AI-generated output, unlike
+// every other panel with a comparable structural signal (e.g. Dollar
+// Smile's regime, computed server-side by fetch_growth_differential.py and
+// read by both this dashboard and the narrative pipeline from the same
+// file — Fair Value now follows that same single-writer convention). See
+// compute_fair_value.py's own header for the full rationale and the
+// verification method (0 mismatches at 1e-9 relative tolerance between this
+// exact regression and the Python port, run against the real 32-pair
+// fair-value-data/*.json files).
 //
-// WHY RIDGE, NOT OLS: with 5 feature columns this coarse (rate_diff moves
-// daily; stress moves in small integer steps; ca_diff/tb_diff/prod_diff
-// update weekly-to-quarterly, so each has only 2-4 real distinct values
-// across a ~59-row window), some linear combination of the slower columns
-// can become exactly collinear with another column even when every column
-// individually has >1 unique value — v8.341.3/v8.341.4 confirmed this via
-// dashboard.js's own real solver: 11 of 32 pairs returned null from plain
-// OLS's _solveLinearSystem() for exactly this reason, not from a genuinely
-// missing data point. Ridge adds λ to the (standardized) design matrix's
-// diagonal, which is guaranteed to make the matrix positive-definite (and
-// therefore solvable) for any λ>0, at the cost of a small, disclosed bias
-// shrinking coefficients toward zero — the standard industry remedy for
-// real (not fabricated) multicollinearity in a multi-factor macro model,
-// not a numerical hack to force a "—" cell to show a number.
-//
-// A row is "usable" for the regression only if spot AND every one of
-// FV_FEATURE_KEYS is non-null. Shared by _fvRegress() and renderFairValue()
-// so the FV_MIN_ROWS gate counts the exact same population it later fits on
-// — see the v8.217.0 CHANGELOG entry for the live discrepancy this closes
-// (raw rows.length briefly overcounted vs. this filter by 2 rows per pair,
-// from rows logged before ca_diff/tb_diff existed).
-function _fvUsableRows(rows) {
-  return rows.filter(r => r && r.spot != null && FV_FEATURE_KEYS.every(k => r[k] != null));
-}
-
-// λ grid searched by _fvChooseLambda() below, on the STANDARDIZED-feature
-// scale (so one grid is meaningful across every pair/currency regardless of
-// each raw feature's native units). 0 is included so a pair with no real
-// collinearity still gets the unbiased OLS answer when it scores best under
-// cross-validation — ridge is applied only where the data actually calls
-// for it, never unconditionally.
-const FV_RIDGE_LAMBDA_GRID = [0, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100];
-const FV_RIDGE_FOLDS = 5; // 5-fold CV, same convention as sklearn's RidgeCV default
-
-// Per-feature mean/std over `rows`, used to standardize before ridge and to
-// un-standardize β back to raw-feature scale afterward. σ falls back to 1
-// for a column that's genuinely constant WITHIN this particular subset
-// (e.g. one CV fold) so standardization doesn't divide by zero — that
-// column simply contributes nothing to the fit for that fold, which is the
-// correct behavior (no information in a constant column).
-function _fvStandardize(rows) {
-  const mu = {}, sigma = {};
-  FV_FEATURE_KEYS.forEach(key => {
-    const vals = rows.map(r => r[key]);
-    const m = vals.reduce((a, b) => a + b, 0) / vals.length;
-    const v = vals.reduce((a, b) => a + (b - m) * (b - m), 0) / vals.length;
-    mu[key] = m;
-    sigma[key] = Math.sqrt(v) || 1;
-  });
-  return { mu, sigma };
-}
-
-// Builds the design matrix: intercept column of 1s + standardized features,
-// using the mu/sigma passed in (always computed from the TRAINING subset,
-// never the subset being predicted — see _fvChooseLambda()'s fold loop).
-function _fvBuildDesign(rows, mu, sigma) {
-  return rows.map(r => [1, ...FV_FEATURE_KEYS.map(key => (r[key] - mu[key]) / sigma[key])]);
-}
-
-// Ridge normal equations: (X'X + λD)β = X'y, where D is the identity matrix
-// with D[0][0]=0 — the intercept (column 0) is never penalized, standard
-// ridge convention (glmnet, sklearn Ridge/RidgeCV both default to this).
-// Reuses the same Gaussian-elimination solver OLS always used; for λ>0 the
-// matrix is guaranteed positive-definite (X'X is PSD, +λI on the penalized
-// block makes it PD), so this returns null only if EVERY λ in the grid
-// (including the strongest) still fails — effectively never in practice.
-function _fvRidgeSolve(X, y, lambda) {
-  const k = X[0].length;
-  let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
-  let Sxy = new Array(k).fill(0);
-  X.forEach((x, i) => {
-    for (let a = 0; a < k; a++) {
-      Sxy[a] += x[a] * y[i];
-      for (let b = 0; b < k; b++) Sxx[a][b] += x[a] * x[b];
-    }
-  });
-  for (let d = 1; d < k; d++) Sxx[d][d] += lambda; // skip index 0 — the intercept
-  return _solveLinearSystem(Sxx, Sxy);
-}
-
-// Chooses λ objectively via blocked (contiguous, not shuffled — these are
-// time-ordered business-day rows) 5-fold cross-validation: for each
-// candidate λ, hold out each block in turn, fit ridge on the rest
-// (standardizing from the training block only, never the held-out one —
-// same look-ahead discipline as the walk-forward split already used
-// elsewhere in this file), score out-of-sample squared error on the held-
-// out block, and keep whichever λ minimizes total CV error. This is the
-// same criterion sklearn's RidgeCV/glmnet's cv.glmnet use — not a value
-// picked because it "makes the singular pairs show a number".
-function _fvChooseLambda(usable) {
-  const n = usable.length;
-  const foldSize = Math.floor(n / FV_RIDGE_FOLDS);
-  let bestLambda = null, bestMSE = Infinity;
-
-  FV_RIDGE_LAMBDA_GRID.forEach(lambda => {
-    let totalSE = 0, totalN = 0;
-    for (let f = 0; f < FV_RIDGE_FOLDS; f++) {
-      const testStart = f * foldSize;
-      const testEnd = (f === FV_RIDGE_FOLDS - 1) ? n : testStart + foldSize;
-      const trainRows = usable.filter((_, i) => i < testStart || i >= testEnd);
-      const testRows = usable.slice(testStart, testEnd);
-      if (trainRows.length < (FV_FEATURE_KEYS.length + 1) * 2 || testRows.length === 0) continue;
-
-      const { mu, sigma } = _fvStandardize(trainRows);
-      const Xtr = _fvBuildDesign(trainRows, mu, sigma);
-      const ytr = trainRows.map(r => r.spot);
-      const beta = _fvRidgeSolve(Xtr, ytr, lambda);
-      if (!beta) continue;
-
-      const Xte = _fvBuildDesign(testRows, mu, sigma);
-      testRows.forEach((r, i) => {
-        const pred = Xte[i].reduce((s, x, j) => s + x * beta[j], 0);
-        const err = r.spot - pred;
-        totalSE += err * err;
-        totalN++;
-      });
-    }
-    if (totalN === 0) return;
-    const mse = totalSE / totalN;
-    if (mse < bestMSE) { bestMSE = mse; bestLambda = lambda; }
-  });
-
-  // Fallback: every λ failed on every fold (only possible with pathologically
-  // few rows) — use the strongest grid value, which is mathematically
-  // guaranteed solvable on the full sample even if CV itself couldn't score it.
-  return bestLambda != null ? bestLambda : FV_RIDGE_LAMBDA_GRID[FV_RIDGE_LAMBDA_GRID.length - 1];
-}
-
-// Returns null if there are fewer usable rows than 2× the number of free
-// parameters (need real headroom above the parameter count for a
-// meaningful residual std, not just one more row than parameters). Unlike
-// the pre-v8.341.5 OLS version, does NOT return null for a collinear design
-// — ridge (see above) resolves that case with a disclosed, cross-validated
-// λ instead of refusing to fit.
-// Checks whether `rows` alone (no regularization) identify the full
-// 6-variable design — i.e. whether plain OLS would have found a real
-// (non-singular) fit. This is intentionally kept separate from the
-// CV-selected λ in _fvRegress()/_fvChooseLambda(): those two signals mean
-// different things. CV can pick a large λ purely because daily FX spot is
-// noisy relative to 6 macro regressors — a bias/variance trade-off that
-// applies to almost every pair, well-conditioned or not (confirmed live:
-// audusd/usdjpy/gbpusd/cadjpy — all OLS-identifiable with zero
-// collinearity — still get CV-selected λ=100, same as genuinely singular
-// EUR crosses). Using λ magnitude alone as a "confidence" signal would
-// have mislabeled well-conditioned pairs as low-confidence. THIS check
-// isolates the thing that actually varies pair-to-pair: whether the
-// pair's own slower-moving inputs (ca_diff/tb_diff/prod_diff) had enough
-// real within-window variation to identify the model without ridge's
-// help at all. See v8.341.6 CHANGELOG for the full reasoning and the
-// live audit (21 identifiable / 11 genuinely singular, unchanged from
-// v8.341.4's OLS-era diagnosis).
-function _fvOlsIdentifiable(rows) {
-  const usable = _fvUsableRows(rows);
-  const k = FV_FEATURE_KEYS.length + 1;
-  if (usable.length < k * 2) return null; // not applicable — caller already gates on this
-  let Sxx = Array.from({ length: k }, () => new Array(k).fill(0));
-  let Sxy = new Array(k).fill(0);
-  usable.forEach(r => {
-    const x = [1, ...FV_FEATURE_KEYS.map(key => r[key])];
-    for (let i = 0; i < k; i++) {
-      Sxy[i] += x[i] * r.spot;
-      for (let j = 0; j < k; j++) Sxx[i][j] += x[i] * x[j];
-    }
-  });
-  return _solveLinearSystem(Sxx, Sxy) !== null;
-}
-
-function _fvRegress(rows) {
-  const usable = _fvUsableRows(rows);
-  const k = FV_FEATURE_KEYS.length + 1; // +1 for the intercept
-  if (usable.length < k * 2) return null;
-
-  const n = usable.length;
-  const lambda = _fvChooseLambda(usable);
-  const { mu, sigma } = _fvStandardize(usable);
-  const X = _fvBuildDesign(usable, mu, sigma);
-  const y = usable.map(r => r.spot);
-
-  const betaStd = _fvRidgeSolve(X, y, lambda);
-  if (!betaStd) return null; // only if the strongest λ in the grid still fails
-
-  const fitted = X.map(x => x.reduce((s, xi, i) => s + xi * betaStd[i], 0));
-  const residuals = usable.map((r, i) => r.spot - fitted[i]);
-  const residMean = residuals.reduce((a, b) => a + b, 0) / n;
-  // Ridge's effective degrees of freedom are slightly below k when λ>0, but
-  // using k here (same as the OLS-era denominator) keeps residStd on the
-  // conservative (slightly wider, never narrower) side rather than
-  // overstating precision — disclosed simplification, not hidden.
-  const residVar = residuals.reduce((a, b) => a + (b - residMean) * (b - residMean), 0) / Math.max(1, n - k);
-  const residStd = residVar > 0 ? Math.sqrt(residVar) : 0;
-
-  // Un-standardize β so renderFairValue()'s existing
-  // `beta[0] + Σ beta[i+1]*last[key]` code keeps working against raw
-  // (non-standardized) feature values, unchanged by this switch to ridge.
-  const beta = new Array(k).fill(0);
-  let intercept = betaStd[0];
-  FV_FEATURE_KEYS.forEach((key, idx) => {
-    const raw = betaStd[idx + 1] / sigma[key];
-    beta[idx + 1] = raw;
-    intercept -= raw * mu[key];
-  });
-  beta[0] = intercept;
-
-  return { beta, n, residStd, usable, lambda };
-}
-
-// Solves the k×k linear system A·x = b via Gaussian elimination with
-// partial pivoting. Returns null if A is singular (no pivot above a small
-// epsilon can be found) rather than dividing by ~0 and returning garbage.
-// Generalized (v8.200.0) from a fixed 3x3 solver to arbitrary k so the Fair
-// Value BEER model can grow its variable count without a second solver
-// needing to be hand-written each time. Reused unchanged by ridge (v8.341.5)
-// — only the matrix fed into it changed (X'X+λD instead of plain X'X).
-function _solveLinearSystem(A, b) {
-  const k = A.length;
-  const M = A.map((row, i) => [...row, b[i]]);
-  const EPS = 1e-9;
-  for (let col = 0; col < k; col++) {
-    let pivot = col;
-    for (let r = col + 1; r < k; r++) {
-      if (Math.abs(M[r][col]) > Math.abs(M[pivot][col])) pivot = r;
-    }
-    if (Math.abs(M[pivot][col]) < EPS) return null; // singular
-    [M[col], M[pivot]] = [M[pivot], M[col]];
-    for (let r = 0; r < k; r++) {
-      if (r === col) continue;
-      const factor = M[r][col] / M[col][col];
-      for (let c = col; c < k + 1; c++) M[r][c] -= factor * M[col][c];
-    }
-  }
-  return M.map((row, i) => row[k] / row[i]);
-}
+// summary.json shape: { generated_at, min_rows, rolling_window,
+// feature_keys, max_usable_rows, pairs: { [pairId]: { totalRows,
+// usableRows, spot, rate_diff, stress, accumulating, fairValue?, z?,
+// lambda?, identifiable?, fit? } } }. This file reads min_rows back OUT of
+// the summary rather than hardcoding its own copy of FV_MIN_ROWS, per
+// compute_fair_value.py's own stated convention — any future change to the
+// regression's constants (lambda grid, rolling window, feature list) is now
+// made in that one Python file only.
 
 async function renderFairValue() {
   const accWrap = document.getElementById('fv-accumulating');
@@ -376,23 +129,18 @@ async function renderFairValue() {
   const tbody   = document.getElementById('fv-tbody');
   if (!accWrap || !tblWrap || !tbody) return;
 
-  const results = await Promise.all(PAIRS.map(async p => {
-    try {
-      const r = await _fetchWithRetry('./fair-value-data/' + p.id + '.json');
-      if (!r || !r.ok) return { pair: p, rows: [] };
-      const rows = await r.json();
-      return { pair: p, rows: Array.isArray(rows) ? rows : [] };
-    } catch {
-      return { pair: p, rows: [] };
-    }
-  }));
+  let summary = null;
+  try {
+    const r = await _fetchWithRetry('./fair-value-data/summary.json');
+    summary = r && r.ok ? await r.json() : null;
+  } catch {
+    summary = null;
+  }
+  if (!summary || !summary.pairs) return;
 
-  // v8.217.0: gate on USABLE rows (spot + all 5 features present), not raw
-  // rows.length — a row logged before ca_diff/tb_diff existed (the two-day
-  // window before the v1.1 cutover) inflates rows.length without being
-  // fittable, so the on-screen "N/60d" would reach 60 up to 2 rows before
-  // the regression actually had 60 fittable observations. See CHANGELOG.
-  const maxRows = results.reduce((m, x) => Math.max(m, _fvUsableRows(x.rows).length), 0);
+  const FV_MIN_ROWS = summary.min_rows;
+  const pairsData = summary.pairs;
+  const maxRows = summary.max_usable_rows || 0;
 
   if (maxRows < FV_MIN_ROWS) {
     accWrap.style.display = '';
@@ -404,81 +152,63 @@ async function renderFairValue() {
     return;
   }
 
-  // Enough history exists for a real rolling regression (v8.197.0) — see
-  // _fvRegress() above. Each pair independently gates on its OWN usable-row
-  // count and its OWN regression succeeding (not singular) — a pair with
-  // fewer than FV_MIN_ROWS usable rows, or with degenerate input (e.g.
-  // rate_diff pinned flat all window), falls back to the raw-inputs row
-  // rather than showing a fabricated or garbage z-score.
+  // Each pair independently gates on its own summary.json entry — a pair
+  // whose own history is still short, or whose regression came back
+  // degenerate server-side, shows the raw-inputs row rather than a
+  // fabricated or garbage z-score. Mirrors the original client-side gating
+  // exactly, just reading the already-computed result instead of computing
+  // it here.
   accWrap.style.display = 'none';
   tblWrap.style.display = '';
 
-  // Collected alongside the existing table-row loop, not a second pass over
-  // the data — one entry per pair that actually has a real regression fit
-  // this render (mirrors the table's own gating exactly, so the chart can
-  // never show a pair the table itself couldn't).
+  // Collected alongside the table-row loop, not a second pass — one entry
+  // per pair that actually has a real regression fit, so the chart can
+  // never show a pair the table itself couldn't.
   const zEntries = [];
 
   let html = '';
-  results.forEach(({ pair, rows }) => {
-    if (!rows.length) return;
-    const last = rows[rows.length - 1];
-    const spotTxt = last.spot != null ? last.spot.toFixed(pair.dec) : '—';
-    const rdTxt   = last.rate_diff != null ? (last.rate_diff >= 0 ? '+' : '') + last.rate_diff.toFixed(2) : '—';
-    const rdColor = last.rate_diff == null ? 'var(--text3)' : (last.rate_diff >= 0 ? 'var(--up)' : 'var(--down)');
-    const stTxt   = last.stress != null ? last.stress.toFixed(0) : '—';
+  PAIRS.forEach(pair => {
+    const d = pairsData[pair.id];
+    if (!d || !d.totalRows) return;
+
+    const spotTxt = d.spot != null ? d.spot.toFixed(pair.dec) : '—';
+    const rdTxt   = d.rate_diff != null ? (d.rate_diff >= 0 ? '+' : '') + d.rate_diff.toFixed(2) : '—';
+    const rdColor = d.rate_diff == null ? 'var(--text3)' : (d.rate_diff >= 0 ? 'var(--up)' : 'var(--down)');
+    const stTxt   = d.stress != null ? d.stress.toFixed(0) : '—';
 
     let fvTxt = '—', zTxt = '—', zColor = 'var(--text3)';
     let fitTxt = '—', fitColor = 'var(--text3)', fitTitle = '';
-    const usableForPair = _fvUsableRows(rows);
-    if (usableForPair.length >= FV_MIN_ROWS) {
-      // v8.262.0 FIX: walk-forward split, same principle as fetch_correlations()'s
-      // v8.180.0 fix — a window that estimates a model's parameters AND scores
-      // that same window's own endpoint against those parameters is look-ahead
-      // biased, even with zero future data involved (see GUIDELINES.md's general
-      // rule). This regression previously fit beta/residStd on windowRows
-      // INCLUDING `last`, then scored `last` against that same fit — OLS pulls
-      // the fitted line toward its own endpoint, systematically damping the
-      // z-score's magnitude right when it's evaluated. Fixed: fit on a training
-      // window that stops one row before `last` (still >= 2*k rows required by
-      // _fvRegress's own singularity guard), then score `last` — which was never
-      // part of the fit — against that trained beta/residStd.
-      const windowRows = usableForPair.slice(-FV_ROLLING_WINDOW);
-      const trainRows  = windowRows.slice(0, -1); // excludes `last`'s own row
-      const reg = _fvRegress(trainRows);
-      const lastHasAllFeatures = FV_FEATURE_KEYS.every(k => last[k] != null);
-      if (reg && reg.residStd > 0 && lastHasAllFeatures) {
-        const fairValue = reg.beta[0] + FV_FEATURE_KEYS.reduce((s, k, i) => s + reg.beta[i + 1] * last[k], 0);
-        const z = (last.spot - fairValue) / reg.residStd;
-        fvTxt = fairValue.toFixed(pair.dec);
-        zTxt = (z >= 0 ? '+' : '') + z.toFixed(2) + '\u03c3';
-        // Spot ABOVE the regression fair value = rich/overvalued vs. the model
-        // (shown as 'down' color — same convention as the rest of the terminal
-        // uses for "expect mean reversion downward"); spot BELOW = cheap.
-        zColor = Math.abs(z) < 1 ? 'var(--text3)' : (z > 0 ? 'var(--down)' : 'var(--up)');
 
-        // Fit-quality tier — see _fvOlsIdentifiable() above for why this is
-        // based on whether the pair's own data identifies the model at
-        // all (genuine collinearity), not on the CV-selected λ magnitude
-        // (which mostly reflects ordinary bias/variance shrinkage that
-        // applies broadly across pairs, identifiable or not).
-        const identifiable = _fvOlsIdentifiable(trainRows);
-        if (identifiable) {
-          fitTxt = 'Solid'; fitColor = 'var(--up)';
-          fitTitle = `This pair's own data (rate differential, risk score, Current Account, Trade Balance, productivity) fully identifies the 6-variable model on its own — no genuine collinearity. Cross-validation additionally applies \u03bb=${reg.lambda} of ridge shrinkage, the same routine bias/variance treatment used for every pair given how noisy daily FX spot is relative to 6 macro regressors — this is not a data-quality flag.`;
-        } else {
-          fitTxt = 'Regularized'; fitColor = 'var(--down)';
-          fitTitle = `This pair's slower-moving inputs (Current Account, Trade Balance, and/or productivity differential — often sparse for EUR crosses or currencies with few recent releases) don't have enough real within-window variation to identify the 6-variable model without ridge regularization (\u03bb=${reg.lambda}). The fit exists and is real, but leans more on regularization and less on this specific pair's own data than a pair marked Solid — treat Fair Value/Z-score here as lower-confidence.`;
-        }
+    if (!d.accumulating && d.fairValue != null && d.z != null) {
+      fvTxt = d.fairValue.toFixed(pair.dec);
+      // Spot ABOVE the regression fair value = rich/overvalued vs. the model
+      // (shown as 'down' color — same convention as the rest of the terminal
+      // uses for "expect mean reversion downward"); spot BELOW = cheap.
+      zTxt = (d.z >= 0 ? '+' : '') + d.z.toFixed(2) + '\u03c3';
+      zColor = Math.abs(d.z) < 1 ? 'var(--text3)' : (d.z > 0 ? 'var(--down)' : 'var(--up)');
 
-        // Same z value already computed above for the table cell — reused,
-        // not recomputed, so the chart and table can never disagree.
-        zEntries.push({
-          label: pair.label || (pair.base + '/' + pair.quote),
-          z,
-          regularized: !identifiable
-        });
+      // Fit-quality tier — based on whether the pair's own data identifies
+      // the model at all (genuine collinearity, computed server-side by
+      // compute_fair_value.py's fv_ols_identifiable()), not on the
+      // CV-selected λ magnitude (which mostly reflects ordinary
+      // bias/variance shrinkage that applies broadly across pairs,
+      // identifiable or not — see v8.341.6).
+      if (d.identifiable) {
+        fitTxt = 'Solid'; fitColor = 'var(--up)';
+        fitTitle = `This pair's own data (rate differential, risk score, Current Account, Trade Balance, productivity) fully identifies the 6-variable model on its own — no genuine collinearity. Cross-validation additionally applies \u03bb=${d.lambda} of ridge shrinkage, the same routine bias/variance treatment used for every pair given how noisy daily FX spot is relative to 6 macro regressors — this is not a data-quality flag.`;
+      } else {
+        fitTxt = 'Regularized'; fitColor = 'var(--down)';
+        fitTitle = `This pair's slower-moving inputs (Current Account, Trade Balance, and/or productivity differential — often sparse for EUR crosses or currencies with few recent releases) don't have enough real within-window variation to identify the 6-variable model without ridge regularization (\u03bb=${d.lambda}). The fit exists and is real, but leans more on regularization and less on this specific pair's own data than a pair marked Solid — treat Fair Value/Z-score here as lower-confidence.`;
       }
+
+      // Same z value the AI narrative pipeline reads from the same
+      // summary.json — table, chart, and any AI-generated text can never
+      // disagree, since all three now read one server-computed number.
+      zEntries.push({
+        label: pair.label || (pair.base + '/' + pair.quote),
+        z: d.z,
+        regularized: !d.identifiable
+      });
     }
 
     html += `<tr>
@@ -489,7 +219,7 @@ async function renderFairValue() {
       <td>${fvTxt}</td>
       <td style="color:${zColor};">${zTxt}</td>
       <td style="color:${fitColor};" title="${fitTitle}">${fitTxt}</td>
-      <td style="color:var(--text3);">${rows.length}d</td>
+      <td style="color:var(--text3);">${d.totalRows}d</td>
     </tr>`;
   });
   tbody.innerHTML = html;
