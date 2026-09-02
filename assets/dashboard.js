@@ -11061,8 +11061,8 @@ async function fetchVolLeaderboard() {
       sbHead._volLbTipAttached = true;
       sbHead.style.cursor = 'help';
       const tipTitle = 'Volatility Leaderboard';
-      const tipBody  = 'Ranks all 28 G10 pairs by current ATM implied volatility — each of the 6 USD majors sourced from an institutional-grade options market (CBOE/CME FX Volatility Index, PHLX World Currency Options, Saxo Bank, or CME futures/ETF, whichever is live for that pair right now), then triangulated for crosses. Shows the top 5, ranked highest to lowest, with a bar scaled to this group\u2019s own spread (not a fixed 0-100 scale) so the real gap — or lack of one — between them is visible at a glance. Hover any row for IV Rank, the percentile vs the pair\u2019s own 52-week range, shown for context only, not a buy/sell signal (this panel already selected for "high", so it isn\u2019t colored cheap/expensive). ~ prefix = triangulated cross value, not a direct market quote. NOK/SEK excluded — no CBOE/CME vol index exists for either. Note: EUR/GBP/JPY use CBOE/CME\u2019s variance-swap-style vol index, a different construction from the plain indicative ATM mid used for AUD/CHF/CAD/NZD — a gap between e.g. GBP and the rest may partly reflect that methodology difference, not just relative market risk, so treat cross-currency-family comparisons in this ranking as directional rather than strictly like-for-like.';
-      const tipEx    = 'Principle: the best opportunity today may not be your usual pair — it\u2019s wherever a data print or sentiment catalyst is driving implied vol higher. Best used as a starting-market filter, not a standalone entry signal.';
+      const tipBody  = 'Ranks the 28 G10 pairs by current ATM implied volatility (6 USD majors from institutional options markets, then triangulated for crosses), showing the top 5 highest to lowest on a scale relative to this group, not fixed 0-100. Hover a row for IV Rank (52-week percentile, context only — not a buy/sell signal). ~ = triangulated cross value. NOK/SEK excluded (no vol index available). EUR/GBP/JPY use a different vol-index construction than AUD/CHF/CAD/NZD, so treat cross-family comparisons as directional, not exact.';
+      const tipEx    = 'The best opportunity may not be your usual pair — it\u2019s wherever a catalyst is driving IV higher. A starting filter, not a standalone entry signal.';
       sbHead.addEventListener('mouseenter', ev => {
         const tt = document.getElementById('fx-tt');
         if (!tt) return;
@@ -18271,7 +18271,7 @@ window.addEventListener('gi-theme-change', function() {
     const top = data.windows && data.windows[0];
     const label = _sznPairLabel(pair);
     if (!top) {
-      insight.textContent = `${label} has ${data.years} years of history but no window reached statistical significance (one-sample t-test, p<0.05) over that period \u2014 no strong recurring seasonal pattern found.`;
+      insight.textContent = `${label}: no window reached statistical significance (p<0.05) over ${data.years}y \u2014 no recurring seasonal pattern found.`;
       return;
     }
     const M = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -18283,13 +18283,13 @@ window.addEventListener('gi-theme-change', function() {
     // "well short" claim now that some pairs can clear 15y+.
     let sampleNote;
     if (data.years < 15) {
-      sampleNote = `${data.years}y of history is well short of the 15-25y sample size seasonality research typically recommends`;
+      sampleNote = `${data.years}y history, below the 15-25y recommended sample`;
     } else if (data.years <= 25) {
-      sampleNote = `${data.years}y of history is within the 15-25y sample size seasonality research typically recommends`;
+      sampleNote = `${data.years}y history, within the 15-25y recommended sample`;
     } else {
-      sampleNote = `${data.years}y of history exceeds the 15-25y sample size seasonality research typically recommends`;
+      sampleNote = `${data.years}y history, above the 15-25y recommended sample`;
     }
-    insight.textContent = `${label} showed ${dirWord} between ${M[top.start_month - 1]} and ${M[top.end_month - 1]} across the last ${top.n_years} years (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, p=${top.p_value} [q=${top.q_value} FDR-adjusted, shown for context]; held in ${top.win_rate}% of qualifying years). Not a predictive signal \u2014 a historical statistical tendency, and ${sampleNote}. Windows above use monthly granularity; the chart uses day-of-year granularity.`;
+    insight.textContent = `${label}: ${dirWord} ${M[top.start_month - 1]}\u2192${M[top.end_month - 1]} over ${top.n_years}y (avg ${top.avg_return > 0 ? '+' : ''}${top.avg_return}% \u00b1 ${top.std_dev}%, win rate ${top.win_rate}%, p=${top.p_value} [q=${top.q_value} FDR-adj., context only]). Historical tendency, not a signal \u2014 ${sampleNote}.`;
   }
 
   async function _sznLoad(pair) {
