@@ -25,13 +25,13 @@
         "9 Dec"
       ],
       "source": "federalreserve.gov",
-      "bias": "hike",
+      "bias": "hold",
       "biasSource": "Fed Funds futures, meeting-bracketed",
-      "biasMethod": "ois",
+      "biasMethod": "spread",
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
-      "hikeProb": 64,
-      "fwdRate": 3.79
+      "hikeProb": 0,
+      "fwdRate": 3.75
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -62,8 +62,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
-      "hikeProb": 77,
-      "fwdRate": 2.4425
+      "hikeProb": 78,
+      "fwdRate": 2.445
     },
     "GBP": {
       "nextMeeting": "17 Sep",
@@ -95,7 +95,7 @@
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 3.7303
+      "fwdRate": 3.75
     },
     "JPY": {
       "nextMeeting": "18 Sep",
@@ -126,8 +126,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
-      "hikeProb": 68,
-      "fwdRate": 1.17
+      "hikeProb": 75,
+      "fwdRate": 1.1875
     },
     "AUD": {
       "nextMeeting": "29 Sep",
@@ -246,8 +246,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
-      "hikeProb": 100,
-      "fwdRate": 2.75
+      "hikeProb": 68,
+      "fwdRate": 2.92
     },
     "NOK": {
       "nextMeeting": "24 Sep",
@@ -278,8 +278,8 @@
       "biasMethod": "ois",
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
-      "hikeProb": 68,
-      "fwdRate": 4.42
+      "hikeProb": 66,
+      "fwdRate": 4.415
     },
     "SEK": {
       "nextMeeting": "24 Sep",
