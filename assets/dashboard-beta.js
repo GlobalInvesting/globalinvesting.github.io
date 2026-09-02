@@ -495,36 +495,55 @@ async function renderFairValue() {
 }
 
 // BETA — FX under/overvaluation Z-score bar chart, prototype requested
-// against the Credit Agricole FAST FX layout (one bar per pair, sorted
-// most-undervalued -> most-overvalued, dotted ±1.5σ/±2σ reference lines).
-// Deliberately simpler than the reference in one respect: only "current"
-// z-scores are shown, not a second "last week" series — that would need a
-// second regression fit anchored one week earlier per pair (not just
-// re-reading last week's row), which is a real second feature, not a
-// styling tweak, and wasn't asked for in this first pass. Faded bars mark
-// pairs whose Fit is "Regularized" (see the table's own Fit column and its
-// tooltip) rather than repeating that logic — same underlying signal,
-// shown two ways. Renders plain inline SVG (no charting library) since
-// this is a categorical bar comparison across pairs, not a time series —
-// Lightweight Charts (already used elsewhere in this file) is built for
-// the latter and isn't a fit here.
+// against the Credit Agricole FAST FX layout: one bar per pair, dotted
+// ±1.5σ/±2σ reference lines. Two fixes applied after reviewing a live
+// screenshot of the first version:
+//
+// (1) ORDER — the reference chart's own bar order is NOT sorted by z-score
+// (its real values, read off the reference table, are -1.496/-1.14/-0.76/
+// +0.04/-2.85/-1.12/-1.61/-0.95/+0.35/-0.71 — not ascending) — it's a fixed
+// pair list, the same order as the summary table beneath it. That's the
+// correct convention here too, for a concrete reason beyond "matches the
+// reference": if a "last week" bar series is added later (deliberately
+// deferred, see the render call site), both bars for the same pair must
+// sit at the same x position to be comparable — impossible if the x-axis
+// order reshuffles every day based on today's values. Now uses each pair's
+// position in the existing PAIRS array (already a deliberate, documented
+// order — majors first, then EUR/GBP/etc. crosses — the same order the
+// table itself renders in), not a z-sort.
+//
+// (2) LABEL CLIPPING — the first version set chartH=220 with the rotated
+// pair-label text baseline AT y=217, but a -55° rotated ~7-char label's
+// real bounding box (confirmed via a live Playwright render of the exact
+// SVG string, not assumed) extends ~37px, past y=254 — outside the SVG's
+// own viewBox. SVG's root element clips to its viewBox by default, so only
+// the topmost sliver of each rotated glyph survived, rendering as the
+// illegible marks in the screenshot. Fixed by explicitly reserving a
+// labelH band below the plot area sized for the actual rotated text,
+// rather than relying on the plot area's own height or a CSS
+// overflow:visible workaround (which a horizontally-scrolling ancestor,
+// this chart's own wrap div, isn't guaranteed to respect on the y-axis).
 function _fvRenderZScoreChart(entries) {
   const wrap = document.getElementById('fv-zchart-wrap');
   if (!wrap) return;
   if (!entries.length) { wrap.innerHTML = ''; return; }
 
-  // Most negative (undervalued) first, most positive (overvalued) last —
-  // matches the reference chart's left-to-right ordering.
-  const sorted = entries.slice().sort((a, b) => a.z - b.z);
+  // Fixed order = each pair's own index in PAIRS (see note above) —
+  // entries were pushed in that same order already, so this is a no-op
+  // stable copy, not a resort; kept explicit so a future edit that reorders
+  // the push site doesn't silently break this chart's ordering guarantee.
+  const ordered = entries.slice();
 
   const barW = 30, gap = 10;
-  const chartW = Math.max(560, sorted.length * (barW + gap) + gap);
-  const chartH = 220;
-  const midY = chartH / 2;
+  const plotH = 170;   // bars + sigma reference lines
+  const labelH = 56;   // reserved band for rotated pair labels below the plot
+  const chartH = plotH + labelH;
+  const chartW = Math.max(560, ordered.length * (barW + gap) + gap);
+  const midY = plotH / 2;
   // Keep at least 3σ of headroom so the ±2σ lines are never at the very
   // edge, even if every pair happens to sit inside ±1.5σ today.
-  const maxAbs = Math.max(3.0, ...sorted.map(e => Math.abs(e.z)));
-  const scale = (chartH / 2 - 18) / maxAbs; // px per 1.0σ
+  const maxAbs = Math.max(3.0, ...ordered.map(e => Math.abs(e.z)));
+  const scale = (plotH / 2 - 16) / maxAbs; // px per 1.0σ
 
   function refLines(sigma) {
     const yTop = midY - sigma * scale;
@@ -536,7 +555,7 @@ function _fvRenderZScoreChart(entries) {
   }
 
   let bars = '';
-  sorted.forEach((e, i) => {
+  ordered.forEach((e, i) => {
     const x = gap + i * (barW + gap);
     const len = Math.max(1, Math.abs(e.z) * scale);
     const y = e.z >= 0 ? midY - len : midY;
@@ -545,9 +564,13 @@ function _fvRenderZScoreChart(entries) {
     const color = e.z >= 0 ? 'var(--down)' : 'var(--up)';
     const opacity = e.regularized ? 0.4 : 0.9;
     const zLabel = (e.z >= 0 ? '+' : '') + e.z.toFixed(2) + '\u03c3';
+    // Label baseline sits just below the plot area (plotH + 12), inside the
+    // reserved labelH band — not chartH - 3, which is what clipped the
+    // rotated text off-canvas in the first version.
+    const labelY = plotH + 12;
     bars += `<g>
       <rect x="${x}" y="${y}" width="${barW}" height="${len}" fill="${color}" opacity="${opacity}"><title>${e.label}: ${zLabel}${e.regularized ? ' \u2014 Regularized fit, lower confidence' : ''}</title></rect>
-      <text x="${x + barW / 2}" y="${chartH - 3}" font-size="9" fill="var(--text2)" font-family="var(--font-mono)" text-anchor="end" transform="rotate(-55 ${x + barW / 2} ${chartH - 3})">${e.label}</text>
+      <text x="${x + barW / 2}" y="${labelY}" font-size="9" fill="var(--text2)" font-family="var(--font-mono)" text-anchor="end" transform="rotate(-55 ${x + barW / 2} ${labelY})">${e.label}</text>
     </g>`;
   });
 
@@ -557,7 +580,7 @@ function _fvRenderZScoreChart(entries) {
       <span>FX under/overvaluation \u2014 Z-scores (beta)</span>
       <span>Undervalued</span>
     </div>
-    <div style="overflow-x:auto;">
+    <div style="overflow-x:auto;overflow-y:hidden;">
       <svg width="${chartW}" height="${chartH}" viewBox="0 0 ${chartW} ${chartH}" style="display:block;">
         ${refLines(2.0)}
         ${refLines(1.5)}
@@ -565,7 +588,7 @@ function _fvRenderZScoreChart(entries) {
         ${bars}
       </svg>
     </div>
-    <div style="font-size:8px;color:var(--text3);font-family:var(--font-ui);margin-top:2px;">Dotted lines mark \u00b11.5\u03c3 and \u00b12.0\u03c3 \u00b7 faded bars = Regularized fit (see Fit column) \u00b7 hover a bar for the exact value</div>
+    <div style="font-size:8px;color:var(--text3);font-family:var(--font-ui);margin-top:2px;">Fixed pair order (same as the table below) \u00b7 dotted lines mark \u00b11.5\u03c3 and \u00b12.0\u03c3 \u00b7 faded bars = Regularized fit (see Fit column) \u00b7 hover a bar for the exact value</div>
   `;
 }
 
