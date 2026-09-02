@@ -418,6 +418,13 @@ a { color: inherit; text-decoration: none; }
     },
     {
       "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-fx-fair-value.png",
+      "width": 664,
+      "height": 623,
+      "caption": "FX Fair Value panel in the Global Investing web terminal, a BEER-style ridge-regularized regression (rate differential, risk score, GDP-normalized Current Account and Trade Balance, productivity growth-rate differential) showing Z-score under/overvaluation for 32 FX pairs"
+    },
+    {
+      "@type": "ImageObject",
       "url": "https://globalinvesting.github.io/assets/screenshot-dollar-smile.png",
       "width": 658,
       "height": 331,
@@ -933,20 +940,20 @@ a { color: inherit; text-decoration: none; }
       <div class="panel-feature-row wide-img reverse">
         <div class="panel-feature-img">
           <div class="scr-hero-wrap">
-            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="Dollar Smile panel in the Global Investing web terminal, showing USD performance bucketed by regime — Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming">
-              <img src="assets/screenshot-dollar-smile.png" data-src="assets/screenshot-dollar-smile.png" alt="Dollar Smile panel in the Global Investing web terminal, showing USD vs regime with Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming buckets, each with average DXY quarter-over-quarter return and sample size" width="658" height="331" loading="lazy">
+            <div class="scr-hero scr-hero-contain" role="button" tabindex="0" aria-label="FX Fair Value panel in the Global Investing web terminal, showing rate-differential and risk-sentiment regression Z-scores for 32 FX pairs against their fitted fair value, with a per-pair table of spot, rate differential, fair value, Z-score, fit quality, and history depth">
+              <img src="assets/screenshot-fx-fair-value.png" data-src="assets/screenshot-fx-fair-value.png" alt="FX Fair Value panel in the Global Investing web terminal, showing a Z-score bar chart of FX under/overvaluation across pairs and a table with Spot, Rate Diff, Risk Score, Fair Value, Z-score, Fit, and History columns per pair" width="664" height="623" loading="lazy">
             </div>
           </div>
         </div>
         <div class="panel-feature-text">
           <div class="mobile-feature-eyebrow">Global Macro</div>
-          <div class="mobile-feature-title">Dollar Smile</div>
-          <p class="panel-feature-desc">USD performance bucketed by regime &mdash; Global Risk-Off, Calm/Muddling Through, USD Growth Outperforming &mdash; following <strong>Jen &amp; Yilmaz's original framework</strong> (Morgan Stanley, 2001). Regime axis is the real US-vs-G9 GDP YoY growth differential (FRED, all G10), with an independent <strong>VIX&ge;40 crisis check</strong> to isolate genuine global risk-off from the US simply growing a bit slower than its peers. Every bucket shows its own sample size and avg DXY return, methodology fully disclosed in the panel itself.</p>
+          <div class="mobile-feature-title">FX Fair Value</div>
+          <p class="panel-feature-desc">A <strong>BEER-style model</strong> &mdash; rate differential, risk-sentiment score, GDP-normalized Current Account (NFA proxy), Trade Balance (terms-of-trade proxy), and productivity growth-rate differential &mdash; fitted per pair via <strong>ridge regression with blocked 5-fold cross-validated &lambda;</strong> over a 60 business-day rolling window, all 32 tracked pairs. Each row's <strong>Fit</strong> column discloses whether that pair is Solid (well-identified under plain OLS) or Regularized (ridge doing real shrinkage work), and the Z-score is walk-forward computed to avoid look-ahead bias. No fabricated history: a pair shows an honest accumulation-progress state instead of a number until 60 real trading days have logged.</p>
         </div>
       </div>
 
       <div class="scr-gallery-label gallery-break">Additional Coverage</div>
-      <p class="gallery-break-desc">Eight more panels — cross-asset correlations, the full pair&times;pair correlation matrix, derivatives, carry, currency strength, COT full breakdown, yield curve &amp; sovereign spreads, and news. Select one to preview it at full size.</p>
+      <p class="gallery-break-desc">Nine more panels — Dollar Smile, cross-asset correlations, the full pair&times;pair correlation matrix, derivatives, carry, currency strength, COT full breakdown, yield curve &amp; sovereign spreads, and news. Select one to preview it at full size.</p>
 
 
       <div class="showcase">
@@ -983,6 +990,10 @@ a { color: inherit; text-decoration: none; }
             <span class="showcase-tab-title">COT Full Breakdown</span>
             <span class="showcase-tab-desc">Full CFTC Leveraged Funds detail across FX, Indices, and Commodities, plus a normalized per-pair Strength Index and a 52-week Net Exposure % Rank chart.</span>
           </button>
+          <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-8" data-idx="8">
+            <span class="showcase-tab-title">Dollar Smile</span>
+            <span class="showcase-tab-desc">USD performance bucketed by regime — Global Risk-Off, Calm/Muddling Through, USD Growth Outperforming — following Jen &amp; Yilmaz's framework (Morgan Stanley, 2001), with an independent VIX&ge;40 crisis check on the left tail.</span>
+          </button>
         </div>
         <div class="showcase-preview">
           <div class="showcase-preview-frame" id="showcase-frame" role="tabpanel" aria-labelledby="showcase-tab-0">
@@ -1009,6 +1020,9 @@ a { color: inherit; text-decoration: none; }
             </div>
             <div class="showcase-slide" data-idx="7" role="button" tabindex="-1" aria-label="Enlarge: COT Full Breakdown" data-caption="COT Full Breakdown — full CFTC Leveraged Funds detail across FX, Indices, and Commodities, a normalized per-pair Strength Index, and a 52-week Net Exposure % Rank chart.">
               <img src="assets/screenshot-cot-full-breakdown.png" data-src="assets/screenshot-cot-full-breakdown.png" alt="COT Full Breakdown view in fullscreen, showing the CFTC TFF Leveraged Funds table with open interest, long and short positions and value, net positions and percent, and net value in base currency and USD, followed by a Currency Pairs LF Strength Index grid and a Net Exposure percent Rank bar chart" width="1920" height="1080" loading="lazy">
+            </div>
+            <div class="showcase-slide" data-idx="8" role="button" tabindex="-1" aria-label="Enlarge: Dollar Smile" data-caption="Dollar Smile — USD performance bucketed by regime (Global Risk-Off, Calm/Muddling Through, USD Growth Outperforming), following Jen &amp; Yilmaz's framework (Morgan Stanley, 2001), with an independent VIX&ge;40 crisis check on the left tail.">
+              <img src="assets/screenshot-dollar-smile.png" data-src="assets/screenshot-dollar-smile.png" alt="Dollar Smile panel in the Global Investing web terminal, showing USD vs regime with Global Risk-Off, Calm/Muddling Through, and USD Growth Outperforming buckets, each with average DXY quarter-over-quarter return and sample size" width="658" height="331" loading="lazy">
             </div>
           </div>
         </div>

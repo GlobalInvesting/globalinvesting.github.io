@@ -4,31 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Forex Fundamental Analysis &amp; Institutional Framework</title>
-<meta name="description" content="What fundamental analysis in forex means, the four inputs institutional desks track — rate bias, positioning, data surprises, risk regime — vs. technicals.">
+<meta name="description" content="What fundamental analysis in forex means, the five inputs institutional desks track — rate bias, positioning, data surprises, risk regime, valuation — vs. technicals.">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <link rel="canonical" href="https://globalinvesting.github.io/guide-fundamental-analysis.html">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://globalinvesting.github.io/guide-fundamental-analysis.html">
 <meta property="og:site_name" content="Global Investing FX Terminal">
 <meta property="og:title" content="Forex Fundamental Analysis: How It Works &amp; Institutional Framework — Global Investing">
-<meta property="og:description" content="What fundamental analysis in forex means, the four inputs institutional desks track — central bank rate bias, positioning, data surprises, and cross-asset risk regime — and how it differs from technical analysis.">
+<meta property="og:description" content="What fundamental analysis in forex means, the five inputs institutional desks track — central bank rate bias, positioning, data surprises, cross-asset risk regime, and fundamental valuation — and how it differs from technical analysis.">
 <meta property="og:image" content="https://globalinvesting.github.io/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2026-07-22T00:00:00Z">
-<meta property="article:modified_time" content="2026-08-24T00:00:00Z">
+<meta property="article:modified_time" content="2026-09-02T00:00:00Z">
 <meta property="article:section" content="Guides">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Forex Fundamental Analysis: How It Works &amp; Institutional Framework">
-<meta name="twitter:description" content="The four inputs institutional FX desks use for fundamental analysis — rate bias, positioning, data surprises, and cross-asset risk — and how it differs from technical analysis.">
+<meta name="twitter:description" content="The five inputs institutional FX desks use for fundamental analysis — rate bias, positioning, data surprises, cross-asset risk, and valuation — and how it differs from technical analysis.">
 <meta name="twitter:image" content="https://globalinvesting.github.io/og-image.png">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Article",
   "headline": "Forex Fundamental Analysis: How It Works & Institutional Framework",
-  "description": "What fundamental analysis in forex means, the four inputs institutional macro desks track to build a fundamental view — central bank rate bias, institutional positioning, economic data surprises, and cross-asset risk regime — and how the approach differs from technical analysis.",
+  "description": "What fundamental analysis in forex means, the five inputs institutional macro desks track to build a fundamental view — central bank rate bias, institutional positioning, economic data surprises, cross-asset risk regime, and fundamental valuation — and how the approach differs from technical analysis.",
   "image": [
     "https://globalinvesting.github.io/og-image.png",
     {
@@ -75,6 +75,13 @@
     },
     {
       "@type": "ImageObject",
+      "url": "https://globalinvesting.github.io/assets/screenshot-fx-fair-value.png",
+      "width": 664,
+      "height": 623,
+      "caption": "FX Fair Value panel, a BEER-style ridge-regularized regression showing Z-score under/overvaluation for 32 FX pairs against rate differential, risk score, current account, trade balance, and productivity growth-rate differential"
+    },
+    {
+      "@type": "ImageObject",
       "url": "https://globalinvesting.github.io/assets/screenshot-ea-composite.png",
       "width": 257,
       "height": 231,
@@ -82,7 +89,7 @@
     }
   ],
   "datePublished": "2026-07-22T00:00:00Z",
-  "dateModified": "2026-08-24T00:00:00Z",
+  "dateModified": "2026-09-02T00:00:00Z",
   "author": {
     "@type": "Organization",
     "name": "Global Investing",
@@ -104,7 +111,7 @@
     "@type": "WebPage",
     "@id": "https://globalinvesting.github.io/guide-fundamental-analysis.html"
   },
-  "keywords": "forex fundamental analysis, what is fundamental analysis in forex, what is fundamental analysis, fundamental analysis forex course, forex fundamental analysis pdf, fundamental vs technical analysis forex, how to do fundamental analysis forex, institutional forex analysis framework"
+  "keywords": "forex fundamental analysis, what is fundamental analysis in forex, what is fundamental analysis, fundamental analysis forex course, forex fundamental analysis pdf, fundamental vs technical analysis forex, how to do fundamental analysis forex, institutional forex analysis framework, fx fair value model, forex valuation BEER model"
 }
 </script>
 <script type="application/ld+json">
@@ -159,7 +166,7 @@
       "name": "What data is used in forex fundamental analysis?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Institutional fundamental analysis for FX generally combines four inputs: central bank policy rates and forward guidance (including what interest-rate markets are already pricing for the next meeting), institutional positioning data such as the CFTC Commitments of Traders report, economic data releases scored against consensus forecasts rather than in absolute terms, and the prevailing cross-asset risk regime, which determines whether carry trades are being rewarded or unwound. No single input is sufficient on its own; the framework is built from reading all four together."
+        "text": "Institutional fundamental analysis for FX generally combines five inputs: central bank policy rates and forward guidance (including what interest-rate markets are already pricing for the next meeting), institutional positioning data such as the CFTC Commitments of Traders report, economic data releases scored against consensus forecasts rather than in absolute terms, the prevailing cross-asset risk regime, which determines whether carry trades are being rewarded or unwound, and a fundamental valuation estimate — typically a BEER-style regression of rate differential, risk sentiment, and external-balance variables — showing whether a pair is trading rich or cheap versus its modeled fair value. No single input is sufficient on its own; the framework is built from reading all five together."
       }
     },
     {
@@ -183,7 +190,15 @@
       "name": "What is the institutional framework for fundamental analysis in FX?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Institutional macro desks generally structure fundamental analysis around four pillars evaluated together: central bank rate bias and policy divergence between two currencies, institutional positioning from sources like the CFTC COT report, economic data momentum measured as surprises relative to consensus rather than absolute levels, and the prevailing cross-asset risk regime that governs carry and funding flows. A currency view built from two or more of these pillars aligning carries materially more weight than any single pillar in isolation."
+        "text": "Institutional macro desks generally structure fundamental analysis around five pillars evaluated together: central bank rate bias and policy divergence between two currencies, institutional positioning from sources like the CFTC COT report, economic data momentum measured as surprises relative to consensus rather than absolute levels, the prevailing cross-asset risk regime that governs carry and funding flows, and a fundamental valuation model that flags whether a pair is already trading rich or cheap versus its rate- and risk-adjusted fair value. A currency view built from two or more of these pillars aligning carries materially more weight than any single pillar in isolation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is FX Fair Value and how does it fit into fundamental analysis?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "FX Fair Value is a valuation model — the fifth pillar alongside rate bias, positioning, data surprises, and risk regime — that estimates what a pair's spot rate should be given its underlying macro drivers, then expresses the live spot rate as a Z-score deviation from that estimate. A common institutional approach is a BEER-style (Behavioral Equilibrium Exchange Rate) regression combining the rate differential, a risk-sentiment score, GDP-normalized Current Account and Trade Balance (proxies for net foreign assets and terms of trade), and a productivity growth-rate differential (a Balassa-Samuelson proxy). Valuation answers a different question than the other four pillars: not which direction has a fundamental tailwind, but how much of that tailwind is already priced in, and how much cushion or stretch exists before the pair reverts toward its modeled fair value."
       }
     }
   ]
@@ -400,11 +415,12 @@ a { color: inherit; text-decoration: none; }
       <div class="toc-head">Contents</div>
       <a class="toc-item" href="#what-is">What Is Fundamental Analysis</a>
       <a class="toc-item" href="#vs-technical">Fundamental vs. Technical</a>
-      <a class="toc-item" href="#building-blocks">The Four Building Blocks</a>
+      <a class="toc-item" href="#building-blocks">The Five Building Blocks</a>
       <a class="toc-item" href="#cb-bias">Central Bank Rate Bias</a>
       <a class="toc-item" href="#positioning">Institutional Positioning</a>
       <a class="toc-item" href="#data-surprises">Data Surprises</a>
       <a class="toc-item" href="#risk-regime">Cross-Asset Risk Regime</a>
+      <a class="toc-item" href="#fair-value">Fundamental Valuation</a>
       <a class="toc-item" href="#synthesis">Reading Signals Together</a>
       <a class="toc-item" href="#ea-composite">The EA's Composite Score</a>
       <a class="toc-item" href="#mistakes">Common Mistakes</a>
@@ -422,7 +438,7 @@ a { color: inherit; text-decoration: none; }
     <div class="page-hero">
       <div class="page-hero-label">Guides</div>
       <h1>Fundamental Analysis in Forex</h1>
-      <p>Fundamental analysis in forex forecasts currency direction from the economic and policy conditions behind it, rather than from price history. Institutional macro desks build a fundamental view from four inputs read together — central bank rate bias, institutional positioning, economic data surprises, and the prevailing cross-asset risk regime — instead of relying on any single one in isolation.</p>
+      <p>Fundamental analysis in forex forecasts currency direction from the economic and policy conditions behind it, rather than from price history. Institutional macro desks build a fundamental view from five inputs read together — central bank rate bias, institutional positioning, economic data surprises, the prevailing cross-asset risk regime, and fundamental valuation — instead of relying on any single one in isolation.</p>
     </div>
 
     <div class="guide-section" id="what-is">
@@ -503,13 +519,14 @@ a { color: inherit; text-decoration: none; }
     </div>
 
     <div class="guide-section" id="building-blocks">
-      <h2>The Four Building Blocks</h2>
-      <p>Institutional macro desks structure fundamental analysis around four inputs, evaluated together rather than individually. Each answers a different question, and a currency view built from two or more aligning carries materially more weight than any single input in isolation.</p>
+      <h2>The Five Building Blocks</h2>
+      <p>Institutional macro desks structure fundamental analysis around five inputs, evaluated together rather than individually. Each answers a different question, and a currency view built from two or more aligning carries materially more weight than any single input in isolation.</p>
       <ol>
         <li><strong style="color:var(--text);">Central bank rate bias</strong> — what monetary policy divergence between two currencies implies, and what is already priced in by rate markets ahead of the next meeting.</li>
         <li><strong style="color:var(--text);">Institutional positioning</strong> — how leveraged funds are already positioned in a currency, which tells you whether a move is early or already crowded.</li>
         <li><strong style="color:var(--text);">Economic data surprises</strong> — whether recent releases are beating or missing consensus forecasts, not just their absolute level.</li>
         <li><strong style="color:var(--text);">Cross-asset risk regime</strong> — whether the broader market is in a risk-on or risk-off posture, which governs carry trade flows and funding-currency demand.</li>
+        <li><strong style="color:var(--text);">Fundamental valuation</strong> — whether a pair is already trading rich or cheap versus a fair value estimated from its own rate, risk, and external-balance drivers, which tells you how much of the fundamental story is already priced in.</li>
       </ol>
     </div>
 
@@ -570,9 +587,22 @@ a { color: inherit; text-decoration: none; }
       <p>The full regime classification methodology is covered in the <a href="guide-cross-asset-risk.html">Cross-Asset Risk Monitor guide</a>. The same guide's <a href="guide-cross-asset-risk.html#dollar-smile">Dollar Smile panel</a> applies this same risk-on/risk-off framing specifically to the dollar — USD tends to strengthen at both tails (safe-haven flows in a genuine risk-off, and yield/growth appeal when US growth outperforms) and underperform in the calm middle regime.</p>
     </div>
 
+    <div class="guide-section" id="fair-value">
+      <h2>Fundamental Valuation (Fair Value)</h2>
+      <p>The first four pillars above answer <em>which direction</em> has a fundamental tailwind. Valuation answers a different question: <em>how much of that tailwind is already reflected in the current price</em>, and how much cushion or stretch is left before the pair reverts toward a level its own fundamentals justify. A hawkish rate bias supporting a currency that is already trading well above its rate- and risk-adjusted fair value carries more two-way risk than the same rate bias applied to a pair still trading at or below fair value.</p>
+      <p>The institutional standard for this is a <strong>BEER model</strong> (Behavioral Equilibrium Exchange Rate) — a regression of the exchange rate against its structural macro drivers, historically the interest-rate differential, a measure of net foreign assets (proxied by the current account), a terms-of-trade proxy (the trade balance), and relative productivity growth (the Balassa-Samuelson effect: an economy whose tradable-sector productivity grows faster than its peers tends to see its real exchange rate appreciate over time). A risk-sentiment variable is commonly added as a desk-level extension to capture the UIP risk premium that a pure rate-differential term misses.</p>
+      <div class="scr-hero-wrap">
+        <div class="scr-hero scr-hero-contain">
+          <img src="assets/screenshot-fx-fair-value.png" alt="FX Fair Value panel showing a Z-score bar chart of FX under/overvaluation across pairs and a table with Spot, Rate Diff, Risk Score, Fair Value, Z-score, Fit, and History columns per pair" width="664" height="623" loading="lazy">
+        </div>
+        <p class="scr-meta"><strong>FX Fair Value panel.</strong> A ridge-regularized BEER-style regression — rate differential, risk score (the same stress-scoring model covered in the <a href="guide-cross-asset-risk.html#scoring-model">Cross-Asset Risk Monitor guide</a>), GDP-normalized Current Account and Trade Balance, and productivity growth-rate differential — fitted per pair over a 60 business-day rolling window, for all 32 tracked pairs. The Z-score expresses live spot as a standard-deviation deviation from the modeled fair value; the Fit column discloses whether a pair's regression is Solid (well-identified under plain OLS) or Regularized (ridge doing real shrinkage work), so a stretched Z-score on a Regularized fit is read with more caution than the same reading on a Solid one.</p>
+      </div>
+      <p>Like the other four pillars, valuation is not a standalone trading signal — a pair can stay stretched away from fair value for a long time if the rate differential or risk-sentiment inputs driving that gap keep moving in the same direction, and a wide Z-score describes a statistical deviation from a fitted model, not a guaranteed reversion timeline or magnitude. It is most useful cross-checked against the other pillars: a currency with a hawkish rate bias, supportive positioning, and improving data surprises that is <em>also</em> trading cheap versus fair value is a stronger combined case than the same three pillars applied to a currency already trading rich.</p>
+    </div>
+
     <div class="guide-section" id="synthesis">
       <h2>Reading the Signals Together</h2>
-      <p>No single input above is reliable in isolation. Rate bias can shift on a single dovish comment; positioning can remain crowded for longer than seems rational; a single data surprise can be noise rather than signal; a risk regime can reverse within a session. The institutional approach is to weight a view by how many of the four pillars agree.</p>
+      <p>No single input above is reliable in isolation. Rate bias can shift on a single dovish comment; positioning can remain crowded for longer than seems rational; a single data surprise can be noise rather than signal; a risk regime can reverse within a session; a valuation gap can persist for months while its own driving inputs keep moving. The institutional approach is to weight a view by how many of the five pillars agree.</p>
       <table class="data-table" aria-label="How combinations of fundamental signals affect conviction">
         <thead>
           <tr>
@@ -583,8 +613,8 @@ a { color: inherit; text-decoration: none; }
         </thead>
         <tbody>
           <tr>
-            <td>All four aligned</td>
-            <td>Hawkish rate bias, positioning still building, positive surprise index, risk-on regime</td>
+            <td>All five aligned</td>
+            <td>Hawkish rate bias, positioning still building, positive surprise index, risk-on regime, pair trading cheap vs. fair value</td>
             <td><span class="tag tag-bull">High conviction</span> — every pillar supports the same direction</td>
           </tr>
           <tr>
@@ -598,8 +628,13 @@ a { color: inherit; text-decoration: none; }
             <td><span class="tag tag-neut">Regime dominates</span> — broad risk-off can override a single currency's own data</td>
           </tr>
           <tr>
-            <td>All four negative</td>
-            <td>Dovish bias, crowded net-short, negative surprises, risk-off unwind</td>
+            <td>Rate bias vs. valuation conflict</td>
+            <td>Hawkish rate bias, but the pair is already trading rich versus its BEER fair value (stretched positive Z-score)</td>
+            <td><span class="tag tag-neut">Caution</span> — carry story intact, but the valuation cushion is gone, leaving more room to reprice against the position than in its favor</td>
+          </tr>
+          <tr>
+            <td>All five negative</td>
+            <td>Dovish bias, crowded net-short, negative surprises, risk-off unwind, pair trading rich vs. fair value</td>
             <td><span class="tag tag-bear">High conviction</span> — every pillar supports weakness</td>
           </tr>
         </tbody>
@@ -614,7 +649,7 @@ a { color: inherit; text-decoration: none; }
       </div>
       <p>The Risk clause in each footer is the automated version of the "what would invalidate this" check an institutional desk applies before sizing a position — e.g. the CHF/JPY card's risk condition above ("Hormuz tensions de-escalate, removing the geopolitical risk premium") states the specific scenario that would flip the setup, not just a restatement of it. These signals describe market conditions; they are never an instruction to take a specific action. Full panel mechanics — priority dots, browser notifications, and the shorter weekend pre-open format — are covered in the <a href="guide-dashboard.html#alerts">Alerts &amp; Market Signals section of the Dashboard guide</a>.</p>
       <h3 id="ea-composite" style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin:28px 0 14px;scroll-margin-top:52px;">The EA's Composite Score</h3>
-      <p>The MT5 Expert Advisor packages this same cross-checking process into a single number, rather than requiring a manual review of each pillar in turn. Its Composite Score panel blends CB bias, COT positioning, carry, and the Economic Surprise Index — all four pillars covered above — together with two additional factors not discussed in this guide, price momentum and retail sentiment, into one per-currency reading on a &plusmn;10 scale.</p>
+      <p>The MT5 Expert Advisor packages this same cross-checking process into a single number, rather than requiring a manual review of each pillar in turn. Its Composite Score panel blends CB bias, COT positioning, carry, and the Economic Surprise Index — four of the five pillars covered above, everything except valuation, which is a web-terminal-only panel — together with two additional factors not discussed in this guide, price momentum and retail sentiment, into one per-currency reading on a &plusmn;10 scale.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero-contain">
           <img src="assets/screenshot-ea-composite.png" alt="Composite Score panel rendered natively inside the MT5 Expert Advisor dashboard, showing the six-factor blended score bar and CB bias label per currency" width="257" height="231" loading="lazy" style="width:293px;height:auto;max-width:100%;">
@@ -649,21 +684,22 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="terminal">
       <h2>How the Terminal Implements This Framework</h2>
-      <p>The Global Investing FX Terminal was built around this exact four-pillar structure, so the inputs used in institutional fundamental analysis are available on one dashboard rather than requiring separate manual research for each:</p>
+      <p>The Global Investing FX Terminal was built around this exact five-pillar structure, so the inputs used in institutional fundamental analysis are available on one dashboard rather than requiring separate manual research for each:</p>
       <ul>
         <li><strong style="color:var(--text);">CB Rates &amp; Bias panel</strong> — current policy rate, trend, and OIS-implied bias for all ten G10 central banks.</li>
         <li><strong style="color:var(--text);">COT Positioning panel</strong> — weekly CFTC Leveraged Funds net positioning by currency.</li>
         <li><strong style="color:var(--text);">Economic Surprise Index</strong> — decay-weighted beat/miss scoring across all G10 currencies.</li>
         <li><strong style="color:var(--text);">Cross-Asset Risk Monitor</strong> — current risk-on/risk-off regime classification and its implication for carry.</li>
-        <li><strong style="color:var(--text);">AI Market Narrative</strong> — a synthesis of the four panels above, refreshed at each major session transition, so the current read is stated in plain language rather than requiring the reader to cross-reference every panel manually.</li>
-        <li><strong style="color:var(--text);">Alerts &amp; Market Signals panel</strong> — the same four-pillar synthesis applied per pair rather than market-wide, generated as a structured card with a Trade bias/Catalyst/Risk footer; see <a href="#synthesis">Reading the Signals Together</a> above for how to interpret conflicting pillars.</li>
+        <li><strong style="color:var(--text);">FX Fair Value panel</strong> — the valuation pillar: a BEER-style ridge-regularized regression showing each pair's Z-score deviation from its rate- and risk-adjusted fair value, for all 32 tracked pairs.</li>
+        <li><strong style="color:var(--text);">AI Market Narrative</strong> — a synthesis of the panels above, refreshed at each major session transition, so the current read is stated in plain language rather than requiring the reader to cross-reference every panel manually.</li>
+        <li><strong style="color:var(--text);">Alerts &amp; Market Signals panel</strong> — the same five-pillar synthesis applied per pair rather than market-wide, generated as a structured card with a Trade bias/Catalyst/Risk footer; see <a href="#synthesis">Reading the Signals Together</a> above for how to interpret conflicting pillars.</li>
       </ul>
-      <p>The same data is available in the browser-based web terminal and natively inside MetaTrader 5 through the companion Expert Advisor — see the <a href="guide-mt5-ea.html">MetaTrader 5 EA guide</a> for the native MT5 panel layout.</p>
+      <p>The same data is available in the browser-based web terminal and natively inside MetaTrader 5 through the companion Expert Advisor — see the <a href="guide-mt5-ea.html">MetaTrader 5 EA guide</a> for the native MT5 panel layout. FX Fair Value is a web-terminal-only panel, not currently ported to the MT5 EA.</p>
     </div>
 
     <div class="callout" style="margin-top:32px;">
       <div class="callout-label">Access</div>
-      <p style="margin-bottom:16px;">CB rate bias, COT positioning, economic surprises, and the cross-asset risk regime for all G10 currencies are available on the web terminal and natively inside MetaTrader 5 through the companion Expert Advisor — both unlock under a single EA rental on MQL5 Market.</p>
+      <p style="margin-bottom:16px;">CB rate bias, COT positioning, economic surprises, and the cross-asset risk regime for all G10 currencies are available on the web terminal and natively inside MetaTrader 5 through the companion Expert Advisor — both unlock under a single EA rental on MQL5 Market. FX Fair Value, the valuation pillar, is a web terminal panel.</p>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <a href="/" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--text);border:1px solid var(--border2);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">Open the terminal &rarr;</a>
         <a href="access.html" style="display:inline-block;padding:9px 18px;background:transparent;color:var(--blue);border:1px solid rgba(79,127,255,.4);border-radius:4px;font-size:12.5px;font-weight:600;text-decoration:none;letter-spacing:.02em;">View access &rarr;</a>
@@ -682,7 +718,7 @@ a { color: inherit; text-decoration: none; }
       </details>
       <details class="faq-item">
         <summary>What data is used in forex fundamental analysis?</summary>
-        <p>Institutional fundamental analysis for FX generally combines four inputs: central bank policy rates and forward guidance (including what interest-rate markets are already pricing for the next meeting), institutional positioning data such as the CFTC Commitments of Traders report, economic data releases scored against consensus forecasts rather than in absolute terms, and the prevailing cross-asset risk regime, which determines whether carry trades are being rewarded or unwound. No single input is sufficient on its own; the framework is built from reading all four together.</p>
+        <p>Institutional fundamental analysis for FX generally combines five inputs: central bank policy rates and forward guidance (including what interest-rate markets are already pricing for the next meeting), institutional positioning data such as the CFTC Commitments of Traders report, economic data releases scored against consensus forecasts rather than in absolute terms, the prevailing cross-asset risk regime, which determines whether carry trades are being rewarded or unwound, and a fundamental valuation estimate — typically a BEER-style regression of rate differential, risk sentiment, and external-balance variables — showing whether a pair is trading rich or cheap versus its modeled fair value. No single input is sufficient on its own; the framework is built from reading all five together.</p>
       </details>
       <details class="faq-item">
         <summary>Can beginners learn forex fundamental analysis without a paid course?</summary>
@@ -694,7 +730,11 @@ a { color: inherit; text-decoration: none; }
       </details>
       <details class="faq-item">
         <summary>What is the institutional framework for fundamental analysis in FX?</summary>
-        <p>Institutional macro desks generally structure fundamental analysis around four pillars evaluated together: central bank rate bias and policy divergence between two currencies, institutional positioning from sources like the CFTC COT report, economic data momentum measured as surprises relative to consensus rather than absolute levels, and the prevailing cross-asset risk regime that governs carry and funding flows. A currency view built from two or more of these pillars aligning carries materially more weight than any single pillar in isolation.</p>
+        <p>Institutional macro desks generally structure fundamental analysis around five pillars evaluated together: central bank rate bias and policy divergence between two currencies, institutional positioning from sources like the CFTC COT report, economic data momentum measured as surprises relative to consensus rather than absolute levels, the prevailing cross-asset risk regime that governs carry and funding flows, and a fundamental valuation model that flags whether a pair is already trading rich or cheap versus its rate- and risk-adjusted fair value. A currency view built from two or more of these pillars aligning carries materially more weight than any single pillar in isolation.</p>
+      </details>
+      <details class="faq-item">
+        <summary>What is FX Fair Value and how does it fit into fundamental analysis?</summary>
+        <p>FX Fair Value is a valuation model — the fifth pillar alongside rate bias, positioning, data surprises, and risk regime — that estimates what a pair's spot rate should be given its underlying macro drivers, then expresses the live spot rate as a Z-score deviation from that estimate. A common institutional approach is a BEER-style (Behavioral Equilibrium Exchange Rate) regression combining the rate differential, a risk-sentiment score, GDP-normalized Current Account and Trade Balance (proxies for net foreign assets and terms of trade), and a productivity growth-rate differential (a Balassa-Samuelson proxy). Valuation answers a different question than the other four pillars: not which direction has a fundamental tailwind, but how much of that tailwind is already priced in, and how much cushion or stretch exists before the pair reverts toward its modeled fair value.</p>
       </details>
     </div>
 
