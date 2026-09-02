@@ -850,7 +850,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.341.7">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.341.8">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1995,7 +1995,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div style="margin-top:8px;color:var(--text3);">Today's inputs are logged and real (not simulated); the z-score/fair-value estimate appears once the rolling window has enough business-day observations to regress against.</div>
       </div>
-      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:280px;overflow-y:auto;">
+      <div id="fv-wrap" class="fv-scroll" style="display:none;max-height:560px;overflow-y:auto;">
+        <!-- FX under/overvaluation Z-score bar chart — one bar per pair,
+             ±1.5σ/±2σ dotted reference lines, fixed pair order (same as the
+             table below). Rendered by _fvRenderZScoreChart() in
+             dashboard.js, called from renderFairValue() right after the
+             table body is built. -->
+        <div id="fv-zchart-wrap" style="padding:10px 12px 14px;border-bottom:1px solid var(--border);"></div>
         <table id="fv-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="FX Fair Value — spot, rate differential, risk-sentiment inputs, regression fair value, z-score deviation, and fit-quality tier for 32 tracked pairs">
           <thead>
             <tr>
@@ -2588,7 +2594,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.6" defer></script>
-<script src="assets/dashboard.js?v=8.341.7" defer></script>
+<script src="assets/dashboard.js?v=8.341.8" defer></script>
 <script src="assets/gi-overview.js?v=1.4.2" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
