@@ -1,7 +1,7 @@
 {
-  "updated_utc": "2026-09-02T12:47:21.567998+00:00",
-  "updated_label": "12:47 UTC",
-  "total": 32,
+  "updated_utc": "2026-09-02T16:20:52.149320+00:00",
+  "updated_label": "16:20 UTC",
+  "total": 31,
   "sources": [
     "BIS",
     "CME",
@@ -9,6 +9,23 @@
     "Saxo"
   ],
   "items": [
+    {
+      "id": "2ae10d3e5d62",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Czech 2027 draft budget: Higher deficit pressures bonds, raises rate hike risk",
+      "excerpt": "CENTRAL AND EASTERN EUROPE: The Czech 2027 draft budget widens the deficit to 3.5% of GDP and lifts borrowing needs to a record high. Higher issuance weighs on CZGBs, although some prefunding is likely this year. Faster public sector wage growth and looser fiscal policy also raise the risk of a CNB rate hike from…",
+      "author": "",
+      "url": "https://think.ing.com/articles/czech-draft-2027-budget-higher-deficit-pressures-bonds-and-raises-rate-hike-risk/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788355140000,
+      "published": "2026-09-02T13:19:00+00:00"
+    },
     {
       "id": "9543a54d6a16",
       "bank": "Saxo",
@@ -281,23 +298,6 @@
       "published": "2026-09-01T09:04:00+00:00"
     },
     {
-      "id": "2c59177f1cdb",
-      "bank": "ING",
-      "bank_full": "ING Think",
-      "series": "",
-      "title": "Eurozone inflation hits a Middle East war high, but core pressures remain contained",
-      "excerpt": "EUROPE: Yes, headline inflation increased from 2.9 to 3.3% in August, but core inflation fell back to 2.4%. Upside risks to inflation remain aplenty but the core rate remains surprisingly benign six months into the Middle East…",
-      "author": "",
-      "url": "https://think.ing.com/snaps/eurozone-inflation-at-middle-east-war-high-but-no-sign-of-core-inflation-moving-up-yet/",
-      "currencies": [
-        "EUR"
-      ],
-      "pairs": [],
-      "category": "macro",
-      "ts": 1788252000000,
-      "published": "2026-09-01T08:40:00+00:00"
-    },
-    {
       "id": "f7b93385e5b0",
       "bank": "Saxo",
       "bank_full": "Saxo Bank (SaxoStrats) — Articles",
@@ -333,6 +333,36 @@
       "published": "2026-09-01T03:00:00+00:00"
     },
     {
+      "id": "0230cc1bf49e",
+      "bank": "BIS",
+      "bank_full": "Bank for International Settlements",
+      "series": "",
+      "title": "Recent economic and financial developments in Turkey",
+      "excerpt": "Speech by Dr Fatih Karahan, Governor of the Central Bank of the Republic of Türkiye, at the briefing on the Inflation Report 2025-III, Istanbul, 13 August 2026.",
+      "author": "Fatih Karahan",
+      "url": "https://www.bis.org/speeches/20260901-recent-economic-and-financial-developments-turkey",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788220800000,
+      "published": "2026-09-01T00:00:00+00:00"
+    },
+    {
+      "id": "d27bbb38b484",
+      "bank": "BIS",
+      "bank_full": "Bank for International Settlements",
+      "series": "",
+      "title": "Monetary policy, the yield curve and financial markets",
+      "excerpt": "Keynote address by Mr Rashad Cassim, Deputy Governor of the South African Reserve Bank, at the London Stock Exchange Group (LSEG) Insight Series event, Johannesburg, 24 June 2026.",
+      "author": "Rashad Cassim",
+      "url": "https://www.bis.org/speeches/20260901-monetary-policy-yield-curve-and-financial-markets",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788220800000,
+      "published": "2026-09-01T00:00:00+00:00"
+    },
+    {
       "id": "1c5794d39430",
       "bank": "BIS",
       "bank_full": "Bank for International Settlements",
@@ -358,36 +388,6 @@
       "excerpt": "Introductory statement by Ms Ida Wolden Bache, Governor of Norges Bank (Central Bank of Norway), at the press conference following Norway's announcement of the policy rate, Oslo, 13 August 2026.",
       "author": "Ida Wolden Bache",
       "url": "https://www.bis.org/speeches/20260901-policy-rate-kept-unchanged-meeting",
-      "currencies": [],
-      "pairs": [],
-      "category": "macro",
-      "ts": 1788220800000,
-      "published": "2026-09-01T00:00:00+00:00"
-    },
-    {
-      "id": "0230cc1bf49e",
-      "bank": "BIS",
-      "bank_full": "Bank for International Settlements",
-      "series": "",
-      "title": "Recent economic and financial developments in Turkey",
-      "excerpt": "Speech by Dr Fatih Karahan, Governor of the Central Bank of the Republic of Türkiye, at the briefing on the Inflation Report 2025-III, Istanbul, 13 August 2026.",
-      "author": "Fatih Karahan",
-      "url": "https://www.bis.org/speeches/20260901-recent-economic-and-financial-developments-turkey",
-      "currencies": [],
-      "pairs": [],
-      "category": "macro",
-      "ts": 1788220800000,
-      "published": "2026-09-01T00:00:00+00:00"
-    },
-    {
-      "id": "d27bbb38b484",
-      "bank": "BIS",
-      "bank_full": "Bank for International Settlements",
-      "series": "",
-      "title": "Monetary policy, the yield curve and financial markets",
-      "excerpt": "Keynote address by Mr Rashad Cassim, Deputy Governor of the South African Reserve Bank, at the London Stock Exchange Group (LSEG) Insight Series event, Johannesburg, 24 June 2026.",
-      "author": "Rashad Cassim",
-      "url": "https://www.bis.org/speeches/20260901-monetary-policy-yield-curve-and-financial-markets",
       "currencies": [],
       "pairs": [],
       "category": "macro",
@@ -534,23 +534,6 @@
       "category": "technical",
       "ts": 1787774379000,
       "published": "2026-08-26T19:59:39+00:00"
-    },
-    {
-      "id": "f7b8c9918b87",
-      "bank": "CME",
-      "bank_full": "CME Group FX",
-      "series": "",
-      "title": "Crude breaks $80 as Iran exports plunge.",
-      "excerpt": "Bob Iaccino of Path Trading Partners breaks down the latest market moves, noting U.S. equities opening lower with Nasdaq futures leading the decline. Economic data comes in mixed as core durable goods miss forecasts while headline numbers surprise to the upside. PCE inflation and second-quarter GDP both match expectations, keeping the Federal Reserve's rate path in focus ahead of key Jackson Hole speeches. In energy, crude oil breaks below $80 as U.S. sanctions and a blockade drive a sharp drop in Iranian exports, despite ongoing diplomatic mediation. Plus, a look ahead at upcoming Treasury auctions, key tech earnings and jobless claims data.",
-      "author": "CME Group",
-      "url": "https://www.cmegroup.com/videos/2026/08/26/crude-breaks-80-as-iran-exports-plunge-8-26-26.html?utm_source=cmegroup&utm_medium=rss&utm_campaign=distribution",
-      "currencies": [
-        "USD"
-      ],
-      "pairs": [],
-      "category": "macro",
-      "ts": 1787757841000,
-      "published": "2026-08-26T15:24:01+00:00"
     }
   ]
 }
