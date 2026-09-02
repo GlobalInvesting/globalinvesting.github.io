@@ -9293,60 +9293,12 @@ async function _renderLWChart(ohlcId, label) {
   chartDiv.style.position = 'relative';
   chartDiv.appendChild(_cbTooltip);
 
-  // ── Drawing overlay value labels ──────────────────────────────────────
-  // Trend lines and rectangles have no underlying series, so unlike an MA/
-  // indicator line (whose value the chart's own axis label already tracks
-  // at the crosshair's row) they have no built-in way to show "what's this
-  // drawing's price here" as the crosshair moves — the industry-standard
-  // behavior (TradingView, MT5) is a small colored label on the price axis
-  // at the y-coordinate where the object intersects the crosshair's current
-  // time. Fib/Fib-extension are excluded: those tools already print each
-  // level's price inline as on-chart text (_svgForDrawing above), which
-  // already satisfies "show the overlay's value" for that tool without
-  // needing an axis label too.
-  const _drawValueLabelsEl = document.createElement('div');
-  _drawValueLabelsEl.id = '_lw-draw-value-labels';
-  _drawValueLabelsEl.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:4;';
-  chartDiv.appendChild(_drawValueLabelsEl);
-
-  function _hideDrawValueLabels() { _drawValueLabelsEl.innerHTML = ''; }
-
-  function _updateDrawValueLabels(crosshairEpoch) {
-    if (crosshairEpoch == null) { _hideDrawValueLabels(); return; }
-    const arr = _curDrawings();
-    if (!arr.length) { _hideDrawValueLabels(); return; }
-    let html = '';
-    arr.forEach(d => {
-      if (d.type !== 'trend' && d.type !== 'rect') return;
-      const e1 = _timeToEpoch(d.p1.time), e2 = _timeToEpoch(d.p2.time);
-      if (e1 == null || e2 == null) return;
-      const lo = Math.min(e1, e2), hi = Math.max(e1, e2);
-      // Bounded to the drawn segment/box's own x-range — matches what's
-      // actually rendered (these tools don't extend past their endpoints),
-      // so the label only appears while it means something real.
-      if (crosshairEpoch < lo || crosshairEpoch > hi) return;
-      const col = d.color || _DRAW_COLORS[d.type] || _DRAW_COLORS.trend;
-      const prices = d.type === 'trend'
-        ? [d.p1.price + ((e2 - e1) ? (crosshairEpoch - e1) / (e2 - e1) : 0) * (d.p2.price - d.p1.price)]
-        : [Math.max(d.p1.price, d.p2.price), Math.min(d.p1.price, d.p2.price)]; // rect: both edges
-      prices.forEach(price => {
-        const y = candleSeries.priceToCoordinate(price);
-        if (y == null) return;
-        html += `<div style="position:absolute;right:2px;top:${(y - 8).toFixed(1)}px;background:${col};`
-              + `color:#0b0e14;font-size:10px;font-weight:700;line-height:16px;padding:0 4px;`
-              + `border-radius:2px;white-space:nowrap;">${price.toFixed(dec)}</div>`;
-      });
-    });
-    _drawValueLabelsEl.innerHTML = html;
-  }
-
   _lwChart.subscribeCrosshairMove(param => {
     // ── Header update & MA legend (runs regardless of CB tooltip state) ──
     if (!param || !param.time || !param.seriesData) {
       _updateLWHeader(lastBar, null, _getRtOverride());
       _updateAllMALegend(null);
       _cbTooltip.style.display = 'none';
-      _hideDrawValueLabels();
       return;
     }
     const _rawSeriesData = param.seriesData.get(candleSeries);
@@ -9359,7 +9311,6 @@ async function _renderLWChart(ohlcId, label) {
     if (candleData) _updateAllMALegend(param.seriesData);
     const isCurrentBar = lastBar && candleData && candleData.time === lastBar.time;
     if (candleData) _updateLWHeader(candleData, null, isCurrentBar ? _getRtOverride() : null);
-    _updateDrawValueLabels(_timeToEpoch(param.time));
 
     // ── CB floating tooltip ──
     const dateStr = typeof param.time === 'string' ? param.time
