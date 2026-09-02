@@ -512,17 +512,17 @@ async function renderFairValue() {
 // order — majors first, then EUR/GBP/etc. crosses — the same order the
 // table itself renders in), not a z-sort.
 //
-// (2) LABEL CLIPPING — the first version set chartH=220 with the rotated
-// pair-label text baseline AT y=217, but a -55° rotated ~7-char label's
-// real bounding box (confirmed via a live Playwright render of the exact
-// SVG string, not assumed) extends ~37px, past y=254 — outside the SVG's
-// own viewBox. SVG's root element clips to its viewBox by default, so only
-// the topmost sliver of each rotated glyph survived, rendering as the
-// illegible marks in the screenshot. Fixed by explicitly reserving a
-// labelH band below the plot area sized for the actual rotated text,
-// rather than relying on the plot area's own height or a CSS
-// overflow:visible workaround (which a horizontally-scrolling ancestor,
-// this chart's own wrap div, isn't guaranteed to respect on the y-axis).
+// (2) LABEL CLIPPING (fixed same session as the ordering fix above) / LABEL
+// ORIENTATION (fixed next session, per live feedback on a screenshot of the
+// rotated-but-unclipped version) — the clipping fix kept -55° rotated
+// labels and just stopped them from being cut off (reserved a 56px band
+// sized for the rotated text's real bounding box, verified via a live
+// Playwright render, not assumed). This later pass switches to horizontal
+// labels instead: verified via the same live-render method that horizontal
+// text at font-size 7 fits inside each column's own 40px slot (barW 30 +
+// gap 10) with zero adjacent-label overlap across a 15-pair test set —
+// centered under each bar, reserved label band shrunk from 56px to 24px
+// since rotation no longer needs the extra vertical room.
 function _fvRenderZScoreChart(entries) {
   const wrap = document.getElementById('fv-zchart-wrap');
   if (!wrap) return;
@@ -536,7 +536,7 @@ function _fvRenderZScoreChart(entries) {
 
   const barW = 30, gap = 10;
   const plotH = 170;   // bars + sigma reference lines
-  const labelH = 56;   // reserved band for rotated pair labels below the plot
+  const labelH = 24;   // reserved band for horizontal pair labels below the plot
   const chartH = plotH + labelH;
   const chartW = Math.max(560, ordered.length * (barW + gap) + gap);
   const midY = plotH / 2;
@@ -564,13 +564,10 @@ function _fvRenderZScoreChart(entries) {
     const color = e.z >= 0 ? 'var(--down)' : 'var(--up)';
     const opacity = e.regularized ? 0.4 : 0.9;
     const zLabel = (e.z >= 0 ? '+' : '') + e.z.toFixed(2) + '\u03c3';
-    // Label baseline sits just below the plot area (plotH + 12), inside the
-    // reserved labelH band — not chartH - 3, which is what clipped the
-    // rotated text off-canvas in the first version.
     const labelY = plotH + 12;
     bars += `<g>
       <rect x="${x}" y="${y}" width="${barW}" height="${len}" fill="${color}" opacity="${opacity}"><title>${e.label}: ${zLabel}${e.regularized ? ' \u2014 Regularized fit, lower confidence' : ''}</title></rect>
-      <text x="${x + barW / 2}" y="${labelY}" font-size="9" fill="var(--text2)" font-family="var(--font-mono)" text-anchor="end" transform="rotate(-55 ${x + barW / 2} ${labelY})">${e.label}</text>
+      <text x="${x + barW / 2}" y="${labelY}" font-size="7" fill="var(--text2)" font-family="var(--font-mono)" text-anchor="middle">${e.label}</text>
     </g>`;
   });
 
