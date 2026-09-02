@@ -25,13 +25,13 @@
         "9 Dec"
       ],
       "source": "federalreserve.gov",
-      "bias": "hold",
+      "bias": "hike",
       "biasSource": "Fed Funds futures, meeting-bracketed",
-      "biasMethod": "spread",
+      "biasMethod": "ois",
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 3.75
+      "hikeProb": 64,
+      "fwdRate": 3.79
     },
     "EUR": {
       "nextMeeting": "10 Sep",
@@ -95,7 +95,7 @@
       "biasUpdated": "2026-09-02",
       "cutProb": 0,
       "hikeProb": 0,
-      "fwdRate": 3.75
+      "fwdRate": 3.7303
     },
     "JPY": {
       "nextMeeting": "18 Sep",
