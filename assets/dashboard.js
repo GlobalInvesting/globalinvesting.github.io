@@ -5129,6 +5129,7 @@ function _destroyLWChart() {
   // _renderLWChart's restore pass (see COMPARE OVERLAY section) can re-add
   // matching series to the new chart once it's built.
   _lwCompareSeriesMap = {};
+  _lwCompareMeta = {}; // crosshair-tooltip metadata — same lifecycle as the series map above
 }
 
 // Compute MA(n) over close prices
@@ -5564,11 +5565,12 @@ function _lwUpdateTodayBar() {
     if (_lwActiveUpdateHeader) {
       _lwActiveUpdateHeader(_liveBar, null, (_rt.pct != null) ? { pct: _rt.pct, chg: _rt.chg } : null);
     }
-    // Re-project the trend-line/swing overlay: a live tick can widen the
-    // autoscaled price range without firing subscribeVisibleTimeRangeChange,
-    // which would otherwise leave the SVG diagonal stale against the new axis.
-    // (Fib levels don't need this -- createPriceLine already tracks the axis
-    // itself, see _syncFibPriceLines.)
+    // Re-project every drawing (trend line/rectangle/Fib): a live tick can
+    // widen the autoscaled price range without firing
+    // subscribeVisibleTimeRangeChange, which would otherwise leave the SVG
+    // overlay stale against the new axis. All drawing types render through
+    // the same _renderDrawings/_svgForDrawing SVG path (see COMPARE OVERLAY
+    // section below for the unrelated, price-line-based compare series).
     if (window._lwRenderDrawings) window._lwRenderDrawings();
     return;
   }
@@ -5663,6 +5665,11 @@ let _lwActiveTf   = 'D1'; // active timeframe: H1 | H4 | D1 | W1 | MN
 // engine's window._lwIndState further down this file — and is what actually
 // gets re-applied on every fresh _renderLWChart() call.
 let _lwCompareSeriesMap = {};
+// Crosshair-tooltip-only metadata, keyed the same as _lwCompareSeriesMap
+// above ({ cmpLabel, color, formatter, decisions }) — deliberately a
+// separate map (see _lwLoadCompare) so nothing that reads
+// _lwCompareSeriesMap's value as a raw series object is affected.
+let _lwCompareMeta = {};
 const _LS_COMPARE = 'gi_compare_list'; // [ { uid, cmpId, cmpLabel, cmpType } ]
 function _lsGetCompare() {
   try { const v = localStorage.getItem(_LS_COMPARE); return v ? JSON.parse(v) : []; }
@@ -9293,12 +9300,41 @@ async function _renderLWChart(ohlcId, label) {
   chartDiv.style.position = 'relative';
   chartDiv.appendChild(_cbTooltip);
 
+  // ── Compare Overlay floating tooltip — shows the value of every active
+  // "+ Compare" series (Rate/COT/ESI/OHLC%) under the crosshair. Same
+  // floating-tooltip pattern as the CB tooltip above, matching the existing
+  // standard already used elsewhere in the terminal for this exact box
+  // (assets/cb-rates-modal.js's .cbr-lw-tooltip, e.g. the CB Rates modal's
+  // own chart). Auto-width instead of a fixed TOOLTIP_W since it can show
+  // 1-N stacked rows depending on how many compare overlays are active.
+  const _cmpTooltip = document.createElement('div');
+  _cmpTooltip.id = '_lw-cmp-tooltip';
+  Object.assign(_cmpTooltip.style, {
+    position:       'absolute',
+    display:        'none',
+    pointerEvents:  'none',
+    boxSizing:      'border-box',
+    background:     'var(--bg2)',
+    border:         '1px solid var(--border2)',
+    borderRadius:   '4px',
+    padding:        '6px 10px',
+    fontSize:       '10px',
+    lineHeight:     '1.5',
+    fontFamily:     'var(--font-mono,monospace)',
+    color:          'var(--text)',
+    zIndex:         '50',
+    boxShadow:      '0 4px 16px rgba(0,0,0,.4)',
+    whiteSpace:     'nowrap',
+  });
+  chartDiv.appendChild(_cmpTooltip);
+
   _lwChart.subscribeCrosshairMove(param => {
     // ── Header update & MA legend (runs regardless of CB tooltip state) ──
     if (!param || !param.time || !param.seriesData) {
       _updateLWHeader(lastBar, null, _getRtOverride());
       _updateAllMALegend(null);
       _cbTooltip.style.display = 'none';
+      _cmpTooltip.style.display = 'none';
       return;
     }
     const _rawSeriesData = param.seriesData.get(candleSeries);
@@ -9315,6 +9351,52 @@ async function _renderLWChart(ohlcId, label) {
     // ── CB floating tooltip ──
     const dateStr = typeof param.time === 'string' ? param.time
       : new Date(param.time * 1000).toISOString().slice(0, 10);
+
+    // ── Compare Overlay floating tooltip — independent of the CB tooltip
+    // below (runs and returns/continues on its own), so an active compare
+    // overlay shows its value regardless of whether a CB meeting also
+    // falls on this date.
+    const cmpUids = Object.keys(_lwCompareSeriesMap);
+    if (cmpUids.length === 0) {
+      _cmpTooltip.style.display = 'none';
+    } else {
+      const rows = [];
+      cmpUids.forEach(uid => {
+        const series = _lwCompareSeriesMap[uid];
+        const meta   = _lwCompareMeta[uid];
+        if (!series || !meta) return;
+        const d = param.seriesData.get(series);
+        if (!d || d.value == null) return;
+        rows.push(`<div style="display:flex;align-items:center;gap:6px;${rows.length ? 'margin-top:2px;' : ''}">`
+          + `<span style="width:8px;height:2px;background:${meta.color};display:inline-block;flex-shrink:0;border-radius:1px;"></span>`
+          + `<span style="color:var(--text2);">${meta.cmpLabel}</span>`
+          + `<span style="color:${meta.color};font-weight:700;margin-left:auto;padding-left:10px;">${meta.formatter(d.value)}</span>`
+          + `</div>`);
+        const dec = meta.decisions && meta.decisions[dateStr];
+        if (dec) {
+          const decCol = dec.delta > 0 ? 'var(--up)' : 'var(--down)';
+          const sign   = dec.delta > 0 ? '+' : '';
+          rows.push(`<div style="color:${decCol};font-weight:600;font-size:9px;margin-top:1px;">${sign}${Math.round(dec.delta * 100)}bp decision</div>`);
+        }
+      });
+      if (rows.length === 0) {
+        _cmpTooltip.style.display = 'none';
+      } else {
+        _cmpTooltip.innerHTML =
+          `<div style="font-size:8px;color:var(--text2);letter-spacing:.05em;margin-bottom:3px;">${dateStr}</div>`
+          + rows.join('');
+        _cmpTooltip.style.display = 'block';
+        const cW2 = chartDiv.offsetWidth;
+        const cx2 = param.point?.x ?? 0, cy2 = param.point?.y ?? 0;
+        const tw2 = _cmpTooltip.offsetWidth  || 140;
+        const th2 = _cmpTooltip.offsetHeight || 40;
+        const tx2 = (cx2 + TOOLTIP_MARGIN + tw2 <= cW2 - 4) ? cx2 + TOOLTIP_MARGIN : cx2 - TOOLTIP_MARGIN - tw2;
+        const ty2 = (cy2 - th2 - TOOLTIP_MARGIN >= 4) ? cy2 - th2 - TOOLTIP_MARGIN : cy2 + TOOLTIP_MARGIN;
+        _cmpTooltip.style.left = Math.max(0, tx2) + 'px';
+        _cmpTooltip.style.top  = Math.max(0, ty2) + 'px';
+      }
+    }
+
     const cbEvents = window._lwShowCb && window._lwCbMarkerMap && window._lwCbMarkerMap[dateStr];
     if (!cbEvents || cbEvents.length === 0) {
       _cbTooltip.style.display = 'none';
@@ -16970,6 +17052,7 @@ function _lwClearCompareOne(uid, keepPersisted) {
   const series = _lwCompareSeriesMap[uid];
   if (series && _lwChart) { try { _lwChart.removeSeries(series); } catch(_e) {} }
   delete _lwCompareSeriesMap[uid];
+  delete _lwCompareMeta[uid];
   document.querySelectorAll('.lw-cmp-pill').forEach(function (p) {
     if (p.dataset.uid === uid) p.remove();
   });
@@ -17013,6 +17096,9 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
   try {
     let seriesData = [];
     let priceFormat;
+    // Decision markers (rate type only) — {dateStr: {delta}} for the crosshair
+    // tooltip's "+Nbp decision" row, mirroring cb-rates-modal.js's decMap.
+    let cmpDecisions = null;
 
     // ── OHLC price overlay (existing behaviour) ───────────────────────────
     if (cmpType === 'ohlc') {
@@ -17108,6 +17194,16 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
         type: 'custom',
         formatter: v => v.toFixed(2) + '%'
       };
+
+      // Decision dates — same >=0.01 (1bp) threshold as cb-rates-modal.js's
+      // _processCBRateData, computed here (pre-expansion monthly points) so
+      // the crosshair tooltip can flag a decision without re-deriving it
+      // on every mouse move.
+      cmpDecisions = {};
+      for (let i = 1; i < seriesData.length; i++) {
+        const delta = seriesData[i].value - seriesData[i - 1].value;
+        if (Math.abs(delta) >= 0.01) cmpDecisions[seriesData[i].time] = { delta };
+      }
 
     // ── ESI (Economic Surprise Index, CESI-style) ─────────────────────────
     } else if (cmpType === 'esi') {
@@ -17268,6 +17364,15 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
 
     cmpSeries.setData(seriesData);
     _lwCompareSeriesMap[uid] = cmpSeries;
+    // Crosshair-tooltip metadata only — kept separate from
+    // _lwCompareSeriesMap (whose value other call sites treat as the raw
+    // series object, e.g. _lwClearCompareOne's removeSeries call) so this
+    // addition can't disturb any existing compare-overlay code path.
+    _lwCompareMeta[uid] = {
+      cmpLabel, color: CMP_COLOR,
+      formatter: (priceFormat && priceFormat.type === 'custom') ? priceFormat.formatter : (v => v.toFixed(2)),
+      decisions: cmpDecisions,
+    };
 
     document.querySelectorAll('.lw-cmp-item').forEach(i =>
       i.classList.toggle('active',
