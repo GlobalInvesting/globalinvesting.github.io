@@ -1,47 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Pre-auth flash guard (v8.139.0) — MUST be the very first thing in <head>,
-     before any stylesheet or deferred script. Runs synchronously during
-     head-parsing, i.e. before #gi-overview / #gi-terminal-view even exist in
-     the DOM, so a returning visitor with a still-valid license token never
-     gets a first paint of the free Overview snapshot before the full
-     terminal swaps in. Without this, the swap only happens once gi-auth.js /
-     gi-overview-beta.js's `defer`red scripts execute — which is after the browser
-     has already parsed and painted the body (#gi-overview visible,
-     #gi-terminal-view display:none are the static, no-JS defaults) — so
-     every visitor, including fully-activated ones, saw the snapshot flash
-     for one frame before the terminal appeared (confirmed against a fresh
-     capture, 2026-08-13).
-     This performs the SAME check as gi-auth.js's isJWTValid()/JWT_KEY — kept
-     as a small, self-contained, inline duplicate on purpose: an anti-flash
-     guard has to run before any external script loads, so it cannot import
-     gi-auth.js's function. If gi-auth.js's JWT_KEY or isJWTValid() logic
-     ever changes, this block must be updated to match (GUIDELINES.md's rule
-     on duplicated parsing logic silently drifting applies here). It sets
-     data-gi-preauth="1" on <html>; the matching CSS override lives in the
-     critical inline <style> block below. This is a pure pre-paint guess to
-     avoid the flash, not a replacement for gi-auth.js's real check —
-     gi-auth.js/gi-overview-beta.js still run their own authoritative isActive
-     check and showTerminal() normally afterward (idempotent if this guard
-     already guessed right; corrects itself in the rare case a token expired
-     between requests). -->
-<script>
-(function () {
-  try {
-    var raw = null;
-    try { raw = sessionStorage.getItem('gi_license_token'); } catch (e) {}
-    if (!raw) { try { raw = localStorage.getItem('gi_license_token'); } catch (e) {} }
-    if (!raw) return;
-    var parts = raw.split('.');
-    if (parts.length !== 3) return;
-    var payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-    if (payload && payload.exp && payload.exp > Math.floor(Date.now() / 1000)) {
-      document.documentElement.setAttribute('data-gi-preauth', '1');
-    }
-  } catch (e) {}
-})();
-</script>
 <!-- Google Analytics — consent-first (GDPR/ePrivacy compliant)
      analytics_storage defaults to 'denied'; gdpr.js upgrades to 'granted' on accept.
      gtag.js loads immediately so the library is ready, but no data is sent until consent.
@@ -74,17 +33,24 @@ gtag('consent', 'default', {
      page loads, not how the Worker validates a token it receives. -->
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Investing FX Terminal — Overview Redesign Beta (internal preview)</title>
+<title>Global Investing FX Terminal — Landing Gate Beta (internal preview)</title>
 
 <!-- ═══════════════════════════════════════
      BETA STAGING PAGE — not linked from production, not for indexing.
-     Preview-only fork of index.html's #gi-overview section (editorial-desk
-     redesign) so it can be reviewed live before promotion. noindex + a
-     canonical pointing back at the real homepage keep this out of search
-     entirely, standard practice for a staging/preview page — see the
-     project's beta→production convention (v8.219.0/v8.220.0/v8.249.0/
-     v8.341.9): this file gets deleted once the redesign is merged into
-     index.html for real, same as every prior *-beta.html/dashboard-beta.js.
+     Removes production's #gi-overview free snapshot section outright —
+     the terminal (#gi-terminal-view) is now the page's only view, visible
+     immediately, with the pre-existing GI_AUTH.showModal() activation gate
+     (blurred terminal behind the modal — the same mechanism already used
+     by the "Open full terminal" entry point and by handleRevocation(),
+     see gi-auth.js) firing automatically on load for any visitor without a
+     valid license, instead of only on click. See
+     assets/gi-overview-beta.js — now a small landing-gate trigger, not an
+     Overview renderer. noindex + a canonical pointing back at the real
+     homepage keep this out of search entirely, standard practice for a
+     staging/preview page — see the project's beta→production convention
+     (v8.219.0/v8.220.0/v8.249.0/v8.341.9): this file gets deleted once the
+     change is merged into index.html for real, same as every prior
+     *-beta.html/dashboard-beta.js.
      ═══════════════════════════════════════ -->
 <meta name="description" content="Professional FX terminal for MT5 and web: CFTC COT positioning, Economic Surprise Index, CB rate expectations, AI narrative, cross-asset risk and carry ranking.">
 <meta name="robots" content="noindex, nofollow">
@@ -676,88 +642,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-  /* ── MARKET OVERVIEW — BETA "editorial desk" redesign ── shown by default,
-     above #gi-terminal-view. Reuses the same --bg/--bg2/--blue/--up/--down
-     palette as the terminal (not the darker satellite-page palette — this
-     section is part of the terminal experience, not a satellite page).
-     Namespaced .gi-ovb-* (not .gi-ov-*) so this beta fork never collides
-     with or silently mutates the production section's own classes — the
-     two can be A/B-compared by opening index.html and index-beta.html
-     side by side. On promotion, delete the old .gi-ov-* block above/below
-     and rename .gi-ovb-* → .gi-ov-* in one pass, same convention as every
-     prior beta→production merge (v8.219.0/v8.220.0/v8.249.0/v8.341.9).
-     Async-content elements get explicit min-height so their
-     skeleton→populated swap causes no layout shift. */
-  #gi-overview { background: var(--bg); }
-  .gi-ovb-shell { display: grid; grid-template-columns: 1fr 300px; max-width: 1180px; margin: 0 auto; }
-  .gi-ovb-main { padding: 30px 30px 60px 20px; border-right: 1px solid var(--border); min-width: 0; }
-  .gi-ovb-rail { padding: 30px 20px 60px; min-width: 0; }
-  .gi-ovb-kicker { font-size: 11px; color: var(--blue); font-weight: 600; margin-bottom: 8px; letter-spacing: .02em; }
-  .gi-ovb-h1 { font-size: 22px; line-height: 1.32; margin: 0 0 12px; letter-spacing: -.01em; color: var(--text); max-width: 660px; font-weight: 600; min-height: 29px; }
-  .gi-ovb-meta { margin-bottom: 14px; }
-  .gi-ovb-meta .ts { font-family: var(--font-mono); font-size: 10.5px; color: var(--text3); }
-  .gi-ovb-body { font-size: 13.5px; line-height: 1.65; color: var(--text2); max-width: 640px; margin: 0 0 8px; min-height: 20px; }
-  .gi-ovb-readmore { display: inline-flex; align-items: center; gap: 3px; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--blue); text-decoration: none; cursor: pointer; background: none; border: none; padding: 0; font-family: var(--font-ui); }
-  .gi-ovb-readmore:hover { opacity: .82; }
-  .gi-ovb-divider { height: 1px; background: var(--border); margin: 26px 0; }
-  .gi-ovb-sec-h { font-size: 12px; color: var(--text); font-weight: 600; margin: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; }
-  .gi-ovb-sec-h span { font-size: 10.5px; color: var(--text3); font-weight: 400; font-family: var(--font-mono); }
-  .gi-ovb-strength-row { display: flex; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 5px; overflow: hidden; min-height: 62px; }
-  .gi-ovb-scell { flex: 1 1 10%; min-width: 58px; padding: 11px 6px; text-align: center; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .gi-ovb-scell:last-child { border-right: none; }
-  .gi-ovb-scell .cc { font-size: 11.5px; font-weight: 700; font-family: var(--font-mono); color: var(--text); }
-  .gi-ovb-scell .vv { font-size: 9.5px; font-family: var(--font-mono); margin-top: 3px; color: var(--text2); }
-  .gi-ovb-loading { padding: 20px; color: var(--text3); font-size: 11px; }
-  .gi-ovb-featlist { border-top: 1px solid var(--border); }
-  .gi-ovb-feat { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 4px; border-bottom: 1px solid var(--border); border-left: none; border-right: none; border-top: none; background: none; cursor: pointer; text-align: left; font-family: var(--font-ui); color: inherit; }
-  .gi-ovb-feat:hover { background: var(--bg2); }
-  .gi-ovb-feat:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-  .gi-ovb-feat .ftitle { font-size: 13.5px; font-weight: 500; color: var(--text); }
-  .gi-ovb-feat .fdesc { font-size: 11.5px; color: var(--text3); margin-top: 3px; }
-  .gi-ovb-feat .flock { display: flex; align-items: center; gap: 8px; font-size: 10.5px; color: var(--text3); flex-shrink: 0; }
-  .gi-ovb-feat svg { width: 13px; height: 13px; }
-  .gi-ovb-faq { margin-top: 30px; }
-  .gi-ovb-faq h3 { font-size: 13px; margin: 0 0 8px; color: var(--text); font-weight: 600; }
-  .gi-ovb-rail-h { font-size: 10.5px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 10px; }
-  .gi-ovb-qrow { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-family: var(--font-mono); font-size: 11.5px; color: var(--text); }
-  .gi-ovb-qrow .chg.up { color: var(--up); } .gi-ovb-qrow .chg.down { color: var(--down); } .gi-ovb-qrow .chg.flat { color: var(--text3); }
-  .gi-ovb-bias-mini { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text); }
-  .gi-ovb-tag { font-size: 9.5px; padding: 2px 6px; border-radius: 3px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; }
-  .gi-ovb-tag.strong { background: rgba(38,166,154,.15); color: var(--up); }
-  .gi-ovb-tag.weak { background: rgba(239,83,80,.15); color: var(--down); }
-  .gi-ovb-tag.neutral { background: rgba(130,144,160,.15); color: var(--text2); }
-  .gi-ovb-railcta { margin-top: 26px; border: 1px solid var(--blue); border-radius: 6px; padding: 16px; background: linear-gradient(180deg, rgba(79,127,255,.08), transparent); }
-  .gi-ovb-railcta h4 { margin: 0 0 6px; font-size: 13px; color: var(--text); }
-  .gi-ovb-railcta p { margin: 0 0 12px; font-size: 11.5px; color: var(--text2); line-height: 1.5; }
-  .gi-ovb-btn { display: block; text-align: center; padding: 9px 0; border-radius: 4px; font-size: 12.5px; font-weight: 600; background: var(--blue); color: #fff; text-decoration: none; border: none; cursor: pointer; width: 100%; font-family: var(--font-ui); }
-  .gi-ovb-btn:hover { opacity: .9; }
-  .gi-ovb-btn2 { display: block; text-align: center; padding: 8px 0; border-radius: 4px; font-size: 12px; font-weight: 500; border: 1px solid var(--border2); color: var(--text2); margin-top: 8px; text-decoration: none; }
-  .gi-ovb-btn2:hover { border-color: var(--blue); color: var(--blue); }
-  .faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
-  .faq-item summary { padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
-  .faq-item[open] summary::after { transform: rotate(45deg); }
-  .faq-item summary:hover { color: var(--blue); }
-  .faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 13px; line-height: 1.7; }
-  @media (max-width: 860px) {
-    .gi-ovb-shell { grid-template-columns: 1fr; }
-    .gi-ovb-main { border-right: none; padding: 22px 16px 40px; }
-    .gi-ovb-rail { padding: 0 16px 40px; }
-    .gi-ovb-scell { flex-basis: 20%; }
-  }
-
-  /* Pre-auth flash guard (v8.139.0) — consumes data-gi-preauth set by the
-     inline guard script at the very top of <head>. !important is required
-     because #gi-terminal-view and #gi-footer-actions are hidden via an
-     inline style="display:none" attribute (higher specificity than any
-     selector-based rule); this is the one deliberate exception to normal
-     specificity hygiene on this page, scoped tightly to these three
-     elements. gi-overview-beta.js's showTerminal() (unchanged) still runs
-     normally afterward and remains the authoritative source of truth. */
-  html[data-gi-preauth="1"] #gi-overview      { display: none !important; }
-  html[data-gi-preauth="1"] #gi-terminal-view { display: block !important; }
-  html[data-gi-preauth="1"] #gi-footer-actions { display: flex !important; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -871,145 +755,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   </div>
 </header>
 
-<!-- MARKET OVERVIEW — BETA "editorial desk" redesign. Preview-only fork of
-     production's #gi-overview, shown by default to first-time visitors, no
-     account required. All values are read from state the terminal already
-     fetches/computes (window._hmStrengths from populateHeatmap(),
-     #narrative-text from buildRichNarrative(), #risk-regime for the live
-     stress badge, the existing #q-* quote-bar spans) — this section
-     deliberately has no independent fetch/compute logic of its own, per
-     GUIDELINES.md's "two independent parsers of the same feed silently
-     drift" principle. See assets/gi-overview-beta.js for the population
-     logic. Copy corrected against the real implementation (not the
-     production FAQ's stale text) before shipping this fork: the strength
-     strip is a live 32-pair composite (ECB cross rates are the fallback
-     only, not the primary source), CB Rate Expectations covers all 10 G10
-     central banks (not eight), and Carry Ranking uses real carry — OIS
-     minus inflation expectations — not CIP (the code's own comment is
-     explicit: "NOT CIP. True CIP uses FX forward points, not inflation
-     data."). Regime badge follows Option C (approved): no color chip next
-     to the narrative — the live risk regime is stated in the first clause
-     of the narrative's own prose, read directly from #risk-regime's
-     textContent (the same single source of truth the alert engine already
-     reads, dashboard.js's evaluateRegimeAlerts()), never re-derived here.
-     The Cross-Asset Risk Monitor further down keeps its own quantitative
-     badge — that is the one place a color-coded regime indicator belongs. -->
-<section id="gi-overview" aria-label="Market overview">
-  <div class="gi-ovb-shell">
-    <div class="gi-ovb-main">
 
-      <div class="gi-ovb-kicker">Market overview &middot; no account required</div>
-      <h1 class="gi-ovb-h1" id="gi-ovb-headline">Loading market narrative&hellip;</h1>
-      <div class="gi-ovb-meta"><span class="ts" id="gi-ovb-narrative-ts">Narrative</span></div>
-      <p class="gi-ovb-body" id="gi-ovb-narrative-body">Loading&hellip;</p>
-      <button type="button" class="gi-ovb-readmore" id="gi-ovb-readmore" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">Read the full narrative &amp; signal pairs <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><path d="M2 6h8M6 2l4 4-4 4"/></svg></button>
-
-      <div class="gi-ovb-divider"></div>
-
-      <div class="gi-ovb-sec-h">Currency strength &mdash; G10<span>Live &middot; 32-pair composite</span></div>
-      <div class="gi-ovb-strength-row" id="gi-ovb-strength-row" aria-live="polite">
-        <div class="gi-ovb-loading">Loading&hellip;</div>
-      </div>
-
-      <div class="gi-ovb-divider"></div>
-
-      <div class="gi-ovb-sec-h">What the full terminal adds<span>Broker account or MT5 EA</span></div>
-      <div class="gi-ovb-featlist">
-        <button type="button" class="gi-ovb-feat" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">
-          <div><div class="ftitle">COT Positioning</div><div class="fdesc">Institutional net speculative positioning, CFTC weekly, FX majors, indices &amp; commodities</div></div>
-          <div class="flock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Locked</div>
-        </button>
-        <button type="button" class="gi-ovb-feat" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">
-          <div><div class="ftitle">CB Rate Expectations</div><div class="fdesc">Meeting-dated pricing for all 10 G10 central banks, OIS-implied bias &amp; probability</div></div>
-          <div class="flock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Locked</div>
-        </button>
-        <button type="button" class="gi-ovb-feat" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">
-          <div><div class="ftitle">Cross-Asset Risk Monitor</div><div class="fdesc">Equities, VIX, MOVE, credit spreads &amp; the yield curve rolled into one regime score</div></div>
-          <div class="flock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Locked</div>
-        </button>
-        <button type="button" class="gi-ovb-feat" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">
-          <div><div class="ftitle">FX Fair Value</div><div class="fdesc">6-variable BEER model, 32 pairs, valuation z-score vs. macro fundamentals</div></div>
-          <div class="flock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Locked</div>
-        </button>
-        <button type="button" class="gi-ovb-feat" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">
-          <div><div class="ftitle">Carry Trade Ranking &amp; Options Skew</div><div class="fdesc">Real carry (OIS minus inflation expectations) across 45 pairs, 25-delta risk reversals</div></div>
-          <div class="flock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>Locked</div>
-        </button>
-      </div>
-
-      <div class="gi-ovb-faq" id="faq">
-        <h2>Frequently asked questions</h2>
-        <details class="faq-item">
-          <summary>How real-time is the forex data?</summary>
-          <p>FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What does the Currency Strength strip show?</summary>
-          <p>Relative strength of the 10 G10 currencies from live 1-day price action across a 32-pair basket, equally weighted (7 pairs per currency). Falls back to ECB daily reference rates only when live pricing is unavailable.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What is the COT positioning data?</summary>
-          <p>COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, indices, and commodities, updated weekly. The CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication.</p>
-        </details>
-        <details class="faq-item">
-          <summary>How does the AI market narrative work?</summary>
-          <p>The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close), and states the prevailing risk regime in its own opening line rather than a separate badge.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What are the OIS-implied central bank rate expectations?</summary>
-          <p>The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, Riksbank, Norges Bank, RBNZ), derived from overnight index swap (OIS) or equivalent futures markets. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points — the same OIS-implied probability methodology as CME FedWatch.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What is the 25-delta Risk Reversal and why does it matter?</summary>
-          <p>The 25-delta Risk Reversal (25d RR) measures the difference in implied volatility between 25-delta calls and 25-delta puts for the same expiry. A negative 25d RR indicates the options market is pricing a higher premium for downside protection than for upside moves. The terminal shows 1-month tenor 25d RR for all major pairs from Saxo Bank indicative quotes, updated daily on business days.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What is the Cross-Asset Risk Monitor?</summary>
-          <p>The Cross-Asset Risk Monitor aggregates stress signals from equities (SPX), volatility (VIX, MOVE index), safe-haven assets (Gold), credit spreads (US HY OAS 20-day change), FX (AUD/JPY, USD/JPY), and the US Treasury yield curve to produce a real-time regime score mapping to four regimes: RISK-ON (score 0), MIXED (1), CAUTION (2-3), and RISK-OFF (4+). Thresholds follow institutional conventions — VIX above 30 signals crisis-level stress, yield curve inversion signals recession risk.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What is the Carry Trade Ranking?</summary>
-          <p>The Carry Trade Ranking shows real carry — the OIS benchmark rate differential net of each currency's inflation expectations, not a raw nominal spread — for all 45 G10 pairs, ranked highest to lowest, displaying the benchmark OIS rate for both currencies and the net real-carry spread in basis points.</p>
-        </details>
-        <details class="faq-item">
-          <summary>What is the Economic Surprise Index and how is it calculated?</summary>
-          <p>The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each major currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring so recent releases count more than older ones, and normalises each event series using a 90-day rolling z-score — the same methodology used by institutional economic research desks.</p>
-        </details>
-        <details class="faq-item">
-          <summary>How does the Economic Calendar work in the terminal?</summary>
-          <p>The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically.</p>
-        </details>
-      </div>
-
-    </div>
-
-    <div class="gi-ovb-rail">
-      <div class="gi-ovb-rail-h">Live quotes</div>
-      <div id="gi-ovb-quotes">
-        <div class="gi-ovb-qrow"><span>EUR/USD</span><span id="gi-ovb-q-eurusd">&mdash;</span><span class="chg" id="gi-ovb-qc-eurusd">&mdash;</span></div>
-        <div class="gi-ovb-qrow"><span>USD/JPY</span><span id="gi-ovb-q-usdjpy">&mdash;</span><span class="chg" id="gi-ovb-qc-usdjpy">&mdash;</span></div>
-        <div class="gi-ovb-qrow"><span>GBP/USD</span><span id="gi-ovb-q-gbpusd">&mdash;</span><span class="chg" id="gi-ovb-qc-gbpusd">&mdash;</span></div>
-        <div class="gi-ovb-qrow"><span>AUD/USD</span><span id="gi-ovb-q-audusd">&mdash;</span><span class="chg" id="gi-ovb-qc-audusd">&mdash;</span></div>
-        <div class="gi-ovb-qrow"><span>GOLD</span><span id="gi-ovb-q-xauusd">&mdash;</span><span class="chg" id="gi-ovb-qc-xauusd">&mdash;</span></div>
-        <div class="gi-ovb-qrow"><span>US 10Y</span><span id="gi-ovb-q-us10y">&mdash;</span><span class="chg" id="gi-ovb-qc-us10y">&mdash;</span></div>
-      </div>
-
-      <div class="gi-ovb-rail-h" style="margin-top:26px;">Currency bias</div>
-      <div id="gi-ovb-bias" aria-live="polite">
-        <div class="gi-ovb-loading">Loading&hellip;</div>
-      </div>
-
-      <div class="gi-ovb-railcta">
-        <h4>Open the full terminal</h4>
-        <p>COT positioning, OIS rate curves, Fair Value, and cross-asset risk &mdash; included with a verified broker account or the MT5 EA.</p>
-        <button type="button" class="gi-ovb-btn" id="gi-ovb-open-terminal">Open full terminal</button>
-        <a class="gi-ovb-btn2" href="access.html#broker-access">Broker access</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div id="gi-terminal-view" style="display:none;">
+<div id="gi-terminal-view">
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
 <div id="tv-ticker-wrap">
@@ -2386,11 +2133,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <!-- v8.131.0: rss/alerts/?shortcuts (and the version tag) are terminal
-       features with nothing to act on from the Overview snapshot — hidden
-       by default, shown only once gi-overview-beta.js's showTerminal() runs
-       (either via activation or a returning visitor's valid license). -->
-  <div id="gi-footer-actions" style="margin-left:auto;display:none;align-items:center;gap:10px;position:relative;">
+  <div id="gi-footer-actions" style="margin-left:auto;display:flex;align-items:center;gap:10px;position:relative;">
 
     <!-- PWA INSTALL BUTTON — hidden until beforeinstallprompt fires -->
     <button id="gi-pwa-install-btn" class="kb-hint-btn" style="display:none;"
@@ -2543,7 +2286,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 <script src="assets/gi-auth.js?v=1.7.6" defer></script>
 <script src="assets/dashboard.js?v=8.350.0" defer></script>
-<script src="assets/gi-overview-beta.js?v=1.0.0" defer></script>
+<script src="assets/gi-overview-beta.js?v=2.0.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
