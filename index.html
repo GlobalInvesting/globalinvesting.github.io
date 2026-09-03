@@ -546,7 +546,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 /* Split layout: stack share btn above badge, center badge vertically */
 #main.split-layout #narrative{position:relative}
 #main.split-layout #narrative .narr-text{padding-right:70px;overflow:hidden}
-#main.split-layout #narrative .narr-meta{position:absolute;right:10px;top:50%;transform:translateY(-50%);flex-direction:column-reverse;align-items:center;gap:0}
+#main.split-layout #narrative .narr-meta{position:absolute;right:10px;top:50%;transform:translateY(-50%);flex-direction:column-reverse;align-items:center;gap:0;width:auto;overflow:visible;margin-left:0}
 #main.split-layout #narrative .narr-share-btn{height:0;overflow:hidden;margin:0;padding:0;border:none;opacity:0;pointer-events:none;transition:height .18s,opacity .18s}
 #main.split-layout #narrative:hover .narr-share-btn,#main.split-layout #narrative:focus-within .narr-share-btn{height:22px;overflow:visible;opacity:1;pointer-events:auto;margin-bottom:4px;border:1px solid transparent}
 /* Economic Matrix: height:440px (inline, on #section-econmap) is tuned for
@@ -636,7 +636,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.358.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.359.1">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
