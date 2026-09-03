@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-03T07:55:09Z",
-  "generatedAt": "2026-09-03T07:55:09Z",
+  "lastUpdate": "2026-09-03T09:01:19Z",
+  "generatedAt": "2026-09-03T09:01:19Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -637,6 +637,11 @@
       "n": 4,
       "mean": 0.0,
       "std": 0.0
+    },
+    "EUR/ppi yoy": {
+      "n": 2,
+      "mean": 0.4,
+      "std": 0.989949
     },
     "EUR/germany ppi yoy": {
       "n": 3,
@@ -48601,7 +48606,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area PPI MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.6%",
       "forecast": "1.2%",
       "previous": "-0.3%"
     },
@@ -48614,7 +48619,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area PPI YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "5.8%",
       "forecast": "4.7%",
       "previous": "4.6%"
     },
