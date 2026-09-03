@@ -1700,6 +1700,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="NZD and NOK use real (constant-price) GDP as the Current Account/Trade Balance denominator instead of nominal GDP, since no live nominal-GDP source exists for either currency — a disclosed simplification for these two currencies only. Fit via cross-validated ridge regression rather than plain OLS, which shrinks coefficients slightly toward zero on pairs whose slower-moving inputs (Current Account, Trade Balance, productivity) are collinear over the fitting window — the standard remedy for that, not a claim of a sharper estimate.">BEER-style model (ridge-regularized): rate differential, risk score, GDP-normalized Current Account (NFA proxy), Trade Balance (ToT direction proxy) &amp; productivity growth-rate differential · statistical deviation, not investment advice</div>
+      <!-- v8.360.0: CSV export for subscriber backtesting (Dool Nath's request,
+           2026-09-03 email thread). Coverage line is read live from
+           fair-value-data/backtest/manifest.json rather than hardcoded, so it
+           never overstates how many pairs/rows actually have a computed
+           walk-forward Fair Value/Z-score yet — see renderFairValueCsvExport()
+           in dashboard.js and export_fair_value_history.py's own header for
+           the no-lookahead methodology. -->
+      <div id="fv-csv-export" style="padding:0 16px 12px;font-size:10px;color:var(--text3);font-family:var(--font-ui);"></div>
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
@@ -2275,7 +2283,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.359.5" defer></script>
+<script src="assets/dashboard.js?v=8.360.0" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
