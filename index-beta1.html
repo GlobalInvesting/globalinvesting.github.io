@@ -876,29 +876,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
          Cross-Asset Risk Monitor's #risk-regime, same live VIX stress score, per
          v8.357-session decision). Reclaims the badge column so the text runs the
          full row width.
-         v2: added an "Updated HH:MM tz · next update at [session]" footer line.
-         - "Updated" reads window._narrativeGeneratedAt (already set by
-           buildRichNarrative()/loadAIRegime() in dashboard.js — a real read, no
-           new fetch) and formats it in the VIEWER's local time + tz abbreviation,
-           matching this codebase's own established convention (toLocaleTimeString
-           with timeZoneName:'short' — see e.g. the ECB rate-decision countdown,
-           the COT panel, the Currency Strength heatmap).
-         - "Next update" is derived from SESSION_DEFS/localHourToUTC — the SAME
-           DST-aware session-open source of truth the Market Sessions/FX Liquidity
-           panels already use — not a hardcoded schedule. This happens to line up
-           with the real generate-ai-narrative.yml refresh points (Tokyo/London/NY
-           open, NY close all match SESSION_DEFS's own open/close hours) but is
-           computed independently, so it stays correct even if the workflow's own
-           fixed-UTC cron drifts slightly across a DST changeover (a known,
-           disclosed limitation of that cron, see the workflow's own header
-           comment) — deliberately an approximate "around X open" label, not a
-           to-the-minute promise. -->
+         v3 (variant A, approved over the footer-line v2): trailing inline
+         timestamp appended to the END of the narrative paragraph itself — no new
+         row, no wasted whitespace. Reads window._narrativeGeneratedAt (already
+         set by buildRichNarrative() in dashboard.js — a real read, no new fetch),
+         formatted in the viewer's local time + tz abbreviation (same
+         toLocaleTimeString(...,{timeZoneName:'short'}) convention already used by
+         the ECB countdown / COT panel / Currency Strength heatmap elsewhere in
+         this codebase).
+         Implementation note: dashboard.js's buildRichNarrative() does
+         `el.textContent = finalNarrative`, which wipes any child node on every
+         refresh — so the timestamp can't just be inserted once. A
+         MutationObserver on #narrative-text re-appends the trailing <span> after
+         every text replacement, which is what keeps it genuinely inline with the
+         CURRENT paragraph instead of a static leftover from a previous refresh. -->
     <div id="narrative" role="region" aria-label="Market Narrative" aria-live="polite" aria-atomic="false">
       <div class="narr-label">Narrative</div>
-      <div class="narr-body" style="flex:1;min-width:0;">
-        <div class="narr-text" id="narrative-text" aria-label="Narrative text" style="padding-right:8px;">Loading market narrative…</div>
-        <div class="narr-updated" id="narrative-updated" aria-hidden="true"></div>
-      </div>
+      <div class="narr-text" id="narrative-text" aria-label="Narrative text" style="padding-right:8px;">Loading market narrative…</div>
       <div class="narr-meta" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
         <button class="narr-share-btn" id="narr-share-btn" onclick="shareNarrative()" title="Share narrative" aria-label="Share market narrative">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
@@ -907,58 +901,50 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
     <style>
       /* BETA-ONLY styling — move to dashboard.css if this direction ships */
-      .narr-updated{font-family:var(--font-mono);font-size:9px;color:var(--text3);text-align:right;margin-top:3px;letter-spacing:.02em}
-      @media (max-width:700px){.narr-updated{text-align:left}}
+      .narr-inline-ts{font-family:var(--font-mono);font-size:10px;color:var(--text3);white-space:nowrap;}
     </style>
     <script>
       (function(){
-        // Reuses SESSION_DEFS/localHourToUTC/getUTCOffsetHours — already defined
-        // earlier in dashboard.js — rather than duplicating session-boundary math.
-        var SESSIONS_FOR_NARR = [
-          { zone:'Asia/Tokyo',       hour:9,  label:'Asia open' },
-          { zone:'Europe/London',    hour:8,  label:'London open' },
-          { zone:'America/New_York', hour:8,  label:'NY open' },
-          { zone:'America/New_York', hour:17, label:'NY close' },
-        ];
-        function nextUpdateLabel(now){
-          if (typeof localHourToUTC !== 'function') return '';
-          var nowUtcH = now.getUTCHours() + now.getUTCMinutes()/60;
-          var best = null, bestDelta = Infinity;
-          SESSIONS_FOR_NARR.forEach(function(s){
-            var h = localHourToUTC(s.zone, s.hour, now);
-            var delta = h - nowUtcH;
-            if (delta < 0) delta += 24;
-            if (delta < bestDelta) { bestDelta = delta; best = s.label; }
-          });
-          return best;
-        }
-        function fmtUpdated(iso){
+        var textEl = document.getElementById('narrative-text');
+        if (!textEl) return;
+        var LOADING = 'Loading market narrative…';
+
+        function fmtTs(iso){
           var d = new Date(iso);
           if (isNaN(d)) return '';
           var t = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
           var tz = d.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || '';
-          return 'Updated ' + t + (tz ? ' ' + tz : '');
+          return t + (tz ? ' ' + tz : '');
         }
-        function render(){
-          var el = document.getElementById('narrative-updated');
-          if (!el) return;
+
+        function appendTimestamp(){
           var iso = window._narrativeGeneratedAt;
-          if (!iso) return; // stays blank until buildRichNarrative() populates it
-          var now = new Date();
-          var parts = [fmtUpdated(iso)];
-          var next = nextUpdateLabel(now);
-          if (next) parts.push('next update at ' + next);
-          el.textContent = parts.join(' · ');
+          if (!iso) return; // nothing to show yet — buildRichNarrative() hasn't populated it
+          if (textEl.textContent.trim() === LOADING) return; // don't stamp the placeholder
+          if (textEl.lastElementChild && textEl.lastElementChild.classList.contains('narr-inline-ts')) return; // already appended for this refresh
+          var ts = fmtTs(iso);
+          if (!ts) return;
+          var span = document.createElement('span');
+          span.className = 'narr-inline-ts';
+          span.textContent = '\u00A0\u2014 ' + ts; // nbsp + em dash, keeps it glued to the last word
+          textEl.appendChild(span);
         }
-        // dashboard.js loads with `defer`, so it may not have executed yet the
-        // moment this inline script runs (localHourToUTC would be undefined) —
-        // the typeof guard above handles that gracefully; poll a bit faster than
-        // the display actually needs (5s, pure local computation, no fetch) so
-        // the footer fills in promptly once dashboard.js's globals are ready,
-        // rather than waiting a full 30s on first paint.
-        render();
-        window.addEventListener('load', render);
-        setInterval(render, 5000);
+
+        // dashboard.js's buildRichNarrative() does el.textContent = finalNarrative
+        // on every refresh cycle, which clears our span — re-append it whenever
+        // that happens.
+        var mo = new MutationObserver(function(mutations){
+          var textReplaced = mutations.some(function(m){ return m.type === 'characterData' || m.type === 'childList'; });
+          if (textReplaced) appendTimestamp();
+        });
+        mo.observe(textEl, { childList:true, characterData:true, subtree:true });
+
+        // dashboard.js loads with `defer`, so window._narrativeGeneratedAt may not
+        // exist yet at this point — poll briefly (pure local check, no fetch)
+        // until the observer above takes over on the next real refresh.
+        appendTimestamp();
+        window.addEventListener('load', appendTimestamp);
+        setInterval(appendTimestamp, 5000);
       })();
     </script>
 
