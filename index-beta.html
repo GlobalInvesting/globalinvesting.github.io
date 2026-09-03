@@ -642,6 +642,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
+  /* ── Landing gate — hard block, BETA-ONLY (v2.1.0) ─────────────────────
+     gi-overview-beta.js adds/removes this class on #gi-terminal-view based
+     on window.GI_AUTH.isActive (gi-auth.js's gi-auth:activated/:revoked
+     events). Distinct from gi-auth.js's own PREMIUM_SECTIONS gate (still
+     runs unchanged): that gate locks 7 specific panels behind an
+     "Activate Access" overlay; this blurs + freezes the ENTIRE terminal
+     underneath the non-dismissible modal, so a visitor with no license
+     cannot see live data or interact with anything (quote bar, chart, FX
+     table, heatmap included) — matching the approved blur+modal mock.
+     Not part of production index.html/gi-overview.js. */
+  #gi-terminal-view.gi-hard-gated {
+    filter: blur(6px);
+    pointer-events: none;
+    user-select: none;
+  }
+  #gi-terminal-view.gi-hard-gated * { cursor: default !important; }
+
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -2284,9 +2301,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </footer>
 
 
-<script src="assets/gi-auth.js?v=1.7.6" defer></script>
+<script src="assets/gi-auth.js?v=1.7.7" defer></script>
 <script src="assets/dashboard.js?v=8.350.0" defer></script>
-<script src="assets/gi-overview-beta.js?v=2.0.0" defer></script>
+<script src="assets/gi-overview-beta.js?v=2.1.0" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
