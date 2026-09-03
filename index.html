@@ -635,7 +635,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.359.4">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.360.2">
 
 <!-- Flag icons — blocking load required to prevent CLS from deferred .fi background-image application -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -1653,6 +1653,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="panel-head">
         <span class="panel-title">FX Fair Value</span>
         <span class="panel-sub" id="fv-sub" title="Recomputed once per weekday, ~23:15 UTC, from that day's close (the &quot;updated&quot; time above is shown in your own local timezone). Every field in this table — including Spot — reflects that snapshot until the next run, not a live quote.">Rate differential + risk sentiment · 60 business-day rolling regression</span>
+        <!-- v8.360.2: standard panel-head CSV export button, matching the
+             FX Pairs/COT convention (.export-btns/.export-btn), replacing
+             v8.360.0/v8.360.1's below-table paragraph link. Points directly
+             at the real static file already written by
+             export_fair_value_history.py — no client-side generation, unlike
+             exportPanel()'s fx/cot/yield/carry cases, since this file already
+             exists pre-built on disk. Hidden by default; _fvRenderCsvExport()
+             (dashboard.js) reveals it and sets href/title only once
+             fair-value-data/backtest/manifest.json confirms real computed
+             rows exist, so it's never a dead link before the workflow's
+             first run with the export step included. -->
+        <div class="export-btns" aria-label="Export Fair Value data">
+          <a class="export-btn" id="fv-csv-btn" href="#" download style="display:none;">CSV</a>
+        </div>
       </div>
       <div id="fv-accumulating" style="padding:14px 16px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
         Accumulating business-day history — <span id="fv-progress-text">0/60d</span>
@@ -1700,14 +1714,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
       </div>
       <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="NZD and NOK use real (constant-price) GDP as the Current Account/Trade Balance denominator instead of nominal GDP, since no live nominal-GDP source exists for either currency — a disclosed simplification for these two currencies only. Fit via cross-validated ridge regression rather than plain OLS, which shrinks coefficients slightly toward zero on pairs whose slower-moving inputs (Current Account, Trade Balance, productivity) are collinear over the fitting window — the standard remedy for that, not a claim of a sharper estimate.">BEER-style model (ridge-regularized): rate differential, risk score, GDP-normalized Current Account (NFA proxy), Trade Balance (ToT direction proxy) &amp; productivity growth-rate differential · statistical deviation, not investment advice</div>
-      <!-- v8.360.0: CSV export for subscriber backtesting (Dool Nath's request,
-           2026-09-03 email thread). Coverage line is read live from
-           fair-value-data/backtest/manifest.json rather than hardcoded, so it
-           never overstates how many pairs/rows actually have a computed
-           walk-forward Fair Value/Z-score yet — see renderFairValueCsvExport()
-           in dashboard.js and export_fair_value_history.py's own header for
-           the no-lookahead methodology. -->
-      <div id="fv-csv-export" style="padding:0 16px 12px;font-size:10px;color:var(--text3);font-family:var(--font-ui);"></div>
     </div>
 
     <!-- ALERTS & MARKET SIGNALS (AI-powered from ai-analysis/signals.json) -->
@@ -2283,7 +2289,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.360.1" defer></script>
+<script src="assets/dashboard.js?v=8.360.2" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
