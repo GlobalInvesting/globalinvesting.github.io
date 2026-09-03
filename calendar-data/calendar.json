@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-03T09:59:42Z",
-  "generatedAt": "2026-09-03T09:59:42Z",
+  "lastUpdate": "2026-09-03T12:31:10Z",
+  "generatedAt": "2026-09-03T12:31:10Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,10 +9,10 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-03",
   "rangeTo": "2026-09-04",
-  "totalEvents": 3870,
+  "totalEvents": 3873,
   "currencyCounts": {
     "AUD": 269,
-    "USD": 1284,
+    "USD": 1287,
     "CHF": 131,
     "GBP": 443,
     "EUR": 907,
@@ -24,7 +24,7 @@
   },
   "impactCounts": {
     "medium": 1947,
-    "high": 1695,
+    "high": 1698,
     "low": 228
   },
   "surpriseStats": {
@@ -179,24 +179,24 @@
       "std": 7.707464
     },
     "CAD/balance of trade": {
-      "n": 3,
-      "mean": 0.773333,
-      "std": 0.6146
+      "n": 4,
+      "mean": -0.1275,
+      "std": 1.870247
     },
     "USD/imports": {
-      "n": 3,
-      "mean": 0.1,
-      "std": 3.651027
+      "n": 4,
+      "mean": -0.025,
+      "std": 2.991516
     },
     "USD/exports": {
-      "n": 3,
-      "mean": 1.466667,
-      "std": 3.043572
+      "n": 4,
+      "mean": 1.65,
+      "std": 2.511971
     },
     "USD/balance of trade": {
-      "n": 3,
-      "mean": 0.266667,
-      "std": 0.602771
+      "n": 4,
+      "mean": 0.55,
+      "std": 0.750555
     },
     "USD/existing home sales mom": {
       "n": 3,
@@ -284,9 +284,9 @@
       "std": 0.0
     },
     "USD/jobless claims 4-week average": {
-      "n": 15,
-      "mean": 0.2,
-      "std": 3.101267
+      "n": 16,
+      "mean": 0.046875,
+      "std": 3.058075
     },
     "USD/ppi mom": {
       "n": 4,
@@ -299,14 +299,14 @@
       "std": 0.05
     },
     "USD/initial jobless claims": {
-      "n": 15,
-      "mean": 3.2,
-      "std": 8.849536
+      "n": 16,
+      "mean": 2.9375,
+      "std": 8.6137
     },
     "USD/continuing jobless claims": {
-      "n": 15,
-      "mean": -1.933333,
-      "std": 14.930633
+      "n": 16,
+      "mean": 0.5,
+      "std": 17.401149
     },
     "NZD/business nz pmi": {
       "n": 4,
@@ -48632,9 +48632,48 @@
       "flag": "🇨🇦",
       "event": "Canada Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "C$0.77B",
       "forecast": "C$3.6B",
-      "previous": "C$3.86B"
+      "previous": "C$4.2B"
+    },
+    {
+      "date": "3 Sep",
+      "dateISO": "2026-09-03",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "high",
+      "actual": "1779.0",
+      "forecast": "1816.0",
+      "previous": "1771.0"
+    },
+    {
+      "date": "3 Sep",
+      "dateISO": "2026-09-03",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Jobless Claims 4-week Average",
+      "impact": "high",
+      "actual": "207.25",
+      "forecast": "205.0",
+      "previous": "205.75"
+    },
+    {
+      "date": "3 Sep",
+      "dateISO": "2026-09-03",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": "206.0K",
+      "forecast": "205.0K",
+      "previous": "204.0K"
     },
     {
       "date": "3 Sep",
@@ -48645,7 +48684,7 @@
       "flag": "🇺🇸",
       "event": "United States Imports",
       "impact": "medium",
-      "actual": null,
+      "actual": "$399.3B",
       "forecast": "$399.7B",
       "previous": "$388.0B"
     },
@@ -48658,7 +48697,7 @@
       "flag": "🇺🇸",
       "event": "United States Exports",
       "impact": "medium",
-      "actual": null,
+      "actual": "$310.7B",
       "forecast": "$308.5B",
       "previous": "$314.7B"
     },
@@ -48671,7 +48710,7 @@
       "flag": "🇺🇸",
       "event": "United States Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "$-88.6B",
       "forecast": "$-90.0B",
       "previous": "$-73.3B"
     },
