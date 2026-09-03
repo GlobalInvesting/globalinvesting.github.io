@@ -148,14 +148,24 @@ async function renderFairValue() {
   // a live quote during an active intraday move; the panel had no visible
   // "as of" marker at all to explain the gap, unlike every other
   // daily-cadence panel in the terminal.
+  // v8.360.1: "updated ..." shown in the visitor's own local time/timezone
+  // instead of UTC, matching this terminal's established convention
+  // (narrative timestamp, ECB/session clocks, etc. — see e.g. the
+  // narrTsLabel pattern a few thousand lines below: local HH:MM +
+  // toLocaleTimeString({timeZoneName:'short'})'s own abbreviation). Per
+  // live feedback, the earlier v8.359.5 version hardcoded UTC — every other
+  // "updated ..." timestamp in this terminal already converts to local, so
+  // Fair Value was the one inconsistent panel, not a deliberate exception.
   const fvSub = document.getElementById('fv-sub');
   if (fvSub) {
     let label = 'Rate differential + risk sentiment \u00b7 60 business-day rolling regression';
     if (summary.generated_at) {
       const d = new Date(summary.generated_at);
       if (!isNaN(d)) {
-        label += ' \u00b7 updated ' + d.toLocaleDateString('en', { day: '2-digit', month: 'short' })
-                + ' ' + d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) + ' UTC';
+        const tzAbbr = d.toLocaleTimeString('en', { timeZoneName: 'short' }).split(' ').pop() || 'LT';
+        label += ' \u00b7 updated ' + d.toLocaleDateString([], { day: '2-digit', month: 'short' })
+                + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+                + ' ' + tzAbbr;
       }
     }
     fvSub.textContent = label;
