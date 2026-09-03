@@ -247,6 +247,46 @@ async function renderFairValue() {
   });
   tbody.innerHTML = html;
   _fvRenderZScoreChart(zEntries);
+  _fvRenderCsvExport();
+}
+
+// v8.360.0: CSV backtest-export link — reads fair-value-data/backtest/
+// manifest.json (written by export_fair_value_history.py, same weekday
+// cadence as the panel itself) and discloses the REAL current coverage
+// (how many of the 32 pairs, and how many computed rows) rather than a
+// static claim that would go stale the moment coverage grows. Runs
+// independently of the main table/accumulating branch above — the export
+// can exist even while some individual pairs are still accumulating, since
+// coverage is per-pair.
+async function _fvRenderCsvExport() {
+  const el = document.getElementById('fv-csv-export');
+  if (!el) return;
+
+  let manifest = null;
+  try {
+    const r = await _fetchWithRetry('./fair-value-data/backtest/manifest.json');
+    manifest = r && r.ok ? await r.json() : null;
+  } catch {
+    manifest = null;
+  }
+
+  // Export not generated yet (e.g. this session's script hasn't run in CI
+  // yet) — say nothing rather than showing a broken/dead link.
+  if (!manifest || !manifest.total_computed_rows_all_pairs) {
+    el.innerHTML = '';
+    return;
+  }
+
+  const pairsWithData = Object.values(manifest.pairs || {}).filter(p => p.computedRows > 0).length;
+  const totalPairs = manifest.pairs_exported || 32;
+  const totalRows = manifest.total_computed_rows_all_pairs;
+
+  el.innerHTML =
+    `Download full history (raw inputs, all ${totalPairs} pairs) for independent backtesting: ` +
+    `<a href="./fair-value-data/backtest/all_pairs.csv" download style="color:var(--accent);">all_pairs.csv</a>` +
+    ` · walk-forward Fair Value/Z-score computed for ${pairsWithData}/${totalPairs} pairs so far ` +
+    `(${totalRows} rows total, growing by one row per pair per weekday session as history accumulates past the 60-day minimum) ` +
+    `· no lookahead: each computed row used only data available up to its own date.`;
 }
 
 // FX under/overvaluation Z-score bar chart, above the Fair Value table —
