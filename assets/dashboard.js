@@ -11706,7 +11706,7 @@ async function loadAIRegime() {
     if (!res.ok) return;
     const d = await res.json();
     // Store generated_at so buildRichNarrative can compute staleness
-    if (d.generated_at) _narrativeGeneratedAt = d.generated_at;
+    if (d.generated_at) { _narrativeGeneratedAt = d.generated_at; window._narrativeGeneratedAt = d.generated_at; }
   } catch { /* silently skip */ }
 }
 
@@ -11729,6 +11729,7 @@ async function buildRichNarrative() {
       baseNarrative = d.narrative || '';
       regime = d.regime || 'RISK-OFF';
       _narrativeGeneratedAt = d.generated_at || null;
+      window._narrativeGeneratedAt = _narrativeGeneratedAt; // exposed for gi-overview-beta.js — mirrors window._hmStrengths' existing pattern
       _narrativeAiRegime   = regime.replace(/^__STALE__/, '') || null; // store raw AI regime for mismatch note
 
       // Staleness check — if the AI JSON is older than 4 hours, mark regime badge as stale
