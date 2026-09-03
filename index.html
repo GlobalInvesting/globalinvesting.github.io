@@ -1,47 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- Pre-auth flash guard (v8.139.0) — MUST be the very first thing in <head>,
-     before any stylesheet or deferred script. Runs synchronously during
-     head-parsing, i.e. before #gi-overview / #gi-terminal-view even exist in
-     the DOM, so a returning visitor with a still-valid license token never
-     gets a first paint of the free Overview snapshot before the full
-     terminal swaps in. Without this, the swap only happens once gi-auth.js /
-     gi-overview.js's `defer`red scripts execute — which is after the browser
-     has already parsed and painted the body (#gi-overview visible,
-     #gi-terminal-view display:none are the static, no-JS defaults) — so
-     every visitor, including fully-activated ones, saw the snapshot flash
-     for one frame before the terminal appeared (confirmed against a fresh
-     capture, 2026-08-13).
-     This performs the SAME check as gi-auth.js's isJWTValid()/JWT_KEY — kept
-     as a small, self-contained, inline duplicate on purpose: an anti-flash
-     guard has to run before any external script loads, so it cannot import
-     gi-auth.js's function. If gi-auth.js's JWT_KEY or isJWTValid() logic
-     ever changes, this block must be updated to match (GUIDELINES.md's rule
-     on duplicated parsing logic silently drifting applies here). It sets
-     data-gi-preauth="1" on <html>; the matching CSS override lives in the
-     critical inline <style> block below. This is a pure pre-paint guess to
-     avoid the flash, not a replacement for gi-auth.js's real check —
-     gi-auth.js/gi-overview.js still run their own authoritative isActive
-     check and showTerminal() normally afterward (idempotent if this guard
-     already guessed right; corrects itself in the rare case a token expired
-     between requests). -->
-<script>
-(function () {
-  try {
-    var raw = null;
-    try { raw = sessionStorage.getItem('gi_license_token'); } catch (e) {}
-    if (!raw) { try { raw = localStorage.getItem('gi_license_token'); } catch (e) {} }
-    if (!raw) return;
-    var parts = raw.split('.');
-    if (parts.length !== 3) return;
-    var payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-    if (payload && payload.exp && payload.exp > Math.floor(Date.now() / 1000)) {
-      document.documentElement.setAttribute('data-gi-preauth', '1');
-    }
-  } catch (e) {}
-})();
-</script>
 <!-- Google Analytics — consent-first (GDPR/ePrivacy compliant)
      analytics_storage defaults to 'denied'; gdpr.js upgrades to 'granted' on accept.
      gtag.js loads immediately so the library is ready, but no data is sent until consent.
@@ -282,95 +241,6 @@ gtag('consent', 'default', {
       "name": "Market Sentiment",
       "url": "https://globalinvesting.github.io/guide-market-sentiment.html",
       "description": "How retail positioning data and sentiment extremes signal potential reversals in major FX pairs."
-    }
-  ]
-}
-</script>
-
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "How real-time is the forex data?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What does the Currency Strength Heatmap show?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "It shows the relative strength of major currencies (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) computed from ECB cross rates, helping traders identify the strongest and weakest currencies at a glance."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is the COT positioning data?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, updated weekly. The CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the AI market narrative work?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What are the OIS-implied central bank rate expectations?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The CB Rate Expectations panel shows the market-consensus forward direction for all eight major central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTER for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, and RBNZ OCR OIS for NZD. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points — the same OIS-implied probability methodology as CME FedWatch."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is the 25-delta Risk Reversal and why does it matter?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The 25-delta Risk Reversal (25d RR) measures the difference in implied volatility between 25-delta calls and 25-delta puts for the same expiry. A negative 25d RR indicates the options market is pricing a higher premium for downside protection than for upside moves. The terminal shows 1-month tenor 25d RR for all major pairs from Saxo Bank indicative quotes, updated daily on business days."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is the cross-asset risk monitor?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Cross-Asset Risk Monitor aggregates stress signals from equities (SPX), volatility (VIX, MOVE index), safe-haven assets (Gold), credit spreads (US HY OAS 20-day change), FX (AUD/JPY, USD/JPY), and the US Treasury yield curve to produce a real-time regime score mapping to four regimes: RISK-ON (score 0), MIXED (1), CAUTION (2-3), and RISK-OFF (4+). Thresholds follow institutional conventions — VIX above 30 signals crisis-level stress, yield curve inversion signals recession risk."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is the carry trade ranking?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Carry Trade Ranking shows the net interest rate differential for all major currency pairs, adjusted for Covered Interest Parity (CIP) — the same methodology used by institutional FX desks. It ranks all 45 G10 pairs from highest to lowest carry, displaying benchmark OIS rates for both currencies and the net spread in basis points."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is the Economic Surprise Index and how is it calculated?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each major currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring so recent releases count more than older ones, and normalises each event series using a 90-day rolling z-score — the same methodology used by institutional economic research desks. The ESI panel shows a running score per currency and a 90-day chart you can inspect by pair, updated within minutes of each data release."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How does the Economic Calendar work in the terminal?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically."
-      }
     }
   ]
 }
@@ -760,90 +630,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   #sent-rows::-webkit-scrollbar-track { background: transparent; }
   #sent-rows::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-  /* ── MARKET OVERVIEW (v8.129.0) ── shown by default, above #gi-terminal-view.
-     Reuses the same --bg/--bg2/--blue/--up/--down palette as the terminal
-     (not the darker satellite-page palette — this section is part of the
-     terminal experience, not a satellite page). Async-content elements
-     (#gi-ov-bias-row, #gi-ov-csi-strip, .gi-ov-narrative-box) get explicit
-     min-height here so their skeleton→populated swap causes no layout shift.
-
-     v8.156.0: reverted the v8.155.0 "Desk Briefing" hero layout back to the
-     original stacked layout (didn't read as well visually) — only the "Read full note" link on the narrative box survives
-     from that iteration. See CHANGELOG.md v8.156.0. */
-  #gi-overview { background: var(--bg); }
-  .gi-ov-inner { max-width: 1040px; margin: 0 auto; padding: 26px 20px 40px; }
-  .gi-ov-head { margin-bottom: 22px; }
-  .gi-ov-eyebrow { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
-  .gi-ov-title { font-size: 20px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
-  .gi-ov-sub { font-size: 13px; color: var(--text2); }
-  .gi-ov-bias-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; min-height: 78px; }
-  .gi-ov-bias-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
-  .gi-ov-bias-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .gi-ov-bias-ccy { font-size: 12px; font-weight: 700; color: var(--text); letter-spacing: .03em; }
-  .gi-ov-bias-tag { font-size: 9px; font-weight: 700; letter-spacing: .03em; padding: 2px 7px; border-radius: 3px; text-transform: uppercase; background: rgba(120,123,134,.15); color: var(--text2); }
-  .gi-ov-bias-tag.up { background: rgba(38,166,154,.15); color: var(--up); }
-  .gi-ov-bias-tag.down { background: rgba(239,83,80,.15); color: var(--down); }
-  .gi-ov-bias-pct { font-size: 16px; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
-  .gi-ov-section-title { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--text3); margin: 24px 0 8px; display: flex; align-items: center; justify-content: space-between; }
-  .gi-ov-section-note { font-size: 10px; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--text3); }
-  .gi-ov-csi-strip { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px; min-height: 96px; display: flex; align-items: flex-end; gap: 10px; }
-  .gi-ov-csi-loading { color: var(--text3); font-size: 11px; }
-  .gi-ov-csi-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 70px; }
-  .gi-ov-csi-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; }
-  .gi-ov-csi-lbl { font-size: 10px; color: var(--text2); margin-top: 5px; font-weight: 600; }
-  .gi-ov-narrative-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; min-height: 76px; }
-  .gi-ov-narrative-tag { font-size: 10px; color: var(--text3); font-weight: 600; margin-bottom: 6px; }
-  .gi-ov-narrative-fade { position: relative; max-height: 56px; overflow: hidden; }
-  .gi-ov-narrative-fade::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 30px; background: linear-gradient(to bottom, rgba(30,34,45,0), var(--bg2)); }
-  .gi-ov-narrative-text { font-size: 12.5px; line-height: 1.6; color: var(--text); }
-  .gi-ov-readmore { display: inline-flex; align-items: center; gap: 3px; margin-top: 8px; font-size: 11px; font-weight: 600; color: var(--text2); text-decoration: none; cursor: pointer; background: none; border: none; padding: 0; font-family: var(--font-ui); transition: color .15s; }
-  .gi-ov-readmore:hover { color: var(--blue); }
-  .gi-ov-readmore svg { width: 10px; height: 10px; transition: transform .15s; }
-  .gi-ov-readmore:hover svg { transform: translateX(2px); }
-  .gi-ov-locked-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
-  .gi-ov-locked-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px; position: relative; overflow: hidden; cursor: pointer; min-height: 90px; }
-  .gi-ov-locked-inner { filter: blur(3px); opacity: .45; pointer-events: none; }
-  .gi-ov-locked-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 9px; }
-  .gi-ov-locked-line { height: 7px; border-radius: 3px; background: var(--bg3); margin-bottom: 6px; }
-  .gi-ov-locked-line.w60 { width: 60%; } .gi-ov-locked-line.w80 { width: 80%; } .gi-ov-locked-line.w40 { width: 40%; }
-  .gi-ov-lock-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; background: rgba(19,23,34,.35); }
-  .gi-ov-lock-icon { width: 24px; height: 24px; border-radius: 50%; background: var(--bg3); border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; color: var(--text2); }
-  .gi-ov-lock-text { font-size: 10px; color: var(--text2); font-weight: 600; text-align: center; padding: 0 8px; }
-  .gi-ov-cta { margin-top: 26px; background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; display: flex; align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap; }
-  .gi-ov-faq { margin-top: 26px; }
-  .gi-ov-faq-h2 { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 14px; border-bottom: 1px solid var(--border); }
-  .faq-item { border: 1px solid var(--border); border-radius: 6px; margin-bottom: 8px; background: var(--bg2); }
-  .faq-item summary { padding: 13px 16px; font-size: 13.5px; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
-  .faq-item[open] summary::after { transform: rotate(45deg); }
-  .faq-item summary:hover { color: var(--blue); }
-  .faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 13px; line-height: 1.7; }
-
-  .gi-ov-cta-copy { font-size: 12.5px; color: var(--text); line-height: 1.5; max-width: 640px; }
-  .gi-ov-cta-copy strong { color: var(--text); font-weight: 600; }
-  .gi-ov-cta-actions { display: flex; gap: 10px; flex-shrink: 0; }
-  .gi-ov-pill { font-size: 11px; font-weight: 700; letter-spacing: .03em; padding: 8px 16px; border-radius: 5px; border: 1px solid var(--border2); color: var(--text); background: transparent; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; cursor: pointer; font-family: var(--font-ui); }
-  .gi-ov-pill:hover { border-color: var(--blue); color: var(--blue); }
-  .gi-ov-pill-filled { background: var(--blue); border-color: var(--blue); color: #fff; }
-  .gi-ov-pill-filled:hover { color: #fff; opacity: .9; }
-  @media (max-width: 720px) {
-    .gi-ov-bias-row { grid-template-columns: repeat(2,1fr); }
-    .gi-ov-locked-row { grid-template-columns: 1fr; }
-    .gi-ov-cta { flex-direction: column; align-items: flex-start; }
-  }
-
-  /* Pre-auth flash guard (v8.139.0) — consumes data-gi-preauth set by the
-     inline guard script at the very top of <head>. !important is required
-     because #gi-terminal-view and #gi-footer-actions are hidden via an
-     inline style="display:none" attribute (higher specificity than any
-     selector-based rule); this is the one deliberate exception to normal
-     specificity hygiene on this page, scoped tightly to these three
-     elements. gi-overview.js's showTerminal() (unchanged) still runs
-     normally afterward and remains the authoritative source of truth. */
-  html[data-gi-preauth="1"] #gi-overview      { display: none !important; }
-  html[data-gi-preauth="1"] #gi-terminal-view { display: block !important; }
-  html[data-gi-preauth="1"] #gi-footer-actions { display: flex !important; }
 </style>
 <!-- Full stylesheet — blocking load ensures no CLS from deferred style application -->
 <!-- Fonts: Inter (UI) + JetBrains Mono (numbers). Blocking load = no font-swap CLS. -->
@@ -957,126 +743,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   </div>
 </header>
 
-<!-- MARKET OVERVIEW — shown by default to first-time visitors. No account
-     required to see this section. All values below are read from data the
-     terminal already fetches/computes (window._hmStrengths from
-     populateHeatmap(), #narrative-text from buildRichNarrative()) — this
-     section deliberately has no independent fetch/compute logic of its own,
-     per GUIDELINES.md's "two independent parsers of the same feed silently
-     drift" principle. See gi-overview.js for the population logic and
-     CHANGELOG.md v8.129.0 for the full context.
 
-     v8.156.0: reverted the v8.155.0 "Desk Briefing" hero back to this
-     original stacked layout — only the "Read full
-     note" link on the narrative box (added in v8.155.0) was kept. See
-     CHANGELOG.md v8.156.0. -->
-<section id="gi-overview" aria-label="Market overview">
-  <div class="gi-ov-inner">
-    <div class="gi-ov-head">
-      <div class="gi-ov-eyebrow">Market overview &middot; updated continuously</div>
-      <h1 class="gi-ov-title">What's driving FX today</h1>
-      <p class="gi-ov-sub">A daily snapshot of currency bias, strength, and market narrative. No account required.</p>
-    </div>
-
-    <div class="gi-ov-bias-row" id="gi-ov-bias-row">
-      <div class="gi-ov-bias-card" data-ccy="USD"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy"><span class="fi fi-us" style="margin-right:6px;border-radius:2px;"></span>USD</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
-      <div class="gi-ov-bias-card" data-ccy="EUR"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy"><span class="fi fi-eu" style="margin-right:6px;border-radius:2px;"></span>EUR</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
-      <div class="gi-ov-bias-card" data-ccy="GBP"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy"><span class="fi fi-gb" style="margin-right:6px;border-radius:2px;"></span>GBP</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
-      <div class="gi-ov-bias-card" data-ccy="JPY"><div class="gi-ov-bias-top"><span class="gi-ov-bias-ccy"><span class="fi fi-jp" style="margin-right:6px;border-radius:2px;"></span>JPY</span><span class="gi-ov-bias-tag">&mdash;</span></div><div class="gi-ov-bias-pct">&mdash;</div></div>
-    </div>
-
-    <div class="gi-ov-section-title">Currency Strength &mdash; G10 snapshot</div>
-    <div class="gi-ov-csi-strip" id="gi-ov-csi-strip">
-      <div class="gi-ov-csi-loading">Loading&hellip;</div>
-    </div>
-
-    <div class="gi-ov-section-title">AI market narrative <span class="gi-ov-section-note">Updated 4x daily</span></div>
-    <div class="gi-ov-narrative-box">
-      <div class="gi-ov-narrative-tag" id="gi-ov-narrative-tag">Desk note</div>
-      <div class="gi-ov-narrative-fade"><div class="gi-ov-narrative-text" id="gi-ov-narrative-text">Loading&hellip;</div></div>
-      <button type="button" class="gi-ov-readmore" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()">Read full note <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><path d="M2 6h8M6 2l4 4-4 4"/></svg></button>
-    </div>
-
-    <div class="gi-ov-section-title">Full terminal <span class="gi-ov-section-note">Included with broker account or EA</span></div>
-    <div class="gi-ov-locked-row">
-      <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
-        <div class="gi-ov-locked-inner">
-          <div class="gi-ov-locked-title">COT Positioning</div>
-          <div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w60"></div><div class="gi-ov-locked-line w40"></div>
-        </div>
-        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div class="gi-ov-lock-text">Institutional positioning breakdown</div></div>
-      </div>
-      <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
-        <div class="gi-ov-locked-inner">
-          <div class="gi-ov-locked-title">OIS Rate Curves</div>
-          <div class="gi-ov-locked-line w60"></div><div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w40"></div>
-        </div>
-        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div class="gi-ov-lock-text">Central bank meeting-dated pricing</div></div>
-      </div>
-      <div class="gi-ov-locked-card" onclick="window.GI_AUTH&amp;&amp;window.GI_AUTH.showModal()" role="button" tabindex="0">
-        <div class="gi-ov-locked-inner">
-          <div class="gi-ov-locked-title">Cross-Asset Risk</div>
-          <div class="gi-ov-locked-line w40"></div><div class="gi-ov-locked-line w80"></div><div class="gi-ov-locked-line w60"></div>
-        </div>
-        <div class="gi-ov-lock-overlay"><div class="gi-ov-lock-icon"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></div><div class="gi-ov-lock-text">Correlations, options analytics, risk regime</div></div>
-      </div>
-    </div>
-
-    <div class="gi-ov-cta">
-      <div class="gi-ov-cta-copy"><strong>This is a snapshot.</strong> The full terminal adds COT positioning, OIS-implied rate curves, cross-asset correlations, options analytics, and derivatives risk &mdash; included with a verified partner broker account, or with the MT5 EA.</div>
-      <div class="gi-ov-cta-actions">
-        <a class="gi-ov-pill" href="access.html#broker-access">Broker access</a>
-        <button class="gi-ov-pill gi-ov-pill-filled" id="gi-ov-open-terminal">Open full terminal</button>
-      </div>
-    </div>
-    <div class="gi-ov-faq" id="faq">
-      <h2 class="gi-ov-faq-h2">Frequently Asked Questions</h2>
-      <details class="faq-item">
-        <summary>How real-time is the forex data?</summary>
-        <p>FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What does the Currency Strength Heatmap show?</summary>
-        <p>It shows the relative strength of major currencies (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD) computed from ECB cross rates, helping traders identify the strongest and weakest currencies at a glance.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What is the COT positioning data?</summary>
-        <p>COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders in major FX futures, updated weekly. The CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication.</p>
-      </details>
-      <details class="faq-item">
-        <summary>How does the AI market narrative work?</summary>
-        <p>The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What are the OIS-implied central bank rate expectations?</summary>
-        <p>The CB Rate Expectations panel shows the market-consensus forward direction for all eight major central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTER for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, and RBNZ OCR OIS for NZD. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points — the same OIS-implied probability methodology as CME FedWatch.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What is the 25-delta Risk Reversal and why does it matter?</summary>
-        <p>The 25-delta Risk Reversal (25d RR) measures the difference in implied volatility between 25-delta calls and 25-delta puts for the same expiry. A negative 25d RR indicates the options market is pricing a higher premium for downside protection than for upside moves. The terminal shows 1-month tenor 25d RR for all major pairs from Saxo Bank indicative quotes, updated daily on business days.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What is the cross-asset risk monitor?</summary>
-        <p>The Cross-Asset Risk Monitor aggregates stress signals from equities (SPX), volatility (VIX, MOVE index), safe-haven assets (Gold), credit spreads (US HY OAS 20-day change), FX (AUD/JPY, USD/JPY), and the US Treasury yield curve to produce a real-time regime score mapping to four regimes: RISK-ON (score 0), MIXED (1), CAUTION (2-3), and RISK-OFF (4+). Thresholds follow institutional conventions — VIX above 30 signals crisis-level stress, yield curve inversion signals recession risk.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What is the carry trade ranking?</summary>
-        <p>The Carry Trade Ranking shows the net interest rate differential for all major currency pairs, adjusted for Covered Interest Parity (CIP) — the same methodology used by institutional FX desks. It ranks all 45 G10 pairs from highest to lowest carry, displaying benchmark OIS rates for both currencies and the net spread in basis points.</p>
-      </details>
-      <details class="faq-item">
-        <summary>What is the Economic Surprise Index and how is it calculated?</summary>
-        <p>The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each major currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring so recent releases count more than older ones, and normalises each event series using a 90-day rolling z-score — the same methodology used by institutional economic research desks. The ESI panel shows a running score per currency and a 90-day chart you can inspect by pair, updated within minutes of each data release.</p>
-      </details>
-      <details class="faq-item">
-        <summary>How does the Economic Calendar work in the terminal?</summary>
-        <p>The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically.</p>
-      </details>
-    </div>
-
-  </div>
-</section>
-
-<div id="gi-terminal-view" style="display:none;">
+<div id="gi-terminal-view">
 
 <!-- QUOTE BAR — populated by Frankfurter + open-proxy for XAU/BTC -->
 <div id="tv-ticker-wrap">
@@ -2453,10 +2121,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div style="display:flex;gap:4px;"><span class="sb-k">SESSION</span><span class="sb-v" id="session-status">DETECTING…</span></div>
   <div style="display:flex;gap:4px;"><span class="sb-k">LOCAL</span><span class="sb-v" id="footer-clock">--:--:--</span></div>
   <div class="footer-copy">&#169; 2026 Santiago Plá Casuriaga · Global Investing. All rights reserved.</div>
-  <!-- v8.131.0: rss/alerts/?shortcuts (and the version tag) are terminal
-       features with nothing to act on from the Overview snapshot — hidden
-       by default, shown only once gi-overview.js's showTerminal() runs
-       (either via activation or a returning visitor's valid license). -->
+  <!-- rss/alerts/?shortcuts (and the version tag) have nothing to act on
+       while the terminal is hard-gated pre-activation — hidden by default,
+       shown by gi-overview.js's unlockTerminal() once the visitor is past
+       the activation gate (v2.0.1). -->
   <div id="gi-footer-actions" style="margin-left:auto;display:none;align-items:center;gap:10px;position:relative;">
 
     <!-- PWA INSTALL BUTTON — hidden until beforeinstallprompt fires -->
@@ -2610,7 +2278,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
 <script src="assets/dashboard.js?v=8.350.0" defer></script>
-<script src="assets/gi-overview.js?v=1.4.2" defer></script>
+<script src="assets/gi-overview.js?v=2.0.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
      in assets/fx-websocket.js, 3) uncommenting the line below.
