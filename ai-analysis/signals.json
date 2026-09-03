@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-09-03T11:48:39Z",
+  "generated_at": "2026-09-03T15:20:22Z",
   "signals": [
     {
-      "time": "11:45",
+      "time": "15:15",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + Intervention-Driven Bid",
-      "text": "NZD/JPY is the focal point of a massive G10 performance spread, with JPY averaging +2.354% gains across the board while NZD lags at -1.628%. The move is fundamentally driven by a suspected BoJ/MoF intervention following a sharp JPY spike, which ING attributes to nervous markets and suspected policy action. This intervention-forced repricing is amplified by BoJ Governor Ueda’s fresh commentary that rate hikes remain on the table for every meeting, including this month. NZD/USD technicals show the pair at 0.5872, holding below its SMA20 of 0.5910, while COT positioning for NZD is at a 52-week extreme short (pctl 0, z -2.60). Despite this crowded spec short, the JPY intervention bid is the dominant driver, overriding NZD-specific positioning. Trade bias: Bearish NZD/JPY; intervention-led JPY strength persists as policy bias shifts. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: VIX remains below 20, allowing carry-seekers to re-enter and fade the JPY spike.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Monetary Divergence",
+      "text": "NZD/JPY trades at 85.50 as the JPY outperformance theme dominates G10 flows following hawkish BoJ rhetoric. BoJ holds at 1.0%. The 4.217% leader-to-laggard spread between JPY and NZD reflects a massive shift in carry-unwind dynamics, with NZD/USD holding below its SMA20 of 0.5910 and USD/JPY testing its SMA200 at 158.45. Despite a +335bp nominal carry advantage for AUD/JPY and similar spreads for NZD, the BoJ’s policy pivot risk is forcing a disorderly exit from yen-funded carry trades. Trade bias: Bearish NZD/JPY; JPY outperformance theme remains the dominant G10 driver. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: BoJ fails to deliver a hawkish signal, allowing the carry trade to restabilize.",
       "evidence": [
-        "JPY 1W avg: +2.354% (n=7)",
-        "NZD 1W avg: -1.628% (n=4)",
-        "G10 spread: 3.983%"
+        "JPY 1W avg: +2.625% (n=7)",
+        "NZD 1W avg: -1.592% (n=4)",
+        "G10 spread: 4.217%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:42",
+      "time": "15:12",
+      "priority": "critical",
+      "title": "USD/JPY — BoJ Policy Repricing + Options Skew",
+      "text": "USD/JPY at 155.57 as Governor Ueda confirms rate hikes are on the table for the September meeting, prompting a 1-month high in the Yen. The 25d RR at -2.64 shows a massive put skew, signaling that the options market is paying a significant premium for USD/JPY downside protection despite a 275bp Fed-BoJ carry advantage. Interestingly, IV at 7.2% remains well below HV30 of 12.1%, resulting in a -4.9% VRP that indicates the options market may still be underpricing the realized volatility of this policy-driven move. Technicals show USD/JPY has decisively broken below its SMA20/50 cluster (159.17/160.71) and is now testing SMA200 support at 158.45 on a daily close basis. Trade bias: Bearish USD/JPY; hawkish BoJ shift overpowers the carry advantage. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: Fed surprises hawkish on 16 Sep, widening the yield gap and stalling the JPY rally.",
+      "evidence": [
+        "USD/JPY 25d RR: -2.64",
+        "VRP: -4.9% (IV 7.2% vs HV30 12.1%)",
+        "Fed 3.75% vs BoJ 1.0% — +275bp"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "15:08",
       "priority": "warning",
-      "title": "USD/JPY — Options Complacency vs Intervention Risk",
-      "text": "USD/JPY has retreated to 156.19, a -1.56% intraday drop that has seen price break below its SMA20 (159.17) and SMA50 (160.71). A significant divergence has emerged between the spot market and the options space; while spot volatility is high, USD/JPY 1M IV at 7.2% sits well below the HV30 of 11.3%, creating a negative -4.1% Vol Risk Premium (VRP). This signal of unusual options complacency suggests markets are not fully pricing in the risk of sustained intervention or a hawkish BoJ pivot. Furthermore, the 25d Risk Reversal at -1.82 confirms a strong put skew, indicating that institutional players are paying up for downside protection despite the 275bp Fed-BoJ carry advantage. Trade bias: Bearish USD/JPY; intervention risk and hawkish BoJ rhetoric outweigh the carry profile. Catalyst: BoJ meeting 18 Sep. Risk: Fed shifts back to a hawkish stance on hot US data, rebuilding the carry floor.",
+      "title": "AUD/USD — Positioning Extreme + Retail Divergence",
+      "text": "AUD/USD at 0.7199 is testing the upper boundaries of its current range as speculative and retail positioning reach opposing extremes. COT LF net long sits at +53,578 (pctl 95, z +1.92), marking a crowded institutional long that historically caps near-term upside. In direct contrast, retail sentiment is 86% short, suggesting a major institutional-retail divergence that often leads to late-trend volatility. While the 69bp AONIA-SOFR carry premium supports AUD, the crowded spec long remains vulnerable to a sharp unwind if US yields catch a bid. Trade bias: Neutral/range AUD/USD; crowded spec longs limit upside despite retail fading the trend. Catalyst: US CPI next week. Risk: Retail capitulation leads to one final squeeze toward 0.7300.",
       "evidence": [
-        "USD/JPY VRP: -4.1% (IV 7.2% vs HV30 11.3%)",
-        "25d RR: -1.82 (strong put skew)",
-        "USD/JPY Carry: +275bp"
+        "AUD COT LF pctl: 95 (z +1.92)",
+        "Retail: 86% Short",
+        "AONIA 4.35% vs SOFR 3.66% — -69bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:40",
+      "time": "15:04",
       "priority": "warning",
-      "title": "EUR/USD — COT Extreme vs Hike Expectations",
-      "text": "EUR/USD trades at 1.1613, currently positioned below its SMA20 (1.1603) and SMA200 (1.1637). COT data shows Leveraged Funds have aggressively built a net short of -55,311, marking a 52-week low (pctl 3, z -2.28) after a massive WoW delta of -55,635. ECB holds at 2.4%. With the ECB market bias firmly in the 'Hike' category, this crowded spec short is vulnerable to a squeeze if the central bank confirms the hawkish shift. Options markets show a +2.4% VRP, indicating that traders are actively hedging for higher volatility ahead of the policy decision. Trade bias: Bullish EUR/USD; extreme spec short positioning faces squeeze risk on ECB hike. Catalyst: ECB meeting 10 Sep — hike 2.50% priced. Risk: ECB holds and signals growth concerns, validating the spec short thesis.",
+      "title": "GBP/USD — Elevated Vol Premium + BoE Caution",
+      "text": "GBP/USD at 1.3535 faces increased two-way risk as BoE's Pill notes that recent geopolitical tensions have not de-anchored inflation expectations while downplaying aggressive hike paths. The options market is pricing in significant tail risk with a VRP of +6.2% (IV 11.0% vs HV30 4.8%), the highest premium in the G10 complex. This elevated hedging demand suggests traders are bracing for a volatility spike despite GBP's relatively neutral 0bp carry spread vs the Fed. Technically, Cable is holding below its SMA20 at 1.3550, with the SMA50/200 cluster at 1.3442/1.3444 providing the next major support zone. Trade bias: Neutral GBP/USD; elevated vol premium suggests market caution ahead of central bank meetings. Catalyst: ECB meeting 10 Sep. Risk: Geopolitical escalation in the Middle East drives a broad flight to USD.",
       "evidence": [
-        "EUR LF Net: -55,311 (pctl 3, z -2.28)",
-        "ECB Rate: 2.4% (Hike bias active)",
-        "EUR/USD VRP: +2.4%"
+        "GBP VRP: +6.2% (IV 11.0% vs HV30 4.8%)",
+        "Fed 3.75% vs BoE 3.75% — 0bp",
+        "GBP COT LF pctl: 96 (z +1.58)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:37",
+      "time": "15:01",
       "priority": "info",
-      "title": "AUD/USD — Positioning + Retail Divergence",
-      "text": "AUD/USD is trading at 0.7195, maintaining its position above all major SMAs including the SMA20 (0.7120). Speculative positioning in COT is reaching a crowded extreme, with Leveraged Funds net long +53,578 (pctl 95, z +1.92). This institutional bullishness is directly contradicted by retail sentiment, where 86% of traders are short, creating a classic contrarian setup. While the AONIA 4.35% vs SOFR 3.66% differential provides a +69bp carry advantage for the AUD, the crowded institutional long suggests the trend is likely to be reaching exhaustion. The ESI for AUD remains positive at +15.4, supporting the currency's resilience, but the extreme long positioning requires a fresh catalyst to extend higher. Trade bias: Neutral AUD/USD; institutional crowding vs retail extreme suggests near-term consolidation. Catalyst: RBA meeting 29 Sep. Risk: Sharp risk-off turn in global equities triggers a carry unwind in commodity-linked pairs.",
+      "title": "USD/NOK — ESI Outperformance vs Retail Longs",
+      "text": "USD/NOK at 9.311 reflects a strengthening Krone supported by a dominant Economic Surprise Index (ESI) of +89.4, the highest in G10. The Norges Bank remains on a hawkish footing with a 4.25% policy rate and a positive real rate of +1.57%, while retail sentiment sits at an extreme 100% long USD/NOK. This retail extreme is fading a structurally sound NOK move backed by consistent data beats and supportive energy prices. Technically, the pair remains in a clear downtrend, trading below its SMA20/50/200 cluster. Trade bias: Bearish USD/NOK; retail extreme provides contrarian support for NOK strength. Catalyst: Norges Bank meeting 24 Sep — hike bias active. Risk: WTI crude oil prices drop below $85, weakening the NOK's terms-of-trade support.",
       "evidence": [
-        "AUD LF Net: +53,578 (pctl 95, z +1.92)",
-        "Retail Sentiment: 86% Short",
-        "AONIA vs SOFR: +69bp"
+        "NOK ESI: +89.4",
+        "Retail: 100% Long USD/NOK",
+        "NOK real rate: +1.57%"
       ],
       "_source": "engine-ai-primary"
     }
