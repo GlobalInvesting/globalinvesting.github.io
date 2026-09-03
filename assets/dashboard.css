@@ -569,6 +569,10 @@
     display: flex;
     align-items: flex-start;
     flex-shrink: 0;
+    /* Positioning context for .narr-meta's floating share-button chip
+       (v8.359.4) — same in default and split-layout, no per-layout
+       override needed. */
+    position: relative;
   }
   .narr-label {
     font-size: 10px; font-weight: 700; color: var(--text2);
@@ -591,33 +595,30 @@
     cursor: help;
   }
 
-  /* ── Narrative share ghost button — visible on #narrative hover only ──
-     .narr-meta (the flex wrapper around the button) collapses to 0 width by
-     default so it reserves NO horizontal space while hidden — .narr-text is
-     then free to use that width for every wrapped line, not just some.
-     Previously .narr-meta only lost opacity/pointer-events on the button
-     itself while staying a fixed 22px-wide flex sibling at all times, which
-     permanently narrowed every line of narrative text to make room for an
-     icon that was invisible 99% of the time. Mirrors the width/height-collapse
-     convention #main.split-layout already uses for this same button. */
+  /* ── Narrative share button — floating corner chip (v8.359.4) ──
+     Prior approach (v8.359.1–v8.359.3) reserved live layout space for this
+     button — collapsing .narr-meta's width/height to 0 by default and
+     expanding it on hover — so .narr-text always got its full width back
+     while HIDDEN, but every hover still visibly reflowed/reshrank the
+     wrapped text to make room, which read as the paragraph "jumping" left.
+     Fixed by taking the button out of flow entirely: .narr-meta is
+     absolutely positioned over the text's bottom-right corner (relative to
+     #narrative, see above), so showing/hiding it on hover never changes
+     .narr-text's width at all — nothing to reflow. This also removes the
+     need for a separate #main.split-layout override, since an
+     absolutely-positioned chip behaves identically in both layout modes. */
   .narr-meta {
-    width: 0;
-    overflow: hidden;
-    margin-left: 0;
-    flex-shrink: 0;
-    transition: width .18s, margin-left .18s;
-  }
-  #narrative:hover .narr-meta,
-  #narrative:focus-within .narr-meta {
-    width: 22px;
-    margin-left: 10px;
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    z-index: 2;
   }
   .narr-share-btn {
     display: flex; align-items: center; justify-content: center;
-    width: 22px; height: 22px;
-    background: transparent;
-    border: 1px solid transparent;
-    border-radius: 3px;
+    width: 20px; height: 20px;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
     color: var(--text3);
     cursor: pointer;
     padding: 0;
