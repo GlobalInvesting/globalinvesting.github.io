@@ -567,7 +567,6 @@
     border-bottom: 1px solid var(--border);
     padding: 7px 10px;
     display: flex;
-    gap: 10px;
     align-items: flex-start;
     flex-shrink: 0;
   }
@@ -576,6 +575,7 @@
     text-transform: uppercase; letter-spacing: .06em;
     white-space: nowrap; margin-top: 1px;
     padding-right: 10px; border-right: 1px solid var(--border2);
+    margin-right: 10px;
     font-family: var(--font-ui);
   }
   .narr-text  {
@@ -591,7 +591,27 @@
     cursor: help;
   }
 
-  /* ── Narrative share ghost button — visible on #narrative hover only ── */
+  /* ── Narrative share ghost button — visible on #narrative hover only ──
+     .narr-meta (the flex wrapper around the button) collapses to 0 width by
+     default so it reserves NO horizontal space while hidden — .narr-text is
+     then free to use that width for every wrapped line, not just some.
+     Previously .narr-meta only lost opacity/pointer-events on the button
+     itself while staying a fixed 22px-wide flex sibling at all times, which
+     permanently narrowed every line of narrative text to make room for an
+     icon that was invisible 99% of the time. Mirrors the width/height-collapse
+     convention #main.split-layout already uses for this same button. */
+  .narr-meta {
+    width: 0;
+    overflow: hidden;
+    margin-left: 0;
+    flex-shrink: 0;
+    transition: width .18s, margin-left .18s;
+  }
+  #narrative:hover .narr-meta,
+  #narrative:focus-within .narr-meta {
+    width: 22px;
+    margin-left: 10px;
+  }
   .narr-share-btn {
     display: flex; align-items: center; justify-content: center;
     width: 22px; height: 22px;
@@ -1287,7 +1307,7 @@
 
     /* Narrative: stack label on top, full width text */
     #narrative { flex-direction: column; gap: 6px; }
-    .narr-label { border-right: none; border-bottom: 1px solid var(--border2); padding-right: 0; padding-bottom: 4px; }
+    .narr-label { border-right: none; border-bottom: 1px solid var(--border2); padding-right: 0; padding-bottom: 4px; margin-right: 0; }
     .narr-text { font-size: 11px; width: 100%; }
 
     /* 2-col grids that should become 1-col on mobile */
