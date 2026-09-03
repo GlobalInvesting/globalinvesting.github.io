@@ -1,12 +1,12 @@
 {
-  "runTimestamp": "2026-09-03T17:30:54.036558Z",
+  "runTimestamp": "2026-09-03T23:03:32.677798Z",
   "runDate": "2026-09-03",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
-      "status": "ok",
+      "status": "cached",
       "rate": "3.75",
-      "source": "FRED:DFEDTARU",
+      "source": "cached-file",
       "date": "2026-09-03",
       "issues": []
     },
@@ -75,6 +75,8 @@
     }
   },
   "issues": [],
-  "warnings": [],
-  "overallStatus": "ok"
+  "warnings": [
+    "USD: kept cached 2026-09-03 value over older NYFed-EFFR candidate (2026-09-02) \u2014 likely a laggy fallback source"
+  ],
+  "overallStatus": "degraded_cached"
 }
