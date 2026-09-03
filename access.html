@@ -237,9 +237,14 @@ a { color: inherit; text-decoration: none; }
 .check { color: var(--up); font-family: var(--font-mono); font-size: 11px; }
 .dash { color: var(--text3); font-family: var(--font-mono); }
 .table-note { font-family: var(--font-mono); font-size: 10px; color: var(--text3); letter-spacing: .03em; margin-top: 12px; }
-.qa-box { margin-top: 24px; padding: 18px 22px; background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; }
-.qa-box .qa-q { font-size: 14px; font-weight: 600; color: #e8edf8; margin-bottom: 6px; }
-.qa-box .qa-a { font-size: 13.5px; color: var(--text2); line-height: 1.8; }
+.qa-group-title { margin-top: 32px; margin-bottom: 4px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text3); }
+.faq-item { margin-top: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg2); }
+.faq-item summary { padding: 13px 16px; font-size: 14px; font-weight: 600; color: #e8edf8; cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: "+"; font-size: 18px; font-weight: 400; color: var(--text3); flex-shrink: 0; transition: transform .15s; }
+.faq-item[open] summary::after { transform: rotate(45deg); }
+.faq-item summary:hover { color: var(--blue); }
+.faq-item p { padding: 0 16px 14px; margin: 0; color: var(--text2); font-size: 13.5px; line-height: 1.8; }
 
 /* TWO-PLATFORM SPLIT */
 .platform-split { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 28px; border: 1px solid var(--border); border-radius: 4px; overflow: hidden; }
@@ -832,6 +837,7 @@ a { color: inherit; text-decoration: none; }
     <a href="#iface-heading" class="subnav-link" data-target="iface-heading">What You Get</a>
     <a href="#coverage-heading" class="subnav-link" data-target="coverage-heading">Features</a>
     <a href="#sub-heading" class="subnav-link" data-target="sub-heading">Pricing</a>
+    <a href="#method-heading" class="subnav-link" data-target="method-heading">Methodology</a>
     <a href="#activation" class="subnav-link" data-target="activation">Getting Started</a>
     <a href="#companion-heading" class="subnav-link" data-target="companion-heading">MT5 Indicators</a>
   </div>
@@ -1249,68 +1255,69 @@ a { color: inherit; text-decoration: none; }
         </div>
       </div>
     </div>
-    <div class="qa-box">
-      <div class="qa-q">Do I need to buy the EA to use the web terminal?</div>
-      <div class="qa-a">No. The MT5 Expert Advisor and the verified-broker-account paths are all independent — any one of them unlocks full access to the web terminal on its own. The EA additionally runs the native MT5 chart overlay; the broker-account paths do not require MT5 at all.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">How does the 14-day trial work?</div>
-      <div class="qa-a">Send us your name and the email address you'd like the access link sent to. We'll reply with a one-click activation link — no MT5 account, EA purchase, or broker account needed. The trial unlocks every panel for 14 days; after that, continue with the MT5 EA rental or a partner-broker account above.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">Does opening a Vantage account include the web terminal?</div>
-      <div class="qa-a">Yes. Opening and verifying a live trading account with Vantage — one of our two partner brokers, ASIC- and FCA-regulated — unlocks full web terminal access: every panel, for 30 days, renewing automatically while the account stays active. No MT5 EA purchase is required. We may receive compensation from partner brokers for accounts opened this way, at no cost to you.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">Does opening a TMGM account include the web terminal?</div>
-      <div class="qa-a">Yes. Opening and verifying a live trading account with TMGM — one of our two partner brokers, ASIC-regulated — unlocks full web terminal access: every panel, for 30 days, renewing automatically while the account stays active. No MT5 EA purchase is required. We may receive compensation from partner brokers for accounts opened this way, at no cost to you.</div>
-    </div>
+    <div class="qa-group-title">Frequently asked questions</div>
+    <details class="faq-item">
+      <summary>Do I need to buy the EA to use the web terminal?</summary>
+      <p>No. The MT5 Expert Advisor and the verified-broker-account paths are all independent — any one of them unlocks full access to the web terminal on its own. The EA additionally runs the native MT5 chart overlay; the broker-account paths do not require MT5 at all.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How does the 14-day trial work?</summary>
+      <p>Send us your name and the email address you'd like the access link sent to. We'll reply with a one-click activation link — no MT5 account, EA purchase, or broker account needed. The trial unlocks every panel for 14 days; after that, continue with the MT5 EA rental or a partner-broker account above.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does opening a Vantage account include the web terminal?</summary>
+      <p>Yes. Opening and verifying a live trading account with Vantage — one of our two partner brokers, ASIC- and FCA-regulated — unlocks full web terminal access: every panel, for 30 days, renewing automatically while the account stays active. No MT5 EA purchase is required. We may receive compensation from partner brokers for accounts opened this way, at no cost to you.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Does opening a TMGM account include the web terminal?</summary>
+      <p>Yes. Opening and verifying a live trading account with TMGM — one of our two partner brokers, ASIC-regulated — unlocks full web terminal access: every panel, for 30 days, renewing automatically while the account stays active. No MT5 EA purchase is required. We may receive compensation from partner brokers for accounts opened this way, at no cost to you.</p>
+    </details>
   </section>
 
   <!-- METHODOLOGY & DATA -->
   <section class="ac-section" aria-labelledby="method-heading">
     <div class="section-label">Methodology</div>
     <h2 class="section-title" id="method-heading">How the data works</h2>
-    <div class="qa-box">
-      <div class="qa-q">How real-time is the forex data?</div>
-      <div class="qa-a">FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What does the Currency Strength Heatmap show?</div>
-      <div class="qa-a">It shows the relative strength of all 10 G10 currencies (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK), computed as a live composite score across all 32 G10 currency pairs' price action — not a single benchmark cross rate — helping traders identify the strongest and weakest currencies at a glance.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What is the COT positioning data?</div>
-      <div class="qa-a">COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders, with separate FX, Indices, and Commodities tabs. FX and Indices use the CFTC TFF report's Leveraged Funds category as the primary speculative signal; Commodities uses the CFTC Disaggregated report's Managed Money category. Updated weekly — the CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">How does the AI market narrative work?</div>
-      <div class="qa-a">The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What are the OIS-implied central bank rate expectations?</div>
-      <div class="qa-a">The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTR for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, RBNZ OCR OIS for NZD, NOWA OIS for NOK, and SWESTR OIS for SEK. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What is the 25-delta Risk Reversal and why does it matter?</div>
-      <div class="qa-a">The 25-delta Risk Reversal (25d RR) measures the difference in implied volatility between 25-delta calls and 25-delta puts for the same expiry. A negative 25d RR indicates the options market is pricing a higher premium for downside protection than for upside moves. The terminal shows 1-month tenor 25d RR for all major pairs from Saxo Bank indicative quotes, updated daily on business days.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What is the cross-asset risk monitor?</div>
-      <div class="qa-a">The Cross-Asset Risk Monitor aggregates stress signals from equities (SPX), volatility (VIX, MOVE index), safe-haven assets (Gold), credit spreads (US HY OAS 20-day change), FX (AUD/JPY, USD/JPY), and the US Treasury yield curve to produce a real-time regime score mapping to four regimes: RISK-ON (VIX below 18, no other stress signals active), MIXED (one stress factor), CAUTION (two to three factors), and RISK-OFF (four or more factors — high stress, USD/JPY/CHF bid, equities sold).</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What is the carry trade ranking?</div>
-      <div class="qa-a">The Carry Trade Ranking shows real carry for all major currency pairs — the nominal OIS interest rate differential minus the inflation-expectations differential between the two currencies, not adjusted for Covered Interest Parity (CIP). This is the same real-carry convention used by institutional FX desks. It ranks all 45 G10 pairs from highest to lowest real carry, displaying benchmark OIS rates for both currencies and the carry-to-volatility ratio as a tiebreak.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">What is the Economic Surprise Index and how is it calculated?</div>
-      <div class="qa-a">The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each major currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring (45-day half-life) so recent releases count more than older ones, blending in a per-event historical z-score once enough observations exist for that event type. The ESI panel shows a running score per currency and a 90-day chart you can inspect by pair, updated within minutes of each data release.</div>
-    </div>
-    <div class="qa-box">
-      <div class="qa-q">How does the Economic Calendar work in the terminal?</div>
-      <div class="qa-a">The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically.</div>
-    </div>
+    <details class="faq-item">
+      <summary>How real-time is the forex data?</summary>
+      <p>FX pair prices stream in real time during market hours via WebSocket. The quote bar label changes from a delayed timestamp to 'Live' on the first tick. Non-FX instruments (Gold, WTI, BTC, US 10Y, DXY) update every ~5 minutes. During weekends and off-hours when the FX market is closed, the last available closing price is displayed.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What does the Currency Strength Heatmap show?</summary>
+      <p>It shows the relative strength of all 10 G10 currencies (USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK), computed as a live composite score across all 32 G10 currency pairs' price action — not a single benchmark cross rate — helping traders identify the strongest and weakest currencies at a glance.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What is the COT positioning data?</summary>
+      <p>COT (Commitment of Traders) data from the CFTC shows net speculative positioning by large traders, with separate FX, Indices, and Commodities tabs. FX and Indices use the CFTC TFF report's Leveraged Funds category as the primary speculative signal; Commodities uses the CFTC Disaggregated report's Managed Money category. Updated weekly — the CFTC publishes on Friday afternoons (approx. 20:30 UTC); the terminal updates Friday evenings (21:30 UTC), typically within one hour of publication.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How does the AI market narrative work?</summary>
+      <p>The AI narrative synthesises live market data — OIS-implied central bank bias, CFTC COT institutional positioning, cross-asset risk scores, carry differentials, and options skew — to generate a structured directional analysis of major FX pairs. It updates four times daily at key session transitions (Asia open, London open, New York open, close). Each update includes a market regime badge (RISK-ON, MIXED, CAUTION, RISK-OFF) and highlighted signal pairs with the thesis behind each.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What are the OIS-implied central bank rate expectations?</summary>
+      <p>The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTR for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, RBNZ OCR OIS for NZD, NOWA OIS for NOK, and SWESTR OIS for SEK. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What is the 25-delta Risk Reversal and why does it matter?</summary>
+      <p>The 25-delta Risk Reversal (25d RR) measures the difference in implied volatility between 25-delta calls and 25-delta puts for the same expiry. A negative 25d RR indicates the options market is pricing a higher premium for downside protection than for upside moves. The terminal shows 1-month tenor 25d RR for all major pairs from Saxo Bank indicative quotes, updated daily on business days.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What is the cross-asset risk monitor?</summary>
+      <p>The Cross-Asset Risk Monitor aggregates stress signals from equities (SPX), volatility (VIX, MOVE index), safe-haven assets (Gold), credit spreads (US HY OAS 20-day change), FX (AUD/JPY, USD/JPY), and the US Treasury yield curve to produce a real-time regime score mapping to four regimes: RISK-ON (VIX below 18, no other stress signals active), MIXED (one stress factor), CAUTION (two to three factors), and RISK-OFF (four or more factors — high stress, USD/JPY/CHF bid, equities sold).</p>
+    </details>
+    <details class="faq-item">
+      <summary>What is the carry trade ranking?</summary>
+      <p>The Carry Trade Ranking shows real carry for all major currency pairs — the nominal OIS interest rate differential minus the inflation-expectations differential between the two currencies, not adjusted for Covered Interest Parity (CIP). This is the same real-carry convention used by institutional FX desks. It ranks all 45 G10 pairs from highest to lowest real carry, displaying benchmark OIS rates for both currencies and the carry-to-volatility ratio as a tiebreak.</p>
+    </details>
+    <details class="faq-item">
+      <summary>What is the Economic Surprise Index and how is it calculated?</summary>
+      <p>The Economic Surprise Index (ESI) measures how economic data is coming in relative to market expectations for each major currency. When the actual release beats the consensus forecast, it registers a positive surprise; a miss registers negative. The terminal uses decay-weighted scoring (45-day half-life) so recent releases count more than older ones, blending in a per-event historical z-score once enough observations exist for that event type. The ESI panel shows a running score per currency and a 90-day chart you can inspect by pair, updated within minutes of each data release.</p>
+    </details>
+    <details class="faq-item">
+      <summary>How does the Economic Calendar work in the terminal?</summary>
+      <p>The Economic Calendar shows medium and high-impact G10 currency events with scheduled release times, consensus forecasts, previous values, and actuals as they are released. Data updates within 2-3 minutes of publication. Each released event feeds directly into the Economic Surprise Index scoring, so the calendar and the ESI panel stay in sync automatically.</p>
+    </details>
   </section>
 
 
