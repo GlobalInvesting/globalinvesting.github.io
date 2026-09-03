@@ -1652,7 +1652,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="section-fair-value" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
       <div class="panel-head">
         <span class="panel-title">FX Fair Value</span>
-        <span class="panel-sub" id="fv-sub" title="Recomputed once per weekday, ~23:15 UTC, from that day's close. Every field in this table — including Spot — reflects that snapshot until the next run, not a live quote.">Rate differential + risk sentiment · 60 business-day rolling regression</span>
+        <span class="panel-sub" id="fv-sub" title="Recomputed once per weekday, ~23:15 UTC, from that day's close (the &quot;updated&quot; time above is shown in your own local timezone). Every field in this table — including Spot — reflects that snapshot until the next run, not a live quote.">Rate differential + risk sentiment · 60 business-day rolling regression</span>
       </div>
       <div id="fv-accumulating" style="padding:14px 16px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
         Accumulating business-day history — <span id="fv-progress-text">0/60d</span>
@@ -2283,7 +2283,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.360.0" defer></script>
+<script src="assets/dashboard.js?v=8.360.1" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 <!-- fx-websocket.js: real-time FX tick feed via Cloudflare Worker proxy (Finnhub).
      Enable by: 1) deploying cf-worker/fx-ws-proxy.js, 2) setting FX_PROXY_WS_URL
