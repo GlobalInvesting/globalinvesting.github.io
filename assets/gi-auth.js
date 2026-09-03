@@ -1,6 +1,31 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.7
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.8
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.8 (2026-09-02): Two follow-ups to v1.7.7's modal-copy rewrite,
+ *   both found live against a rendered mock before shipping (not a
+ *   post-deploy bug report):
+ *   1. The subtitle claimed "Full access is free either way" — wrong.
+ *      The terminal itself has no separate subscription, but reaching it
+ *      still costs money either path (rent/buy the EA on MQL5, or fund a
+ *      live account with a partner broker) — "free" overstated that.
+ *      Reworded to "Included with an EA license or a partner broker
+ *      account — no separate terminal subscription", which states the
+ *      actual claim (no third cost on top of either path) without
+ *      implying either path itself is free.
+ *   2. v1.7.7's two-option list (both paths' full copy stacked above the
+ *      form, unconditionally) still read long/text-heavy. Replaced with
+ *      an EA-license/Broker-account tab pair — only the selected path's
+ *      copy (and, for EA license, its form) is visible at once. The
+ *      "Where is my key?" block is now a `<details>`/`<summary>`
+ *      disclosure instead of an always-open paragraph, for the same
+ *      reason. No IDs the rest of this file depends on changed
+ *      (`gi-inp-key`/`-account`/`-server`, `gi-auth-activate`,
+ *      `gi-auth-status`, `gi-auth-close` are all identical) — `activate()`,
+ *      the Enter-to-submit binding, and the key auto-formatter are
+ *      untouched. New: a small tab-switch handler in `init()` that swaps
+ *      `.active` between `.gi-auth-tab`/`.gi-auth-panel` pairs and keeps
+ *      `aria-selected` in sync; purely a display toggle.
  *
  * v1.7.7 (2026-09-02): Two additive changes, both backward-compatible with
  *   every existing call site (verified: per-panel .gi-gate-btn onclick,
@@ -335,42 +360,58 @@
 }
 .gi-auth-sub a { color: var(--blue,#4f7fff); text-decoration: none; }
 .gi-auth-sub a:hover { text-decoration: underline; }
-/* v1.7.7: the two account-opening paths, restated as clearly labeled
-   options ahead of the form (was prose buried after the license-key
-   fields — see header changelog). */
-#gi-auth-paths {
-  list-style: none;
-  margin: 0 0 18px;
-  padding: 0;
+/* v1.7.8: two-tab account-opening picker (EA license / Broker account),
+   replacing v1.7.7's always-both-visible stacked list — see header
+   changelog for why. Only the active tab's panel is shown; nothing about
+   the other account-opening path is scrolled past to reach the form. */
+#gi-auth-tabs {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border: 1px solid var(--border, #323232);
+  border-radius: 3px;
+  padding: 2px;
+  margin: 0 0 16px;
 }
-#gi-auth-paths li {
-  font-size: 11.5px;
-  color: var(--text2, #A0A0A0);
-  line-height: 1.55;
-  border-left: 2px solid var(--border, #323232);
-  padding-left: 10px;
-}
-#gi-auth-paths li strong {
-  display: block;
+.gi-auth-tab {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  font-family: inherit;
   font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text2, #A0A0A0);
+  background: none;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.gi-auth-tab.active { color: #fff; background: var(--blue,#4f7fff); }
+.gi-auth-panel { display: none; }
+.gi-auth-panel.active { display: block; }
+.gi-auth-broker-cta {
+  display: block;
+  text-align: center;
+  background: transparent;
+  border: 1px solid var(--blue,#4f7fff);
+  border-radius: 3px;
+  color: var(--blue,#4f7fff);
+  font-family: inherit;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text, #E8E4DC);
-  margin-bottom: 2px;
+  text-decoration: none;
+  padding: 11px 0;
+  margin-top: 4px;
+  transition: background 0.15s, color 0.15s;
 }
-#gi-auth-paths a { color: var(--blue,#4f7fff); text-decoration: none; }
-#gi-auth-paths a:hover { text-decoration: underline; }
-#gi-auth-form-label {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text3, #727272);
-  margin: 0 0 12px;
+.gi-auth-broker-cta:hover { background: var(--blue,#4f7fff); color: #fff; }
+#gi-auth-newhere {
+  font-size: 11px;
+  text-align: center;
+  margin: 16px 0 0;
   padding-top: 14px;
   border-top: 1px solid var(--border, #222);
 }
@@ -421,13 +462,23 @@
 }
 #gi-auth-status.is-err { color: var(--down,#e03030); }
 #gi-auth-status.is-ok  { color: var(--up,#00b050); }
+/* v1.7.8: "Where is my key?" is now a collapsible <details> instead of
+   an always-visible block — see header changelog. */
 #gi-auth-hint {
-  font-size: 10px;
-  color: var(--text3,#666666);
-  margin-top: 12px;
+  margin-top: 4px;
+}
+#gi-auth-hint summary {
+  font-size: 10.5px;
+  color: var(--text3,#727272);
+  cursor: pointer;
+  list-style: none;
+}
+#gi-auth-hint summary::-webkit-details-marker { display: none; }
+#gi-auth-hint p {
+  font-size: 10.5px;
+  color: var(--text3,#727272);
   line-height: 1.6;
-  border-top: 1px solid var(--border, #222);
-  padding-top: 12px;
+  margin: 8px 0 0;
 }
 #gi-auth-hint code {
   color: var(--text2, #A0A0A0);
@@ -552,50 +603,58 @@
     <button id="gi-auth-close" type="button" aria-label="Close">&times;</button>
     <h2>ACTIVATE TERMINAL</h2>
     <p class="gi-auth-sub">
-      Full access is free either way &mdash; there is no separate terminal subscription.
+      Included with an EA license or a partner broker account &mdash; no separate terminal subscription.
     </p>
 
-    <ul id="gi-auth-paths">
-      <li>
-        <strong>Option 1 &mdash; EA license</strong>
+    <div id="gi-auth-tabs" role="tablist">
+      <button type="button" class="gi-auth-tab active" data-tab="ea" role="tab" aria-selected="true" aria-controls="gi-auth-panel-ea">EA license</button>
+      <button type="button" class="gi-auth-tab" data-tab="broker" role="tab" aria-selected="false" aria-controls="gi-auth-panel-broker">Broker account</button>
+    </div>
+
+    <div id="gi-auth-panel-ea" class="gi-auth-panel active" role="tabpanel">
+      <p class="gi-auth-sub" style="margin-bottom:16px;">
         Rent or buy the
         <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener">Global Investing FX Terminal EA</a>
-        on MQL5 Market, then enter the activation key from your MT5 terminal below.
-      </li>
-      <li>
-        <strong>Option 2 &mdash; Partner broker account</strong>
-        Hold (or open) a live account with TMGM or Vantage through our referral link, then
-        <a href="contact.html">contact us</a> for a no-key web access link &mdash; no MT5 or
-        activation key needed.
-      </li>
-    </ul>
-    <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-10px;">
+        on MQL5 Market, then enter the activation key from your MT5 terminal.
+      </p>
+
+      <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
+      <input id="gi-inp-key" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="14"
+             autocomplete="off" spellcheck="false" />
+
+      <label for="gi-inp-account">MT5 Account Number</label>
+      <input id="gi-inp-account" type="text" placeholder="e.g. 12345678"
+             maxlength="20" autocomplete="off" />
+
+      <label for="gi-inp-server">Broker Server Name</label>
+      <input id="gi-inp-server" type="text" placeholder="e.g. Broker-Live01"
+             maxlength="80" autocomplete="off" />
+
+      <button id="gi-auth-activate">Activate</button>
+      <div id="gi-auth-status" role="alert" aria-live="assertive"></div>
+
+      <details id="gi-auth-hint">
+        <summary>Where is my key?</summary>
+        <p>
+          Open MetaTrader 5 &rarr; attach the <em>Global Investing FX Terminal EA</em> to any chart.
+          The activation key appears in the terminal top bar as <code>KEY:XXXX-XXXX-XXXX</code>.
+          Copy the 14-character code (dashes included) and paste it above. The account number and
+          server name must match the MT5 account the EA is running on.
+        </p>
+      </details>
+    </div>
+
+    <div id="gi-auth-panel-broker" class="gi-auth-panel" role="tabpanel">
+      <p class="gi-auth-sub" style="margin-bottom:16px;">
+        Hold (or open) a live account with TMGM or Vantage through our referral link. No MT5
+        account or activation key required &mdash; we issue web-only access directly.
+      </p>
+      <a href="contact.html" class="gi-auth-broker-cta">Contact us for access &rarr;</a>
+    </div>
+
+    <p class="gi-auth-sub" id="gi-auth-newhere">
       New here? <a href="access.html">Compare both options &amp; full pricing &rarr;</a>
     </p>
-
-    <p id="gi-auth-form-label">Option 1 &mdash; enter your EA activation key</p>
-    <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
-    <input id="gi-inp-key" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="14"
-           autocomplete="off" spellcheck="false" />
-
-    <label for="gi-inp-account">MT5 Account Number</label>
-    <input id="gi-inp-account" type="text" placeholder="e.g. 12345678"
-           maxlength="20" autocomplete="off" />
-
-    <label for="gi-inp-server">Broker Server Name</label>
-    <input id="gi-inp-server" type="text" placeholder="e.g. Broker-Live01"
-           maxlength="80" autocomplete="off" />
-
-    <button id="gi-auth-activate">Activate</button>
-    <div id="gi-auth-status" role="alert" aria-live="assertive"></div>
-
-    <div id="gi-auth-hint">
-      <strong style="color:var(--text3,#666666)">Where is my key?</strong><br>
-      Open MetaTrader 5 → attach the <em>Global Investing FX Terminal EA</em> to any chart.
-      The activation key appears in the terminal top bar as <code>KEY:XXXX-XXXX-XXXX</code>.
-      Copy the 14-character code (dashes included) and paste it above.<br><br>
-      The account number and server name must match the MT5 account the EA is running on.
-    </div>
   </div>
 </div>
 `;
@@ -880,6 +939,23 @@
 
     document.getElementById('gi-auth-activate')
       ?.addEventListener('click', activate);
+
+    // v1.7.8: EA license / Broker account tabs — swap the active
+    // .gi-auth-tab and .gi-auth-panel classes, keep aria-selected in
+    // sync. Purely a display toggle; doesn't touch activate()'s own
+    // field reads (still #gi-inp-key/-account/-server, unchanged).
+    document.querySelectorAll('.gi-auth-tab').forEach(tabBtn => {
+      tabBtn.addEventListener('click', () => {
+        document.querySelectorAll('.gi-auth-tab').forEach(t => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tabBtn.classList.add('active');
+        tabBtn.setAttribute('aria-selected', 'true');
+        document.querySelectorAll('.gi-auth-panel').forEach(p => p.classList.remove('active'));
+        document.getElementById(`gi-auth-panel-${tabBtn.dataset.tab}`)?.classList.add('active');
+      });
+    });
 
     // Close affordances (v1.6.0) — button, backdrop click, Escape. Allowed
     // in every state, including after handleRevocation() sets its "access
