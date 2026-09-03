@@ -876,33 +876,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
          Cross-Asset Risk Monitor's #risk-regime, same live VIX stress score, per
          v8.357-session decision). Reclaims the badge column so the text runs the
          full row width.
-         v3 (variant A, approved over the footer-line v2): trailing inline
-         timestamp appended to the END of the narrative paragraph itself — no new
-         row, no wasted whitespace. Reads window._narrativeGeneratedAt (already
-         set by buildRichNarrative() in dashboard.js — a real read, no new fetch),
-         formatted in the viewer's local time + tz abbreviation (same
-         toLocaleTimeString(...,{timeZoneName:'short'}) convention already used by
-         the ECB countdown / COT panel / Currency Strength heatmap elsewhere in
-         this codebase).
-         Implementation note: dashboard.js's buildRichNarrative() does
-         `el.textContent = finalNarrative`, which wipes any child node on every
-         refresh — so the timestamp can't just be inserted once. A
-         MutationObserver on #narrative-text re-appends the trailing <span> after
-         every text replacement, which is what keeps it genuinely inline with the
-         CURRENT paragraph instead of a static leftover from a previous refresh. -->
+         v4 (tooltip, replacing the v3 inline "— HH:MM" span): panel stays 100%
+         visually clean — no visible timestamp chrome at all — but traceability
+         isn't dropped silently. The narrative only regenerates 4x/day (Tokyo/
+         London/NY open, NY close — see generate-ai-narrative.yml), so a stale
+         reading citing a specific price level ("USD/JPY retreats to 157.01") can
+         be several hours old with nothing on-page saying so; institutional feeds
+         (Bloomberg First Word, Reuters Top News) always timestamp free text for
+         exactly this reason. Native `title` attribute on #narrative-text carries
+         "Updated HH:MM tz" as a hover tooltip — the browser handles rendering, no
+         extra DOM, no visible element. `cursor:help` is the only visible hint
+         that it's hoverable (no underline/color, per the "no colores" direction).
+         Unlike the v3 span, setting an attribute isn't wiped by dashboard.js's
+         `el.textContent = finalNarrative` refresh, so no MutationObserver is
+         needed here — a plain interval keeping the attribute current is enough. -->
     <div id="narrative" role="region" aria-label="Market Narrative" aria-live="polite" aria-atomic="false">
       <div class="narr-label">Narrative</div>
-      <div class="narr-text" id="narrative-text" aria-label="Narrative text" style="padding-right:8px;">Loading market narrative…</div>
+      <div class="narr-text" id="narrative-text" aria-label="Narrative text" style="padding-right:8px;cursor:help;">Loading market narrative…</div>
       <div class="narr-meta" style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
         <button class="narr-share-btn" id="narr-share-btn" onclick="shareNarrative()" title="Share narrative" aria-label="Share market narrative">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
         </button>
       </div>
     </div>
-    <style>
-      /* BETA-ONLY styling — move to dashboard.css if this direction ships */
-      .narr-inline-ts{font-family:var(--font-mono);font-size:8.5px;color:var(--text3);white-space:nowrap;}
-    </style>
     <script>
       (function(){
         var textEl = document.getElementById('narrative-text');
@@ -914,37 +910,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           if (isNaN(d)) return '';
           var t = d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false});
           var tz = d.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || '';
-          return t + (tz ? ' ' + tz : '');
+          return 'Updated ' + t + (tz ? ' ' + tz : '');
         }
 
-        function appendTimestamp(){
+        function refreshTooltip(){
           var iso = window._narrativeGeneratedAt;
-          if (!iso) return; // nothing to show yet — buildRichNarrative() hasn't populated it
+          if (!iso) return; // buildRichNarrative() hasn't populated it yet
           if (textEl.textContent.trim() === LOADING) return; // don't stamp the placeholder
-          if (textEl.lastElementChild && textEl.lastElementChild.classList.contains('narr-inline-ts')) return; // already appended for this refresh
           var ts = fmtTs(iso);
-          if (!ts) return;
-          var span = document.createElement('span');
-          span.className = 'narr-inline-ts';
-          span.textContent = '\u00A0\u2014 ' + ts; // nbsp + em dash, keeps it glued to the last word
-          textEl.appendChild(span);
+          if (ts) textEl.title = ts;
         }
 
-        // dashboard.js's buildRichNarrative() does el.textContent = finalNarrative
-        // on every refresh cycle, which clears our span — re-append it whenever
-        // that happens.
-        var mo = new MutationObserver(function(mutations){
-          var textReplaced = mutations.some(function(m){ return m.type === 'characterData' || m.type === 'childList'; });
-          if (textReplaced) appendTimestamp();
-        });
-        mo.observe(textEl, { childList:true, characterData:true, subtree:true });
-
-        // dashboard.js loads with `defer`, so window._narrativeGeneratedAt may not
-        // exist yet at this point — poll briefly (pure local check, no fetch)
-        // until the observer above takes over on the next real refresh.
-        appendTimestamp();
-        window.addEventListener('load', appendTimestamp);
-        setInterval(appendTimestamp, 5000);
+        // No MutationObserver needed: unlike appending a child span, the `title`
+        // attribute isn't touched by dashboard.js's el.textContent reassignment,
+        // so a plain poll keeps it current without racing the refresh cycle.
+        refreshTooltip();
+        window.addEventListener('load', refreshTooltip);
+        setInterval(refreshTooltip, 5000);
       })();
     </script>
 
