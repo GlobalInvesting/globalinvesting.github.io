@@ -138,6 +138,29 @@ async function renderFairValue() {
   }
   if (!summary || !summary.pairs) return;
 
+  // v8.359.5: disclose the regression's actual data vintage, mirroring the
+  // convention econ-matrix.js already uses for calendar.json's lastUpdate
+  // (renderMatrix() -> "... · updated 03 Sep"). Fair Value is computed
+  // server-side once per weekday (~23:15 UTC, log-fair-value-inputs.yml),
+  // never intraday — every field in this table, including Spot, is frozen
+  // at that run's snapshot until the next one, not live. Prompted by a live
+  // report (Dool) misreading the table's frozen pre-selloff EUR/JPY spot as
+  // a live quote during an active intraday move; the panel had no visible
+  // "as of" marker at all to explain the gap, unlike every other
+  // daily-cadence panel in the terminal.
+  const fvSub = document.getElementById('fv-sub');
+  if (fvSub) {
+    let label = 'Rate differential + risk sentiment \u00b7 60 business-day rolling regression';
+    if (summary.generated_at) {
+      const d = new Date(summary.generated_at);
+      if (!isNaN(d)) {
+        label += ' \u00b7 updated ' + d.toLocaleDateString('en', { day: '2-digit', month: 'short' })
+                + ' ' + d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'UTC' }) + ' UTC';
+      }
+    }
+    fvSub.textContent = label;
+  }
+
   const FV_MIN_ROWS = summary.min_rows;
   const pairsData = summary.pairs;
   const maxRows = summary.max_usable_rows || 0;
