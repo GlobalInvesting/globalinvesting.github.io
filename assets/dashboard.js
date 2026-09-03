@@ -4350,27 +4350,29 @@ async function renderRiskData(byId) {
     }
     setEl('risk-regime-sub', regimeSub);
 
-    // ── Narrative badge (above narrative text) ──
-    // Rule: always mirrors the live stress score so both badges are consistent.
-    // The AI narrative text below the badge retains its qualitative context;
-    // the badge itself is a semaphore that must be unambiguous at a glance.
-    const narrRegEl = document.getElementById('narrative-regime');
-    if (narrRegEl) {
-      const isOn  = regime === 'RISK-ON';
-      const isOff = regime === 'RISK-OFF';
-      narrRegEl.textContent = regime;
-      narrRegEl.className = 'narr-regime';
-      narrRegEl.style.borderColor = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
-      narrRegEl.style.color       = isOn ? 'var(--up)' : isOff ? 'var(--down)' : 'var(--orange)';
-      const narrTsLabel = _narrativeGeneratedAt
-        ? ` · AI narrative: ${new Date(_narrativeGeneratedAt).toUTCString().slice(17, 22)} UTC`
-        : '';
-      // Show AI regime mismatch in tooltip when live score differs from the regime
-      // the narrative was written under — explains why narrative tone may not match the badge.
+    // ── Narrative tooltip (hover on the narrative text itself) ──
+    // Replaces the always-visible narrative-regime badge (removed v8.358.0 — it
+    // just mirrored the Risk Monitor's #risk-regime, same live stress score, a
+    // few hundred px away; see CHANGELOG). Traceability isn't dropped, just
+    // moved off the always-visible surface: the narrative only regenerates
+    // 4x/day (Tokyo/London/NY open, NY close — generate-ai-narrative.yml), so a
+    // reading citing a specific price level can be hours old with nothing
+    // on-page saying so. Institutional feeds (Bloomberg First Word, Reuters Top
+    // News) always timestamp free text for exactly this reason. `cursor:help`
+    // on .narr-text (see dashboard.css) is the only visible affordance; the
+    // native title attribute carries both the generation time AND the same
+    // regime-mismatch warning the old badge's tooltip used to carry.
+    const narrTextEl = document.getElementById('narrative-text');
+    if (narrTextEl && _narrativeGeneratedAt) {
+      const _narrTsD = new Date(_narrativeGeneratedAt);
+      const _narrTz = _narrTsD.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+      const narrTsLabel = 'Updated ' + _narrTsD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false}) + ' ' + _narrTz;
+      // Same mismatch check the old badge tooltip did: warn when the live
+      // stress score has moved on from the regime the narrative was written under.
       const aiMismatchNote = (_narrativeAiRegime && _narrativeAiRegime !== regime)
         ? ` · Narrative written under ${_narrativeAiRegime} (conditions changed since generation)`
         : '';
-      narrRegEl.title = `Live assessment · VIX ${vix.toFixed(1)}${isInverted ? ' · inverted curve' : ''}${narrTsLabel}${aiMismatchNote}`;
+      narrTextEl.title = narrTsLabel + aiMismatchNote;
     }
   }
 
@@ -11697,8 +11699,9 @@ async function fetchOptionSkew() {
 // ═══════════════════════════════════════════════════════════════════
 // LOAD AI REGIME — fast-path: prime narrative text from cached AI JSON.
 // Primes the narrative text from cached AI JSON before buildRichNarrative() runs.
-// Regime badges (#risk-regime, #narrative-regime) are exclusively owned by
-// renderRiskData() — always reflecting the live VIX stress score.
+// The #risk-regime badge is exclusively owned by renderRiskData() — always
+// reflecting the live VIX stress score. (The narrative-regime badge that used
+// to duplicate it here was removed v8.358.0 — see renderRiskData().)
 // ═══════════════════════════════════════════════════════════════════
 async function loadAIRegime() {
   try {
@@ -11817,10 +11820,18 @@ async function buildRichNarrative() {
     }
 
     // Update narrative text only.
-    // Regime badges (#risk-regime, #narrative-regime) are exclusively owned by
-    // renderRiskData() — always live VIX stress score. Never written here.
+    // The #risk-regime badge is exclusively owned by renderRiskData() — always
+    // live VIX stress score. Never written here.
     const el = document.getElementById('narrative-text');
     if (el && finalNarrative) el.textContent = finalNarrative;
+    // Refresh the hover-tooltip timestamp (see renderRiskData()) immediately
+    // after new text lands, rather than waiting for the next risk-data cycle —
+    // keeps "Updated HH:MM" accurate to the second the text actually changed.
+    if (el && _narrativeGeneratedAt) {
+      const _tsD = new Date(_narrativeGeneratedAt);
+      const _tz = _tsD.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
+      el.title = 'Updated ' + _tsD.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', hour12:false}) + ' ' + _tz;
+    }
 
     // Also load signals (moved here from fetchAIData to keep AI logic together)
     try {

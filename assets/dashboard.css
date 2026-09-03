@@ -583,18 +583,12 @@
     font-family: var(--font-ui); word-wrap: break-word; overflow-wrap: break-word;
     white-space: normal; min-width: 0;
     display: block;
-  }
-  .narr-regime {
-    font-size: 10px; font-weight: 700;
-    padding: 2px 8px;
-    border: 1px solid var(--up); color: var(--up);
-    white-space: nowrap; align-self: center; letter-spacing: .04em;
-    font-family: var(--font-ui);
-  }
-  .narr-regime.stale {
-    border-color: var(--text3) !important;
-    color: var(--text3) !important;
-    opacity: 0.6;
+    /* v8.358.0: narrative-regime badge removed (duplicated Risk Monitor's
+       #risk-regime). cursor:help is the only visible affordance that hovering
+       reveals a tooltip (generation time + regime-mismatch note, set by
+       renderRiskData()/buildRichNarrative() in dashboard.js) — kept the panel
+       visually clean per design decision rather than adding a visible timestamp. */
+    cursor: help;
   }
 
   /* ── Narrative share ghost button — visible on #narrative hover only ── */
@@ -1295,7 +1289,6 @@
     #narrative { flex-direction: column; gap: 6px; }
     .narr-label { border-right: none; border-bottom: 1px solid var(--border2); padding-right: 0; padding-bottom: 4px; }
     .narr-text { font-size: 11px; width: 100%; }
-    .narr-regime { align-self: flex-start; }
 
     /* 2-col grids that should become 1-col on mobile */
     div[style*="grid-template-columns:1fr 1fr"]:not(#cross-asset-grid):not(.ca-grid) { display: flex !important; flex-direction: column !important; }
