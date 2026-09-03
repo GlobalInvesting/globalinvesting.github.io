@@ -1,6 +1,45 @@
 /**
- * GlobalInvesting FX Terminal — License Auth Module  v1.7.6
+ * GlobalInvesting FX Terminal — License Auth Module  v1.7.7
  * assets/gi-auth.js  — include BEFORE dashboard.js in index.html
+ *
+ * v1.7.7 (2026-09-02): Two additive changes, both backward-compatible with
+ *   every existing call site (verified: per-panel .gi-gate-btn onclick,
+ *   handleRevocation(), and index.html's "Open full terminal" button all
+ *   call showModal() with no argument and are unaffected).
+ *
+ *   1. showModal() now accepts an optional `dismissible` argument
+ *      (default true). When a caller passes showModal(false), the ×
+ *      button is hidden (`.gi-auth-modal--locked` CSS) and hideModal()
+ *      becomes a no-op — ignoring the close button, backdrop click, and
+ *      Escape key alike — until either window.GI_AUTH.isActive becomes
+ *      true (successful activation) or a caller calls showModal() again
+ *      with a truthy argument. Built for index-beta.html's new landing
+ *      gate (gi-overview-beta.js v2.1.0), which replaces #gi-overview
+ *      outright with the real (blurred) terminal + this modal — a
+ *      dismissible modal there would let a visitor close it and use the
+ *      blurred terminal underneath with no license at all, which must
+ *      never happen. Every existing production call site keeps calling
+ *      showModal() with no argument, so `dismissible` stays true and
+ *      behavior is byte-for-byte unchanged there.
+ *   2. Two DOM events now fire so other scripts can react to activation
+ *      state without polling: `gi-auth:activated` (dispatched on
+ *      window right after isActive is set true in activate()'s success
+ *      path) and `gi-auth:revoked` (dispatched from handleRevocation()).
+ *      No listeners existed anywhere in this repo before this change —
+ *      purely additive, zero effect on current behavior. Consumed by
+ *      gi-overview-beta.js v2.1.0 to lift/reapply its own full-terminal
+ *      blur independently of the existing per-panel PREMIUM_SECTIONS
+ *      gate, which this file's applyGates() continues to own unchanged.
+ *
+ *   Also rewrote the activation modal's copy (MODAL_HTML) — the two
+ *   real paths to full access (EA license vs. partner-broker referral)
+ *   were buried in prose after the license-key form, reading like a
+ *   single path with a footnote. Restated as two clearly labeled,
+ *   equally-weighted options ahead of the form, closer to how
+ *   self-serve institutional tools (Koyfin, TrendSpider) present
+ *   "bring your own license" vs. "come through a partner" account paths.
+ *   No copy changed in substance (broker names, MQL5 link, contact.html
+ *   link, access.html link all identical) — only structure and clarity.
  *
  * v1.7.6 (2026-08-29): Industry-standard audit — no security/data-integrity
  *   findings (localStorage/sessionStorage usage is JWT/session-id storage,
@@ -277,6 +316,10 @@
   transition: color 0.15s;
 }
 #gi-auth-close:hover, #gi-auth-close:focus { color: var(--text, #E8E4DC); }
+/* v1.7.7: hard-gate mode (showModal(false)) hides the × entirely — see
+   header changelog. hideModal() itself also no-ops while locked, so this
+   is belt-and-suspenders (no dead click target), not the only guard. */
+#gi-auth-modal.gi-auth-modal--locked #gi-auth-close { display: none; }
 #gi-auth-box h2 {
   margin: 0 0 4px;
   font-size: 14px;
@@ -292,6 +335,45 @@
 }
 .gi-auth-sub a { color: var(--blue,#4f7fff); text-decoration: none; }
 .gi-auth-sub a:hover { text-decoration: underline; }
+/* v1.7.7: the two account-opening paths, restated as clearly labeled
+   options ahead of the form (was prose buried after the license-key
+   fields — see header changelog). */
+#gi-auth-paths {
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+#gi-auth-paths li {
+  font-size: 11.5px;
+  color: var(--text2, #A0A0A0);
+  line-height: 1.55;
+  border-left: 2px solid var(--border, #323232);
+  padding-left: 10px;
+}
+#gi-auth-paths li strong {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text, #E8E4DC);
+  margin-bottom: 2px;
+}
+#gi-auth-paths a { color: var(--blue,#4f7fff); text-decoration: none; }
+#gi-auth-paths a:hover { text-decoration: underline; }
+#gi-auth-form-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3, #727272);
+  margin: 0 0 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border, #222);
+}
 #gi-auth-box label {
   display: block;
   font-size: 10px;
@@ -470,21 +552,28 @@
     <button id="gi-auth-close" type="button" aria-label="Close">&times;</button>
     <h2>ACTIVATE TERMINAL</h2>
     <p class="gi-auth-sub">
-      Full access is included with the
-      <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener">
-        Global Investing FX Terminal EA
-      </a>
-      on MQL5 Market. Enter the activation key shown in your MT5 terminal to unlock all panels.
-    </p>
-    <p class="gi-auth-sub" style="font-size:12px;opacity:0.85;margin-top:-10px;">
-      Opened a verified account with one of our partner brokers instead? As our referral partner,
-      account holders get full web terminal access too &mdash; <a href="contact.html">contact us</a>
-      for your access link, no MT5 key required.
-    </p>
-    <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-8px;">
-      New here? <a href="access.html">See the full walkthrough &amp; pricing &rarr;</a>
+      Full access is free either way &mdash; there is no separate terminal subscription.
     </p>
 
+    <ul id="gi-auth-paths">
+      <li>
+        <strong>Option 1 &mdash; EA license</strong>
+        Rent or buy the
+        <a href="https://www.mql5.com/en/market/product/180326" target="_blank" rel="noopener">Global Investing FX Terminal EA</a>
+        on MQL5 Market, then enter the activation key from your MT5 terminal below.
+      </li>
+      <li>
+        <strong>Option 2 &mdash; Partner broker account</strong>
+        Hold (or open) a live account with TMGM or Vantage through our referral link, then
+        <a href="contact.html">contact us</a> for a no-key web access link &mdash; no MT5 or
+        activation key needed.
+      </li>
+    </ul>
+    <p class="gi-auth-sub" style="font-size:12px;opacity:0.75;margin-top:-10px;">
+      New here? <a href="access.html">Compare both options &amp; full pricing &rarr;</a>
+    </p>
+
+    <p id="gi-auth-form-label">Option 1 &mdash; enter your EA activation key</p>
     <label for="gi-inp-key">Activation Key (from MT5 terminal top bar)</label>
     <input id="gi-inp-key" type="text" placeholder="XXXX-XXXX-XXXX" maxlength="14"
            autocomplete="off" spellcheck="false" />
@@ -596,6 +685,9 @@
     try { sessionStorage.removeItem(JWT_KEY); } catch {}
     try { localStorage.removeItem(JWT_KEY); }   catch {}
     window.GI_AUTH.isActive = false;
+    // v1.7.7: mirror of the 'gi-auth:activated' event above, for the same
+    // reason — see header changelog.
+    window.dispatchEvent(new CustomEvent('gi-auth:revoked'));
     // v8.139.0: clear the pre-auth flash guard's attribute (index.html's
     // inline <head> script) the moment a token is known-invalid. That
     // attribute drives a !important CSS override that force-shows
@@ -660,11 +752,27 @@
   }
 
   // ── Modal control ──────────────────────────────────────────────────────────
-  function showModal() {
-    document.getElementById(MODAL_ID)?.classList.add('visible');
+  // v1.7.7: modalDismissible tracks whether the currently-shown modal may be
+  // closed by the user (× / backdrop / Escape). Defaults true, matching
+  // every pre-v1.7.7 call site's behavior exactly. showModal(false) locks
+  // it — see header changelog for why (index-beta.html's landing gate).
+  let modalDismissible = true;
+
+  function showModal(dismissible) {
+    modalDismissible = dismissible !== false;
+    const modal = document.getElementById(MODAL_ID);
+    if (!modal) return;
+    modal.classList.toggle('gi-auth-modal--locked', !modalDismissible);
+    modal.classList.add('visible');
   }
 
   function hideModal() {
+    // v1.7.7: while locked (showModal(false)) and still inactive, closing
+    // is blocked outright — this guard alone covers the × button, backdrop
+    // click, and Escape key, since all three already funnel through this
+    // same function. Once isActive is true (successful activation) this
+    // guard is a no-op and hideModal() behaves exactly as before.
+    if (!modalDismissible && !window.GI_AUTH.isActive) return;
     document.getElementById(MODAL_ID)?.classList.remove('visible');
     // v1.7.0: closing the gate must never leave a non-activated visitor
     // standing inside the (partially-gated) terminal — see header
@@ -720,6 +828,10 @@
       if (res.ok && data.token) {
         saveToken(data.token);
         window.GI_AUTH.isActive = true;
+        // v1.7.7: lets listeners (e.g. gi-overview-beta.js's hard-gate
+        // blur) react to activation without polling isActive. Purely
+        // additive — no listeners existed before this change.
+        window.dispatchEvent(new CustomEvent('gi-auth:activated'));
         startSessionPing(data.token);
         setStatus(statusEl, 'Activated. Loading terminal\u2026', 'ok');
         setTimeout(() => { hideModal(); unlockPremiumPanels(); }, 900);
@@ -848,7 +960,10 @@
   // ── Public API ─────────────────────────────────────────────────────────────
   window.GI_AUTH = {
     isActive:   false,
-    showModal:  () => showModal(),
+    // v1.7.7: dismissible defaults true if omitted — every pre-v1.7.7 call
+    // site calls showModal() with no argument, so this is unchanged for
+    // all of them. See header changelog.
+    showModal:  (dismissible) => showModal(dismissible),
     hideModal:  () => hideModal(),
     applyGates: () => applyGates(),
     unlock:     () => unlockPremiumPanels(),
