@@ -11729,7 +11729,7 @@ async function buildRichNarrative() {
       baseNarrative = d.narrative || '';
       regime = d.regime || 'RISK-OFF';
       _narrativeGeneratedAt = d.generated_at || null;
-      window._narrativeGeneratedAt = _narrativeGeneratedAt; // exposed for gi-overview-beta.js — mirrors window._hmStrengths' existing pattern
+      window._narrativeGeneratedAt = _narrativeGeneratedAt; // exposed on window — mirrors window._hmStrengths' existing pattern
       _narrativeAiRegime   = regime.replace(/^__STALE__/, '') || null; // store raw AI regime for mismatch note
 
       // Staleness check — if the AI JSON is older than 4 hours, mark regime badge as stale
