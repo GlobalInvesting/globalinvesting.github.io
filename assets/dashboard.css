@@ -1796,6 +1796,11 @@ a:focus-visible,
   white-space: nowrap;
 }
 .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+/* v8.360.2: .export-btn's existing siblings are all <button> elements
+   (inline-block by default); the Fair Value CSV export (#fv-csv-btn) is a
+   plain static file, so it's an <a download> instead — needs an explicit
+   inline-block so its padding/border render identically to the others. */
+a.export-btn { display: inline-block; text-decoration: none; }
 
 /* ── KEYBOARD HINT BUTTON (statusbar) ──────────────────────────────── */
 .kb-hint-btn {
