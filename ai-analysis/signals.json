@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-09-04T07:02:06Z",
+  "generated_at": "2026-09-04T11:47:45Z",
   "signals": [
     {
-      "time": "07:01",
+      "time": "11:45",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + BOJ Speculation",
-      "text": "NZD/JPY trades under heavy pressure as JPY dominates G10 performance while NZD lags across the board. The G10 scorecard reveals a massive 3.479% leader-to-laggard spread, with JPY averaging +2.176% across 7 pairs and NZD dropping -1.303% across 4 pairs. Yen buying is accelerated by local headlines pointing to BOJ rate hike speculation after spot USD/JPY dropped to 1-month lows near 155.00. While RBNZ holds a 2.75% policy rate versus BOJ at 1.0%, the +175bp nominal carry advantage is failing to shield NZD/JPY against aggressive JPY repricing and ESI divergence (JPY +21.7 vs NZD -3.1). Trade bias: Bearish NZD/JPY; cross-market momentum favors persistent JPY outperformance against weak G10 high-beta currencies. Catalyst: US NFP release today and upcoming BOJ policy decision on 18 Sep. Risk: Sudden hawkish shift in global risk appetite or dovish BOJ communication that unwinds recent JPY gains.",
+      "title": "NZD/JPY — G10 Bilateral Theme + BoJ Hike Speculation",
+      "text": "The G10 scorecard flags JPY as the weekly leader averaging +2.237% across 7 pairs, while NZD is the clear laggard averaging −1.464% across 4 pairs, producing a 3.701% spread. BoJ 1.0% holds a hike bias against RBNZ 2.75%, while New Zealand dollar positioning remains exceptionally stretched with COT leveraged funds net short −32,496 contracts at the 0th percentile of its 52-week range (z −2.60). JPY outperformance accelerates despite a nominal carry deficit, as domestic data beats reinforce BoJ tightening expectations ahead of the 18 September decision. Technical structure in NZD/USD shows price trading at 0.5883, pinned below its SMA20 of 0.5911, leaving cross downside exposed against broad JPY demand. Trade bias: Bearish NZD/JPY, driven by bilateral G10 momentum divergence and BoJ policy repricing. Catalyst: BoJ meeting 18 Sep. Risk: Leveraged funds cover crowded NZD short exposure, compressing the G10 performance spread below 1.20%.",
       "evidence": [
-        "JPY 1W avg: +2.176% (n=7)",
-        "NZD 1W avg: -1.303% (n=4)",
-        "G10 spread: 3.479%"
+        "JPY 1W avg: +2.237% (n=7)",
+        "NZD 1W avg: -1.464% (n=4)",
+        "G10 spread: 3.701%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:58",
+      "time": "11:42",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Carry Tension",
-      "text": "USD/JPY trades at 156.20, pushing decisively below its SMA20/50/200 cluster at 159.04, 160.59, and 158.45. Options markets show a clear bearish tilt with 25-delta Risk Reversals printing at -2.64, signaling heavy institutional demand for USD/JPY downside protection despite a 267bp OIS carry advantage (SOFR 3.65% vs TONA 0.98%). JPY CFTC Leveraged Funds net positioning remains short at -81,619 contracts (9th percentile 52w), but retail traders are heavily caught on the long side at 84%. Volatility dynamics show notable complacency with 1M IV at 7.2% against HV30 at 10.1% (VRP -2.9%), creating asymmetric downside risk if spec shorts begin unwinding into a thin options buffer. Trade bias: Bearish USD/JPY; technical break below key moving averages and downside options skew override carry support. Catalyst: US Nonfarm Payrolls today at 12:30 UTC. Risk: US NFP beats expectations significantly, pushing US yields higher and re-asserting the USD carry advantage.",
+      "title": "USD/JPY — Options Skew + Volatility Disconnect",
+      "text": "USD/JPY trades at 156.23, sitting firmly below its SMA20 of 159.04, SMA50 of 160.59, and SMA200 of 158.45. Saxo 25-delta risk reversals print at −2.64, signaling an extreme put skew as options participants aggressively price protection against base currency downside. Concurrently, ATM implied volatility sits at 7.2% against 30-day realized volatility of 10.1%, generating a negative volatility risk premium of −2.9%. This vol pricing reflects complacency in broader market pricing even as leveraged funds hold −81,619 net short contracts in JPY, vulnerable to rapid liquidation. Fed 3.75% vs BoJ 1.0% maintains a 267bp OIS carry advantage via SOFR-TONA, but policy tightening speculation continues to cap spot upside. Trade bias: Bearish USD/JPY, pressured by asymmetric downside options demand and moving-average breakdown. Catalyst: US NFP release today. Risk: Spot reclaims the SMA200 at 158.45, invalidating the technical breakdown.",
       "evidence": [
-        "USD/JPY: 156.20 (below SMA20/50/200)",
-        "25d RR: -2.64 (strong put skew)",
-        "USD/JPY OIS Carry: +267bp"
+        "USD/JPY 25d RR: -2.64",
+        "USD/JPY IV 7.2% vs HV30 10.1% — VRP -2.9%",
+        "Fed 3.75% vs BoJ 1.0% — 267bp OIS"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:56",
+      "time": "11:38",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long + Retail Divergence",
-      "text": "AUD/USD holds at 0.7208, trading above its SMA20/50/200 moving-average cluster anchored at 0.7129, 0.7035, and 0.6985. Institutional positioning is highly stretched, with CFTC Leveraged Funds net long 53,578 contracts, putting AUD in the 95th percentile of its 52-week range (z = +1.92). In direct contrast, retail sentiment sits at an extreme 90% short bias, setting up a classic institutional-versus-retail positioning split while RBA hike bets provide underlying fundamental support. The OIS spread favors AUD by 70bp (AONIA 4.35% vs SOFR 3.65%), though a mild options put skew (25d RR -0.52) hints that institutional accounts are hedging the top of the range rather than aggressively buying spot higher. Trade bias: Long AUD/USD; institutional positioning momentum and carry advantage remain intact despite retail fading. Catalyst: US NFP release today and RBA policy meeting on 29 Sep. Risk: Sharp risk-off signal or lower-than-expected US employment data that triggers broader macro position liquidation.",
+      "title": "AUD/USD — Positioning + Retail Divergence",
+      "text": "AUD/USD trades at 0.7206, holding firmly above its SMA20 of 0.7129, SMA50 of 0.7035, and SMA200 of 0.6985. CFTC positioning shows institutional leveraged funds crowded long at +53,578 contracts, situated in the 95th percentile of its 52-week distribution with a z-score of +1.92. Conversely, Myfxbook retail sentiment registers 90% short, establishing an acute institutional versus retail positioning divergence at trend highs. RBA 4.35% vs Fed 3.75% provides a 70bp AUD carry premium via AONIA-SOFR differentials, while Australia inflation persistence keeps local policy restrictive. The combination indicates late-trend extension, where further gains threaten a forced capitulation of extreme retail short interest into resistance. Trade bias: Long AUD/USD, supported by carry advantage and retail short squeeze dynamics. Catalyst: RBA meeting 29 Sep. Risk: Spot closes below the SMA20 at 0.7129, signaling institutional long liquidation.",
       "evidence": [
         "AUD COT LF net: +53,578 (pctl 95, z +1.92)",
-        "Retail sentiment: 90% short",
-        "AUD/USD OIS carry: -70bp (favors AUD)"
+        "Retail AUD/USD: 90% short",
+        "RBA 4.35% vs Fed 3.75% — 70bp AONIA-SOFR"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:53",
-      "priority": "warning",
-      "title": "GBP/USD — Elevated Options Vol Premium",
-      "text": "GBP/USD trades at 1.3542, resting between its 20-day SMA at 1.3554 and 50-day SMA at 1.3449. Options markets are pricing a massive volatility risk premium, with 1M implied volatility sitting at 11.0% against 30-day realized volatility of 4.8% (VRP +6.2%), pointing to intense demand for option hedges ahead of upcoming risk events. CFTC positioning shows Leveraged Funds hold a net long position of +56,839 contracts (96th percentile 52w, z = +1.58), indicating a stretched speculative long setup that faces headwinds from a negative UK Economic Surprise Index (-8.7). Carry between SONIA at 3.73% and SOFR at 3.65% remains essentially flat at -8bp, leaving Cable vulnerable if economic data continues to disappoint relative to US prints. Trade bias: Neutral/Bearish GBP/USD; heavy spec long positioning and elevated option volatility premium suggest downside risk on negative data surprises. Catalyst: US NFP release today and BoE policy meeting on 17 Sep. Risk: US NFP misses sharply, depressing US yields and sending GBP/USD above 1.3600.",
-      "evidence": [
-        "GBP/USD IV 11.0% vs HV30 4.8% (VRP +6.2%)",
-        "GBP COT LF net: +56,839 (pctl 96, z +1.58)",
-        "UK ESI: -8.7"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "06:48",
+      "time": "11:32",
       "priority": "info",
-      "title": "USD/NOK — Data Outperformance + Extreme Retail Bias",
-      "text": "USD/NOK trades at 9.284, remaining firmly below its SMA20/50/200 cluster at 9.380, 9.566, and 9.631. Norway's Economic Surprise Index stands out as the strongest across G10 economies at +89.4 (3 beats, 0 misses), providing solid fundamental backing for NOK strength alongside elevated WTI crude prices holding above $91/bbl amid Persian Gulf geopolitical tensions. Myfxbook community outlook shows retail traders are 100% long USD/NOK, presenting a complete retail extreme that directly opposes the fundamental macro picture. Norges Bank policy rate of 4.25% provides a +50bp nominal rate advantage over the Fed's 3.75%, further penalizing long USD/NOK carry positions. Trade bias: Bearish USD/NOK; extreme retail long positioning and dominant Norwegian economic data support ongoing downside. Catalyst: Norges Bank policy meeting on 24 Sep. Risk: Crude oil prices crash below $85/bbl, removing key commodity support for Norway's terms of trade.",
+      "title": "EUR/USD — Macro Rates + Options Hedging Demand",
+      "text": "EUR/USD trades at 1.1624, positioned between its SMA20 of 1.1609 and its SMA200 of 1.1637. Fed 3.75% vs ECB 2.4% maintains a 135bp nominal carry spread in favor of the US dollar, reflected in a +146bp SOFR-€STR OIS advantage. Options markets display defensive characteristics, with implied volatility at 7.1% against a 30-day realized print of 4.7%, driving an elevated volatility risk premium of +2.5%. COT leveraged funds maintain net short exposure of −55,311 contracts at the 3rd percentile (z −2.28), though a weekly reduction of −55,635 contracts reflects rapid short-covering. Dovish remarks from Federal Reserve leadership have weakened the dollar index toward 99.08, yet overhead moving averages constrain topside momentum. Trade bias: Neutral EUR/USD, capped by structural USD carry advantage against technical resistance. Catalyst: ECB meeting 10 Sep. Risk: A daily close above the SMA200 at 1.1637, triggering extended institutional short covering.",
       "evidence": [
-        "Norway ESI: +89.4 (strongest G10)",
-        "USD/NOK Retail: 100% long",
-        "USD/NOK position: below SMA20/50/200"
+        "Fed 3.75% vs ECB 2.4% — 135bp carry",
+        "EUR/USD IV 7.1% vs HV30 4.7% — VRP +2.5%",
+        "EUR COT LF net: -55,311 (pctl 3, z -2.28)"
       ],
       "_source": "engine-ai-primary"
     }
