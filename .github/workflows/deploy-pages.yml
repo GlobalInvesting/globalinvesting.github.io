@@ -28,6 +28,9 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write   # NEW (v2.1) — required for `gh run list`/`gh run cancel` in the
+                    # new "Clear stuck queued runs" step below (actions:read alone
+                    # is enough to list runs, but cancelling needs actions:write)
 
 # v2 (2026-07-20): concurrency moved from workflow-level to per-job (see BUG
 # note on the "build" job below). No workflow-level concurrency block here
@@ -36,6 +39,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10   # NEW (v2.1) — neither job had an explicit timeout before;
+                           # a hung job now self-terminates instead of blocking the
+                           # queue indefinitely, the same failure mode as the
+                           # incident this version's own first step guards against.
     # BUG FOUND 2026-07-20: the original v1 setup had ONE workflow-level
     # "pages" concurrency group shared by both build and deploy, with
     # cancel-in-progress:false — kept deliberately so a *deploy* is never
@@ -68,6 +75,59 @@ jobs:
       group: "pages-build"
       cancel-in-progress: true
     steps:
+      - name: Clear stuck queued runs of this workflow
+        # v2.1 FIX (2026-09-04): root cause of a 7h+ site-wide stale-data
+        # incident — 7 independent workflows (update-ff-calendar,
+        # update-intraday-quotes, forex-news, update-fx-liquidity,
+        # update-ohlc, update-myfxbook-sentiment, update-sitemap) each
+        # dispatch this workflow independently via `gh workflow run
+        # deploy-pages.yml`, with no coordination between them. GitHub's own
+        # `github-pages` deployment environment serializes actual publishes
+        # to one at a time — separate from this file's own `concurrency:`
+        # blocks, which only govern OUR job queue, not GitHub's
+        # environment-level one. When a run gets stuck in "Queued" against
+        # that environment (observed live 2026-09-04, 11:11 UTC — cause on
+        # GitHub's platform side, not this repo's own workflow logic), every
+        # subsequent dispatch cancels automatically instead of queuing
+        # behind it (GitHub only keeps one pending run per concurrency
+        # group), and nothing surfaced this — the site silently stopped
+        # redeploying for 7+ hours until manually caught and cancelled via
+        # the Actions UI.
+        # This step self-heals: before starting a new build, cancel any of
+        # this workflow's own runs still `queued` after 10+ minutes, so a
+        # future stuck run clears itself within one dispatch cycle instead
+        # of requiring someone to notice and cancel it by hand. Uses the
+        # workflow's own filename (not a hardcoded numeric ID) so it keeps
+        # working if the workflow is ever renamed.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          THRESHOLD_MIN=10
+          gh run list --workflow=deploy-pages.yml --status=queued \
+            --json databaseId,createdAt --limit 20 > /tmp/queued_runs.json
+          python3 -c "
+          import json, sys, subprocess
+          from datetime import datetime, timezone
+
+          THRESHOLD_MIN = ${THRESHOLD_MIN}
+          with open('/tmp/queued_runs.json') as f:
+              runs = json.load(f)
+          now = datetime.now(timezone.utc)
+          cleared = 0
+          for r in runs:
+              created = datetime.fromisoformat(r['createdAt'].replace('Z', '+00:00'))
+              age_min = (now - created).total_seconds() / 60
+              if age_min > THRESHOLD_MIN:
+                  print(f\"Cancelling stuck queued run {r['databaseId']} (queued {age_min:.0f}min ago)\")
+                  subprocess.run(['gh', 'run', 'cancel', str(r['databaseId'])], check=False)
+                  cleared += 1
+          if cleared == 0:
+              print('No stuck queued runs found — nothing to clear.')
+          else:
+              print(f'Cleared {cleared} stuck queued run(s).')
+          "
+
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -120,6 +180,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15   # NEW (v2.1) — see the build job's own timeout comment above
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
