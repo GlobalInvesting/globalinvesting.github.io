@@ -104,7 +104,15 @@ jobs:
         run: |
           set -euo pipefail
           THRESHOLD_MIN=10
-          gh run list --workflow=deploy-pages.yml --status=queued \
+          # v2.2 FIX (2026-09-04): live first-run failure — "failed to determine
+          # base repo: fatal: not a git repository" — this step deliberately
+          # runs BEFORE the Checkout step below (it must clear a stuck queue
+          # slot before the build even starts), so there is no local git repo
+          # for `gh` to auto-detect the target repo from. Passing --repo
+          # explicitly removes that dependency entirely, regardless of step
+          # order or whether a checkout has happened yet.
+          gh run list --repo "${{ github.repository }}" \
+            --workflow=deploy-pages.yml --status=queued \
             --json databaseId,createdAt --limit 20 > /tmp/queued_runs.json
           python3 -c "
           import json, sys, subprocess
@@ -120,7 +128,7 @@ jobs:
               age_min = (now - created).total_seconds() / 60
               if age_min > THRESHOLD_MIN:
                   print(f\"Cancelling stuck queued run {r['databaseId']} (queued {age_min:.0f}min ago)\")
-                  subprocess.run(['gh', 'run', 'cancel', str(r['databaseId'])], check=False)
+                  subprocess.run(['gh', 'run', 'cancel', str(r['databaseId']), '--repo', '${{ github.repository }}'], check=False)
                   cleared += 1
           if cleared == 0:
               print('No stuck queued runs found — nothing to clear.')
