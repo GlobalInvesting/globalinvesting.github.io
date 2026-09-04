@@ -474,23 +474,23 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="faq">
       <h2>Frequently Asked Questions</h2>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What is the Currency Strength Index (CSI)?</summary>
         <p>The CSI is a composite measure of how strong or weak each G10 currency is relative to all the others at once, computed from the cumulative log-return of every pair a currency appears in, rather than looking at a single pair in isolation.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>How is the CSI calculated?</summary>
         <p>Each currency's score sums the return of every pair it appears in, adding the return when the currency is the base and subtracting it when the currency is the quote, over a selected lookback horizon. The standalone MT5 indicator goes further: it computes this independently across three lookback horizons (short, medium, long), normalises each into a cross-sectional z-score, and blends the three with configurable weights (25%/35%/40% by default) — a multi-lookback weighted z-score model based on Asness, Moskowitz &amp;amp; Pedersen (2013), designed to avoid the cliff-edge artifact a single fixed lookback produces.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>Where can I see the CSI: on the web terminal or in MetaTrader 5?</summary>
         <p>Both. The web terminal shows CSI as a tab inside the Currency Strength Heatmap modal, covering all 10 G10 currencies with a timeframe selector (H1 / H4 / 1D / 1W) and horizon presets within each. A separate MQL5 Market product, CSI Currency Strength, renders the same concept as a native panel overlay directly on an MT5 chart, for traders who prefer not to switch to a browser.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>How do I install the standalone CSI indicator in MetaTrader 5?</summary>
         <p>Purchase or download the CSI Currency Strength indicator from MQL5 Market, then drag it from the Navigator panel onto any MT5 chart. It renders its own panel overlay; no additional configuration is required for the default lookback and pair set.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>Does CSI predict future price direction?</summary>
         <p>No. It is descriptive, not predictive — a snapshot of relative strength based on realised price moves over the selected lookback period. It does not generate trade signals or forecasts.</p>
       </details>

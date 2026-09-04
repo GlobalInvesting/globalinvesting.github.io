@@ -687,31 +687,31 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="faq">
       <h2>Frequently Asked Questions</h2>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What is the Economic Surprise Index (ESI)?</summary>
         <p>The Economic Surprise Index (ESI) measures whether economic data releases are coming in above or below market consensus forecasts. A positive index value means recent data releases for that currency have beat expectations more than they have missed; a negative value means misses have outweighed beats. The FX Terminal ESI uses a decay-weighted z-score methodology modeled on the Citigroup CESI and Bloomberg BEEI — recent surprises carry more weight than older data, and the magnitude of the surprise (how far actual differed from forecast, normalized by historical variance) is incorporated when sufficient history is available.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>How does the Economic Surprise Index affect currency direction?</summary>
         <p>A rising ESI for a currency signals that its economy is outperforming expectations, which tends to support the currency — either by delaying rate cuts or increasing the probability of rate hikes, both of which attract capital inflows. A falling ESI signals economic underperformance relative to expectations, which tends to weaken the currency. The key driver is not the absolute level of the data, but the direction and momentum of surprises relative to what the market already priced in. ESI divergence — where one currency's index is rising while a paired currency's is falling — is a more reliable FX signal than either ESI reading in isolation.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What is the difference between the ESI and standard economic data?</summary>
         <p>Standard economic data (e.g. 'US CPI was 3.2%') tells you the absolute level of an indicator. The ESI tells you whether that level was higher or lower than the market expected. A 3.2% CPI print is irrelevant without context: if the consensus forecast was 3.5%, the actual result is a downside surprise — which can weaken the currency even though CPI is still high. The ESI aggregates these relative surprises across all major-economy medium and high-impact releases over a 90-day rolling window, giving a comprehensive picture of whether a currency's macro backdrop is improving or deteriorating relative to expectations.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What is a decay-weighted z-score in the ESI?</summary>
         <p>The ESI uses three weighting adjustments. First, exponential time-decay: each event's weight decreases as it ages, using a 45-day half-life (matching the Citigroup CESI convention). This means a surprise from 45 days ago carries half the weight of one from today. Second, z-score normalization: when an event has at least 5 historical observations, the magnitude of the surprise is normalized by dividing by the historical standard deviation. A 0.2% CPI beat when historical standard deviation is 0.1% scores twice as large as a 0.2% beat when standard deviation is 0.4%. Events without sufficient history use a simpler beat/miss score. Third, confidence weighting: the resulting index is scaled by min(1, N/15), where N is the event count shown in the panel, so a currency backed by very few releases shows a proportionally muted reading rather than full magnitude. Both the decay and z-score adjustments are blended proportionally when mixed; confidence weighting is applied after.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What does the N column mean in the ESI panel?</summary>
         <p>The N column shows the raw count of medium and high-impact data releases with actuals in the 90-day scoring window for that currency. A higher N means more events contributed to the index, providing greater statistical confidence. N also directly scales the index magnitude: the displayed index is multiplied by min(1, N/15), so a currency with N below 15 shows a proportionally muted bar rather than the full-strength reading a single beat or miss would otherwise produce — this is in addition to the dimmer N text color already used to flag low sample size.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>Which economic events are excluded from the ESI scoring?</summary>
         <p>The ESI only scores fundamental macro releases — the same events that institutional CESI indices (Citi, Deutsche Bank, Morgan Stanley) include. Excluded events include: CFTC positioning reports, Baker Hughes rig counts, bond and bill auctions, API crude oil inventories, EIA energy storage reports, milk price auctions, money supply data (M2/M3/M4), Fed balance sheet updates, Atlanta Fed GDPNow and NY Fed nowcasts (derived, not actual releases), TIC capital flow data, and interest rate projection data from the SEP dot plot. Flash and Final PMI releases are deduplicated to avoid double-counting the same macro signal.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What are inverse indicators in the ESI?</summary>
         <p>Inverse indicators are economic releases where a lower actual reading is a positive surprise for the economy. Examples include unemployment rate, jobless claims, and budget deficits. If the unemployment rate was forecast at 4.1% and the actual came in at 3.8%, that is a positive surprise (fewer unemployed than expected) — but the raw actual is lower than forecast. The ESI scoring inverts the sign for these indicators so that a positive economic surprise always results in a positive contribution to the index, regardless of whether the metric is 'higher = better' or 'lower = better'. Trade balance is not on this list: it is already a signed net level (deficit negative, surplus positive), so a smaller-than-forecast deficit already scores correctly as a beat with no inversion needed — the same convention already used for Current Account.</p>
       </details>

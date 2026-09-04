@@ -474,27 +474,27 @@ a { color: inherit; text-decoration: none; }
 
     <div class="guide-section" id="faq">
       <h2>Frequently Asked Questions</h2>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What is Monte Carlo Equity Projection?</summary>
         <p>A MetaTrader 5 indicator that runs a bootstrap simulation on an account's own closed-trade history and projects a percentile cone of future equity paths directly on the chart, using no assumed return distribution and no external data feed.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>How does the bootstrap simulation work?</summary>
         <p>The indicator draws from the account's closed deals with replacement — bootstrap resampling — running a configurable number of simulations (default 10,000) to project a configurable number of forward trades (default 500). Percentile bands (p5, p25, p50, p75, p95) are plotted as a cone over the equity curve, with faint background paths showing individual simulation runs.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>Does it predict future returns?</summary>
         <p>No. It is a statistical projection built from the distribution of trades already closed on the account, not a forecast or a guarantee. If the underlying strategy or market regime changes, the historical sample the simulation draws from may no longer be representative.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>Is it connected to any external data source?</summary>
         <p>No. All computation runs locally from the account's own closed-deal history via the native MT5 API. There is no external server, no WebRequest call, and no internet permission required.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>How do I install Monte Carlo Equity Projection in MetaTrader 5?</summary>
         <p>Download it from MQL5 Market, then drag it from the Navigator panel onto any MT5 chart. It reads the account's closed trade history directly — no WebRequest permission or additional configuration is required to see the default cone.</p>
       </details>
-      <details class="faq-item">
+      <details class="faq-item" name="faq">
         <summary>What is probability of ruin in this context?</summary>
         <p>The share of the 10,000 simulated equity paths in which account balance falls below 20% of starting capital at any point during the projected trade sequence — one of the probabilities shown in the risk metrics strip below the cone.</p>
       </details>
