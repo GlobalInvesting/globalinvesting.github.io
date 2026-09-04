@@ -1,14 +1,45 @@
 {
-  "updated_utc": "2026-09-04T00:20:45.380304+00:00",
-  "updated_label": "00:20 UTC",
-  "total": 23,
+  "updated_utc": "2026-09-04T04:20:46.060433+00:00",
+  "updated_label": "04:20 UTC",
+  "total": 31,
   "sources": [
     "BIS",
     "CME",
+    "ING",
     "Saxo",
     "UBS"
   ],
   "items": [
+    {
+      "id": "03eb07218e2d",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Asia week ahead: Key data on China, Taiwan, India, Japan, Korea",
+      "excerpt": "ASIA/PACIFIC: Markets will focus on trade and inflation data from China and Taiwan, India's CPI, Japan's GDP and PPI, and South Korea’s revised…",
+      "author": "",
+      "url": "https://think.ing.com/articles/asia-week-ahead-040926/",
+      "currencies": [],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788494160000,
+      "published": "2026-09-04T03:56:00+00:00"
+    },
+    {
+      "id": "b16b0dacdff5",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Philippine inflation pressures persist despite softer CPI",
+      "excerpt": "ASIA/PACIFIC: While Philippine headline CPI eased marginally, persistent core inflation and rising food-price risks from El Niño suggest prices will stay above target for longer. This supports our call for an additional rate hike in the fourth…",
+      "author": "",
+      "url": "https://think.ing.com/snaps/philippines-inflation-pressures-persist-despite-softer-headline-cpi/",
+      "currencies": [],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1788493080000,
+      "published": "2026-09-04T03:38:00+00:00"
+    },
     {
       "id": "ca56bd64680d",
       "bank": "CME",
@@ -26,6 +57,40 @@
       "category": "macro",
       "ts": 1788468202000,
       "published": "2026-09-03T20:43:22+00:00"
+    },
+    {
+      "id": "b6ba8d7596ec",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Rates Spark: A short sigh of relief",
+      "excerpt": "Relatively dovish comments from the Fed's Waller pushed back against the bearish trend from the past week. But markets remain sensitive to data and after a strong ISM report, the US payrolls number will be closely watched. A number below 25k together with a benign inflation reading next week could persuade the Fed to stay on hold at the upcoming…",
+      "author": "",
+      "url": "https://think.ing.com/articles/rates-spark-a-subtle-sigh-of-relief/",
+      "currencies": [
+        "USD"
+      ],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1788452880000,
+      "published": "2026-09-03T16:28:00+00:00"
+    },
+    {
+      "id": "abed7e4c883e",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Dutch economy keeps pace, but growth drivers are gradually shifting",
+      "excerpt": "EUROPE: The Dutch economy continues to grow at a decent pace. While somewhat higher inflation and interest rate expectations moderated the outlook for 2027 a bit, expectations for 2026 have improved on the back of continued strong export…",
+      "author": "",
+      "url": "https://think.ing.com/articles/dutch-economy-keeps-pace-but-growth-drivers-are-gradually-shifting/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788439500000,
+      "published": "2026-09-03T12:45:00+00:00"
     },
     {
       "id": "664a901430ae",
@@ -46,6 +111,74 @@
       "category": "trade_idea",
       "ts": 1788436860000,
       "published": "2026-09-03T12:01:00+00:00"
+    },
+    {
+      "id": "e0f27f709d7b",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Trump’s MFN policy is reshaping global pharma, not prices",
+      "excerpt": "The Trump Administration this week announced nine new most-favoured nation (MFN) deals with mid-sized pharma companies. As the MFN model continues to expand, its implications for the industry are becoming increasingly clear: the US is attracting investment and Europe is losing out. The benefits for American patients, however, are far less…",
+      "author": "",
+      "url": "https://think.ing.com/articles/mfn-keeps-expanding-while-the-benefit-for-american-patients-remains-unclear/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788435540000,
+      "published": "2026-09-03T11:39:00+00:00"
+    },
+    {
+      "id": "6b5212c129f1",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "ING Monthly: Weathering the shocks",
+      "excerpt": "EUROPE: The most striking thing about this summer isn’t the string of unprecedented shocks. It’s that the global economy has barely…",
+      "author": "",
+      "url": "https://think.ing.com/reports/ing-monthly-weathering-the-shocks-report/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788432780000,
+      "published": "2026-09-03T10:53:00+00:00"
+    },
+    {
+      "id": "28ae0e4b6d45",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "Carsten: Weathering the shocks",
+      "excerpt": "EUROPE: The most striking thing about this summer isn’t the string of unprecedented shocks – it's that the global economy has barely flinched. But a new risk has emerged in recent days, and this one comes with a transmission channel attached: the bond market sell-off. Higher rates could be kryptonite for an economy that has so far looked suspiciously…",
+      "author": "",
+      "url": "https://think.ing.com/articles/monthly-intro/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "trade_idea",
+      "ts": 1788432600000,
+      "published": "2026-09-03T10:50:00+00:00"
+    },
+    {
+      "id": "1d003d8f858d",
+      "bank": "ING",
+      "bank_full": "ING Think",
+      "series": "",
+      "title": "The debt sustainability dashboard: Who comes off worst?",
+      "excerpt": "EUROPE: Sovereign debt concerns are on the rise with yields heading higher. This means higher interest costs, further worsening the fiscal outlook. We look at how countries are faring and what the prospects are for credible…",
+      "author": "",
+      "url": "https://think.ing.com/articles/monthly-debt-sustainability-dashboard-who-comes-off-worst/",
+      "currencies": [
+        "EUR"
+      ],
+      "pairs": [],
+      "category": "macro",
+      "ts": 1788432300000,
+      "published": "2026-09-03T10:45:00+00:00"
     },
     {
       "id": "80e073480d26",
