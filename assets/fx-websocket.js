@@ -1,5 +1,17 @@
 /**
- * fx-websocket.js — Real-time FX tick feed via Cloudflare Worker proxy v1.0.1
+ * fx-websocket.js — Real-time FX tick feed via Cloudflare Worker proxy v1.1.0
+ *
+ * v1.1.0 (2026-09-04): added a client-side staleness watchdog
+ *   (_startStaleWatchdog/_stopStaleWatchdog). Before this, the footer DELAY
+ *   chip / qb-source-label were purely event-driven — nothing ever
+ *   re-checked staleness after a successful "open", so a WebSocket that
+ *   stayed technically connected but stopped delivering real ticks (see
+ *   worker.js v2.7's changelog for the paired backend-side root cause) left
+ *   the UI stuck showing whatever it last showed, with no self-correction.
+ *   Does not touch reconnect logic — the CF Worker already owns that
+ *   decision independently — only keeps the label honest about what's
+ *   actually being delivered, deferring to the underlying yfinance 60s poll
+ *   as the visibly-authoritative source whenever ticks go stale.
  *
  * WHAT THIS DOES
  *   Connects to the globalinvesting-fx-ws-proxy Cloudflare Worker, which holds
@@ -59,6 +71,16 @@ let _reconnectAttempts = 0;
 let _reconnectTimer    = null;
 let _lastTickTs        = 0;   // timestamp of last tick received (for label logic)
 let _active            = false;
+// v1.1.0: staleness watchdog — see _startStaleWatchdog() for the incident
+// this closes. TICK_STALE_MS is deliberately above the backend's own
+// REAL_TICK_STALE_THRESHOLD_MS (90s, worker.js v2.7) so the backend gets
+// the first chance to self-heal via reconnect before the frontend gives up
+// on the label.
+const TICK_STALE_MS = 120_000; // 2 min
+let _staleCheckTimer   = null;
+let _connectedAt       = 0;    // ms epoch — baseline so the watchdog doesn't
+                                // false-fire in the window between "open" and
+                                // the first real tick ever received
 
 // ── ENTRY POINT ───────────────────────────────────────────────────────────────
 
@@ -92,6 +114,8 @@ function _connect() {
   _ws.addEventListener("open", () => {
     console.log("[fx-ws] Connected to FX proxy");
     _reconnectAttempts = 0;
+    _connectedAt = Date.now();
+    _startStaleWatchdog();
   });
 
   _ws.addEventListener("message", event => {
@@ -101,6 +125,7 @@ function _connect() {
   _ws.addEventListener("close", event => {
     console.warn(`[fx-ws] Connection closed (code ${event.code}) — will reconnect`);
     _ws = null;
+    _stopStaleWatchdog();
     _scheduleReconnect();
   });
 
@@ -129,6 +154,49 @@ function _scheduleReconnect() {
   _reconnectTimer = setTimeout(() => {
     if (_active && !_ws) _connect();
   }, delay);
+}
+
+// v1.1.0 FIX — root cause of a live incident (2026-09-04): the WebSocket
+// connection to the CF Worker proxy can stay genuinely OPEN (no close/error
+// event ever fires — nothing here would have caught it) while the Worker's
+// own upstream Finnhub connection stops delivering real trade ticks (see
+// worker.js v2.7's changelog for the backend half of this fix). Before this
+// fix, NOTHING on the frontend side ever re-checked staleness after the
+// initial connection succeeded — the footer chip's label was purely
+// event-driven (flips on "open", flips again only on an actual "tick"), so
+// a WS that looks connected but has gone quiet left the UI either stuck on
+// the default delayed state forever (today's actual symptom) or, in a
+// different failure order (ticks arrive, then stop), silently claiming
+// "LIVE" indefinitely — neither is caught by the existing open/close
+// listeners.
+// This does NOT close/reconnect the WebSocket itself — the CF Worker side
+// already owns that decision independently (worker.js v2.7's own real-tick
+// watchdog). This only keeps the UI honest about what the user is actually
+// seeing: if no tick (real or otherwise) has arrived in TICK_STALE_MS, the
+// label reverts and the existing yfinance 60s-poll path (already always
+// running underneath, per this file's own module docstring) is left as the
+// visibly-authoritative source until a real tick resumes.
+function _startStaleWatchdog() {
+  _stopStaleWatchdog();
+  _staleCheckTimer = setInterval(() => {
+    // Reference point is the more recent of "last real tick" and "when this
+    // connection opened" — so a connection that's genuinely still within
+    // its normal startup grace window (no tick yet, but only just opened)
+    // isn't flagged stale on its very first watchdog tick.
+    const referenceMs = Math.max(_lastTickTs, _connectedAt);
+    const staleMs = referenceMs ? Date.now() - referenceMs : Infinity;
+    if (staleMs > TICK_STALE_MS) {
+      console.warn(`[fx-ws] No tick received in ${Math.round(staleMs / 1000)}s — reverting label; yfinance polling remains authoritative`);
+      _updateSourceLabel(null);
+    }
+  }, 30_000);
+}
+
+function _stopStaleWatchdog() {
+  if (_staleCheckTimer) {
+    clearInterval(_staleCheckTimer);
+    _staleCheckTimer = null;
+  }
 }
 
 // ── MESSAGE HANDLER ───────────────────────────────────────────────────────────
