@@ -165,7 +165,7 @@ function checkFaqJsonLdSync() {
       .replace(/&quot;/g, '"')
       .replace(/&#39;/g, "'");
     const qaRe = /<div class="qa-q">([\s\S]*?)<\/div>\s*<div class="qa-a">([\s\S]*?)<\/div>/g;
-    const detailsRe = /<details class="faq-item">\s*<summary>([\s\S]*?)<\/summary>\s*<p>([\s\S]*?)<\/p>\s*<\/details>/g;
+    const detailsRe = /<details class="faq-item"[^>]*>\s*<summary>([\s\S]*?)<\/summary>\s*<p>([\s\S]*?)<\/p>\s*<\/details>/g;
     const visiblePairs = new Map();
     let m;
     while ((m = qaRe.exec(html))) {
