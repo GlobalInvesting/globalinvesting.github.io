@@ -1,68 +1,63 @@
 {
-  "generated_at": "2026-09-04T21:01:05Z",
+  "generated_at": "2026-09-05T12:00:49Z",
   "signals": [
     {
-      "time": "20:50",
+      "time": "11:50",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + Monetary Policy Divergence",
-      "text": "JPY leads G10 1W performance at +2.326% while NZD lags at -1.463%, generating a decisive 3.789% bilateral spread that favors NZD/JPY downside into the open. Strong BoJ rate hike speculation drove USD/JPY down to 156.23 Friday, while RBNZ pause expectations keep the Kiwi weak despite positive real rates. The 18 Sep BoJ meeting is the catalyst for formalizing policy tightening. Trade bias: Bearish NZD/JPY into the Sydney and Tokyo open. Catalyst: BoJ meeting on 18 Sep. Risk: Break and close above the NZD/USD SMA20 at 0.5911 alongside a broader rebound in risk sentiment.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Hawkish BoJ Divergence",
+      "text": "JPY outperformance (+2.298%, n=7) vs NZD weakness (-1.445%, n=4) creates a 3.742% G10 spread, setting up downside pressure on NZD/JPY into the Sydney/Tokyo open. BoJ rate hike speculation and hawkish policymaker rhetoric run counter to the 175bp nominal carry deficit, accelerating cross unwinds as JPY momentum dominates. The BoJ meeting on 18 Sep determines whether policy normalization validates the JPY rally. Trade bias: Bearish NZD/JPY into the weekly open. Catalyst: Sydney/Tokyo open followed by the BoJ meeting on 18 Sep. Risk: A rebound above key technical resistance or aggressive carry restoration invalidates downside momentum.",
       "evidence": [
-        "JPY 1W avg: +2.326% (n=7)",
-        "NZD 1W avg: -1.463% (n=4)",
-        "G10 spread: 3.789%",
-        "USD/JPY closed Friday at 156.23"
+        "JPY 1W avg: +2.298% (n=7)",
+        "NZD 1W avg: -1.445% (n=4)",
+        "G10 spread: 3.742%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:50",
-      "priority": "critical",
-      "title": "USD/JPY — BoJ Hike Speculation vs Stretched Short Squeeze Risk",
-      "text": "JPY COT LF net short of -81,619 contracts (pctl 9, z -1.34) faces intense squeeze risk after USD/JPY closed Friday at 156.23 on escalating BoJ rate hike bets. Options 25-delta risk reversals exhibit extreme put skew at -2.54, reflecting heightened institutional demand for downside protection despite the SOFR-TONA +267bp carry advantage favoring the Dollar. The 18 Sep BoJ policy decision determines whether policy normalization forces further liquidation of crowded JPY shorts. Trade bias: Bearish USD/JPY targeting a test toward the 155.00 psychological support. Catalyst: BoJ rate decision on 18 Sep. Risk: Rebound above the USD/JPY 200-day SMA at 158.45 fueled by widening US-Japan yield spreads.",
-      "evidence": [
-        "JPY COT LF net: -81,619 (pctl 9, z -1.34)",
-        "USD/JPY 25d RR: -2.54 put skew",
-        "USD/JPY closed Friday at 156.23 (below SMA200 at 158.45)",
-        "SOFR vs TONA carry: +267bp"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "20:34",
+      "time": "11:50",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Speculative Long Unwind Risk",
-      "text": "AUD COT LF net long of +53,578 contracts (74.8% long, pctl 95, z +1.92) sets up acute long-unwind risk after AUD/USD closed Friday at 0.7208 following strong US non-farm payrolls. The robust US August jobs gain of 162,000 revives Fed tightening debate, while retail traders remain contrarian short at 90% against stretched institutional positioning. The 16 Sep FOMC meeting determines whether US yield support caps the Australian Dollar's carry appeal. Trade bias: Bearish AUD/USD on late-cycle long positioning exhaustion. Catalyst: FOMC rate decision on 16 Sep. Risk: Daily close above 0.7250 supported by ongoing Australian terms-of-trade strength.",
+      "title": "USD/JPY — Leveraged Short Squeeze + Hawkish BoJ Headlines",
+      "text": "JPY COT LF short -111.3k (pctl 2, z -2.18) establishes severe short-squeeze risk — USD/JPY closed Friday at 156.22 after breaking below its SMA20 (158.96) and SMA200 (158.45). Mounting calls from BoJ hawks for rate hikes alongside strong options put skew (25d RR -2.54) drive accelerated liquidation of crowded dollar-yen longs despite the +268bp SOFR-TONA carry buffer. The BoJ meeting on 18 Sep resolves whether further policy tightening forces an extended positioning wash-out. Trade bias: Short USD/JPY targeting deeper retracement below 156.00. Catalyst: Tokyo open followed by the Fed meeting on 16 Sep and BoJ meeting on 18 Sep. Risk: Daily close back above the 200-day SMA at 158.45 aborts the short-squeeze dynamic.",
       "evidence": [
-        "AUD COT LF net: +53,578 (74.8% long, pctl 95, z +1.92)",
-        "AUD/USD closed Friday at 0.7208",
+        "JPY COT LF net: -111,297 (pctl 2, z -2.18)",
+        "USD/JPY closed Friday at 156.22 (below SMA20 158.96 and SMA200 158.45)",
+        "USD/JPY 25d RR: -2.54 with retail 84% long"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "21:59",
+      "priority": "warning",
+      "title": "EUR/USD — Crowded Leveraged Short vs ECB Hike Bias",
+      "text": "EUR COT LF short -52.8k (pctl 4, z -2.15) creates stretched downside positioning risk — EUR/USD closed Friday at 1.1621 right near its SMA20 (1.1611). Persistent ESTR-SOFR carry drag (-147bp) maintains baseline resistance, but the ECB's explicit hike bias ahead of this week's decision leaves shorts vulnerable to a squeeze. The ECB meeting on 10 Sep determines whether monetary policy divergence forces an unwind of leveraged short exposure. Trade bias: Bullish EUR/USD on positioning mean-reversion toward 1.1700. Catalyst: ECB meeting on 10 Sep. Risk: ECB holds rates and shifts to a dovish guidance stance, invalidating the squeeze setup.",
+      "evidence": [
+        "EUR COT LF net: -52,784 (pctl 4, z -2.15)",
+        "EUR/USD closed Friday at 1.1621 vs SMA20 1.1611",
+        "ECB next meeting on 10 Sep (bias: Hike)"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "21:53",
+      "priority": "warning",
+      "title": "AUD/USD — Crowded Long Positioning vs Retail Short Divergence",
+      "text": "AUD COT LF long +50.3k (pctl 94, z +1.79) creates crowded-long unwind risk — AUD/USD closed Friday at 0.7205 above all major moving averages. Institutional positioning extremes diverge sharply from retail sentiment (90% short), while positive AONIA-SOFR carry (+69bp) and resilient commodity prices buffer against immediate liquidation. The RBA meeting on 29 Sep determines whether neutral policy settings can sustain current speculative length. Trade bias: Neutral-to-bearish AUD/USD on stretched leveraged length into the open. Catalyst: Sydney open and RBA meeting on 29 Sep. Risk: Break below SMA20 at 0.7135 triggers a broader institutional liquidation wave.",
+      "evidence": [
+        "AUD COT LF net: +50,250 (pctl 94, z +1.79)",
         "Retail sentiment: 10% long / 90% short",
-        "US NFP: +162k beat vs expectations"
+        "AUD/USD closed Friday at 0.7205 vs SMA20 0.7135"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "19:52",
-      "priority": "warning",
-      "title": "GBP/USD — Stretched COT Longs Face Fed Repricing",
-      "text": "GBP COT LF net long of +56,839 contracts (74.7% long, pctl 96, z +1.58) creates vulnerability to a sharp liquidation after GBP/USD stalled at 1.3515 Friday on US jobs data. BoE-Fed rate parity at 3.75% and an elevated GBP/USD vol risk premium of +6.3% (IV 11.0% vs HV30 4.7%) highlight heavy hedging demand against downside breaks below the 20-day SMA of 1.3554. The 16 Sep FOMC meeting serves as the catalyst testing market expectations for central bank divergence. Trade bias: Bearish GBP/USD toward the 50-day SMA at 1.3449. Catalyst: FOMC policy announcement on 16 Sep. Risk: Sustained close above 1.3600 accompanied by an upside surprise in UK macroeconomic data.",
-      "evidence": [
-        "GBP COT LF net: +56,839 (74.7% long, pctl 96, z +1.58)",
-        "GBP/USD closed Friday at 1.3515 (below SMA20 at 1.3554)",
-        "GBP/USD VRP: +6.3% (IV 11.0% vs HV30 4.7%)",
-        "BoE vs Fed policy rate: 3.75% vs 3.75% (0bp carry spread)"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "18:16",
+      "time": "09:27",
       "priority": "info",
-      "title": "EUR/USD — Extreme COT Short Overhang Ahead of ECB",
-      "text": "EUR COT LF net short of -55,311 contracts (pctl 3, z -2.28) leaves EUR/USD heavily crowded short around Friday's close of 1.1616. The ECB holds a rate hike bias heading into its 10 Sep meeting, conflicting with the SOFR-ESTR carry spread of +146bp favoring the US Dollar and hawkish rhetoric from Fed officials. The 10 Sep ECB meeting is the catalyst that determines whether Eurozone rate guidance forces a short-covering squeeze. Trade bias: Neutral-to-bullish EUR/USD on short-covering risk into central bank decisions. Catalyst: ECB rate decision on 10 Sep. Risk: Decisive breakdown below the 50-day SMA at 1.1508 driven by broader US Dollar index momentum.",
+      "title": "USD/CAD — Crowded Leveraged Short Ahead of BoC Decision",
+      "text": "CAD COT LF short -70.1k (pctl 10, z -1.44) sets up short-covering squeeze potential — USD/CAD closed Friday at 1.3837, testing its SMA200 (1.3833). Although USD holds a +136bp SOFR-CORRA carry advantage, elevated WTI crude prices at $91.50 reinforce CAD terms-of-trade support and cap topside momentum. The BoC meeting on 9 Sep resolves whether domestic policy guidance accelerates covering of speculative Canadian Dollar shorts. Trade bias: Bearish USD/CAD on failure to hold above the 200-day SMA. Catalyst: BoC meeting on 9 Sep. Risk: Firm break above SMA20 at 1.3861 invalidates downside momentum and targets 1.4000.",
       "evidence": [
-        "EUR COT LF net: -55,311 (pctl 3, z -2.28, WoW -55,635)",
-        "EUR/USD closed Friday at 1.1616 (SMA200 at 1.1637)",
-        "SOFR vs ESTR carry: +146bp favoring USD",
-        "ECB next meeting: 10 Sep (market bias: hike)"
+        "CAD COT LF net: -70,142 (pctl 10, z -1.44)",
+        "USD/CAD closed Friday at 1.3837 vs SMA200 1.3833",
+        "BoC next meeting on 9 Sep (bias: Hold)"
       ],
       "_source": "engine-ai-primary"
     }
