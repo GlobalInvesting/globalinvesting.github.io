@@ -4,7 +4,11 @@
 // REGENERATED v1 (2026-08-14): this file was accidentally deleted from the
 // working tree. It has been rebuilt from scratch against the current
 // assets/dashboard.js and the coverage table documented in GUIDELINES.md
-// ("Automated tests — non-negotiable" section, 85 tests across 9 modules).
+// ("Automated tests — non-negotiable" section). Test count drifts as
+// coverage is added/removed (e.g. the Fair Value regression mirror below
+// was removed in v8.349.0 when that logic moved server-side) — run the
+// file itself for the current authoritative pass count rather than
+// trusting a number in a comment.
 //
 // Run with: node assets/dashboard.test.js
 // Exits 0 on all-pass, 1 on any failure (safe for CI / pre-deploy gating).
