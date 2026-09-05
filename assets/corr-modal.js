@@ -1,6 +1,20 @@
 // ═══════════════════════════════════════════════════════════════════════════
-// CORRELATION MODAL  v2.6  — inline-panel edition
+// CORRELATION MODAL  v2.7  — inline-panel edition
 // Fluid layout, terminal CSS variables throughout.
+// v2.7: consumes fetch_intraday_quotes.py v3.29's decoupled cointegration
+// window — the Engle-Granger test now runs on a 252d window (`coint_n`,
+// new field, the actual observation count used) instead of sharing the
+// spread's own 60d window, giving the test real statistical power. The
+// spread z-score itself is unchanged (still 60d). Pairs-signal copy/meta
+// label updated to disclose both windows separately ("60d spread · 252d
+// coint. test") instead of implying one shared window, and the
+// "insufficient window" vs "ran, not cointegrated" disambiguation (v2.6,
+// below) now keys off `coint_n` directly rather than the 60d sample count
+// `n` — `n` no longer describes the cointegration test's own window, so
+// using it to decide whether that test had enough data would be checking
+// the wrong number. Falls back to the old `n`-based check only for cached
+// `corrObj` entries with no `coint_n` field yet (pre-v3.29 quotes.json,
+// before the next scheduled refresh lands). No layout/CSS change.
 // v2.6: consumes fetch_intraday_quotes.py v3.22's history-fetch retry/
 // completeness gate. Pairs-signal "no signal" copy now distinguishes two
 // states that used to share one misleading message — "cointegration test
@@ -130,29 +144,34 @@ function _cmFmtDate(iso) { if (!iso) return ''; try { const d = new Date(iso + '
 
 // ── Pairs-trade signal — hedge-ratio spread z-score, computed server-side ──
 // (fetch_intraday_quotes.py fetch_correlations(), spread_z/signal/beta/
-// coint_p fields). `signal` is undefined on cached data from before this
-// feature shipped (not yet re-fetched); null covers two DIFFERENT states
-// that must not share copy (v2.6) — the cointegration test either never
-// ran because the 60d window was too short (`n` < 20, most often because
-// one leg's own history was too short/missing that run — see
-// fetch_intraday_quotes.py v3.22's `_CORR_MIN_ROWS` retry/completeness
-// gate), or it ran and the pair genuinely isn't cointegrated. `n` (the 60d
-// sample count) is checked directly rather than inferred from other
-// fields, since `coint_p` is `None` in both cases and can't disambiguate
-// them on its own. Once computed, `signal` is one of
+// coint_p/coint_n fields). `signal` is undefined on cached data from before
+// this feature shipped (not yet re-fetched); null covers two DIFFERENT
+// states that must not share copy (v2.6, window-decoupling note updated
+// v2.7) — the cointegration test either never ran because its OWN 252d
+// window (`coint_n`, the actual observation count used — distinct from
+// `n`, the 60d correlation-panel sample count, since v3.29 decoupled the
+// two) was too short, most often because one leg's own history was too
+// short/missing that run (see fetch_intraday_quotes.py v3.22's
+// `_CORR_MIN_ROWS` retry/completeness gate), or it ran and the pair
+// genuinely isn't cointegrated. `coint_n` is checked directly rather than
+// inferred from other fields, since `coint_p` is `None` in both cases and
+// can't disambiguate them on its own; falls back to the pre-v3.29 `n`-based
+// check only when `coint_n` is absent (cached quotes.json from before this
+// field existed). Once computed, `signal` is one of
 // 'long_a_short_b'/'short_a_long_b'/'neutral'.
 function _cmPairsSignalHtml(corrObj) {
-  const { a, b, signal, spread_z, beta, coint_p, n } = corrObj;
+  const { a, b, signal, spread_z, beta, coint_p, coint_n, n } = corrObj;
   if (typeof signal === 'undefined') {
     return '<div class="cm-psig pending"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">pending</span></div>' +
       '<div class="cm-psig-note">Not available for this pair yet \u2014 lands with the next scheduled data refresh.</div></div>';
   }
   if (signal == null) {
-    const insufficientWindow = n != null && n < 20;
+    const insufficientWindow = coint_n != null ? coint_n < 60 : (n != null && n < 20);
+    const windowTxt = coint_n != null ? coint_n : n;
     const note = insufficientWindow
-      ? 'Not enough overlapping history this window to run the cointegration test (' + n + ' of the 20+ sessions needed) \u2014 no directional read until more data is available.'
-      : 'Legs aren\u2019t cointegrated this window (Engle-Granger' + (coint_p != null ? ', p=' + coint_p.toFixed(2) : '') + ') \u2014 no statistically stable spread to trade a reversion against.';
-    return '<div class="cm-psig neutral"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread</span></div>' +
+      ? 'Not enough overlapping history to run the cointegration test on its 252-day window (' + (windowTxt != null ? windowTxt : 0) + ' of the 60+ sessions needed) \u2014 no directional read until more data accumulates.'
+      : 'Legs aren\u2019t cointegrated over the trailing ' + (coint_n != null ? coint_n : 252) + '-session window (Engle-Granger' + (coint_p != null ? ', p=' + coint_p.toFixed(2) : '') + ') \u2014 no statistically stable long-run relationship to trade a reversion against.';
+    return '<div class="cm-psig neutral"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d spread \u00b7 252d coint. test</span></div>' +
       '<div class="cm-psig-note">' + note + '</div></div>';
   }
   const dirCls = signal === 'neutral' ? 'neutral' : (signal === 'short_a_long_b' ? 'short' : 'long');
@@ -163,8 +182,8 @@ function _cmPairsSignalHtml(corrObj) {
   const coTxt = coint_p != null ? ' \u00b7 coint. p=' + coint_p.toFixed(2) : '';
   const note = signal === 'neutral'
     ? 'The hedge-ratio-adjusted spread between the two legs is tracking within its normal range \u2014 no mean-reversion edge currently.'
-    : 'The hedge-ratio-adjusted spread (beta ' + (beta != null ? beta.toFixed(2) : '\u2014') + ') is stretched ' + zTxt + ' vs its own 60d norm \u2014 ' + (signal === 'short_a_long_b' ? a : b) + ' has run ahead of what the pair\u2019s usual co-movement implies. Legs are Engle-Granger cointegrated this window' + (coint_p != null ? ' (p=' + coint_p.toFixed(2) + ')' : '') + '. Mean-reversion read, not investment advice.';
-  return '<div class="cm-psig ' + dirCls + '"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d hedge-ratio spread \u00b7 ' + zTxt + coTxt + '</span></div>' +
+    : 'The hedge-ratio-adjusted spread (beta ' + (beta != null ? beta.toFixed(2) : '\u2014') + ') is stretched ' + zTxt + ' vs its own 60d norm \u2014 ' + (signal === 'short_a_long_b' ? a : b) + ' has run ahead of what the pair\u2019s usual co-movement implies. Legs are Engle-Granger cointegrated over the trailing ' + (coint_n != null ? coint_n : 252) + '-session window' + (coint_p != null ? ' (p=' + coint_p.toFixed(2) + ')' : '') + '. Mean-reversion read, not investment advice.';
+  return '<div class="cm-psig ' + dirCls + '"><div class="cm-psig-hd"><span class="cm-psig-tag">Pairs signal</span><span class="cm-psig-meta">60d spread \u00b7 252d coint. test \u00b7 ' + zTxt + coTxt + '</span></div>' +
     '<div class="cm-psig-dir">' + dirText + '</div><div class="cm-psig-note">' + note + '</div></div>';
 }
 
