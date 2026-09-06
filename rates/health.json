@@ -1,6 +1,6 @@
 {
-  "runTimestamp": "2026-09-05T11:45:52.122988Z",
-  "runDate": "2026-09-05",
+  "runTimestamp": "2026-09-06T12:03:38.066660Z",
+  "runDate": "2026-09-06",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
@@ -32,10 +32,10 @@
       "issues": []
     },
     "CAD": {
-      "status": "cached",
+      "status": "fallback",
       "rate": "2.25",
-      "source": "cached-file",
-      "date": "2026-09-02",
+      "source": "BoC-Valet (merged history)",
+      "date": "2026-09-01",
       "issues": []
     },
     "AUD": {
@@ -49,14 +49,14 @@
       "status": "ok",
       "rate": "0.00",
       "source": "SNB-scraping",
-      "date": "2026-09-05",
+      "date": "2026-09-06",
       "issues": []
     },
     "NZD": {
-      "status": "cached",
+      "status": "fallback",
       "rate": "2.75",
-      "source": "cached-file",
-      "date": "2026-09-02",
+      "source": "BIS-CBPOL (merged history)",
+      "date": "2026-09-01",
       "issues": []
     },
     "NOK": {
@@ -75,9 +75,6 @@
     }
   },
   "issues": [],
-  "warnings": [
-    "CAD: kept cached 2026-09-02 value over older BoC-Valet candidate (2026-08-28) \u2014 likely a laggy fallback source",
-    "NZD: kept cached 2026-09-02 value over older BIS-CBPOL candidate (2026-07-01) \u2014 likely a laggy fallback source"
-  ],
-  "overallStatus": "degraded_cached"
+  "warnings": [],
+  "overallStatus": "ok"
 }
