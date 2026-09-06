@@ -1,5 +1,11 @@
 /**
- * econ-matrix.js v2.5.14 — Native Economic Matrix panel
+ * econ-matrix.js v2.6.0 — Native Economic Matrix panel
+ *
+ * ── v2.6.0 (2026-09-06) — Added header tooltips (title= on every <th>)
+ *    explaining what each column measures and why it matters to an
+ *    institutional FX desk, via applyHeaderTooltips() — see CHANGELOG.md
+ *    v8.389.0 for the wiring rationale (COLUMNS[].title existed since
+ *    v2.5.3 but was dead data, never read anywhere in this file).
  *
  * ── v2.5.14 (2026-08-30) — Industry-standard cadence audit: JPY Retail Sales
  *    and SEK Industrial Production were both missing their MoM title,
@@ -679,7 +685,7 @@
   // this exact bug shipped with v2.2.0's PPI column).
   const COLUMNS = [
     { key: 'gdp',     label: 'GDP',       title: 'Latest GDP growth rate \u2014 QoQ where published, YoY otherwise, falling back to the freshest monthly print for GBP/CAD between quarterly releases (see subtext on each cell for the period actually shown). Note: USD\u2019s QoQ is seasonally-adjusted ANNUALIZED (SAAR) per BEA convention \u2014 tagged \u201cQoQ SAAR\u201d, not directly comparable in magnitude to the raw non-annualized QoQ shown for other currencies.' },
-    { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year' },
+    { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year \u2014 the primary inflation gauge central banks reference against their target when setting policy rates.' },
     { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
     { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
     { key: 'ppi',     label: 'PPI',       title: 'Latest producer-price inflation \u2014 YoY where published, QoQ/MoM otherwise (see subtext on each cell for the period actually shown). EUR shows Germany\u2019s national PPI as a proxy \u2014 no genuine Euro Area-aggregate PPI title exists in the current source. Blank where the currency\u2019s economy has no standalone PPI release in the current source.' },
@@ -690,12 +696,12 @@
     // (not assumed) before wiring — see CATS entries for per-currency
     // sourcing notes and confirmed gaps (JPY/CHF/NOK/SEK).
     { key: 'emp',     label: 'Emp Chg',   title: 'Latest employment change \u2014 net jobs created, a flow/leading labor-market indicator distinct from the Unemployment Rate (a stock/lagging indicator). US shows Non-Farm Payrolls, the single most market-watched G10 print. Blank where the currency\u2019s economy has no standalone employment-change release in the current source \u2014 see column-specific per-currency notes.' },
-    { key: 'unemp',   label: 'Unemp',     title: 'Latest unemployment rate' },
-    { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change' },
+    { key: 'unemp',   label: 'Unemp',     title: 'Latest unemployment rate \u2014 a lagging labor-market indicator central banks weigh alongside inflation when assessing how much slack remains in the economy.' },
+    { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change \u2014 a real-economy activity gauge and a common input to leading-indicator composites, typically less market-moving on release day than PMI surveys.' },
     { key: 'conf',    label: 'Bus Cond',  title: 'Latest manufacturing PMI, or the economy\u2019s standard business/industrial confidence survey where no PMI is published. PMI readings are on a 0\u2013100 scale where 50 is the expansion/contraction cutoff \u2014 non-PMI substitutes (Ifo, NAB Business Confidence, Industrial Confidence, etc.) use their own survey-specific scale with no fixed 50 threshold.' },
-    { key: 'rtl',     label: 'Rtl Sales', title: 'Latest retail sales change' },
-    { key: 'ca',      label: 'Cur Acct',  title: 'Latest current account, native reporting units \u2014 not normalized to %GDP' },
-    { key: 'trade',   label: 'Trade Bal', title: 'Latest trade balance, native reporting units' },
+    { key: 'rtl',     label: 'Rtl Sales', title: 'Latest retail sales change \u2014 a timely proxy for consumer spending, the largest single component of GDP in most G10 economies.' },
+    { key: 'ca',      label: 'Cur Acct',  title: 'Latest current account, native reporting units \u2014 not normalized to %GDP. A persistent deficit or surplus reflects a currency\u2019s external financing needs, a slower-moving structural driver than higher-frequency flow data.' },
+    { key: 'trade',   label: 'Trade Bal', title: 'Latest trade balance, native reporting units \u2014 the goods-and-services component of the current account; a narrower, higher-frequency read on external demand for a currency\u2019s exports.' },
     { key: 'pce',     label: 'PCE YoY',   title: 'Latest PCE Price Index, year-on-year \u2014 the U.S. Federal Reserve\u2019s preferred inflation gauge. US-specific; other economies target CPI/HICP-based measures shown in the CPI/Core CPI columns instead.' },
   ];
 
@@ -1608,6 +1614,40 @@
   // backend fix) this replaced the old "cache forever" comment/behavior for.
   const ECONMX_POLL_MS = 90 * 1000; // v2.5.1: 3min → 90s, matches calendar-panel.js's cadence
 
+  // v2.6.0: header tooltips. COLUMNS[].title already existed (added v2.5.3
+  // alongside the Emp Chg column) but was never wired into the DOM — dead
+  // data. index.html's <thead> is static HTML with no title= attributes;
+  // rather than hand-duplicate 16 tooltip strings into index.html (a second
+  // manual-sync surface on top of the COLUMNS-length/order one already
+  // flagged above, and this codebase's proven failure mode — see the
+  // v8.143.0 PPI-column incident), this applies COLUMNS' own title text to
+  // the corresponding <th> at runtime by position, plus explicit copy for
+  // the 3 header cells that live outside COLUMNS (Ccy, 10Y Yld, CB Rate).
+  // Deriving the two trailing offsets from COLUMNS.length (not a hardcoded
+  // index) means a future COLUMNS entry keeps this aligned automatically —
+  // the header TEXT itself still needs the existing manual thead/skeleton
+  // sync, this only removes tooltip text as a second thing to keep in sync.
+  const EXTRA_HEADER_TITLES = {
+    ccy:     'G10 currency (ISO code) covered by this matrix.',
+    bond10y: 'Latest 10-year government bond yield \u2014 the benchmark long-end rate used in cross-currency rate-differential and carry-trade comparisons.',
+    cbrate:  'Current central bank policy rate \u2014 the anchor for short-term rate differentials and a primary input to carry-trade positioning across G10 FX.',
+  };
+
+  function applyHeaderTooltips() {
+    const table = document.querySelector('.econmx-table');
+    const ths = table ? table.querySelectorAll('thead th') : null;
+    if (!ths || !ths.length) return;
+    if (ths[0]) ths[0].title = EXTRA_HEADER_TITLES.ccy;
+    COLUMNS.forEach((col, i) => {
+      const th = ths[i + 1];
+      if (th && col.title) th.title = col.title;
+    });
+    const y10Th = ths[1 + COLUMNS.length];
+    const cbTh  = ths[2 + COLUMNS.length];
+    if (y10Th) y10Th.title = EXTRA_HEADER_TITLES.bond10y;
+    if (cbTh)  cbTh.title  = EXTRA_HEADER_TITLES.cbrate;
+  }
+
   let _loading = false;
   let _y10Cache = null;
   let _cbCache  = null;
@@ -1684,6 +1724,10 @@
   function attach() {
     const section = document.getElementById('section-econmap');
     if (!section) return;
+
+    applyHeaderTooltips(); // runs immediately — headers are static markup,
+                           // no need to wait on the IntersectionObserver
+                           // below (which only gates the data fetch).
 
     function start() {
       loadEconMatrix();
