@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-09-05",
+  "lastUpdate": "2026-09-06",
   "meetings": {
     "USD": {
       "nextMeeting": "16 Sep",
@@ -28,7 +28,7 @@
       "bias": "hold",
       "biasSource": "Fed Funds futures, meeting-bracketed",
       "biasMethod": "spread",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.63
@@ -60,10 +60,10 @@
       "bias": "hike",
       "biasSource": "ESTR futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
-      "hikeProb": 80,
-      "fwdRate": 2.45
+      "hikeProb": 79,
+      "fwdRate": 2.4475
     },
     "GBP": {
       "nextMeeting": "17 Sep",
@@ -92,7 +92,7 @@
       "bias": "hold",
       "biasSource": "SONIA futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 3.7298
@@ -124,10 +124,10 @@
       "bias": "hike",
       "biasSource": "OIS TONA curve + BoJ daily spot rate",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
-      "hikeProb": 83,
-      "fwdRate": 1.2075
+      "hikeProb": 80,
+      "fwdRate": 1.2
     },
     "AUD": {
       "nextMeeting": "29 Sep",
@@ -156,7 +156,7 @@
       "bias": "hold",
       "biasSource": "30-day Interbank Cash Rate futures",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 4.35
@@ -190,7 +190,7 @@
       "bias": "hold",
       "biasSource": "CORRA 1-Month futures, meeting-bracketed",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.29
@@ -214,7 +214,7 @@
       "bias": "hold",
       "biasSource": "OIS SARON curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 0.0
@@ -244,7 +244,7 @@
       "bias": "hold",
       "biasSource": "OIS NZIONA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 2.75
@@ -276,10 +276,10 @@
       "bias": "hike",
       "biasSource": "OIS NOWA curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
-      "hikeProb": 66,
-      "fwdRate": 4.415
+      "hikeProb": 64,
+      "fwdRate": 4.41
     },
     "SEK": {
       "nextMeeting": "24 Sep",
@@ -308,7 +308,7 @@
       "bias": "hold",
       "biasSource": "OIS SWESTR curve, meeting-bracketed forward",
       "biasMethod": "ois",
-      "biasUpdated": "2026-09-05",
+      "biasUpdated": "2026-09-06",
       "cutProb": 0,
       "hikeProb": 0,
       "fwdRate": 1.75
