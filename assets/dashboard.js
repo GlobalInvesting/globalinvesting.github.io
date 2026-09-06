@@ -3290,6 +3290,28 @@ const COT_SENTIMENT_CACHE = {};
 // Retail sentiment cache — populated by fetchSentiment() from myfxbook.json
 // keyed by normalised sym e.g. "EUR/USD" → { longPct, shortPct, longPos, shortPos, avgL, avgS }
 const RETAIL_SENTIMENT_CACHE = {};
+
+// Decides whether sentiment-data/myfxbook.json's cached `pairs` array is
+// usable, independent of its `apiBlocked` flag. `apiBlocked` only means the
+// most recent scheduled run's live refresh attempt failed (e.g. a transient
+// Myfxbook login/session hiccup) -- fetch_myfxbook_sentiment.py's own
+// fallback path (save_fallback()) deliberately preserves the last
+// genuinely-fetched `pairs` array untouched in that case, specifically so a
+// temporary upstream failure doesn't have to blank an otherwise perfectly
+// good, still-fresh cached read. Treating apiBlocked alone as disqualifying
+// (as this used to do) discarded real cached data and fell through to the
+// Dukascopy/static-fallback sources even while the genuine numbers were
+// sitting right there in `d.pairs`. The only thing that actually
+// disqualifies the cached data is its own age: once `updated` is old
+// enough that it can no longer be trusted (>=15h, covering the normal
+// overnight/weekend gap between hourly runs), fall through regardless of
+// apiBlocked.
+function _sentimentSourceOneUsable(d, nowMs) {
+  if (!d || !d.pairs || d.pairs.length < 5) return false;
+  const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
+  const ageMin = (nowMs - updatedMs) / 60000;
+  return ageMin < 900;
+}
 // Retail FX Positioning: metals rows (myfxbook sym 'XAU/USD'/'XAG/USD') must map
 // to the OANDA: TradingView symbols that _TV_TO_OHLC recognises as 'gold'/'silver',
 // not the generic FX_IDC: prefix used for currency pairs — see loadTVChart() call
@@ -3726,18 +3748,18 @@ async function fetchSentiment() {
   await loadIntradayQuotes().catch(() => null);
 
   // ── SOURCE 1: Myfxbook community outlook (primary — updated every hour via GitHub Action) ──
-  // Skipped automatically when apiBlocked=true (GitHub Actions IPs blocked by provider).
-  // In that case the dashboard promotes Dukascopy to SOURCE 2 for real-time retail sentiment.
+  // Used whenever the cached `pairs` data is still fresh (<15h old), regardless
+  // of apiBlocked -- see _sentimentSourceOneUsable() above. Only skipped to
+  // Dukascopy/static once the cached data itself is missing or stale.
   try {
     const r = await fetch('./sentiment-data/myfxbook.json');
     if (r.ok) {
       const d = await r.json();
-      // If Myfxbook API is blocking GitHub Actions IPs, skip to Dukascopy immediately.
-      if (d.apiBlocked) throw new Error('apiBlocked');
-      // Freshness check: reject if data is older than 15 hours (covers overnight/weekend gaps between workflow runs)
-      const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
-      const ageMin = (Date.now() - updatedMs) / 60000;
-      if (d.pairs && d.pairs.length >= 5 && ageMin < 900) {
+      // Freshness (not apiBlocked) is what actually gates whether the cached
+      // pairs are usable -- see _sentimentSourceOneUsable() above.
+      if (_sentimentSourceOneUsable(d, Date.now())) {
+        const updatedMs = new Date(d.updated).getTime();
+        const ageMin = (Date.now() - updatedMs) / 60000;
         const pairs = d.pairs.map(p => ({
           sym:      p.sym,
           buy:      p.long,
@@ -3765,7 +3787,14 @@ async function fetchSentiment() {
             avgS: p.avgS || 0,
           };
         });
-        _setSentimentSource(pairs, 'Myfxbook · ' + ageLabel, general);
+        // d.apiBlocked=true means the most recent live-refresh attempt
+        // failed but this cached data is still genuine, not synthetic --
+        // disclose that a refresh is pending rather than presenting it
+        // identically to a clean fetch.
+        const sourceLabel = d.apiBlocked
+          ? 'Myfxbook · ' + ageLabel + ' (refresh pending)'
+          : 'Myfxbook · ' + ageLabel;
+        _setSentimentSource(pairs, sourceLabel, general);
         return;
       }
     }

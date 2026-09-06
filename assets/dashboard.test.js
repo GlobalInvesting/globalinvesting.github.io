@@ -75,6 +75,20 @@ function pctStr(val) {
   return sign + val.toFixed(2) + '%';
 }
 
+// Source: dashboard.js ~L3292-3311 (_sentimentSourceOneUsable)
+// Regression coverage for the 2026-09-06 live incident: sentiment-data/
+// myfxbook.json's apiBlocked=true (a failed live-refresh attempt) used to be
+// treated as disqualifying the cached `pairs` data outright, discarding a
+// perfectly good, still-fresh cached read and falling through to the
+// Dukascopy/static-fallback sources instead. Freshness of `updated` is the
+// only thing that should gate usability.
+function _sentimentSourceOneUsable(d, nowMs) {
+  if (!d || !d.pairs || d.pairs.length < 5) return false;
+  const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
+  const ageMin = (nowMs - updatedMs) / 60000;
+  return ageMin < 900;
+}
+
 // Source: dashboard.js ~L167-169
 function isOpen(openH, closeH, h) {
   return openH < closeH ? (h >= openH && h < closeH) : (h >= openH || h < closeH);
@@ -707,6 +721,38 @@ test('renderFairValue: reads the precomputed summary file, not a per-pair recomp
   assert.ok(fnBody.includes('fair-value-data/summary.json'), 'renderFairValue() must fetch the precomputed summary.json');
   assert.ok(!/_fvRegress|_fvRidgeSolve|_fvChooseLambda|_solveLinearSystem/.test(fnBody),
     'renderFairValue() must not contain any client-side regression logic — that now lives solely in compute_fair_value.py');
+});
+
+section('Sentiment source gating (_sentimentSourceOneUsable)');
+
+test('apiBlocked=true with fresh cached pairs is still usable (the 2026-09-06 incident)', () => {
+  const now = Date.now();
+  const d = { apiBlocked: true, updated: new Date(now - 2 * 60 * 60 * 1000).toISOString(), pairs: new Array(39).fill({}) };
+  assert.strictEqual(_sentimentSourceOneUsable(d, now), true);
+});
+
+test('apiBlocked=false with fresh pairs is usable (baseline, unaffected by the fix)', () => {
+  const now = Date.now();
+  const d = { apiBlocked: false, updated: new Date(now - 10 * 60 * 1000).toISOString(), pairs: new Array(39).fill({}) };
+  assert.strictEqual(_sentimentSourceOneUsable(d, now), true);
+});
+
+test('too few pairs is never usable, regardless of apiBlocked', () => {
+  const now = Date.now();
+  const d = { apiBlocked: false, updated: new Date(now).toISOString(), pairs: [{}, {}] };
+  assert.strictEqual(_sentimentSourceOneUsable(d, now), false);
+});
+
+test('stale updated (>=15h) is not usable even when apiBlocked=false', () => {
+  const now = Date.now();
+  const d = { apiBlocked: false, updated: new Date(now - 16 * 60 * 60 * 1000).toISOString(), pairs: new Array(39).fill({}) };
+  assert.strictEqual(_sentimentSourceOneUsable(d, now), false);
+});
+
+test('apiBlocked=true with stale updated correctly falls through to SOURCE 2/3', () => {
+  const now = Date.now();
+  const d = { apiBlocked: true, updated: new Date(now - 20 * 60 * 60 * 1000).toISOString(), pairs: new Array(39).fill({}) };
+  assert.strictEqual(_sentimentSourceOneUsable(d, now), false);
 });
 
 // ═══════════════════════════════════════════════════════════════════
