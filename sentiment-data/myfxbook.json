@@ -1,7 +1,7 @@
 {
   "updated": "2026-09-06T21:27:33Z",
   "source": "retail-positioning-primary",
-  "apiBlocked": false,
+  "apiBlocked": true,
   "pairs": [
     {
       "sym": "EUR/USD",
@@ -520,5 +520,7 @@
     "averageDeposit": "76,508.60",
     "averageAccountProfit": "120,875.83",
     "averageAccountLoss": "-69,569.55"
-  }
+  },
+  "blockReason": "Login failed: Wrong email/password.",
+  "lastAttempt": "2026-09-06T23:00:38Z"
 }
