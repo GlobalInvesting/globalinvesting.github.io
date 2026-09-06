@@ -125,6 +125,20 @@ jobs:
             exit 0
           fi
 
+          # workflow_dispatch (manual run, e.g. to verify a fix or force an
+          # off-schedule fetch) always proceeds too — a human explicitly asked
+          # for this run right now, so the release-window gate below (which
+          # exists only to keep the */5 cron's runner-minutes usage efficient)
+          # must not silently no-op it. v3.40's "manual dispatch bypasses the
+          # tick gate" comment further down refers to a DIFFERENT, internal
+          # gate inside fetch_ff_calendar.py (the :00/:30 ForexFactory tick
+          # check) — it never covered this YAML-level release-window gate.
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "Triggered by workflow_dispatch (manual run) — proceeding unconditionally."
+            echo "run=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           # Only apply the gate to the */5 cron — off-peak sparse crons always proceed.
           HOUR=$(date -u +%H)
           MIN=$(date -u +%M)
