@@ -1,5 +1,13 @@
 /**
- * econ-matrix.js v2.6.0 — Native Economic Matrix panel
+ * econ-matrix.js v2.6.1 — Native Economic Matrix panel
+ *
+ * ── v2.6.1 (2026-09-06) — refLabel() no longer extracts a bare "(Mon)"
+ *    reference-period tag from NOK/SEK-style titles for the subtext line;
+ *    it now always shows the release dateISO as "DD Mon", matching every
+ *    other currency's subtext in the same column. Fixes a live screenshot
+ *    report (Santiago) of NOK/SEK cells showing only a month with no day
+ *    while every other currency's cell in the same column shows a full
+ *    date. See CHANGELOG.md v8.391.0.
  *
  * ── v2.6.0 (2026-09-06) — Added header tooltips (title= on every <th>)
  *    explaining what each column measures and why it matters to an
@@ -1281,13 +1289,23 @@
     return '';
   }
 
-  // Formats a dateISO ('YYYY-MM-DD') as 'DD Mon' for the subtext line, or
-  // extracts a parenthetical month/quarter tag ("(Apr)"/"(Q1)") from the
-  // NOK/SEK title style when present, since that's the vendor's own stated
-  // reference period and is more precise than the release/print date.
+  // Formats a dateISO ('YYYY-MM-DD') as 'DD Mon' for the subtext line.
+  //
+  // v2.6.1 (2026-09-06): CORRECTION — this used to extract a parenthetical
+  // month/quarter tag ("(Apr)"/"(Q1)") from the NOK/SEK title style when
+  // present (e.g. "Balance of Trade(Jul)"), on the reasoning that the
+  // vendor's own stated reference period is more precise than the release
+  // date. In practice this made NOK/SEK-style cells show ONLY a bare month
+  // ("Jul") with no day, while every other currency's subtext in the same
+  // column shows a full "DD Mon" release date (e.g. "17 Aug") \u2014 a real
+  // inconsistency Santiago flagged from a live screenshot, not a display
+  // preference. Per his explicit call: consistency across columns wins over
+  // showing the reference period: this always formats the event's own
+  // dateISO (release date) as "DD Mon" now, matching every other currency's
+  // subtext in the same column. The reference-period tag is still visible
+  // inside the cell's own event title/tooltip \u2014 only the subtext line
+  // changed. See CHANGELOG.md v8.391.0.
   function refLabel(ev) {
-    const m = /\(([^)]+)\)\s*$/.exec(ev.event);
-    if (m) return m[1];
     const d = new Date(ev.dateISO + 'T00:00:00Z');
     if (isNaN(d)) return ev.dateISO;
     return d.toLocaleDateString('en', { day: '2-digit', month: 'short', timeZone: 'UTC' });
