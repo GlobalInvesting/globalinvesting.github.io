@@ -1,6 +1,25 @@
 /**
- * econ-matrix.js v2.6.3 — Native Economic Matrix panel
+ * econ-matrix.js v2.6.6 — Native Economic Matrix panel
  *
+ * ── v2.6.6 (2026-09-07) — CORRECTION: NZD's 'cpi' column (header "CPI YoY")
+ *    showed 'Inflation Rate QoQ' data under a code comment claiming "NZ
+ *    publishes quarterly (not monthly/annual) CPI under this title" — that
+ *    claim was wrong. Live-verified against myfxbook.com/forex-economic-
+ *    calendar/new-zealand/inflation-rate-yoy: NZ Stats publishes a genuine
+ *    YoY headline CPI figure, released the same day as the QoQ print (e.g.
+ *    20 Jul 2026: QoQ 1.5%, YoY 4.1%), Impact: Low on Myfxbook (same
+ *    masking pattern already fixed for several other NOK/SEK/NZD
+ *    indicators this session). Per explicit direction: 'Inflation Rate
+ *    YoY' is now PRIMARY (matches the column's own stated definition),
+ *    'Inflation Rate QoQ' kept as secondary tie-break — same two-title
+ *    same-day pairing pattern already used for NZD's gdp column (v2.5.12).
+ *    Historical YoY releases missed by the RSS's rolling window (22 Jan,
+ *    20 Apr, 20 Jul 2026) backfilled directly in calendar.json from the
+ *    same Myfxbook History table used for verification. Also bumped this
+ *    header line to match the real deployed version (was stuck at v2.6.3
+ *    while the v2.6.4 entry below and the live cache-buster had already
+ *    moved to 2.6.5 — another instance of the standing header/cache-
+ *    buster drift this project tracks). See CHANGELOG.md v8.400.0.
  * ── v2.6.4 (2026-09-06) — CHF/NOK/SEK's emp column prefix list read the
  *    bare 'Employment Change' title, which carries no MoM/YoY/QoQ substring
  *    for periodTag() to match — even though this figure is a genuine
@@ -1081,7 +1100,14 @@
       // 1.5%), same QoQ/YoY pairing already used for AUD's gdp column.
       // QoQ stays first (unchanged priority) since it's NZ's own headline framing.
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
-      cpi:   ['Inflation Rate QoQ'], // NZ publishes quarterly (not monthly/annual) CPI under this title \u2014 see subtext "QoQ" tag
+      // v2.6.6: CORRECTED \u2014 a real 'Inflation Rate YoY' title exists for NZ
+      // (myfxbook.com/forex-economic-calendar/new-zealand/inflation-rate-yoy,
+      // Impact: Low, released same day as QoQ \u2014 e.g. 20 Jul 2026: QoQ 1.5%,
+      // YoY 4.1%). The prior comment here ("NZ does not publish YoY CPI")
+      // was wrong. YoY now PRIMARY to match this column's own header/
+      // definition; QoQ kept as same-day tie-break fallback, same pairing
+      // pattern as the gdp column two entries above.
+      cpi:   ['Inflation Rate YoY', 'Inflation Rate QoQ'],
       cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
       // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to
       // The vendor's "New Zealand Core Inflation Rate" (NZCIR,
