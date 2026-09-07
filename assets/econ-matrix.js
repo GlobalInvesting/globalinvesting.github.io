@@ -1,5 +1,24 @@
 /**
- * econ-matrix.js v2.6.2 — Native Economic Matrix panel
+ * econ-matrix.js v2.6.3 — Native Economic Matrix panel
+ *
+ * ── v2.6.3 (2026-09-06) — NOK's gdp column prefix list only ever listed
+ *    'GDP Growth Rate QoQ' (nationwide, incl. petroleum), never 'GDP
+ *    Growth Mainland QoQ' (Norges Bank's own preferred, ex-petroleum GDP
+ *    measure). Live report (screenshot): myfxbook.com's own
+ *    gdp-growth-mainland-qoq page already had a 27 Aug 2026 (Q2) release
+ *    while the matrix cell showed 28 May (Q1) — an incomplete prefix
+ *    list, the same class already fixed for GBP's GDP column and SEK's
+ *    rtl/prod columns (GUIDELINES.md v8.141.0), not a data-freshness bug
+ *    on its own. Mainland listed first (the Norges-Bank-watched measure);
+ *    findLatestGeneric() picks whichever of the two prefixes has the
+ *    fresher dateISO. Root-cause fix in the frontend; the underlying
+ *    fetch-side masking bug (Myfxbook tags this indicator Low impact for
+ *    NOK, silently dropped by the impact filter) fixed separately in
+ *    fetch_ff_calendar.py v3.53/calendar-watcher.js v5.61 — see
+ *    CHANGELOG.md. Also confirmed live that SEK's "GDP Growth Rate QoQ"
+ *    (the title already wired for SEK) has the identical masking bug —
+ *    same fetch-side fix covers it, no frontend prefix-list change
+ *    needed for SEK.
  *
  * ── v2.6.2 (2026-09-06) — Two fixes, both from a live screenshot report
  *    (Santiago): (1) refLabel()/the tooltip no longer show a fabricated
@@ -1169,7 +1188,22 @@
       pce:   [],
     },
     NOK: {
-      gdp:   ['GDP Growth Rate QoQ'],
+      // v2.6.3 (2026-09-06): CORRECTION — this column only ever listed
+      // 'GDP Growth Rate QoQ' (the nationwide figure incl. petroleum),
+      // never 'GDP Growth Mainland QoQ' (Norges Bank's own preferred GDP
+      // measure, excl. petroleum/shipping — the series Myfxbook's own
+      // page for Norway GDP most prominently surfaces). Live report
+      // (screenshot of myfxbook.com/forex-economic-calendar/norway/
+      // gdp-growth-mainland-qoq): that page already had a 27 Aug 2026
+      // (Q2) release while this cell showed 28 May (Q1) — root-caused to
+      // this incomplete prefix list, the same "incomplete prefix list
+      // silently overrides the column's own freshest-wins policy" class
+      // already documented for GBP's GDP column and SEK's rtl/prod
+      // columns (see GUIDELINES.md v8.141.0). Mainland listed first
+      // (Norges Bank's own preferred measure); findLatestGeneric() picks
+      // whichever of the two has the more recent dateISO, same
+      // self-correcting pattern already used elsewhere in this file.
+      gdp:   ['GDP Growth Mainland QoQ', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
