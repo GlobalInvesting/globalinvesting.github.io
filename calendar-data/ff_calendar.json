@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-07T00:07:21.702Z",
+  "generated_at": "2026-09-07T01:25:22.387Z",
   "source": "Myfxbook · ForexFactory (CF Worker direct-commit fallback — GitHub Actions unavailable)",
   "holidays": [],
   "events": [
@@ -148,6 +148,17 @@
     },
     {
       "currency": "EUR",
+      "impact": "medium",
+      "title": "Euro Area GDP Growth Rate YoY",
+      "actual": null,
+      "forecast": "1.0%",
+      "previous": "0.5%",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "released": false
+    },
+    {
+      "currency": "EUR",
       "impact": "high",
       "title": "Euro Area Employment Change QoQ",
       "actual": null,
@@ -159,11 +170,44 @@
     },
     {
       "currency": "EUR",
+      "impact": "medium",
+      "title": "Euro Area GDP Growth Rate QoQ",
+      "actual": null,
+      "forecast": "0.4%",
+      "previous": "0.0%",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "released": false
+    },
+    {
+      "currency": "EUR",
       "impact": "high",
       "title": "Euro Area Employment Change YoY",
       "actual": null,
       "forecast": "0.5%",
       "previous": "0.5%",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "released": false
+    },
+    {
+      "currency": "EUR",
+      "impact": "medium",
+      "title": "Greece GDP Growth Rate QoQ",
+      "actual": null,
+      "forecast": "0.4",
+      "previous": "0.2",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "released": false
+    },
+    {
+      "currency": "EUR",
+      "impact": "medium",
+      "title": "Greece GDP Growth Rate YoY",
+      "actual": null,
+      "forecast": "1.6",
+      "previous": "2.0",
       "dateISO": "2026-09-07",
       "timeUTC": "09:00",
       "released": false
