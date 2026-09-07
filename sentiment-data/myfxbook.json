@@ -1,7 +1,7 @@
 {
   "updated": "2026-09-07T18:09:27Z",
   "source": "retail-positioning-primary",
-  "apiBlocked": false,
+  "apiBlocked": true,
   "pairs": [
     {
       "sym": "EUR/USD",
@@ -520,5 +520,7 @@
     "averageDeposit": "78,486.84",
     "averageAccountProfit": "113,706.63",
     "averageAccountLoss": "-72,118.55"
-  }
+  },
+  "blockReason": "Outlook failed: Invalid session.",
+  "lastAttempt": "2026-09-07T19:40:24Z"
 }
