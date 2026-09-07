@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-07T06:01:22Z",
-  "generatedAt": "2026-09-07T06:01:22Z",
+  "lastUpdate": "2026-09-07T06:07:02Z",
+  "generatedAt": "2026-09-07T06:07:02Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -173,20 +173,25 @@
       "mean": -0.433333,
       "std": 0.814453
     },
+    "SEK/inflation rate yoy": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.212132
+    },
     "SEK/inflation rate mom": {
       "n": 2,
       "mean": -0.1,
       "std": 0.141421
     },
     "SEK/cpif yoy": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.057735
+      "n": 4,
+      "mean": 0.025,
+      "std": 0.095743
     },
     "SEK/cpif mom": {
-      "n": 3,
-      "mean": 0.066667,
-      "std": 0.11547
+      "n": 4,
+      "mean": 0.0,
+      "std": 0.163299
     },
     "EUR/ecb interest rate decision": {
       "n": 3,
@@ -48948,7 +48953,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Lloyds House Price Index YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.4%",
       "forecast": "0.1%",
       "previous": "0.1%"
     },
@@ -48961,7 +48966,7 @@
       "flag": "🇬🇧",
       "event": "United Kingdom Lloyds House Price Index MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.2%",
       "forecast": "0.2%",
       "previous": "0.0%"
     },
@@ -49000,7 +49005,7 @@
       "flag": "🇸🇪",
       "event": "Sweden Inflation Rate YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.6%",
       "previous": "0.2%"
     },
@@ -49013,7 +49018,7 @@
       "flag": "🇸🇪",
       "event": "Sweden CPIF YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": "0.8%",
       "previous": "0.7%"
     },
@@ -49026,7 +49031,7 @@
       "flag": "🇸🇪",
       "event": "Sweden CPIF MoM",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.3%",
       "forecast": "-0.1%",
       "previous": "-0.3%"
     },
