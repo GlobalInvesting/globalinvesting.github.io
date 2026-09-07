@@ -49,8 +49,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #lw-fs-close{flex-shrink:0;background:transparent;border:none;border-left:1px solid var(--border);color:var(--text2);font-size:11px;padding:4px 14px;cursor:pointer;white-space:nowrap;display:flex;align-items:center}
 #lw-fs-close:hover{border-color:var(--down);color:var(--down)}
 #lw-fullscreen-overlay.lw-fs-active #lw-fs-btn{display:none!important}
-/* Economic Calendar fullscreen overlay — same DOM-lift pattern as the chart's
-   #lw-fullscreen-overlay, but no chart-resize logic needed (plain scrollable list). */
 #cal-fullscreen-overlay{display:none;position:fixed;inset:0;z-index:9000;background:var(--bg);flex-direction:column}
 #cal-fullscreen-overlay.cal-fs-active{display:flex}
 #cal-fullscreen-inner{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden}
@@ -58,10 +56,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cal-fullscreen-overlay.cal-fs-active #section-tvcalendar.cal-fs-split{max-width:2200px}
 #cal-fullscreen-overlay.cal-fs-active #cal-events-body{max-height:none!important}
 #cal-fullscreen-overlay.cal-fs-active #cal-fs-btn{display:none!important}
-/* Wide-monitor two-column layout (fullscreen only, >=1400px viewport) — see
-   shouldSplitCalColumns()/relayoutCalendar() in calendar-panel.js. Splits the
-   chronological event list into two side-by-side columns instead of leaving
-   a large dead margin on ultra-wide monitors once the table width is capped. */
 .cal-events-cols{display:flex;height:100%;align-items:stretch}
 .cal-col-wrap{flex:1;min-width:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 .cal-col-wrap+.cal-col-wrap{border-left:1px solid var(--border)}
@@ -80,12 +74,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #lw-chart-header .lw-hdr-chg.up{color:var(--up)}
 #lw-chart-header .lw-hdr-chg.dn{color:var(--down)}
 #lw-chart-header .lw-hdr-ma-val{color:var(--accent)}
-/* Hide LW Charts attribution logo (rendered as an anchor tag inside the chart div) */
 #tv-chart-wrap a[href*="tradingview"]{display:none!important}
 #tvcal-inner{overflow:hidden}
-
-/* ── OPTION B: SPLIT LAYOUT (upper chart / lower 2×2 grid) ── */
-/* SPLIT LAYOUT — vertical left/right split */
 #main.split-layout{display:flex;flex-direction:row;height:calc(100vh - 92px);height:calc(100dvh - 92px);overflow:hidden;width:100%}
 #main.split-layout #split-upper{display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;width:55%;min-width:300px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent}
 #main.split-layout #split-upper::-webkit-scrollbar{width:3px}
@@ -100,23 +90,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #main.split-layout .panel,#main.split-layout #split-upper>div{min-width:0;max-width:100%}
 #main.split-layout #split-upper .panel table,#main.split-layout #split-lower table{width:100%}
 #main.split-layout #tv-chart-wrap{height:300px;min-height:300px}
-/* Split layout: stack share btn above badge, center badge vertically */
 #main.split-layout #narrative{position:relative}
 #main.split-layout #narrative .narr-text{padding-right:70px;overflow:hidden}
 #main.split-layout #narrative .narr-meta{position:absolute;right:10px;top:50%;transform:translateY(-50%);flex-direction:column-reverse;align-items:center;gap:0}
 #main.split-layout #narrative .narr-share-btn{height:0;overflow:hidden;margin:0;padding:0;border:none;opacity:0;pointer-events:none;transition:height .18s,opacity .18s}
 #main.split-layout #narrative:hover .narr-share-btn,#main.split-layout #narrative:focus-within .narr-share-btn{height:22px;overflow:visible;opacity:1;pointer-events:auto;margin-bottom:4px;border:1px solid transparent}
-/* Economic Matrix: height:440px (inline, on #section-econmap) is tuned for
-   the split layout's narrower right column. Outside of split, this panel
-   sits directly above Alerts & Market Signals in a single full-width
-   column, and the fixed height leaves a dead gap below the 10-row G10
-   table. Let it size to its content instead whenever split isn't active. */
 #main:not(.split-layout) #section-econmap{height:auto!important}
-/* drag handle — vertical bar between left and right */
 .split-drag-handle{width:2px;background:var(--border2);cursor:col-resize;flex-shrink:0;transition:background .15s;position:relative;height:100%}
 .split-drag-handle:hover,.split-drag-handle.dragging{background:var(--accent)}
 .split-drag-handle::after{display:none}
-/* toggle btn — subtle icon only */
 .split-toggle-btn{display:inline-flex;align-items:center;justify-content:center;width:22px;height:18px;border-radius:3px;cursor:pointer;background:transparent;border:1px solid var(--border2);color:var(--text3);transition:border-color .15s,color .15s,background .15s;flex-shrink:0;position:relative}
 #split-tip{position:absolute;top:calc(100% + 7px);right:0;background:var(--head-bg);border:1px solid var(--accent);border-radius:4px;padding:6px 9px;white-space:nowrap;font-size:10px;color:var(--text2);pointer-events:none;z-index:200;box-shadow:0 4px 12px rgba(0,0,0,.35);opacity:0;transform:translateY(-3px);transition:opacity .2s,transform .2s}
 #split-tip.visible{opacity:1;transform:translateY(0)}
@@ -136,13 +118,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #split-layout-btn{display:none!important}
 #split-tip{display:none!important}
 #split-drag-handle{display:none!important}
-/* Force-disable split layout on mobile even if the class is active */
 #main.split-layout{display:block!important;flex-direction:unset!important;height:auto!important;overflow:visible!important}
 #main.split-layout #split-upper{width:100%!important;min-width:0!important;overflow-y:visible!important;flex-shrink:unset!important}
 #main.split-layout #split-lower{border-left:none!important;overflow-y:visible!important}
 .split-drag-handle{display:none!important}
 }
-  /* ── Economic Calendar native panel ──────────────────────────────────── */
   .cal-date-row {
     padding: 3px 8px;
     font-size: 10px;

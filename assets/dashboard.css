@@ -11,51 +11,37 @@
     --text3: #8290a0;
     --up: #26a69a;
     --down: #ef5350;
-    --candle-up: #26a69a;   /* candlestick/bar up — always TradingView teal, both themes */
-    --candle-down: #ef5350; /* candlestick/bar down — always TradingView red, both themes */
+    --candle-up: #26a69a;
+    --candle-down: #ef5350;
     --blue: #4f7fff;
-    --accent: #4f7fff;       /* UI accent — selected states, borders, highlights */
-    --chart-line: #4f7fff;  /* dedicated chart/canvas line color */
+    --accent: #4f7fff;
+    --chart-line: #4f7fff;
     --orange: #f6941c;
     --head-bg: #1a1d29;
     --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   }
-
-  /* ── MT5 THEME — calibrated to MT5 platform native + Bloomberg/Refinitiv conventions ── */
   [data-theme="mt5"] {
-    /* Near-black backgrounds matching MT5 platform native (slightly cooler than pure #000) */
     --bg:      #0f0f0f;
     --bg2:     #1a1a1a;
     --bg3:     #222222;
     --border:  #2e2e2e;
     --border2: #3a3a3a;
-    /* Text: warm off-white for primary (matches MT5 EA C_TEXT), cooler greys for secondary */
     --text:    #e2ddd6;
     --text2:   #9a9a9a;
     --text3:   #666666;
-    /* Up/Down: Bloomberg-style muted greens/reds — not neon, not oversaturated */
     --up:      #00b050;
     --down:    #e03030;
-    /* Candle colors: MT5-native green/red matching platform EA palette */
     --candle-up: #00b061;
     --candle-down: #ff3a3a;
-    /* Blue: restore as a proper accent (was incorrectly set to #e8e8e8 which broke all blue UI) */
     --blue:    #4f8eff;
-    /* Accent: subtle grey matching MT5 EA selected-state */
     --accent:  #3a3a3a;
-    /* Chart line: kept as-is — visible blue on dark bg */
     --chart-line: #4f7fff;
-    /* Orange: toned down from #d95000 to a more muted amber — Bloomberg uses #e0c040 for alerts */
     --orange:  #e67e00;
-    /* Header background: slightly lighter than bg for topbar/panel-head separation */
     --head-bg: #141414;
-    /* Font: Consolas for all UI in MT5 mode — matches MT5 platform terminal aesthetic industry standard */
     --font-ui:   'Consolas', 'Menlo', 'Courier New', monospace;
     --font-mono: 'Consolas', 'Menlo', 'Courier New', monospace;
   }
-
-  /* MT5: monospace ONLY on numeric/data elements — not on nav, titles, labels */
   [data-theme="mt5"] .q-price,
   [data-theme="mt5"] .q-chg,
   [data-theme="mt5"] .q-sym,
@@ -65,35 +51,25 @@
   [data-theme="mt5"] .mono {
     font-family: 'Consolas', 'Menlo', 'Courier New', monospace !important;
   }
-
-  /* MT5: topbar — subtle 1px separator, no decorative color accent */
   [data-theme="mt5"] #topbar {
     border-bottom: 1px solid var(--border);
     background: var(--head-bg);
   }
-
-  /* MT5: nav active tab — amber bottom border mirrors the EA selected-tab convention */
   [data-theme="mt5"] .top-nav a.active {
     border-bottom: 2px solid var(--orange);
     background: var(--bg2);
     color: var(--text);
   }
-
-  /* MT5: panel headers — darker than panel bg for clear section delineation */
   [data-theme="mt5"] .panel-head {
     background: var(--head-bg);
     border-bottom: 1px solid var(--border);
   }
-
-  /* MT5: sidebar section heads — amber left accent bar, matches EA section dividers */
   [data-theme="mt5"] .sb-head {
     border-left: 2px solid var(--orange);
     padding-left: 6px;
     color: var(--text2);
     background: var(--head-bg);
   }
-
-  /* MT5: quote bar items — tighter, MT5-style data density */
   [data-theme="mt5"] .q-item {
     border-right: 1px solid var(--border);
     padding: 0 10px;
@@ -103,8 +79,6 @@
     font-size: 10.5px;
     letter-spacing: 0.03em;
   }
-
-  /* MT5: news ticker — slightly darker bg, tighter label */
   [data-theme="mt5"] #news-ticker {
     background: var(--head-bg);
     border-bottom: 1px solid var(--border);
@@ -113,13 +87,9 @@
     color: var(--orange);
     border-right: 1px solid var(--border);
   }
-
-  /* MT5: table zebra stripes — very subtle alternating rows (institutional convention) */
   [data-theme="mt5"] table tbody tr:nth-child(even) td {
     background: rgba(255,255,255,0.022);
   }
-
-  /* MT5: scrollbars — match MT5 platform chrome */
   [data-theme="mt5"] #sidebar::-webkit-scrollbar-thumb,
   [data-theme="mt5"] ::-webkit-scrollbar-thumb {
     background: var(--border2);
@@ -127,20 +97,15 @@
   [data-theme="mt5"] ::-webkit-scrollbar-track {
     background: var(--head-bg);
   }
-
-  /* MT5: status bar — slightly elevated from body bg */
   [data-theme="mt5"] #statusbar {
     background: var(--head-bg);
     border-top: 1px solid var(--border);
   }
-
-  /* MT5: heatmap cells — recalibrated to MT5 palette greens/reds (Bloomberg-style muted) */
-  /* Base cells use hardcoded dark-theme tints; MT5 overrides use matching but MT5-calibrated tints */
-  [data-theme="mt5"] .h-s-up   { background: #112b1e; } /* strong up — deep muted green */
-  [data-theme="mt5"] .h-up     { background: #0f2019; } /* mild up */
+  [data-theme="mt5"] .h-s-up   { background: #112b1e; }
+  [data-theme="mt5"] .h-up     { background: #0f2019; }
   [data-theme="mt5"] .h-flat   { background: var(--bg3); }
-  [data-theme="mt5"] .h-down   { background: #2a1515; } /* mild down */
-  [data-theme="mt5"] .h-s-down { background: #361818; } /* strong down — deep muted red */
+  [data-theme="mt5"] .h-down   { background: #2a1515; }
+  [data-theme="mt5"] .h-s-down { background: #361818; }
 
   .gi-theme-toggle {
     display: flex;
@@ -189,8 +154,6 @@
     line-height: 1.4;
     min-height: 100vh;
   }
-
-  /* ── TOPBAR ── */
   #topbar {
     background: var(--head-bg);
     border-bottom: 1px solid var(--border);
@@ -296,8 +259,6 @@
   #session-label {
     white-space: nowrap;
   }
-
-  /* ── QUOTE BAR ── */
   #tv-ticker-wrap {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
@@ -353,8 +314,6 @@
   .q-sym   { font-weight: 700; font-size: 11px; color: var(--text); font-family: var(--font-ui); }
   .q-price { font-size: 12px; font-family: var(--font-mono); }
   .q-chg   { font-size: 10px; font-family: var(--font-mono); }
-
-  /* ── NEWS TICKER ── */
   #news-ticker {
     background: var(--head-bg);
     border-bottom: 1px solid var(--border);
@@ -369,7 +328,7 @@
   }
   .ticker-track {
     display: flex; align-items: center;
-    white-space: nowrap; /* animation injected dynamically by buildNewsTicker() */
+    white-space: nowrap;
   }
   .ticker-track:hover { animation-play-state: paused; }
   .ticker-item {
@@ -381,9 +340,6 @@
   .ticker-item .t-cur { color: var(--orange); font-weight: 700; font-size: 9px; }
   .t-up   { color: var(--up); }
   .t-down { color: var(--down); }
-  /* @keyframes ticker-scroll removed — replaced by JS-injected ticker-exact keyframe */
-
-  /* ── LAYOUT ── */
   #layout {
     display: grid;
     grid-template-columns: 180px minmax(0,1fr) 220px;
@@ -393,15 +349,12 @@
     min-width: 0;
     width: 100%;
   }
-  /* When rightpanel is hidden, collapse its grid column */
   #layout.layout--no-right {
     grid-template-columns: 180px 1fr 0;
   }
   #layout.layout--no-right #rightpanel {
     display: none;
   }
-
-  /* ── SIDEBAR ── */
   #sidebar {
     background: var(--bg2);
     border-right: 1px solid var(--border);
@@ -410,18 +363,13 @@
     display: flex;
     flex-direction: column;
   }
-  /* Watchlist is the last section — grows to fill leftover sidebar height, no blank gap */
   #watchlist-section {
     flex: 1 0 auto;
     border-bottom: none;
-    /* FIX-WL-5: Extra bottom padding so the search input (#wl-input-row) is always
-       fully visible when the sidebar scrolls to it. Without this, the input sits flush
-       against the sidebar bottom edge and the last few px are clipped by the container. */
     padding-bottom: 48px;
   }
   #sidebar::-webkit-scrollbar { width: 3px; }
   #sidebar::-webkit-scrollbar-thumb { background: var(--border2); }
-  /* Crosses scrollable list — match sidebar scrollbar style */
   .sb-section div[style*="overflow-y:auto"]::-webkit-scrollbar { width: 3px; }
   .sb-section div[style*="overflow-y:auto"]::-webkit-scrollbar-track { background: transparent; }
   .sb-section div[style*="overflow-y:auto"]::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -459,15 +407,9 @@
   .sb-row.sb-selected .sb-sym::after { content: ' ▾'; font-size: 8px; color: var(--text3); }
   .sb-expand-row { border-bottom: 1px solid var(--border2); background: var(--bg2); overflow: hidden; }
   .sb-expand-inner { max-height: 0; overflow: hidden; transition: max-height .22s ease; }
-
-  /* ── Sidebar expand: vertical layout override ──
-     pd-inline is designed for horizontal scroll in the wide FX table.
-     Inside the 180px sidebar we restack all groups vertically. */
   .sb-expand-inner .pd-inline-scroll { overflow-x: hidden; }
   .sb-expand-inner .pd-inline { flex-direction: column; width: 100%; }
-  /* Hide the price block — symbol, rate and chg are already visible in the sb-row above */
   .sb-expand-inner .pd-inline-price { display: none; }
-  /* Each group becomes a full-width row */
   .sb-expand-inner .pd-inline-group {
     border-right: none;
     border-bottom: 1px solid var(--border);
@@ -477,9 +419,7 @@
     box-sizing: border-box;
   }
   .sb-expand-inner .pd-inline-group:last-of-type { border-bottom: none; }
-  /* Metrics wrap tightly in the narrow column */
   .sb-expand-inner .pd-inline-metrics { gap: 6px 10px; flex-wrap: wrap; }
-  /* Footer sits flush at the bottom */
   .sb-expand-inner .pd-inline-footer { position: static; }
 
 
@@ -488,8 +428,6 @@
   .down    { color: var(--down);   }
   .flat    { color: var(--text2);  }
   .warning { color: var(--orange); }
-
-  /* ── MAIN ── */
   #main {
     overflow-y: auto;
     overflow-x: hidden;
@@ -504,13 +442,9 @@
   #main::-webkit-scrollbar-thumb { background: var(--border2); }
 
   .panel { border-bottom: 1px solid var(--border); }
-  /* Suppress TradingView copyright bar that causes gap */
   .tradingview-widget-copyright { display:none !important; height:0 !important; overflow:hidden !important; margin:0 !important; padding:0 !important; }
-  /* Kill any bottom spacing inside TV chart container */
   #tv-chart-wrap .tradingview-widget-container { margin-bottom:0 !important; padding-bottom:0 !important; }
   #tv-chart-wrap iframe { display:block; pointer-events:auto; }
-  /* pointer-events:none on wrap kills the 32px margin-bottom overlap intercept;
-     restored on iframe so chart pan/zoom/interaction still works */
   #tv-chart-wrap { pointer-events:none; }
 
 
@@ -530,8 +464,6 @@
     font-family: var(--font-ui);
   }
   .panel-sub { font-size: 10px; color: var(--text2); font-family: var(--font-ui); margin-left: 8px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-  /* Key Correlations — compact layout to fit 12 rows without clipping */
   table[aria-label="Key FX correlations"] td {
     font-size: 10px;
     padding: 2px 4px;
@@ -539,8 +471,6 @@
   table[aria-label="Key FX correlations"] th {
     padding: 3px 4px;
   }
-
-  /* Signal notification toggle — in Alerts & Market Signals panel-head */
   .sig-notif-toggle {
     display: inline-flex; align-items: center; justify-content: center;
     margin-left: auto;
@@ -560,8 +490,6 @@
     color: var(--down); border-color: var(--down);
     opacity: .7; cursor: not-allowed;
   }
-
-  /* NARRATIVE */
   #narrative {
     background: var(--bg2);
     border-bottom: 1px solid var(--border);
@@ -569,9 +497,6 @@
     display: flex;
     align-items: flex-start;
     flex-shrink: 0;
-    /* Positioning context for .narr-meta's floating share-button chip
-       (v8.359.4) — same in default and split-layout, no per-layout
-       override needed. */
     position: relative;
   }
   .narr-label {
@@ -587,26 +512,8 @@
     font-family: var(--font-ui); word-wrap: break-word; overflow-wrap: break-word;
     white-space: normal; min-width: 0;
     display: block;
-    /* v8.358.0: narrative-regime badge removed (duplicated Risk Monitor's
-       #risk-regime). cursor:help is the only visible affordance that hovering
-       reveals a tooltip (generation time + regime-mismatch note, set by
-       renderRiskData()/buildRichNarrative() in dashboard.js) — kept the panel
-       visually clean per design decision rather than adding a visible timestamp. */
     cursor: help;
   }
-
-  /* ── Narrative share button — floating corner chip (v8.359.4) ──
-     Prior approach (v8.359.1–v8.359.3) reserved live layout space for this
-     button — collapsing .narr-meta's width/height to 0 by default and
-     expanding it on hover — so .narr-text always got its full width back
-     while HIDDEN, but every hover still visibly reflowed/reshrank the
-     wrapped text to make room, which read as the paragraph "jumping" left.
-     Fixed by taking the button out of flow entirely: .narr-meta is
-     absolutely positioned over the text's bottom-right corner (relative to
-     #narrative, see above), so showing/hiding it on hover never changes
-     .narr-text's width at all — nothing to reflow. This also removes the
-     need for a separate #main.split-layout override, since an
-     absolutely-positioned chip behaves identically in both layout modes. */
   .narr-meta {
     position: absolute;
     right: 8px;
@@ -642,15 +549,12 @@
     opacity: 1;
     pointer-events: auto;
   }
-  /* Copied confirmation state */
   .narr-share-btn.copied {
     border-color: var(--up) !important;
     color: var(--up) !important;
     opacity: 1;
     pointer-events: none;
   }
-
-  /* TABLE */
   table { width: 100%; border-collapse: collapse; }
   th {
     font-size: 9px; font-weight: 700; color: var(--text2);
@@ -669,11 +573,9 @@
   td.sym { font-weight: 700; font-size: 12px; color: #fff; font-family: var(--font-ui); white-space: nowrap; min-width: 52px; }
   tr:hover td { background: var(--bg3); }
   tr:last-child td { border-bottom: none; }
-
-  /* HEATMAP */
   .heatmap {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);  /* G10: 10 cells, 5 per row */
+    grid-template-columns: repeat(5, 1fr);
     gap: 2px; padding: 6px 10px;
   }
   .hm-cell {
@@ -690,8 +592,6 @@
   .h-flat   { background: var(--bg3); }
   .h-down   { background: #2e1c1c; }
   .h-s-down { background: #3a1a1a; }
-
-  /* COT */
   .cot-header {
     display: grid;
     grid-template-columns: 58px 1fr 42px 64px 52px 14px 46px 68px;
@@ -709,20 +609,7 @@
   }
   .cot-row:hover { background: var(--bg3); }
   .cot-row:last-child { border-bottom: none; }
-  /* overflow:hidden + ellipsis is a safety net, not the primary fix — the
-     58px track above (widened from 48px in v8.161.2 — "COPPER" was still
-     clipping to "COPP…" at 48px, confirmed by a fresh render) is sized for the
-     longest symbol currently shown (NAS100/COPPER/NATGAS, 6 chars). Ellipsis
-     just prevents a future longer symbol from bleeding into the Long/Short
-     bar column instead of silently overlapping it (v8.160.4 incident: "NAS100"
-     at the old 36px currency-code-only width visually overlapped .cot-bar-outer). */
   .cot-sym { font-weight: 700; color: #fff; font-family: var(--font-ui); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  /* Contained horizontal scroll when #rightpanel is resized narrower than the grid's
-     fixed-column total (378px) — matches institutional dense-grid convention: scroll
-     the row set, never silently squeeze the Long/Short bar to unreadable width or
-     clip a column with no way to reach it. min-width on cot-bar-outer sets the grid's
-     automatic minimum for the 1fr track, so the whole row's intrinsic min-width
-     becomes ~414px (322px fixed cols + 56px gaps + 36px bar floor). */
   .cot-scroll-wrap { overflow-x: auto; }
   .cot-scroll-wrap::-webkit-scrollbar { height: 3px; }
   .cot-scroll-wrap::-webkit-scrollbar-thumb { background: var(--border2); }
@@ -732,27 +619,19 @@
   .cot-short-fill { position: absolute; right: 0; top: 0; height: 100%; background: var(--down); opacity: .75; }
   .cot-pct { font-size: 10px; font-family: var(--font-mono); }
   .cot-net { text-align: right; font-size: 10px; font-family: var(--font-mono); }
-  /* WoW Δ — primary momentum signal */
   .cot-wow { text-align: right; font-size: 10px; font-family: var(--font-mono); }
-  /* LF/AM divergence dot — filled circle = aligned, hollow = diverging */
   .cot-div { font-size: 10px; text-align: center; cursor: help; line-height: 1; }
   .cot-div.aligned { color: var(--up); }
   .cot-div.diverge { color: var(--orange, #e8963c); }
-  /* Net as % of Total OI */
   .cot-pcoi { font-size: 10px; font-family: var(--font-mono); text-align: right; }
-  /* Open Interest cell */
   .cot-oi { font-size: 10px; font-family: var(--font-mono); color: var(--text2); text-align: right; }
   .cot-oi .oi-up { color: var(--up); font-size: 8px; margin-right: 2px; }
   .cot-oi .oi-dn { color: var(--down); font-size: 8px; margin-right: 2px; }
-
-  /* RATES GRID */
   .rates-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
   .rate-cell  { background: var(--bg); padding: 6px 8px; }
   .rate-cty   { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; font-family: var(--font-ui); }
   .rate-val   { font-size: 18px; font-weight: 700; color: #fff; font-family: var(--font-mono); line-height: 1.1; }
   .rate-chg   { font-size: 10px; margin-top: 1px; font-family: var(--font-mono); }
-
-  /* CROSS ASSET */
   .ca-grid  { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
   .ca-cell  { background: var(--bg); padding: 7px 8px; cursor: pointer; transition: background .1s; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; justify-content: center; }
   .ca-cell:hover { background: var(--bg3); }
@@ -760,21 +639,15 @@
   .ca-name  { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; font-family: var(--font-ui); }
   .ca-val   { font-size: 16px; font-weight: 700; color: #fff; font-family: var(--font-mono); }
   .ca-chg   { font-size: 10px; font-family: var(--font-mono); }
-
-  /* RISK */
   .risk-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
   .risk-cell { background: var(--bg); padding: 6px 8px; }
   .risk-lbl  { font-size: 10px; color: var(--text2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 3px; font-family: var(--font-ui); }
   .risk-val  { font-size: 20px; font-weight: 700; font-family: var(--font-mono); line-height: 1.1; }
   .risk-sub  { font-size: 10px; color: var(--text2); margin-top: 1px; font-family: var(--font-mono); }
-
-  /* SESSIONS */
   .session-row { display: flex; flex-wrap: wrap; gap: 4px; padding: 6px 10px; border-bottom: 1px solid var(--border); }
   .sess { padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; border: 1px solid var(--border2); color: var(--text3); font-family: var(--font-ui); white-space: nowrap; }
   .sess.active { border-color: var(--up); color: var(--up); }
   .sessions-table-wrap { overflow-x: auto; }
-
-  /* SPREADS */
   .spread-row {
     display: grid; grid-template-columns: 56px 1fr 48px;
     align-items: center; gap: 6px; padding: 3px 0;
@@ -785,8 +658,6 @@
   .spr-bar  { height: 4px; background: var(--bg3); overflow: hidden; }
   .spr-fill { height: 100%; }
   .spr-val  { text-align: right; font-family: var(--font-mono); color: var(--text2); }
-
-  /* ALERTS */
   .alert-row {
     display: flex; flex-wrap: wrap; gap: 0 8px; padding: 5px 10px;
     border-bottom: 1px solid var(--border);
@@ -801,17 +672,6 @@
   .a-info { background: var(--accent); }
   .a-text { color: var(--text2); flex: 1; font-size: 11px; line-height: 1.4; font-family: var(--font-ui); min-width: 0; }
   .a-text strong { color: var(--text); font-weight: 600; }
-
-  /* ── AI SIGNAL — structured typography (Rule 10 title + Rule 14 footer) ──
-     No card: no border, no background, no radius — same flat row as every
-     other .alert-row, separated only by the row's own border-bottom.
-     "Regime: X" badge is the parsed Rule 10 Setup Name, never a separate
-     frontend taxonomy.
-     Severity indicator: a single colored dot (Forex Factory calendar
-     convention: red/orange/yellow impact), same 6px size as the existing
-     .a-dot so it reads as one consistent visual language across both card
-     and fallback rows. aria-label/title on the element carry High/Medium/Low
-     text since the dot alone isn't WCAG 1.4.1-compliant without color. */
   .a-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; min-width: 0; }
   .a-badge { color: var(--text3); font-size: 9.5px; font-family: var(--font-mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
   .a-name { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
@@ -820,14 +680,10 @@
   .a-sev-crit { background: var(--down); }
   .a-sev-warn { background: var(--orange); }
   .a-sev-info { background: var(--accent); }
-  /* Body reads brighter than the footer (--text, not --text2) so the desk-note
-     narrative stands out from the scannable Trade bias/Catalyst/Risk stance
-     lines beneath it — matches the reference mockup's tonal hierarchy. */
   .a-desc { display: block; margin: 4px 0 6px; color: var(--text); }
   .a-foot { border-top: 1px solid var(--border2); padding-top: 6px; margin-top: 2px; font-size: 10.5px; line-height: 1.7; }
   .a-foot-line { color: var(--text2); }
   .a-foot-lbl { color: var(--text3); }
-  /* Collapsible body — text + evidence chips. Hidden by default, expanded on row click. */
   .a-has-body { cursor: pointer; }
   .a-has-body::after {
     content: '▸'; font-size: 8px; color: var(--text3);
@@ -837,12 +693,11 @@
   .a-has-body.a-body-open::after { transform: rotate(90deg); }
   .a-body {
     display: none; width: 100%;
-    padding: 6px 0 4px calc(34px + 8px + 6px + 8px); /* align under title */
+    padding: 6px 0 4px calc(34px + 8px + 6px + 8px);
     color: var(--text2); font-size: 11px; line-height: 1.5; font-family: var(--font-ui);
   }
   .a-has-body.a-body-open .a-body { display: block; }
   .a-body-text { margin: 0 0 6px; }
-  /* Evidence chips — data traceability for AI signals */
   .a-evidence {
     display: flex; flex-wrap: wrap; gap: 4px;
     padding-top: 5px; border-top: 1px solid var(--border2);
@@ -854,31 +709,16 @@
     border: 0.5px solid var(--border2);
     white-space: nowrap;
   }
-
-  /* RIGHT PANEL */
   #rightpanel {
     background: var(--bg2); border-left: 1px solid var(--border);
     overflow-y: auto; font-size: 11px; display: flex; flex-direction: column;
-    /* v8.135.5: bottom safety margin so the last row of whichever panel ends
-       up last in the sidebar (currently Economic Surprise Index, SEK row)
-       doesn't sit flush against — or behind — #statusbar, a position:fixed
-       22px bar. #layout's height is calc(100vh - 92px)/calc(100dvh - 92px);
-       any small mismatch between that hardcoded figure and the real header/
-       footer heights leaves zero scroll room to clear the fixed footer.
-       26px = statusbar's own 22px height + 4px clearance, chosen so this
-       protects any panel, not just ESI specifically, if content order ever
-       changes. See GUIDELINES.md ESI/rightpanel scroll-clearance entry. */
     padding-bottom: 26px;
   }
   #rightpanel::-webkit-scrollbar { width: 3px; }
   #rightpanel::-webkit-scrollbar-thumb { background: var(--border2); }
-
-  /* ── CB RATES CLICKABLE ROWS ──────────────────────────────────── */
   #cbrates-tbody tr[data-cbr-id]:hover td {
     background: var(--bg3);
   }
-
-  /* Correlations — clickable rows */
   #correlations-tbody tr[data-corr-idx]:hover td {
     background: var(--bg3);
   }
@@ -891,8 +731,6 @@
     color: var(--text3);
     font-size: 9px;
   }
-
-  /* Yield curve canvas — hover hint */
   .yield-canvas-wrap:hover {
     opacity: 0.88;
   }
@@ -906,9 +744,6 @@
   #cbrates-tbody tr[data-cbr-id]:hover td:first-child::after {
     opacity: 1;
   }
-
-  /* ── PAIR DETAIL PANEL ───────────────────────────────────────── */
-  /* #pair-detail removed v7.12.22 — replaced by #pd-popover floating overlay */
   .pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
   .pd-sym { font-size:12px; font-weight:700; color:var(--text); letter-spacing:.03em; }
   .pd-source { font-size:9px; color:var(--text3); font-family:var(--font-mono); }
@@ -938,25 +773,15 @@
   .pd-oi-dn { color:var(--down); font-size:9px; }
   .pd-cot-summary { font-size:9px; font-family:var(--font-mono); color:var(--text3); padding:2px 8px 4px; border-top:1px solid var(--border); }
   .pd-footer { display:flex; align-items:center; gap:6px; padding:3px 8px; flex-wrap:wrap; border-top:1px solid var(--border); }
-
-  /* ── PAIR DETAIL POPOVER ─────────────────────────────────────── */
-  /* Popover header with close button */
   #pd-popover .pd-header { display:flex; justify-content:space-between; align-items:center; padding:3px 8px 2px; background:var(--head-bg); border-bottom:1px solid var(--border); }
   .pd-close { background:none; border:none; color:var(--text3); font-size:13px; line-height:1; cursor:pointer; padding:2px 4px; border-radius:2px; transition:color .1s; }
   .pd-close:hover { color:var(--text); }
-
-  /* Wide cell spans both columns — for retail positioning bar */
   .pd-cell--wide { grid-column: 1 / -1; border-right:none; }
   .pd-cell--wide:last-child { border-bottom:none; }
-
-  /* Retail positioning bar */
   .pd-retail-bar { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:3px 0 2px; }
   .pd-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
   .pd-retail-nums { font-size:10px; font-family:var(--font-mono); color:var(--text2); font-weight:600; }
   .pd-retail-sep { color:var(--text3); margin:0 3px; }
-
-  /* ── EXPAND-IN-ROW (inline accordion) ───────────────────────── */
-  /* The expansion row sits immediately below the selected pair row */
   tr.pd-expand-row td { padding:0; border-bottom:1px solid var(--border2); background:var(--bg2); }
   tr.pd-expand-row td > div {
     overflow:hidden;
@@ -964,10 +789,6 @@
     transition:max-height 0.18s ease-out;
   }
   tr.pd-expand-row.pd-open td > div { max-height:185px; }
-  /* Scroll wrapper fills the full td width; pd-inline is min-width:max-content
-     so it never wraps — scrolls horizontally on narrow screens (split mode).
-     On wide screens the wrapper is wider than pd-inline so we use
-     justify-content:stretch via a flex trick on the wrapper. */
   .pd-inline-scroll {
     display:flex;
     overflow-x:auto;
@@ -976,7 +797,6 @@
     box-sizing:border-box;
   }
   .pd-inline { display:flex; align-items:stretch; padding:0; font-family:var(--font-ui); width:100%; }
-  /* Price block left: pair, price, chg */
   .pd-inline-price {
     display:flex; flex-direction:column; justify-content:center;
     padding:6px 10px 6px 10px;
@@ -987,7 +807,6 @@
   .pd-inline-rate { font-size:14px; font-weight:700; font-family:var(--font-mono); color:var(--text); line-height:1.2; margin-top:3px; }
   .pd-inline-chg { font-size:10px; font-family:var(--font-mono); font-weight:600; line-height:1; margin-top:2px; }
   .pd-inline-meta { font-size:9px; color:var(--text3); font-family:var(--font-mono); margin-top:2px; }
-  /* Metric groups */
   .pd-inline-group {
     display:flex; flex-direction:column; justify-content:flex-start;
     padding:5px 8px 5px 8px;
@@ -1004,22 +823,15 @@
   .pd-inline-val { font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--text); white-space:nowrap; }
   .pd-inline-val.pd-up { color:var(--up); }
   .pd-inline-val.pd-dn { color:var(--down); }
-  /* Retail group in inline layout */
   .pd-inline-retail-bar { height:3px; width:100%; max-width:90px; background:var(--bg3); border-radius:2px; overflow:hidden; margin:3px 0; }
   .pd-inline-retail-fill { height:100%; background:var(--up); border-radius:2px; opacity:.7; }
   .pd-inline-retail-row { display:flex; align-items:center; gap:2px; font-size:10px; font-family:var(--font-mono); font-weight:600; }
   .pd-inline-retail-avg { display:flex; flex-direction:column; gap:1px; margin-top:3px; }
   .pd-inline-retail-skew { font-size:8px; font-weight:600; letter-spacing:.03em; margin-left:3px; }
-  /* Footer strip */
   .pd-inline-footer { font-size:8px; color:var(--text3); font-family:var(--font-mono); padding:2px 10px; border-top:1px solid var(--border); background:var(--bg2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  /* Expand indicator on the pair row */
   tr.pd-selected td { background:var(--bg3) !important; }
   tr.pd-selected td.sym::after { content:' ▾'; font-size:8px; color:var(--text3); }
-
-  /* Double-click on any row opens pair detail popover (Refinitiv Eikon pattern) */
   .sb-sym { flex-shrink: 0; }
-
-  /* ── CARRY TRADE RANKING ─────────────────────────────────────── */
   .carry-rank-row { display:grid; grid-template-columns:10px 46px 36px 1fr 34px; align-items:center; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-ui); font-size:11px; cursor:pointer; transition:background .1s; }
   .carry-rank-row:hover { background:var(--bg3); }
   .carry-rank-row:last-child { border-bottom:none; }
@@ -1029,18 +841,6 @@
   .cr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; min-width:8px; }
   .cr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.7; max-width:100%; }
   .cr-diff { font-family:var(--font-mono); font-size:9.5px; text-align:right; white-space:nowrap; }
-
-  /* ── VOLATILITY LEADERBOARD — ranked list (v8.104.1) ──────────────
-     Same row+bar structure as Carry Trade Ranking directly below it
-     (.carry-rank-row above) — deliberately reused rather than a new
-     visual language, both for sidebar consistency and because it's the
-     Bloomberg/Refinitiv Top-N convention. Replaces the treemap
-     (v8.103.0-4) and the strip plot (v8.104.0): neither fit 5
-     seven-character pair labels into the sidebar's typical 180-300px
-     width without cramming or overlap; a vertically stacked list has no
-     such constraint. Bar color uses var(--up) (not a hardcoded hex) so it
-     themes correctly under [data-theme="mt5"], same reasoning as the strip
-     plot's .vs-dot before it. */
   .vol-lb-row { display:grid; grid-template-columns:10px 46px 1fr 34px; align-items:center; gap:6px; padding:4px 8px; border-bottom:1px solid var(--border); font-family:var(--font-mono); cursor:pointer; transition:background .1s; }
   .vol-lb-row:hover { background:var(--bg3); }
   .vol-lb-row:last-child { border-bottom:none; }
@@ -1049,13 +849,6 @@
   .vlr-bar-wrap { height:4px; background:var(--bg3); border-radius:2px; overflow:hidden; min-width:8px; }
   .vlr-bar { height:100%; background:var(--up); border-radius:2px; opacity:.85; max-width:100%; }
   .vlr-val { font-size:9.5px; color:var(--text); text-align:right; white-space:nowrap; }
-
-  /* ── CARRY TRADE RANKING v2 (index2 / dashboard2.js) ─────────── */
-  /* Shared grid definition — hdr and rows must always use identical columns so
-     headers track content at every sidebar width (120px–320px).
-     Column logic: PAIR fixed 46px · NOM. and CIP share remaining space equally ·
-     SIGNAL gets enough for "▲ Positive" at 9px mono (~62px min) but grows with space.
-     minmax() lets SIGNAL shrink gracefully without stealing space from NOM./CIP.     */
   .carry-rank-hdr,
   #carry-rank-rows:has(> .carry-rank-hdr) .carry-rank-row {
     display: grid;
@@ -1078,7 +871,6 @@
   .crh-nom  { font-family:var(--font-mono); font-size:8px; text-align:right; padding-right:4px; }
   .crh-cip  { font-family:var(--font-mono); font-size:8px; text-align:right; padding-right:4px; }
   .crh-sig  { font-size:8px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  /* v2 row cells — font-size:10px matches Key Correlations td; cr-pair defined in v1 */
   .cr-nom   { font-family:var(--font-mono); font-size:10px; color:var(--text2); text-align:right; white-space:nowrap; padding-right:4px; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
   .cr-cip   { font-family:var(--font-mono); font-size:10px; text-align:right; white-space:nowrap; padding-right:4px; letter-spacing:0; overflow:hidden; text-overflow:ellipsis; }
   .cr-sig   { font-size:10px; text-align:right; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -1087,8 +879,6 @@
   .cr-sig-neu    { color:var(--text3); }
   .cr-sig-weak   { color:var(--down); }
   .cr-sig-neg    { color:var(--down); font-weight:700; }
-
-  /* MACRO */
   .macro-row {
     display: grid; grid-template-columns: 32px 1fr 36px 36px 42px;
     padding: 4px 8px; border-bottom: 1px solid var(--border);
@@ -1105,8 +895,6 @@
   .imp-h { background: var(--down); }
   .imp-m { background: var(--orange); }
   .imp-l { background: var(--text3); }
-
-  /* NEWS FEED SCROLLBAR — custom thin dark */
   #news-feed-items::-webkit-scrollbar { width: 3px; }
   #news-feed-items::-webkit-scrollbar-track { background: var(--bg); }
   #news-feed-items::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
@@ -1114,8 +902,6 @@
   #var-cvar-tbody::-webkit-scrollbar-track { background: transparent; }
   #var-cvar-tbody::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
   #news-feed-items { scrollbar-width: thin; scrollbar-color: var(--border2) var(--bg); }
-
-  /* NEWS FEED */
   .news-item {
     display: flex; gap: 8px; align-items: flex-start;
     padding: 6px 10px; border-bottom: 1px solid var(--border);
@@ -1135,7 +921,6 @@
   .news-headline { font-size: 11px; color: var(--text); line-height: 1.4; font-family: var(--font-ui); }
   .news-meta { font-size: 9px; color: var(--text3); margin-top: 2px; font-family: var(--font-ui); display: flex; gap: 8px; }
   .news-source { color: var(--text2); }
-  /* skew table 4-col — fixed layout prevents Direction column overflow in 220px panel */
   #skew-tbody td:not(:first-child) { text-align: right; }
   #skew-tbody closest table,
   #skew-source-label ~ table,
@@ -1151,8 +936,6 @@
   [aria-label*="Directional positioning bias"] td:nth-child(3) { width: 40px; }
   [aria-label*="Directional positioning bias"] th:nth-child(4),
   [aria-label*="Directional positioning bias"] td:nth-child(4) { width: auto; }
-
-  /* TV CHART TABS */
   #tv-pair-tabs::-webkit-scrollbar { display: none; }
   .tv-tab {
     background: none; border: 1px solid var(--border2); border-right: none;
@@ -1164,12 +947,8 @@
   .tv-tab:last-child { border-right: 1px solid var(--border2); }
   .tv-tab:hover { color: var(--text); background: var(--bg3); }
   .tv-tab.active { color: #fff; background: var(--bg3); border-color: var(--border2); }
-
-  /* YIELD CURVE CANVAS */
   .yield-canvas-wrap { padding: 6px 10px 8px; }
   #yield-canvas { display: block; }
-
-  /* CB RATES SIDEBAR */
   .cb-row {
     display: grid; grid-template-columns: 1fr 46px 44px;
     padding: 3px 8px; border-bottom: 1px solid var(--border);
@@ -1179,8 +958,6 @@
   .cb-bank { color: var(--text); font-family: var(--font-ui); }
   .cb-rate { font-family: var(--font-mono); text-align: right; font-weight: 700; }
   .cb-next { font-family: var(--font-ui); font-size: 9px; text-align: right; }
-
-  /* STATUS BAR / FOOTER */
   #statusbar {
     position: fixed; bottom: 0; left: 0; right: 0;
     height: 22px; background: var(--head-bg);
@@ -1194,7 +971,6 @@
   #statusbar > div:not(.footer-copy) {
     flex-shrink: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  /* Limit the wide DATA item so it doesn't crowd the centered copyright */
   #statusbar > div:first-child {
     max-width: 220px;
   }
@@ -1211,24 +987,15 @@
   .footer-copy {
     font-size: 10px; color: var(--text3); white-space: nowrap; font-family: var(--font-ui);
     position: absolute; left: 50%; transform: translateX(-50%);
-    pointer-events: none; /* sits above flex flow but never blocks clicks */
+    pointer-events: none;
   }
   @media (max-width: 600px) {
     .footer-copy { display: none; }
   }
-
-  /* Flag icons in sidebar tables */
   .fi { width: 16px; height: 12px; display: inline-block; }
-
-  /* SENTIMENT PANEL — native render (no iframe) */
   #myfxbook-wrap ::-webkit-scrollbar { width: 3px; }
   #myfxbook-wrap ::-webkit-scrollbar-thumb { background: var(--border2); }
-
-  /* ══════════════════════════════════════════════
-     MOBILE RESPONSIVE — max-width: 900px
-  ══════════════════════════════════════════════ */
   @media (max-width: 900px) {
-    /* Topbar: two-row layout — row1: logo + right controls, row2: nav tabs */
     #topbar {
       padding: 0 6px;
       height: auto;
@@ -1240,7 +1007,6 @@
       flex-shrink: 0;
       order: 1;
     }
-    /* Push topbar-right to far right of row 1 */
     .topbar-right {
       margin-left: auto;
       font-size: 10px;
@@ -1249,10 +1015,8 @@
       flex-shrink: 0;
       gap: 8px !important;
     }
-    /* Hide clock on mobile to save header space */
     #clock { display: none; }
     .live-dot { display: none; }
-    /* Nav tabs: full-width second row, horizontally scrollable */
     .top-nav {
       display: flex;
       overflow-x: auto;
@@ -1264,7 +1028,6 @@
       min-height: 30px;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
-      /* Right-edge fade hint so user knows it scrolls */
       -webkit-mask-image: linear-gradient(to right, black 88%, transparent 100%);
       mask-image: linear-gradient(to right, black 88%, transparent 100%);
     }
@@ -1277,23 +1040,10 @@
       height: auto;
     }
     #news-ticker { display: none; }
-
-    /* Layout: stack main → right panel → sidebar vertically.
-       DOM order is sidebar/main/rightpanel (desktop 3-col layout), so on mobile
-       (where #layout collapses to a flex column and visual order otherwise just
-       follows DOM order) the sidebar's FX Liquidity/Crosses/Carry/Vol/Watchlist
-       stack used to render ABOVE the narrative+chart — confirmed on
-       load: mobile showed the sidebar stack first and had to
-       scroll past all of it to reach the narrative and chart. `order` reverses
-       the visual stack without touching DOM/JS wiring (no ids moved, no event
-       listeners re-bound) — main (narrative+chart+tab content) first, rightpanel
-       second, sidebar last. See CHANGELOG.md for the full entry. */
     #layout { display: flex; flex-direction: column; height: auto; overflow: visible; }
     #main      { order: 1; }
     #rightpanel { order: 2; }
     #sidebar   { order: 3; }
-
-    /* Sidebar: horizontal scrollable strip at top */
     #sidebar {
       width: 100%; max-height: none; overflow-y: visible; overflow-x: auto;
       border-right: none; border-bottom: 1px solid var(--border);
@@ -1301,68 +1051,30 @@
     }
     #sidebar .sb-section { min-width: 160px; border-bottom: none; border-right: 1px solid var(--border); flex-shrink: 0; }
     #sidebar .sb-head { white-space: nowrap; }
-
-    /* Main + Right: full width, auto height */
     #main { width: 100%; overflow-y: visible; overflow-x: hidden; }
     #rightpanel { width: 100%; border-left: none; border-top: 1px solid var(--border); }
-
-    /* Narrative: stack label on top, full width text */
     #narrative { flex-direction: column; gap: 6px; }
     .narr-label { border-right: none; border-bottom: 1px solid var(--border2); padding-right: 0; padding-bottom: 4px; margin-right: 0; }
     .narr-text { font-size: 11px; width: 100%; }
-
-    /* 2-col grids that should become 1-col on mobile */
     div[style*="grid-template-columns:1fr 1fr"]:not(#cross-asset-grid):not(.ca-grid) { display: flex !important; flex-direction: column !important; }
     div[style*="grid-template-columns: 1fr 1fr"]:not(#cross-asset-grid):not(.ca-grid) { display: flex !important; flex-direction: column !important; }
-
-    /* Cross-asset: always keep 2 cols — compact enough for mobile */
     #cross-asset-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }
-
-    /* Cross-asset: keep 2 cols (compact enough) */
     .ca-grid { grid-template-columns: 1fr 1fr !important; }
     .ca-val { font-size: 13px !important; }
     .ca-name { font-size: 9px !important; }
-
-    /* Risk grid: 2x2 OK */
     .risk-grid { grid-template-columns: 1fr 1fr !important; }
     .risk-val { font-size: 13px !important; }
-
-    /* Rates grid: 2x2 */
     .rates-grid { grid-template-columns: 1fr 1fr !important; }
     .rate-val { font-size: 15px !important; }
-
-    /* Cross-asset + Risk monitor panels: fixed height → auto */
     div[style*="height:320px"] { height: auto !important; max-height: none !important; }
     div[style*="max-height:320px"] { max-height: none !important; }
     div[style*="min-height:320px"] { min-height: 0 !important; }
     div[style*="height:580px"] { height: auto !important; }
-    /* When stacked as flex column, both panels must stretch to full width */
     #section-crossasset, #section-risk { align-self: stretch !important; width: 100% !important; border-right: none !important; }
-
-    /* News + Economic map: stack */
     div[style*="height:440px"] { height: auto !important; flex-direction: column !important; }
     div[style*="height:440px"] > div { height: auto !important; min-height: 0 !important; border-right: none !important; border-bottom: 1px solid var(--border) !important; }
     #news-feed-items { max-height: 300px !important; }
     tv-economic-map { min-height: 260px !important; }
-
-    /* Intel panel (News tab: News/Research/Analysis sub-panels) — huge empty
-       gaps found during a visual review (2026-08-19). #intel-scroll's
-       desktop layout (see the v8.117.18 comment above its rule in this file)
-       is a CSS Grid with three `minmax(0,1fr)` tracks giving News/Research/
-       Analysis an exact equal-thirds split of #intel-scroll's height — which
-       only works because #layout is `display:grid` with a real, viewport-
-       bound `calc(100vh - 92px)` height on desktop. On mobile #layout
-       switches to a flex column with `height:auto` (see the "Layout: stack…"
-       rule above), so #main/#split-lower/#intel-scroll have no definite
-       height for the grid to distribute — each 1fr track still tried to
-       claim an equal third of whatever stray height resulted, leaving mostly
-       empty space below any sub-panel with just a few items. Same root cause
-       as every other fixed/grid-height panel in this file that already gets
-       an auto-height override for mobile (Cross-Asset/Risk, News+Econ map,
-       Sessions+Spreads, TV Calendar) — this one was simply missed when
-       v8.117.18 shipped, since that fix was tested on desktop only. Fix:
-       drop the Grid on mobile, let all three sub-panels stack at their real
-       natural content height and scroll as part of the normal page flow. */
     #intel-scroll {
       display: block !important;
       height: auto !important;
@@ -1374,16 +1086,8 @@
       overflow-y: visible !important;
       max-height: none !important;
     }
-    /* Sub-panel headers were sticky within #intel-scroll's own internal
-       scroll (desktop). With the whole page scrolling instead on mobile,
-       sticky-to-viewport would compete with #topbar (also top:0, higher
-       z-index) for the same spot — disable rather than risk the overlap. */
     .intel-sub-head { position: static !important; }
-
-    /* Market Sessions + Spreads: stack */
     div[style*="grid-template-columns:1fr 1fr;border-bottom"] { display: flex !important; flex-direction: column !important; }
-
-    /* TV Events calendar: fixed height on mobile so iframe fills space properly */
     #section-tvcalendar { min-height: 0 !important; flex: none !important; }
     #tvcal-inner { height: 350px !important; flex: none !important; min-height: 0 !important; }
     #tvcal-scale {
@@ -1391,80 +1095,38 @@
       width: 113.6% !important;
       height: 113.6% !important;
     }
-
-    /* Sessions table: compact */
     #sessions-table table { min-width: unset; }
-
-    /* Price chart: full width */
     #chart-wrap, .tv-chart-container { width: 100% !important; }
-
-    /* FX table: horizontal scroll */
     div[style*="overflow-x:auto"] { overflow-x: auto !important; }
     table { min-width: 480px; }
     .fx-pairs-table table, #fx-pairs-tbody { min-width: 480px; }
-    /* Right panel tables must NOT get that min-width — they're in a narrow column */
     #rightpanel table { min-width: unset !important; width: 100% !important; }
-    /* Calendar history modal table must NOT get that min-width either — it's
-       inside a centered dialog capped at ~420px (see #cal-hist-modal in
-       calendar-panel.js), not a full-width panel. The blanket `table {
-       min-width:480px }` rule above forced this 4-column table wider than
-       its own modal, which overflowed the dialog's rounded/bordered edge
-       on any viewport ≤900px (i.e. effectively every phone) — the modal
-       itself never resized, so this read as "cut off" text/columns. */
     #cal-hist-modal table { min-width: unset !important; width: 100% !important; }
     #rightpanel td, #rightpanel th { font-size: 10px !important; padding: 2px 4px !important; }
-    /* Indicator + Spread tables in main panel: no min-width, fit container width */
     table:has(#risk-indicators-tbody),
     table:has(#yield-spreads-tbody) { min-width: unset !important; width: 100% !important; }
-    /* Fallback for browsers without :has() — target by container */
     #section-risk table,
     #section-rates table { min-width: unset !important; width: 100% !important; }
-
-    /* Heatmap */
     #heatmap-wrap { overflow-x: auto !important; }
-
-    /* Topbar ticker: scrollable */
     #tv-ticker { overflow-x: auto; white-space: nowrap; }
     #quotebar-inner { flex-wrap: nowrap !important; }
     .q-item { display: inline-flex !important; flex-shrink: 0; }
-
-    /* Font sizes */
     body { font-size: 11px; }
     .panel-title { font-size: 10px !important; }
     .panel-sub { font-size: 9px !important; }
-
-    /* Sidebar full-width columns */
     #sidebar { flex-direction: column; overflow-x: hidden; }
     #sidebar .sb-section { min-width: unset; width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
-
-    /* Sessions overflow fix */
     div[style*="max-height:520px"] { max-height: none !important; overflow: visible !important; }
-
-    /* Sessions table: no min-width — se adapta al ancho del panel */
     #section-crossasset table { min-width: unset !important; width: 100% !important; }
     #section-crossasset td, #section-crossasset th { font-size: 10px !important; padding: 2px 4px !important; white-space: nowrap; }
-    /* Sessions: add left breathing room to first column so it's not cut off */
     #section-crossasset td:first-child,
     #section-crossasset th:first-child { padding-left: 8px !important; }
-    /* Sessions: add right breathing room to last column so it's not cut off */
     #section-crossasset td:last-child,
     #section-crossasset th:last-child { padding-right: 8px !important; }
-
-    /* Market sentiment: no forced height */
-    /* Myfxbook widget overflows its fixed internal table — clip + scroll horizontally */
-
-
-    /* Reference Spreads: ensure it fills full width when stacked */
     #spreads-rows { width: 100%; box-sizing: border-box; }
     .spread-row { grid-template-columns: 48px 1fr 42px; gap: 4px; }
-
-    /* Retail FX Positioning: fixed height + internal scroll on mobile */
     #myfxbook-wrap { max-height: 340px !important; flex: none !important; }
     #sent-rows { overflow-y: auto !important; flex: 1 !important; min-height: 0 !important; }
-
-    /* Indicator + Yield Spread tables: show all 3 columns on mobile.
-       Label col truncates with ellipsis if too long; Value and Signal
-       shrink to content and never wrap or get clipped. */
     .signal-col { display: table-cell !important; }
     [id$="-sig"] { display: table-cell !important; }
 
@@ -1475,7 +1137,6 @@
       table-layout: fixed;
       width: 100%;
     }
-    /* Col 1 (label): fills remaining space, truncates with ellipsis */
     #risk-indicators-tbody td:first-child,
     #yield-spreads-tbody td:first-child,
     table:has(#risk-indicators-tbody) th:first-child,
@@ -1485,7 +1146,6 @@
       text-overflow: ellipsis;
       white-space: nowrap;
     }
-    /* Col 2 (Value) and Col 3 (Signal): fixed narrow width, no wrapping */
     #risk-indicators-tbody td:nth-child(2),
     #yield-spreads-tbody td:nth-child(2),
     #risk-indicators-tbody td:nth-child(3),
@@ -1499,15 +1159,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    /* Compact font + padding for these tables on mobile */
     #section-risk table td, #section-risk table th,
     #section-rates table td, #section-rates table th {
       font-size: 10px;
       padding: 3px 4px;
     }
-
-    /* Footer: align into a 2-column grid instead of a ragged flex-wrap so
-       row 2 (SESSION/LOCAL) lines up under row 1 (DATA/DELAY). */
     #statusbar {
       display: grid; grid-template-columns: 1fr 1fr;
       gap: 4px 10px; font-size: 9px; padding: 4px 8px;
@@ -1515,15 +1171,11 @@
     }
     #statusbar > div:first-child { max-width: none; }
     #statusbar .footer-copy { grid-column: 1 / -1; position: static; transform: none; order: 10; text-align: center; }
-
-    /* COT panel: fit all 8 cols within mobile viewport (overflow-x:hidden on #main prevents scroll) */
     .cot-scroll-wrap {
       overflow-x: visible;
     }
     .cot-header,
     .cot-row {
-      /* First column widened 38px → 44px in v8.161.2 alongside the desktop
-         fix — "COPPER" (6 chars) was clipping here too at the smaller track. */
       grid-template-columns: 44px 60px 30px 48px 40px 10px 40px 52px;
       gap: 4px;
       min-width: 0;
@@ -1532,10 +1184,7 @@
     .cot-pct, .cot-net, .cot-wow, .cot-pcoi, .cot-oi { font-size: 9px; }
     .cot-div  { font-size: 9px; }
     .cot-bar-outer { min-width: 0; }
-    /* Header text: truncate if needed */
     .cot-header span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9px; }
-
-    /* Pair detail popover: bottom sheet on mobile */
     #pd-popover {
       position: fixed !important;
       left: 0 !important;
@@ -1549,7 +1198,6 @@
       box-shadow: 0 -4px 24px rgba(0,0,0,0.55) !important;
       overflow-y: auto !important;
     }
-    /* Drag handle hint at top of bottom sheet */
     #pd-popover::before {
       content: '';
       display: block;
@@ -1560,8 +1208,6 @@
       margin: 8px auto 4px;
       flex-shrink: 0;
     }
-
-    /* Expand-in-row: keep horizontal layout, just remove the fixed height cap */
     tr.pd-expand-row.pd-open td > div {
       max-height: none;
       overflow: visible;
@@ -1569,37 +1215,22 @@
   }
 
   @media (max-width: 480px) {
-    /* Extra-small: single column everything */
     .ca-grid { grid-template-columns: 1fr 1fr !important; }
     .rates-grid { grid-template-columns: 1fr 1fr !important; }
     .risk-grid { grid-template-columns: 1fr 1fr !important; }
     table { font-size: 10px; }
     .ca-val { font-size: 13px !important; }
     .rate-val { font-size: 14px !important; }
-
-    /* Topbar: minimal on very small screens */
     #topbar { padding: 0 4px; }
     .logo-text { font-size: 10px !important; }
-    .logo-sub { display: block; font-size: 7px !important; } /* keep "FX Terminal" visible */
+    .logo-sub { display: block; font-size: 7px !important; }
     .topbar-right { font-size: 9px; gap: 6px !important; }
-    /* Session label shortened */
     #session-label { max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .top-nav a { padding: 5px 10px; font-size: 10px; }
-    /* Ensure main layout doesn't clip content below header */
     #layout { overflow: visible !important; }
     #main { overflow-x: hidden; overflow-y: visible !important; }
-
-    /* Liquidity canvas: fill on mobile */
     #liquidity-canvas { height: 110px !important; }
   }
-
-  /* ── Site menu dropdown ── */
-  /* position: relative is required here — without it, .site-menu-panel and the
-     .site-menu::after hover-bridge below fall back to positioning against
-     .topbar-right (the nearest positioned ancestor), which is a taller row
-     (clock, session label, etc.). That mismatch opens a real gap between the
-     button and the bridge, so the pointer loses :hover before reaching the
-     panel and the dropdown closes on the way down. Root-caused 2026-07-17. */
   .site-menu { display: flex; align-items: center; position: relative; }
   .site-menu-btn {
     display: flex; align-items: center; gap: 5px;
@@ -1619,7 +1250,6 @@
   }
   .site-menu:hover .site-menu-panel,
   .site-menu:focus-within .site-menu-panel { display: block; }
-  /* invisible bridge so menu doesn't close when moving from button to panel */
   .site-menu::after {
     content: ''; position: absolute; top: 100%;
     left: -8px; right: -8px; height: 8px;
@@ -1663,8 +1293,6 @@
     #gdpr-banner .gdpr-btns { width: 100%; }
     #gdpr-banner button { flex: 1; }
   }
-
-/* ── Accessibility — Skip link (WCAG 2.4.1) ── */
 .skip-link {
   position: absolute;
   top: -100px;
@@ -1684,8 +1312,6 @@
   outline: 2px solid #fff;
   outline-offset: 2px;
 }
-
-/* ── Focus visible (WCAG 2.4.7) — restore outline stripped by reset ── */
 :focus-visible {
   outline: 2px solid var(--accent, #4f7fff);
   outline-offset: 2px;
@@ -1697,8 +1323,6 @@ a:focus-visible,
   outline-offset: 2px;
   border-radius: 2px;
 }
-
-/* ── Screen-reader-only utility (WCAG 1.3.1) ── */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -1710,9 +1334,6 @@ a:focus-visible,
   white-space: nowrap;
   border: 0;
 }
-
-/* ── CLS fix: skeleton placeholders for TradingView widgets ── */
-/* Shown before the iframe loads — reserves the exact space to prevent layout shift */
 .tv-skeleton {
   position: absolute;
   inset: 0;
@@ -1737,8 +1358,6 @@ a:focus-visible,
   pointer-events: none;
 }
 #user-alerts-list button:hover { color:var(--down) !important; }
-
-/* ── KEYBOARD SHORTCUT LEGEND ─────────────────────────────────────── */
 #kb-legend {
   position: fixed; inset: 0; z-index: 10000;
   background: rgba(0,0,0,.55); backdrop-filter: blur(2px);
@@ -1775,15 +1394,11 @@ a:focus-visible,
   border-top: 1px solid var(--border);
   font-size: 10px; color: var(--text3); text-align: center;
 }
-
-/* ── KEYBOARD ROW FOCUS ────────────────────────────────────────────── */
 #fx-pairs-tbody tr.kb-focus {
   background: var(--bg3) !important;
   outline: 1px solid var(--accent);
   outline-offset: -1px;
 }
-
-/* ── EXPORT BUTTONS ────────────────────────────────────────────────── */
 .export-btns {
   display: flex; gap: 4px; align-items: center; margin-left: auto; flex-shrink: 0;
 }
@@ -1796,13 +1411,7 @@ a:focus-visible,
   white-space: nowrap;
 }
 .export-btn:hover { border-color: var(--accent); color: var(--accent); }
-/* v8.360.2: .export-btn's existing siblings are all <button> elements
-   (inline-block by default); the Fair Value CSV export (#fv-csv-btn) is a
-   plain static file, so it's an <a download> instead — needs an explicit
-   inline-block so its padding/border render identically to the others. */
 a.export-btn { display: inline-block; text-decoration: none; }
-
-/* ── KEYBOARD HINT BUTTON (statusbar) ──────────────────────────────── */
 .kb-hint-btn {
   font-size: 9px; font-family: var(--font-mono);
   background: transparent; border: 1px solid var(--border2);
@@ -1812,8 +1421,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   white-space: nowrap;
 }
 .kb-hint-btn:hover { border-color: var(--accent); color: var(--accent); }
-
-/* ── ETF OPTIONS IV PANEL ───────────────────────────────────────── */
 .etf-iv-row {
   display: flex; align-items: center; gap: 5px;
   padding: 3px 8px; border-bottom: 1px solid var(--border);
@@ -1840,12 +1447,8 @@ a.export-btn { display: inline-block; text-decoration: none; }
   font-size: 9px; font-family: var(--font-mono);
   width: 38px; text-align: right; flex-shrink: 0; color: var(--text3);
 }
-
-/* ── PAIR DETAIL — TOOLTIPS (handled by #fx-tt engine in JS) ──────── */
 .pd-cell { position: relative; }
 .pd-cell.fx-tip { cursor: help; }
-
-/* ── CONFIGURABLE ALERTS PANEL ──────────────────────────────────── */
 #alerts-panel {
   border-bottom: 1px solid var(--border);
 }
@@ -1886,8 +1489,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   background: var(--down); color: #fff; font-family: var(--font-mono);
   vertical-align: middle;
 }
-
-/* ── ALERTS POPOVER (statusbar bell icon) ───────────────────────── */
 #alerts-popover {
   position: fixed;
   width: 280px;
@@ -1931,11 +1532,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   font-size: 9px; color: var(--text3);
   border-top: 1px solid var(--border);
 }
-
-/* ── LAYOUT RESIZE HANDLES (v7.71.0) ────────────────────────────────────
- * Drag handles inserted between grid columns by layout-resizer.js.
- * Only visible on desktop (> 900px) — hidden via display:none on mobile.
- * ─────────────────────────────────────────────────────────────────────── */
 @media (min-width: 901px) {
   .gi-layout-handle {
     position: relative;
@@ -1945,7 +1541,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
     background: transparent;
     transition: background 0.15s ease;
     flex-shrink: 0;
-    /* Expand hit area without affecting layout width */
     margin: 0 -3px;
     padding: 0 3px;
     box-sizing: content-box;
@@ -1955,7 +1550,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
     background: var(--accent);
     opacity: 0.5;
   }
-  /* Subtle indicator line at rest */
   .gi-layout-handle::after {
     content: '';
     position: absolute;
@@ -1972,8 +1566,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   .gi-layout-handle:hover::after {
     opacity: 0;
   }
-
-  /* Prevent text selection while dragging */
   body.gi-resizing {
     user-select: none;
     -webkit-user-select: none;
@@ -1985,8 +1577,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   body.gi-resizing iframe {
     pointer-events: none;
   }
-
-  /* Toast for reset feedback */
   #gi-layout-toast {
     position: fixed;
     bottom: 36px;
@@ -2011,8 +1601,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
     transform: translateX(-50%) translateY(0);
   }
 }
-
-/* ── Economic Surprises panel — CESI-style bar chart (v7.77.0) ── */
 #econ-surprise-table {
   table-layout: fixed;
 }
@@ -2024,7 +1612,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
 #econ-surprise-table td:last-child {
   width: 28px;
 }
-/* ── Economic Matrix (v8.23.0) — native G10 macro snapshot, replaces TradingView Economic Map ── */
 .econmx-wrap {
   overflow: auto;
 }
@@ -2039,14 +1626,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   font-family: var(--font-ui);
   font-weight: 600;
 }
-/* [v2.3.0] Sticky first column (Ccy + flag) — keeps the reference currency
-   visible while horizontally scrolling the matrix on narrow viewports.
-   z-index: 2 keeps it above ordinary cells scrolling underneath; the header
-   cell needs its own rule since <th>/<td> don't share specificity, and gets
-   z-index: 3 so it also stays above the sticky body cells (thead itself
-   isn't sticky vertically here — only horizontal stickiness was requested).
-   Background must be opaque (var(--bg), matching .econmx-wrap's own
-   background) or scrolled-under cell content would show through. */
 .econmx-table th:first-child,
 .econmx-table td:first-child {
   position: sticky;
@@ -2058,9 +1637,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
 .econmx-table thead th:first-child {
   z-index: 3;
 }
-/* [v2.0.0] Per-cell reference period + date subtext (client-requested — see
-   econ-matrix.js header comment). Kept small and muted so it reads as
-   metadata, not a second data point, and doesn't compete with the value. */
 .econmx-table td {
   vertical-align: middle;
   line-height: 1.25;
@@ -2076,7 +1652,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   font-weight: 400;
   margin-top: 1px;
 }
-/* ── FX Fair Value (v8.191.0) ── */
 #fv-table th {
   position: sticky;
   top: 0;
@@ -2109,7 +1684,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   background: var(--bg3);
   border-radius: 2px;
   overflow: visible;
-  /* Centre-line marker */
 }
 .es-bar-wrap::after {
   content: '';
@@ -2128,7 +1702,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   border-radius: 2px;
   transition: width 0.35s ease, background 0.35s ease, left 0.35s ease;
 }
-/* Clickable Economic Surprises rows */
 #econ-surprise-tbody tr:hover td {
   background: rgba(79,127,255,0.06);
 }
@@ -2136,24 +1709,10 @@ a.export-btn { display: inline-block; text-decoration: none; }
   outline: 2px solid var(--blue,#4f7fff);
   outline-offset: -1px;
 }
-
-/* ─────────────────────────────────────────────────────────────────────────
-   GLOBAL THIN SCROLLBARS — v7.99.7
-   Applies to every scrollable container in the terminal.
-   Firefox: scrollbar-width:thin + scrollbar-color
-   Webkit/Blink (Chrome, Safari, Edge): 4px width, transparent track,
-   var(--border2) thumb with rounded corners.
-   The universal * selector ensures no container inherits the OS default
-   thick scrollbar — each element picks up the thin style automatically.
-   ───────────────────────────────────────────────────────────────────────── */
-
-/* Firefox — global */
 * {
   scrollbar-width: thin;
   scrollbar-color: var(--border2) transparent;
 }
-
-/* Webkit — global: any element that scrolls gets a thin bar */
 *::-webkit-scrollbar {
   width: 4px;
   height: 4px;
@@ -2171,8 +1730,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
 *::-webkit-scrollbar-corner {
   background: transparent;
 }
-
-/* Elements that should show NO scrollbar at all — preserve existing hide rules */
 #tv-ticker::-webkit-scrollbar,
 #tv-pair-tabs::-webkit-scrollbar,
 #lw-range-bar::-webkit-scrollbar,
@@ -2180,80 +1737,38 @@ a.export-btn { display: inline-block; text-decoration: none; }
 .top-nav::-webkit-scrollbar {
   display: none;
 }
-
-/* ─── NEWS SECTION (.ns-*) ──────────────────────────────────────────────────
-   Always-expanded article blocks — CB Rates Market Commentary aesthetic (v8.8.2).
-   Layout per item: [meta row: source · time · cur-tag] / [title] / [body].
-   No accordion/drawer — content always visible, matching cbr-ps-* pattern. */
-
-/* Article block */
 .ns-article { padding:9px 14px 10px;border-bottom:1px solid rgba(54,60,78,.35); }
 .ns-article:last-child { border-bottom:none; }
 .ns-featured { border-left:2px solid var(--accent);padding-left:12px; }
-
-/* Meta row: source · time · currency tag — all inline */
 .ns-art-meta { display:flex;align-items:center;gap:6px;margin-bottom:4px; }
 
 .ns-art-source { font-size:8px;font-weight:600;color:var(--accent,var(--blue));font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em; }
 .ns-art-time   { font-size:8px;color:var(--text2);font-family:var(--font-mono); }
 .ns-cur-tag    { font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-mono);flex-shrink:0; }
-
-/* Headline — semibold, clickable when a safe link is available */
 .ns-art-title { font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 .ns-art-title a { color:inherit;text-decoration:none; }
 .ns-art-title a:hover { text-decoration:underline;text-decoration-color:var(--text2); }
-
-/* Body excerpt — always visible (no collapse) */
 .ns-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
-
-/* Currency filter pills — shared across all three sub-panels */
 .ns-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.04em; }
 .ns-cur-pill:hover { background:var(--bg3);color:var(--text); }
 .ns-pill-active { background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important; }
-
-/* ─── RESEARCH SECTION (.rs-*) ──────────────────────────────────────────────
-   Always-expanded article blocks — mirrors News/Analysis (.ns-art-*) aesthetic.
-   Layout per item: [meta row: source · time · cur-tag(s)] / [title] / [body].
-   No accordion/drawer — content always visible, matching cbr-ps-* pattern.
-   Updated: v8.8.3 (2026-06-20) */
 .rs-article { padding:9px 14px 10px;border-bottom:1px solid rgba(54,60,78,.35); }
 .rs-article:last-child { border-bottom:none; }
 .rs-art-trade-idea { border-left:2px solid var(--up);padding-left:12px; }
-
-/* Meta row: source · time · currency tag(s) — all inline */
 .rs-art-meta { display:flex;align-items:center;gap:6px;margin-bottom:4px; }
 .rs-art-source { font-size:8px;font-weight:600;color:var(--accent,var(--blue));font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em; }
 .rs-art-time   { font-size:8px;color:var(--text2);font-family:var(--font-mono); }
 .rs-cur-tag    { font-size:8px;font-weight:700;color:var(--text2);border:1px solid var(--border2);padding:0 4px;border-radius:2px;font-family:var(--font-mono);flex-shrink:0; }
-
-/* Title — semibold, clickable when a safe link is available */
 .rs-art-title { font-size:10px;font-weight:600;color:var(--text);line-height:1.35;margin-bottom:5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 .rs-art-title a { color:inherit;text-decoration:none; }
 .rs-art-title a:hover { text-decoration:underline;text-decoration-color:var(--text2); }
-
-/* Body excerpt — always visible (no collapse) */
 .rs-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
-
-/* Filter pills — source filter bar */
 .rs-bank-pill,
 .rs-cur-pill { font-size:9px;font-family:var(--font-ui);font-weight:600;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:2px;padding:1px 6px;cursor:pointer;transition:background .1s,color .1s,border-color .1s;text-transform:uppercase;letter-spacing:.03em; }
 .rs-bank-pill:hover,
 .rs-cur-pill:hover  { background:var(--bg3);color:var(--text); }
 .rs-pill-active     { background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important; }
-
-/* Empty state */
 .rs-empty { padding:20px 14px;color:var(--text3);font-size:11px; }
-
-/* ─── NEWS DISPLAY DENSITY TOGGLE (v8.100.0) ────────────────────────────────
-   Expanded (default): current always-visible-excerpt layout, unchanged.
-   Compact: one line per item (source · time · cur-tag · title inline), no
-   excerpt — matches Bloomberg TOP<GO> scan density. Single class toggle on
-   #section-news collapses .ns-art-body/.rs-art-body across all three
-   sub-panels (News/Research/Analysis) — no per-item JS changes needed.
-   v8.169.0: also matched on #intel-scroll.ns-compact — see the comment on
-   _newsApplyDensity() in dashboard.js for why #section-news alone stopped
-   being enough once Intel Fullscreen (v8.167.x) started DOM-lifting
-   #intel-scroll outside #section-news. */
 #ns-density-toggle {
   margin-left: auto;
   display: flex;
@@ -2324,18 +1839,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
-/* ─── NEWS TEXT SIZE (A-/A+) TOGGLE (v8.169.0) ──────────────────────────────
-   Institutional terminals (Bloomberg NI, Eikon News Monitor) all expose a
-   reader-controlled text-size step for news bodies — WCAG 2.1 AA (1.4.4,
-   Resize Text) also expects user-adjustable text short of relying on
-   browser zoom alone. 4 fixed steps rather than free continuous sizing,
-   same "few discrete states, not a slider" pattern as the density toggle
-   above. Step 1 (10px) is the pre-existing default — no visual change for
-   anyone who never touches the control. Scoped to both #section-news and
-   #intel-scroll for the same DOM-lift reason as .ns-compact above, since
-   #ns-filter-bar (and this control inside it) is shared/reused unmodified
-   between the compact view and Intel Fullscreen. */
 #ns-fontsize-toggle {
   display: flex;
   border: 1px solid var(--border2);
@@ -2374,40 +1877,6 @@ a.export-btn { display: inline-block; text-decoration: none; }
 #intel-scroll.ns-fontsize-3 .ns-art-body,  #intel-scroll.ns-fontsize-3 .rs-art-body {
   font-size: 14px;
 }
-
-
-/* ─── Proportional split for the 3 stacked sub-panels ────────────────────────
-   v8.117.18 fix, revised twice: each sub-panel feed originally had its own
-   fixed max-height in px (News/Analysis 225px, Research 240px) with
-   independent overflow-y:auto, while #intel-scroll was overflow:hidden.
-   That only fully used the available vertical space when the 3 heads + 3
-   capped feeds summed to exactly #intel-scroll's flex-grown height — on a
-   taller viewport/panel the leftover space sat empty below the last
-   sub-panel (Analysis), clipped by overflow:hidden, showing as a dead black
-   gap instead of more of that panel's actual items.
-   Attempt 1: made #intel-scroll the single scroll container with the 3
-   feeds at natural height. Fixed the dead space, but let News (routinely
-   30+ items, first in DOM order) dominate the visible area — reverted.
-   Attempt 2: kept #intel-scroll overflow:hidden and gave the 3 feeds
-   `flex:1 1 0` (equal thirds) via nested flexbox. In testing this collapsed
-   unpredictably — the first two sections rendered at ~0 height and the
-   third expanded to fill 100% of the remaining space instead of an even
-   three-way split, a known nested-flex edge case (equal flex-basis:0 items
-   inside an overflow:hidden flex column don't always distribute evenly
-   when combined with independently-scrolling overflow-y:auto children and
-   interleaved non-flex siblings like #rs-filter-bar) — reverted.
-   Fix (final): switched #intel-scroll from flexbox to CSS Grid. Grid's `fr`
-   unit distributes remaining space deterministically regardless of sibling
-   content/overflow quirks, which nested flex was clearly not doing here.
-   `grid-template-rows` lists the 7 real children in DOM order: News header
-   (auto) / News feed (1fr) / Research header (auto) / Research filter bar
-   (auto) / Research feed (1fr) / Analysis header (auto) / Analysis feed
-   (1fr) — the 3 `minmax(0,1fr)` tracks always get exactly equal shares of
-   whatever height is left over after the 4 auto tracks, with `minmax(0,…)`
-   preventing any one track's content from forcing the row taller than its
-   fair share. Each feed keeps its own overflow-y:auto to scroll internally
-   if its share of items exceeds its allotted third.
-   ─────────────────────────────────────────────────────────────────────────── */
 #intel-scroll {
   display: grid;
   grid-template-rows: auto minmax(0,1fr) auto auto minmax(0,1fr) auto minmax(0,1fr);
@@ -2433,24 +1902,7 @@ a.export-btn { display: inline-block; text-decoration: none; }
 #news-section-feed::-webkit-scrollbar-thumb,
 #research-section-feed::-webkit-scrollbar-thumb,
 #trading-section-feed::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-/* ─── Intel Fullscreen — News/Research/Analysis as tabs (v8.167.x) ───────────
-   .intel-group wraps each of the 3 sub-panels (News/Research/Analysis) inside
-   #intel-scroll. display:contents makes the wrapper invisible to the box
-   model/CSS Grid above — #intel-scroll's grid-template-rows (7 real children:
-   News head/feed, Research head/filter/feed, Analysis head/feed) keeps
-   distributing space exactly as it did before these wrappers existed, so the
-   compact/stacked view is pixel-identical to pre-v8.167.x. Only inside
-   #intel-fullscreen-overlay.intel-fs-active (see rules further down, and
-   openIntelFullscreen()/_intelFsSetTab() in dashboard.js) does a .intel-group
-   become a real flex box — one shown at a time as the active tab pane. */
 .intel-group { display: contents; }
-
-/* ─── INTEL PANEL — sub-section dividers (News / Research / Trading) ──────────
-   Three stacked sub-panels inside #section-news, separated by sticky headers.
-   Pattern: Bloomberg Intelligence terminal section dividers.
-   Each header is position:sticky so it stays visible while scrolling content below.
-──────────────────────────────────────────────────────────────────────────────── */
 .intel-sub-head {
   display: flex;
   align-items: center;

@@ -1,45 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// CORRELATION MODAL  v2.7  — inline-panel edition
-// Fluid layout, terminal CSS variables throughout.
-// v2.7: consumes fetch_intraday_quotes.py v3.29's decoupled cointegration
-// window — the Engle-Granger test now runs on a 252d window (`coint_n`,
-// new field, the actual observation count used) instead of sharing the
-// spread's own 60d window, giving the test real statistical power. The
-// spread z-score itself is unchanged (still 60d). Pairs-signal copy/meta
-// label updated to disclose both windows separately ("60d spread · 252d
-// coint. test") instead of implying one shared window, and the
-// "insufficient window" vs "ran, not cointegrated" disambiguation (v2.6,
-// below) now keys off `coint_n` directly rather than the 60d sample count
-// `n` — `n` no longer describes the cointegration test's own window, so
-// using it to decide whether that test had enough data would be checking
-// the wrong number. Falls back to the old `n`-based check only for cached
-// `corrObj` entries with no `coint_n` field yet (pre-v3.29 quotes.json,
-// before the next scheduled refresh lands). No layout/CSS change.
-// v2.6: consumes fetch_intraday_quotes.py v3.22's history-fetch retry/
-// completeness gate. Pairs-signal "no signal" copy now distinguishes two
-// states that used to share one misleading message — "cointegration test
-// never ran, window too short" (checks the 60d sample count `n` directly)
-// vs "test ran, pair genuinely isn't cointegrated" — surfaced live via the
-// USD/JPY vs US 10Y pair when ^TNX's history came back truncated. No
-// layout/CSS change.
-// v2.5: consumes fetch_intraday_quotes.py v3.21's Engle-Granger cointegration
-// gate — the pairs signal's stability check is no longer a bare |corr|>=0.30
-// proxy, it's a real Engle-Granger test on 60d log-price levels (coint_p <
-// 0.05). New `coint_p` field surfaced in the pairs-signal meta line and its
-// "no signal" state copy updated to say why in cointegration terms, not
-// correlation terms. No layout/CSS change.
-// v2.4: consumes fetch_intraday_quotes.py v3.20's Fisher z-transform fields —
-// chart's ±1.5σ/±2.5σ bands now read explicit band15hi/lo, band25hi/lo (pre-
-// computed server-side in Fisher space, mapped back to correlation space) via
-// _cmDrawChart's new `bands` param, replacing the old norm±1.5*std client-side
-// math; "252d norm" legend/strip now discloses n_indep (honest non-overlapping
-// sample count); pairs-signal neutral copy updated to ±1.5σ to match the
-// raised server-side threshold. No layout/CSS change.
-// v2.3: added an industry-standard pairs-trade signal (hedge-ratio spread
-// z-score — spread_z/signal/beta from fetch_intraday_quotes.py) below the
-// existing z-score signal row. No other structural or aesthetic change —
-// title, strip, chart, legend, and regime rows are unchanged from v2.2.
-// ═══════════════════════════════════════════════════════════════════════════
 (function () {
   if (document.getElementById('cm2-modal-css')) return;
   const s = document.createElement('style');
@@ -142,23 +100,6 @@ function _cmFmt(v, d) { if (v == null) return '\u2014'; return (v >= 0 ? '+' : '
 function _cmParseDate(iso) { if (!iso || typeof iso !== 'string') return null; const p = iso.split('-'); if (p.length < 3) return null; return { year: +p[0], month: +p[1], day: +p[2] }; }
 function _cmFmtDate(iso) { if (!iso) return ''; try { const d = new Date(iso + 'T12:00:00Z'); return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }); } catch (_) { return iso; } }
 
-// ── Pairs-trade signal — hedge-ratio spread z-score, computed server-side ──
-// (fetch_intraday_quotes.py fetch_correlations(), spread_z/signal/beta/
-// coint_p/coint_n fields). `signal` is undefined on cached data from before
-// this feature shipped (not yet re-fetched); null covers two DIFFERENT
-// states that must not share copy (v2.6, window-decoupling note updated
-// v2.7) — the cointegration test either never ran because its OWN 252d
-// window (`coint_n`, the actual observation count used — distinct from
-// `n`, the 60d correlation-panel sample count, since v3.29 decoupled the
-// two) was too short, most often because one leg's own history was too
-// short/missing that run (see fetch_intraday_quotes.py v3.22's
-// `_CORR_MIN_ROWS` retry/completeness gate), or it ran and the pair
-// genuinely isn't cointegrated. `coint_n` is checked directly rather than
-// inferred from other fields, since `coint_p` is `None` in both cases and
-// can't disambiguate them on its own; falls back to the pre-v3.29 `n`-based
-// check only when `coint_n` is absent (cached quotes.json from before this
-// field existed). Once computed, `signal` is one of
-// 'long_a_short_b'/'short_a_long_b'/'neutral'.
 function _cmPairsSignalHtml(corrObj) {
   const { a, b, signal, spread_z, beta, coint_p, coint_n, n } = corrObj;
   if (typeof signal === 'undefined') {
@@ -215,10 +156,6 @@ function _cmDrawChart(container, history, histDates, norm, bands) {
   if (norm != null) {
     const normSer = _cmChart.addSeries(LWC.LineSeries, { color: 'rgba(209,212,220,.4)', lineWidth: 1, lineStyle: 2, lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false, priceFormat: { type: 'custom', formatter: fmt } });
     normSer.setData(hLine(norm));
-    // Band lines come pre-computed server-side in Fisher (arctanh) space and mapped back
-    // via tanh() for display (fetch_correlations() v3.20) — do NOT re-derive them here by
-    // adding/subtracting a std in raw correlation space, which reintroduces the compressed/
-    // non-normal-near-±1 bias the Fisher transform exists to fix.
     if (bands && bands.hi15 != null) {
       [[bands.hi15, 'rgba(246,148,28,.7)'], [bands.lo15, 'rgba(246,148,28,.7)'], [bands.hi25, 'rgba(239,83,80,.7)'], [bands.lo25, 'rgba(239,83,80,.7)']].forEach(([val, color]) => {
         if (val == null) return;
@@ -288,7 +225,6 @@ function openCorrModal(corrObj) {
   const hist = Array.isArray(history) ? history : [];
   const dates = Array.isArray(hist_dates) ? hist_dates : [];
 
-  // Regime label — qualitative description of current 30d correlation
   let regimeLabel = '\u2014', regimeCls = '';
   if (corr30 != null) {
     const v = corr30;
@@ -301,7 +237,6 @@ function openCorrModal(corrObj) {
     else                  { regimeLabel = 'Strong inverse'; regimeCls = 'down'; }
   }
 
-  // 252d range from history array
   let rangeHtml = '\u2014';
   if (hist.length > 0) {
     const hi = Math.max(...hist), lo = Math.min(...hist);
@@ -314,8 +249,6 @@ function openCorrModal(corrObj) {
   if (dates.length >= 2) dateRangeLabel = ' \u00b7 ' + _cmFmtDate(dates[0]) + ' \u2013 ' + _cmFmtDate(dates[dates.length - 1]);
   const psigHtml = _cmPairsSignalHtml(corrObj);
 
-  // Related correlations — other cached pairs sharing an instrument with this one (a or b).
-  // Cross-asset confluence check: a Bloomberg CORR matrix reduced to "what else moves with this pair right now".
   const _cache = Array.isArray(window._corrDataCache) ? window._corrDataCache : [];
   const related = _cache
     .filter(c => c && c !== corrObj && (c.a === a || c.b === a || c.a === b || c.b === b))

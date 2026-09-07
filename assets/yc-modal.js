@@ -1,47 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// YIELD CURVE MODAL  v2.7 — _ycShape() Flat-band ordering fixed (v8.263.0):
-//   see the comment inside _ycShape() below for the full incident writeup.
-// v2.5 — #ycm-bd now actually stretches in the real
-//   (inline-panel.js) render path, so the v2.4 min-height:100% fix has a
-//   definite parent height to resolve against.
-// Fluid layout, terminal CSS variables throughout.
-// v2.5 (2026-08-02): v2.4 gave #ycm-modal `min-height:100%`, but in the
-//   actual production path this modal is transplanted by inline-panel.js
-//   into a flex-column `body` container, with inline-panel.js overriding
-//   #ycm-bd to `position:static` (the absolute/top/bottom rule below only
-//   ever applies in a legacy fallback that isn't normally reached). A plain
-//   flex child with no flex-grow doesn't stretch along the main axis just
-//   because its container has room — #ycm-bd kept its own intrinsic content
-//   height regardless, leaving #ycm-modal's `min-height:100%` with nothing
-//   definite to resolve against, so v2.4 alone likely didn't fix the actual
-//   symptom. Added `flex:1;min-height:0` to `#ycm-bd` so it now genuinely
-//   claims the available vertical space inside inline-panel.js's body.
-// v2.4 (2026-08-02): #ycm-modal had height:auto with no floor, so whenever
-//   its actual content (strip + fixed 240px chart + tenor table + a
-//   3-article commentary block capped at max-height:220px) was shorter than
-//   #ycm-bd's full panel height, the leftover space below the modal was
-//   just bare #ycm-bd background — same color as everything else, so it
-//   read as a dead black gap rather than as "more commentary available."
-//   Fixed by giving #ycm-modal min-height:100% (so it always fills the
-//   panel, growing beyond it and letting #ycm-bd scroll if content is
-//   taller) and changing .ycm-ps-wrap from a flex-shrink:0/max-height:220px
-//   internally-scrolling box to flex:1 (no cap), so it actually claims the
-//   freed-up space. Article cap raised 3 → 6 so that space gets used by
-//   real commentary instead of staying visually empty when more matching
-//   articles exist.
-// v2.3 (2026-08-01): #ycm-chart-wrap was flex:1 with no cap, so in the
-//   full-#main inline-panel context (split layout off) — where the
-//   container's height is nearly the full viewport — the chart expanded
-//   to fill almost the entire panel, pushing the Tenor table and Market
-//   Commentary out of view below the fold. Fixed height:240px instead;
-//   #ycm-canvas-wrap's flex:1 fills whatever's left inside that fixed box.
-// v2.2 (2026-06-20): Market Commentary block added below the tenor table.
-//   Renders below #ycm-table-wrap. Fetches news-data/news.json, filters by
-//   topic keywords (Treasury/yield-curve terminology, not currency tag — see
-//   _ycLoadPolicySummary() docstring for rationale), displays up to 3 most
-//   recent matching articles. Lazy, non-blocking — mirrors the CB Rates
-//   modal's Market Commentary pattern (cb-rates-modal.js _cbrLoadPolicySummary()).
-// ═══════════════════════════════════════════════════════════════════════════
 (function () {
   if (document.getElementById('ycm-css')) return;
   const s = document.createElement('style');
@@ -58,16 +14,13 @@
   border-left:1px solid var(--border2)!important;
   scrollbar-width:thin;
   scrollbar-color:var(--border2) transparent;
-  /* flex/min-height only matter when inline-panel.js overrides position to
-     static and transplants this into its flex-column "body" container (the
-     actual production path) — harmless no-ops in the absolute fallback
-     above, since out-of-flow positioned elements ignore flex properties. */
+  
   flex:1;
   min-height:0;
 }
 #ycm-bd::-webkit-scrollbar { width:3px; }
 #ycm-bd::-webkit-scrollbar-thumb { background:var(--border2); border-radius:2px; }
-/* #main needs position:relative to contain the absolute modal */
+
 #main { position:relative; }
 #ycm-modal {
   width:100%!important;max-width:none!important;height:auto!important;min-height:100%!important;max-height:none!important;
@@ -131,11 +84,6 @@
 })();
 
 let _ycChart = null;
-// HTML-escape externally-sourced free text (news-data/news.json article title/
-// source) before it goes into innerHTML content. Same class of gap already
-// fixed once in calendar-panel.js (v8.304.0, _escAttr) — this file's Market
-// Commentary block reused cb-rates-modal.js's pattern but never inherited the
-// escaping discipline, since the two files don't share any module/import.
 function _escHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
@@ -152,15 +100,6 @@ function _ycShape(tenors) {
   if (t10y == null) return null;
   const spread_10_2y = t2y != null ? t10y - t2y : null;
   const spread_10_3m = t3m != null ? t10y - t3m : null;
-  // v8.263.0: band order fixed. The Flat tooltip explicitly documents "within
-  // ±20bp of zero" — but checking `< 0` before the ±0.2 Flat band made that
-  // band's entire negative half (-0.01 to -0.20) unreachable: any spread just
-  // barely negative (e.g. -2bp, pure noise) fell through to the `< 0` check
-  // first and was returned as "Inverted", triggering the modal's strongest
-  // tooltip ("the most reliable recession signal... every US recession in the
-  // past 50 years was preceded by this") for what is, by the panel's own
-  // stated definition, a Flat curve. The Flat band must be checked before the
-  // Inverted cutoff so "Inverted" only fires beyond the documented ±20bp zone.
   if (spread_10_2y != null) {
     if (spread_10_2y >= -0.2 && spread_10_2y <= 0.2) return 'Flat';
     if (spread_10_2y < 0) return 'Inverted';
@@ -203,7 +142,6 @@ function openYCModal(tenorData) {
   const labels    = tenorData.map(t => t.label);
   const todayVals = tenorData.map(t => t.close);
   const priorVals = tenorData.map(t => t.prev_close);
-  // Detect if all tenors lack prev_close (fromRepo FRED batch — no intraday prev available)
   const noPrior   = tenorData.every(t => t.prev_close == null);
   const subLabel  = noPrior
     ? 'FRED \u00b7 daily batch \u00b7 prior close unavailable until market open'
@@ -274,23 +212,11 @@ function openYCModal(tenorData) {
   });
   bd.addEventListener('click', e => { if (e.target === bd) closeYCModal(); });
   document.addEventListener('keydown', _ycKeydown);
-  // Scroll modal into view on mobile — same double-rAF pattern as heatmap-modal and cb-rates-modal
   requestAnimationFrame(() => requestAnimationFrame(() => { bd.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
   requestAnimationFrame(() => _ycDrawChart(labels, todayVals, noPrior ? null : priorVals));
-  // Load market commentary non-blocking after chart render (same lazy pattern as CB Rates modal)
   setTimeout(() => _ycLoadPolicySummary(), 100);
 }
 
-// Market Commentary — Bloomberg/TE-style text block rendered inline below the yield
-// table. Fetches news-data/news.json and selects up to 3 most recent articles whose
-// title or expand text references US Treasuries / the yield curve. Unlike the CB Rates
-// modal's Market Commentary (filtered by currency tag), this panel has no single
-// currency to key off — US Treasury yield news is generally tagged "USD" but so is
-// every other USD macro headline (jobs, CPI, Fed speeches unrelated to the curve), so
-// filtering by cur==='USD' alone would surface irrelevant articles. Instead this uses
-// a topic keyword filter against title+expand, scoped to Treasury/yield/curve/auction
-// terminology. Lazy-fetched: triggered on modal open, non-blocking (runs after chart
-// render), same as _cbrLoadPolicySummary() in cb-rates-modal.js.
 async function _ycLoadPolicySummary(){
   const wrap=document.getElementById('ycm-policy-summary');
   if(!wrap)return;
@@ -371,13 +297,11 @@ function _ycDrawChart(labels, todayVals, priorVals) {
   const ctx = canvas.getContext('2d');
 
   const chartH = canvas.offsetHeight || document.getElementById('ycm-canvas-wrap')?.offsetHeight || 200;
-  // Convert hex #rrggbb or CSS var value to rgba(r,g,b,a)
   function hexAlpha(hex, a) {
     const h = hex.replace('#','');
     const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
     return isNaN(r) ? `rgba(79,127,255,${a})` : `rgba(${r},${g},${b},${a})`;
   }
-  // Build top-to-bottom gradient: blue with opacity → transparent
   const grad = ctx.createLinearGradient(0, 0, 0, chartH);
   grad.addColorStop(0,   hexAlpha(blue, 0.35));
   grad.addColorStop(0.6, hexAlpha(blue, 0.08));

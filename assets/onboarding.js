@@ -1,43 +1,7 @@
-/**
- * Global Investing FX Terminal — First-Visit Welcome Tour
- * v7.89.12 — production build
- *
- * Changes vs v7.89.10:
- *   - Gated init() on window.giOnTerminalShown() (gi-overview.js v1.1.0)
- *     instead of raw DOMContentLoaded+DELAY_MS — see full explanation in
- *     the init() section below. Fixes the tour appearing while the visitor
- *     is still on the Market Overview snapshot, before the terminal itself
- *     is even visible.
- *
- * Changes vs v7.89.9:
- *   - BUG FIX: Economic Calendar step targeted 'section-tvcalendar-top', an ID that
- *     does not exist in index.html (actual element is 'section-tvcalendar'). Since
- *     getElementById returned null, positionPopover() fell back to applyBottomCenter(),
- *     pinning the popover to the bottom of the viewport instead of anchoring it below
- *     the calendar panel. Fixed target to 'section-tvcalendar'.
- *
- * Changes vs v7.81.5 (prior production):
- *   - 15-step tour: FX Pairs, Economic Calendar, ESI (opens modal), Macro Regime,
- *     Cross-Asset, COT Positioning (opens modal), Rates, Sessions, Heatmap, Derivatives,
- *     MT5 companion (new), Signal Alerts
- *   - ESI step opens openEconSurprisesModal('USD') — same pattern as COT step
- *   - dismiss() now also closes ESI modal via closeESModal()
- *   - Removed Install/RSS step (replaced by higher-value panels)
- *   - [prior] 10-step tour: AI Narrative, Macro Regime, Cross-Asset, COT Positioning,
- *     Rates, Heatmap, Derivatives, Install & Subscribe, Signal Alerts
- *   - Step 8 (Install & Subscribe): surfaces PWA install + RSS feed — retention
- *   - Derivatives step clicks nav link and waits 400ms before positioning
- *   - COT modal opened non-blocking (600ms delay) so popover renders first
- *   - All BUG-1..5 fixes from v7.73.0 preserved
- *   - Wider popover (340px), improved body max-height (140px), step fade animation
- *   - Icon badges on step titles (institutional look)
- *   - Progress bar replaces countdown bar — cleaner visual hierarchy
- */
 
 (function () {
   'use strict';
 
-  /* ─── config ─────────────────────────────────────────────────────────── */
   var STORAGE_KEY  = 'gi_welcome_done';
   var DELAY_MS     = 2400;
   var AUTO_CLOSE_S = 100;
@@ -46,7 +10,6 @@
   var ARROW_SIZE   = 8;
   var MOBILE_BP    = 900;
 
-  /* ─── regime copy ────────────────────────────────────────────────────── */
   var REGIME_CONTEXT = {
     'RISK-ON':  'AUD, NZD, and higher-beta pairs tend to attract flows as yield appetite increases. The terminal is biased long carry.',
     'MIXED':    'Mixed signals: some risk appetite but with offsetting stress factors. Pair selection requires more discrimination than a clean RISK-ON.',
@@ -54,12 +17,9 @@
     'RISK-OFF': 'JPY, CHF, and USD attract safe-haven flows. High-beta pairs (AUD, NZD) are under structural pressure until the regime clears.',
   };
 
-  /* ─── step icons (unicode, no external dep) ─────────────────────────── */
   var STEP_ICONS = ['⬡', '◈', '◎', '◈', '◆', '▪', '▣', '◈', '◉'];
 
-  /* ─── steps ──────────────────────────────────────────────────────────── */
   var STEPS = [
-    /* 0 — Welcome */
     {
       target:  null,
       side:    'bottom',
@@ -69,7 +29,6 @@
       action:  null,
     },
 
-    /* 1 — AI Narrative */
     {
       target:  'narrative',
       side:    'bottom',
@@ -79,7 +38,6 @@
       action:  null,
     },
 
-    /* 2 — FX Pairs & Price Chart */
     {
       target:  'section-fxpairs',
       side:    'right',
@@ -89,7 +47,6 @@
       action:  null,
     },
 
-    /* 3 — Economic Calendar */
     {
       target:  'section-tvcalendar',
       side:    'bottom',
@@ -99,7 +56,6 @@
       action:  null,
     },
 
-    /* 4 — Economic Surprise Index (opens modal) */
     {
       target:    'split-lower',
       highlight: 'section-econ-surprise',
@@ -109,7 +65,6 @@
       body:    'The ESI is a decay-weighted score that measures whether major-economy economic data is consistently beating or missing consensus — decay-weighted so recent releases count more than older ones. A rising ESI signals that the economy is outperforming expectations, which is typically bullish for the currency. The chart is opening now so you can explore the 90-day rolling window.',
       action:  function () {
         try {
-          // Scroll rightpanel so "Economic Surprises" section is visible
           var rp = document.getElementById('rightpanel');
           var es = document.getElementById('section-econ-surprise');
           if (rp && es) {
@@ -122,7 +77,6 @@
       },
     },
 
-    /* 5 — Macro Risk Regime */
     {
       target:    'split-lower',
       highlight: 'section-risk',
@@ -132,11 +86,6 @@
       body:    null,
       dynamic: 'regime',
       action:  function () {
-        // Close the ESI inline panel completely.
-        // closeESModal() removes #esm-bd but the inline-panel wrap stays alive
-        // with overflowY:hidden and no content → black screen.
-        // Clicking the wrap's own close button triggers onClose (closeESModal)
-        // AND runs restoreChildren() + removes the wrap correctly.
         try {
           var lwr = document.getElementById('split-lower');
           if (lwr) {
@@ -152,7 +101,6 @@
       },
     },
 
-    /* 6 — Cross-Asset */
     {
       target:  'section-crossasset',
       side:    'right',
@@ -162,7 +110,6 @@
       action:  null,
     },
 
-    /* 7 — COT Positioning (opens modal) */
     {
       target:    'split-lower',
       highlight: 'section-positioning',
@@ -183,7 +130,6 @@
       },
     },
 
-    /* 8 — Rates & Yield Curve */
     {
       target:  'section-rates',
       side:    'top',
@@ -191,7 +137,6 @@
       badge:   'Rates',
       body:    'major sovereign yields across the full term structure — 3M through 30Y — plotted against the prior close. Switch tabs for DE, GB, JP, AU, CA, NZ or Sovereign Spreads. Key spread signals (2Y–10Y slope, US–DE, US–JP) flag curve regime shifts in real time. Click the curve to open the detailed yield modal.',
       action:  function () {
-        // Close the COT inline panel correctly via the shell close button.
         try {
           var lwr = document.getElementById('split-lower');
           if (lwr) {
@@ -207,7 +152,6 @@
       },
     },
 
-    /* 9 — CB Rate Expectations & OIS */
     {
       target:    'section-rates',
       highlight: 'section-cb-expectations',
@@ -224,7 +168,6 @@
       },
     },
 
-    /* 10 — Market Sessions */
     {
       target:  'section-sessions',
       side:    'top',
@@ -236,7 +179,6 @@
       },
     },
 
-    /* 11 — Heatmap */
     {
       target:  'heatmap-grid',
       side:    'top',
@@ -246,7 +188,6 @@
       action:  null,
     },
 
-    /* 12 — Derivatives */
     {
       target:  'section-derivatives',
       side:    'top',
@@ -274,7 +215,6 @@
       },
     },
 
-    /* 13 — Web terminal as analytical layer */
     {
       target:  null,
       side:    'bottom',
@@ -286,7 +226,6 @@
       },
     },
 
-    /* 14 — Signal alerts (last CTA) */
     {
       target:  'sig-notif-btn',
       side:    'top',
@@ -297,7 +236,6 @@
       lastCta: true,
     },
   ];
-  /* ─── state ──────────────────────────────────────────────────────────── */
   var currentStep  = 0;
   var overlayEl    = null;
   var arrowEl      = null;
@@ -308,12 +246,6 @@
   var secondsLeft  = AUTO_CLOSE_S;
   var _memDone     = false;
 
-  /* ─── storage ────────────────────────────────────────────────────────── */
-  // Multi-layer persistence: localStorage → sessionStorage → cookie.
-  // Edge Tracking Prevention can silently block localStorage.setItem without
-  // throwing, so we verify the write succeeded and fall back to sessionStorage,
-  // then to a session cookie. _memDone guards against showing the tour twice
-  // within the same page load even if all storage layers fail.
   function _storageGet() {
     try { if (localStorage.getItem(STORAGE_KEY)) return true; } catch (e) {}
     try { if (sessionStorage.getItem(STORAGE_KEY)) return true; } catch (e) {}
@@ -325,7 +257,6 @@
     var ok = false;
     try {
       localStorage.setItem(STORAGE_KEY, '1');
-      // Verify the write actually persisted (silent-fail defence)
       if (localStorage.getItem(STORAGE_KEY) === '1') ok = true;
     } catch (e) {}
     if (!ok) {
@@ -346,7 +277,6 @@
     _storageSet();
   }
 
-  /* ─── utils ──────────────────────────────────────────────────────────── */
   function isMobile() { return window.innerWidth <= MOBILE_BP; }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
@@ -369,7 +299,6 @@
     return step.body;
   }
 
-  /* ─── highlight ──────────────────────────────────────────────────────── */
   function highlight(targetId) {
     document.querySelectorAll('.gi-tour2-highlight').forEach(function (el) {
       el.classList.remove('gi-tour2-highlight');
@@ -380,7 +309,6 @@
     return el || null;
   }
 
-  /* ─── positioning ────────────────────────────────────────────────────── */
   function applyBottomCenter() {
     if (!overlayEl) return;
     overlayEl.style.cssText += [
@@ -474,7 +402,6 @@
     }, 0);
   }
 
-  /* ─── countdown ──────────────────────────────────────────────────────── */
   function startCountdown() {
     secondsLeft = AUTO_CLOSE_S;
     updateCountdown();
@@ -501,13 +428,11 @@
     if (countdownBar) countdownBar.style.width = ((secondsLeft / AUTO_CLOSE_S) * 100) + '%';
     var textEl = overlayEl && overlayEl.querySelector('#gi-tour2-countdown-text');
     if (textEl) textEl.textContent = secondsLeft + 's';
-    /* also update step progress bar width */
     if (progressBar) {
       progressBar.style.width = (((currentStep + 1) / STEPS.length) * 100) + '%';
     }
   }
 
-  /* ─── dismiss ────────────────────────────────────────────────────────── */
   function dismiss() {
     markDone();
     stopCountdown();
@@ -554,7 +479,6 @@
     } catch (e) {}
   }
 
-  /* ─── navigation ─────────────────────────────────────────────────────── */
   function goToStep(idx) { currentStep = idx; renderStep(); resetCountdown(); }
   function next() {
     if (currentStep < STEPS.length - 1) goToStep(currentStep + 1);
@@ -562,14 +486,12 @@
   }
   function back() { if (currentStep > 0) goToStep(currentStep - 1); }
 
-  /* ─── render ─────────────────────────────────────────────────────────── */
   function renderStep() {
     if (!overlayEl) return;
     var step   = STEPS[currentStep];
     var isLast = currentStep === STEPS.length - 1;
     var total  = STEPS.length;
 
-    /* dots */
     var dotsHTML = STEPS.map(function (_, i) {
       var active = i === currentStep;
       return '<span style="display:inline-block;width:' + (active ? '18' : '6') + 'px;height:6px;border-radius:3px;' +
@@ -577,7 +499,6 @@
         ';transition:all .25s;cursor:pointer;" data-tour-dot="' + i + '"></span>';
     }).join('');
 
-    /* badge */
     var badge = step.badge
       ? '<span style="display:inline-block;font-size:9px;font-weight:700;letter-spacing:.08em;' +
         'text-transform:uppercase;color:var(--blue);background:color-mix(in srgb,var(--blue) 12%,transparent);' +
@@ -592,28 +513,22 @@
     overlayEl.querySelector('#gi-tour2-back').style.display     = currentStep === 0 ? 'none' : '';
     overlayEl.querySelector('#gi-tour2-next').textContent       = isLast ? 'Enable alerts \u2192' : 'Next \u2192';
 
-    /* progress bar */
     if (progressBar) progressBar.style.width = (((currentStep + 1) / total) * 100) + '%';
 
-    /* dot click */
     overlayEl.querySelectorAll('[data-tour-dot]').forEach(function (dot) {
       dot.addEventListener('click', function () { goToStep(+dot.dataset.tourDot); });
     });
 
-    /* run step action */
     if (step.action) {
       try { step.action(); } catch (e) { console.warn('[gi-tour2] step action error:', e); }
     }
 
-    /* position popover — extra delay for derivatives nav and modal steps */
-    /* step.highlight (optional) separates the highlighted element from the positioning target */
     highlight(step.highlight !== undefined ? step.highlight : step.target);
     var targetEl = step.target ? (document.getElementById(step.target) || null) : null;
     var posDelay = (step.target === 'section-derivatives' || step.target === 'section-econ-surprise' || step.target === 'split-lower') ? 800 : 0;
     setTimeout(function () { positionPopover(targetEl, step.side); }, posDelay);
   }
 
-  /* ─── keyboard ───────────────────────────────────────────────────────── */
   function keyHandler(e) {
     if (!overlayEl) return;
     if (e.key === 'Escape')     dismiss();
@@ -621,15 +536,12 @@
     if (e.key === 'ArrowLeft')  back();
   }
 
-  /* ─── build DOM ──────────────────────────────────────────────────────── */
   function buildOverlay() {
-    /* arrow tip */
     arrowEl = document.createElement('div');
     arrowEl.id = 'gi-tour2-arrow';
     arrowEl.style.cssText = 'position:fixed;z-index:2999;display:none;pointer-events:none;width:0;height:0;';
     document.body.appendChild(arrowEl);
 
-    /* popover */
     var div = document.createElement('div');
     div.id = 'gi-welcome-tour2';
     div.setAttribute('role', 'dialog');
@@ -652,7 +564,6 @@
     ].join(';');
 
     div.innerHTML =
-      /* header row — label left, step-counter + close button right (no absolute overlap) */
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">' +
         '<div style="font-size:9.5px;font-weight:700;letter-spacing:.09em;color:var(--text3);text-transform:uppercase;' +
         'display:flex;align-items:center;gap:5px;">' +
@@ -668,21 +579,17 @@
         '</div>' +
       '</div>' +
 
-      /* step progress bar */
       '<div style="height:2px;background:var(--border2);border-radius:1px;margin:0 0 12px;overflow:hidden;">' +
         '<div id="gi-tour2-progress" style="height:100%;background:var(--blue);width:0;' +
         'transition:width .35s cubic-bezier(.4,0,.2,1);border-radius:1px;"></div>' +
       '</div>' +
 
-      /* badge + title */
       '<div id="gi-tour2-badge-title" style="font-size:13px;font-weight:700;color:var(--text);' +
       'margin-bottom:8px;line-height:1.4;"></div>' +
 
-      /* body */
       '<div id="gi-tour2-body" style="font-size:11.5px;color:var(--text2);line-height:1.7;' +
       'margin-bottom:14px;overflow-y:auto;max-height:140px;"></div>' +
 
-      /* footer row — dots + buttons */
       '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">' +
         '<div id="gi-tour2-dots" style="display:flex;gap:4px;align-items:center;"></div>' +
         '<div style="display:flex;gap:7px;">' +
@@ -700,7 +607,6 @@
         '</div>' +
       '</div>' +
 
-      /* countdown strip */
       '<div style="display:flex;align-items:center;gap:7px;padding:5px 16px;margin:0 -16px;' +
       'border-top:1px solid var(--border2);background:var(--bg3);">' +
         '<div style="flex:1;height:2px;background:var(--border2);border-radius:1px;overflow:hidden;">' +
@@ -716,7 +622,6 @@
     countdownBar = div.querySelector('#gi-tour2-countdown-bar');
     progressBar  = div.querySelector('#gi-tour2-progress');
 
-    /* events */
     div.querySelector('#gi-tour2-close').addEventListener('click', dismiss);
 
     div.querySelector('#gi-tour2-next').addEventListener('click', function () {
@@ -733,7 +638,6 @@
 
     renderStep();
 
-    /* fade in */
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
         div.style.transition = 'opacity .4s ease, transform .4s ease';
@@ -750,7 +654,6 @@
     }, 450);
   }
 
-  /* ─── styles ─────────────────────────────────────────────────────────── */
   function injectStyles() {
     if (document.getElementById('gi-tour2-styles')) return;
     var style = document.createElement('style');
@@ -769,18 +672,6 @@
     document.head.appendChild(style);
   }
 
-  /* ─── init ───────────────────────────────────────────────────────────── */
-  // v7.89.11 (2026-08-12): gated on window.giOnTerminalShown() (gi-overview.js
-  // v1.1.0) — this tour's steps all target elements inside #gi-terminal-view
-  // (FX Pairs, Economic Calendar, COT panel, etc.), which since v8.129.0 stay
-  // display:none behind the Market Overview snapshot until the visitor either
-  // has a valid license already or clicks "Open full terminal". The old
-  // DOMContentLoaded+DELAY_MS trigger fired regardless, so first-time
-  // visitors saw the tour pointing at a hidden terminal while still on the
-  // Overview page. giOnTerminalShown
-  // resolves immediately for returning active users (terminal visible from
-  // load) and otherwise waits for the actual Overview→terminal transition,
-  // whenever that happens.
   function startAfterDelay() {
     if (!shouldShow()) return;
     injectStyles();
@@ -794,8 +685,6 @@
     if (window.giOnTerminalShown) {
       window.giOnTerminalShown(startAfterDelay);
     } else {
-      // Fallback for any page that doesn't load gi-overview.js (e.g. a
-      // cached old asset bundle) — behave exactly as before.
       startAfterDelay();
     }
   }
@@ -806,7 +695,6 @@
     init();
   }
 
-  /* ─── public replay API ──────────────────────────────────────────────── */
   window.giReplayTour = function () {
     _memDone = false;
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}

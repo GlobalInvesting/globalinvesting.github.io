@@ -1,784 +1,15 @@
-/**
- * econ-matrix.js v2.6.6 — Native Economic Matrix panel
- *
- * ── v2.6.6 (2026-09-07) — CORRECTION: NZD's 'cpi' column (header "CPI YoY")
- *    showed 'Inflation Rate QoQ' data under a code comment claiming "NZ
- *    publishes quarterly (not monthly/annual) CPI under this title" — that
- *    claim was wrong. Live-verified against myfxbook.com/forex-economic-
- *    calendar/new-zealand/inflation-rate-yoy: NZ Stats publishes a genuine
- *    YoY headline CPI figure, released the same day as the QoQ print (e.g.
- *    20 Jul 2026: QoQ 1.5%, YoY 4.1%), Impact: Low on Myfxbook (same
- *    masking pattern already fixed for several other NOK/SEK/NZD
- *    indicators this session). Per explicit direction: 'Inflation Rate
- *    YoY' is now PRIMARY (matches the column's own stated definition),
- *    'Inflation Rate QoQ' kept as secondary tie-break — same two-title
- *    same-day pairing pattern already used for NZD's gdp column (v2.5.12).
- *    Historical YoY releases missed by the RSS's rolling window (22 Jan,
- *    20 Apr, 20 Jul 2026) backfilled directly in calendar.json from the
- *    same Myfxbook History table used for verification. Also bumped this
- *    header line to match the real deployed version (was stuck at v2.6.3
- *    while the v2.6.4 entry below and the live cache-buster had already
- *    moved to 2.6.5 — another instance of the standing header/cache-
- *    buster drift this project tracks). See CHANGELOG.md v8.400.0.
- * ── v2.6.4 (2026-09-06) — CHF/NOK/SEK's emp column prefix list read the
- *    bare 'Employment Change' title, which carries no MoM/YoY/QoQ substring
- *    for periodTag() to match — even though this figure is a genuine
- *    Eurostat-compiled QUARTERLY % change (see fetch_te_employment_change.py's
- *    own header). Live-verified this was the one column in the Economic
- *    Matrix showing a bare percentage with no period badge, next to every
- *    other classified cell in the same row. Fetcher v1.6 now emits
- *    'Employment Change QoQ'; the three prefix lists here updated to match
- *    in the same change. Same session: re-applied two prior-session
- *    _IMPACT_UPGRADES fixes ("cpif", "manufacturing production") that a
- *    fresh zip export showed had never actually reached fetch_ff_calendar.py
- *    (v8.161.5 pattern again), plus a new one ("swedbank manufacturing
- *    pmi") for a live report that SEK's Bus Cond cell was 3 months stale —
- *    see fetch_ff_calendar.py v3.54.0 and CHANGELOG.md.
- * ── v2.6.3 (2026-09-06) — NOK's gdp column prefix list only ever listed
- *    'GDP Growth Rate QoQ' (nationwide, incl. petroleum), never 'GDP
- *    Growth Mainland QoQ' (Norges Bank's own preferred, ex-petroleum GDP
- *    measure). Live report (screenshot): myfxbook.com's own
- *    gdp-growth-mainland-qoq page already had a 27 Aug 2026 (Q2) release
- *    while the matrix cell showed 28 May (Q1) — an incomplete prefix
- *    list, the same class already fixed for GBP's GDP column and SEK's
- *    rtl/prod columns (GUIDELINES.md v8.141.0), not a data-freshness bug
- *    on its own. Mainland listed first (the Norges-Bank-watched measure);
- *    findLatestGeneric() picks whichever of the two prefixes has the
- *    fresher dateISO. Root-cause fix in the frontend; the underlying
- *    fetch-side masking bug (Myfxbook tags this indicator Low impact for
- *    NOK, silently dropped by the impact filter) fixed separately in
- *    fetch_ff_calendar.py v3.53/calendar-watcher.js v5.61 — see
- *    CHANGELOG.md. Also confirmed live that SEK's "GDP Growth Rate QoQ"
- *    (the title already wired for SEK) has the identical masking bug —
- *    same fetch-side fix covers it, no frontend prefix-list change
- *    needed for SEK.
- *
- * ── v2.6.2 (2026-09-06) — Two fixes, both from a live screenshot report
- *    (Santiago): (1) refLabel()/the tooltip no longer show a fabricated
- *    "DD" day for events whose source only ever published a reference
- *    MONTH+YEAR (TE's "Related" table, via fetch_te_employment_change.py/
- *    fetch_te_core_inflation.py/fetch_te_nzd_ind_prod.py) — those events
- *    now carry `dayPrecision:'month'` and render/tooltip as a bare month,
- *    while every day-precise event is unchanged. This deliberately
- *    reverts part of v2.6.1: v2.6.1's "always show DD Mon" fix was correct
- *    for NOK/SEK's Myfxbook-sourced cells (which DO have a real release
- *    day, just previously mis-displayed as a reference-period tag instead)
- *    but wrongly forced a fabricated day onto genuinely month-only TE
- *    cells added since — the two cases need different handling, not one
- *    uniform rule. (2) The Emp Chg column's "in-house estimate, not an
- *    officially-tracked headline release" disclosure incorrectly grouped
- *    CHF/NOK/SEK together with JPY — CHF/NOK/SEK's figure is a real,
- *    directly-scraped, Eurostat-compiled published release (TE's own page
- *    cites EUROSTAT as source), not something this codebase estimated;
- *    only JPY's is genuinely locally-computed (a MoM delta of a level).
- *    Split into EMP_COMPUTED_CCY (JPY, keeps the original language) and
- *    EMP_EUROSTAT_CCY (CHF/NOK/SEK, new accurate wording) — both still
- *    carry the dagger marker (different national series than USD/AUD/CAD/
- *    GBP/NZD/EUR's own headline), neither implies the CHF/NOK/SEK figure
- *    is untracked or invented. See CHANGELOG.md v8.394.0.
- *
- * ── v2.6.1 (2026-09-06) — refLabel() no longer extracts a bare "(Mon)"
- *    reference-period tag from NOK/SEK-style titles for the subtext line;
- *    it now always shows the release dateISO as "DD Mon", matching every
- *    other currency's subtext in the same column. Fixes a live screenshot
- *    report (Santiago) of NOK/SEK cells showing only a month with no day
- *    while every other currency's cell in the same column shows a full
- *    date. See CHANGELOG.md v8.391.0.
- *
- * ── v2.6.0 (2026-09-06) — Added header tooltips (title= on every <th>)
- *    explaining what each column measures and why it matters to an
- *    institutional FX desk, via applyHeaderTooltips() — see CHANGELOG.md
- *    v8.389.0 for the wiring rationale (COLUMNS[].title existed since
- *    v2.5.3 but was dead data, never read anywhere in this file).
- *
- * ── v2.5.14 (2026-08-30) — Industry-standard cadence audit: JPY Retail Sales
- *    and SEK Industrial Production were both missing their MoM title,
- *    silently stuck on YoY-only despite a same-day MoM release existing in
- *    the live feed. JPY.rtl: the v2.5.11 "zero MoM events" finding was
- *    correct at the time but went stale once 'Japan Retail Sales MoM'
- *    printed for the first time ever on 2026-08-30 — re-verified against a
- *    freshly-downloaded calendar.json (not assumed), MoM now added ahead of
- *    YoY. SEK.prod: 'Industrial Production MoM' was never in this
- *    currency's prefix list at all (not a staleness issue like JPY, a pure
- *    omission), confirmed live releasing same-day as YoY every month —
- *    added ahead of YoY, matching the column's existing MoM-first
- *    momentum-indicator convention (USD/GBP/JPY/NOK/EUR). Full systematic
- *    sweep of every currency's rtl/prod/ppi cadence arrays against a fresh
- *    calendar.json this session found no further gaps: CHF/NZD Ind Prod
- *    confirmed genuinely YoY-only in the live feed (no MoM title exists),
- *    USD PPI confirmed genuinely MoM-only (no YoY title exists), NOK
- *    PPI/AUD PPI confirmed genuinely single-cadence — all four correctly
- *    already reflect their real native availability, not further bugs.
- *
- * ── v2.5.13 (2026-08-29) — Industry-standard audit: real stored-XSS fixed in
- *    cellHTML() — ev.actual (calendar.json's external actual value) and sub
- *    (period label + ref, ref derived from ev.event's free-text parenthetical)
- *    were injected into innerHTML content unescaped, and the title attribute
- *    only escaped double-quotes, not &/</>. Same class of bug already fixed
- *    in calendar-panel.js (v8.304.0) and the shared Market Commentary widget
- *    (v8.305.0), never propagated here. Fixed with a local _emxEscHtml()
- *    helper (full HTML-entity escape) applied at all three sites. Also
- *    completed the v8.278.0 internal-procedure-narration cleanup for this
- *    file — rewrote every "the client"/"screenshot"/named-individual mention
- *    in the version history to state only the technical change.
- *
- * ── v2.5.12 (2026-08-28) — Completed the calendar.json-verified audit for
- *    the 5 remaining currencies (AUD, CAD, NZD, NOK, EUR), same method as
- *    v2.5.11: freshly-downloaded calendar.json (curl, verified lastUpdate
- *    current), never myfxbook.com directly. Confirmed-real fixes: CAD.rtl
- *    and EUR.rtl each gained 'Retail Sales YoY' (both confirmed released
- *    same-day as MoM, distinct titles, zero collisions); NZD.rtl gained
- *    'Retail Sales YoY' and NZD.gdp gained 'GDP Growth Rate YoY' (both
- *    confirmed released same-day as their QoQ counterparts, same pairing
- *    AUD's gdp column already uses). NOK: re-verified, no changes needed —
- *    every configured title already matches once canon()'s country-prefix
- *    stripping and strictMatch()'s parenthetical-suffix allowance are
- *    applied (NOK/SEK's "(Mon)" title style). Found and flagged, NOT
- *    auto-fixed: AUD.rtl is a genuinely dead entry — the v2.2.3 comment
- *    claimed an upstream fix (fetch_ff_calendar.py v3.44) that verifiably
- *    exists in the scripts repo but has zero effect on the live feed (0 of
- *    263 AUD events contain "retail"); root cause not diagnosed this
- *    session, see the corrected comment on CATS.AUD.rtl below.
- *
- * ── v2.5.11 (2026-08-28) — Continued the live-audit,
- *    now cross-checked against the ACTUAL calendar.json (downloaded via
- *    bash/curl — the cached copy an earlier web_fetch returned was stale,
- *    lastUpdate 2026-08-10 vs the real file's 2026-08-28) instead of a
- *    secondary vendor's own site. This caught a real mistake in v2.5.10:
- *    JPY's added 'Retail Sales MoM' was based on myfxbook.com's live page
- *    alone and never actually appears in calendar.json (0 of 3,843
- *    events) — REVERTED back to YoY-only. Myfxbook's own site and this
- *    repo's actual ForexFactory-fed source don't carry an identical title
- *    set, so a vendor's site alone is not sufficient evidence for this
- *    codebase; calendar.json itself is the only thing that matters.
- *    Confirmed-real fixes this session: USD.rtl and GBP.rtl both gained
- *    'Retail Sales YoY' (confirmed present, distinct from MoM, in
- *    calendar.json); USD.ppi/USD.prod checked and found to have NO YoY
- *    title in the real feed (existing comments were correct, left as-is).
- *    Also found and fixed a genuinely BROKEN cell: GBP.conf's
- *    'S&P Global Manufacturing PMI' never matched anything (0 of 3,843
- *    events) — the feed's real title is 'Flash Manufacturing PMI'; this
- *    column had been silently running on the CBI Industrial Trends Orders
- *    fallback alone. See CHANGELOG.md v8.276.0 for full detail.
- *
- * ── v2.5.10 (2026-08-28) — Fixed SEK/CHF Retail Sales columns silently
- *    ignoring live MoM releases. Both currencies' 'rtl' prefix list only
- *    ever contained 'Retail Sales YoY', so once that YoY print aged (SEK:
- *    Apr), the column stayed frozen on it and never picked up the SAME
- *    report's intervening MoM releases — confirmed live for SEK against
- *    today's "Sweden Retail Sales MoM" (-0.2%, 2026-08-28) sitting
- *    unreflected in the matrix next to NOK's correctly-updated MoM cell
- *    one row below. Same omission class as the GBP GDP QoQ gap
- *    (GUIDELINES.md v8.141.0) — a prefix list that never included a title
- *    the vendor genuinely publishes, not a deliberate policy choice.
- *    findLatestGeneric() already selects whichever prefix has the most
- *    recent dateISO, so listing both MoM and YoY (MoM first, matching the
- *    Bloomberg-headline convention already used for USD/GBP/AUD/NOK) lets
- *    both columns self-correct to the freshest release going forward with
- *    no other logic change. Same-session follow-up: live-audited
- *    myfxbook.com/forex-economic-calendar/japan directly and found the
- *    identical gap for JPY's rtl (also YoY-only, MoM confirmed live) —
- *    fixed the same way. See CHANGELOG.md v8.275.0 for the fuller
- *    per-currency Myfxbook audit this triggered (USD/GBP findings
- *    pending confirmation before wiring). NOTE: the JPY part
- *    of this entry was corrected in v2.5.11 above — verify against
- *    calendar.json before trusting the "MoM confirmed live" claim here.
- *
- * ── v2.5.9 (2026-08-27) — Removed an internal-documentation reference
- *    ("see GUIDELINES.md for sourcing") from the public Emp Chg proxy
- *    tooltip. The disclosure itself (in-house estimate vs. official
- *    headline) is correct and stays; only the pointer to internal repo
- *    docs is removed, per the standing "no backend/architecture details
- *    in user-facing copy" rule.
- *
- * ── v2.5.5 (2026-08-26) — Wired NOK/SEK "Emp Chg" to a new Trading
- *    Economics fallback (fetch_te_employment_change.py v1.0) — both
- *    currencies' only Myfxbook labor-market title is a raw LEVEL, not a
- *    change/rate figure, so the cell stayed correctly blank until now.
- *    JPY/CHF's "Emp Chg" cells remain deliberately blank for a different,
- *    already-documented reason (ratio / quarterly headcount level, not a
- *    genuine gap in coverage) — see the v2.5.4 note directly below.
- *
- * ── v2.5.4 (2026-08-26) — Documentation-only update: JPY/CHF "Emp Chg"
- *    blank-cell comments were stale. fetch_ff_calendar.py v3.47 /
- *    calendar-watcher.js v5.34.0 (same session) restored general calendar
- *    coverage for two previously-filtered Low-impact events — JPY "Jobs/
- *    applications ratio" (MHLW) and CHF "Switzerland Non Farm Payrolls"
- *    (FSO) — which made the v2.5.3 comments ("no title found") inaccurate:
- *    a title now does reach calendar.json for both. No column-wiring
- *    change: JPY's newly-reachable title is a labor-tightness RATIO (jobs
- *    offered \u00f7 applicants) and CHF's is a quarterly headcount LEVEL,
- *    neither a net-jobs-created change/rate figure this column's "Emp Chg"
- *    label requires — wiring either would misrepresent the column, the
- *    same level/ratio-vs-change conflation risk already documented for
- *    NOK/SEK. Both cells remain deliberately blank, comments updated to
- *    explain why with the current (not stale) facts. See
- *    fetch_ff_calendar.py v3.47 header and CHANGELOG.md for the full
- *    incident.
- *
- * ── v2.5.3 (2026-08-26) — New "Emp Chg" column (net jobs created / employment
- *    change) — G10 labor-market coverage was incomplete without it —
- *    not accurate. "Unemp" already existed and shipped in v2.0.0; what was
- *    genuinely absent was the flow/leading counterpart (net jobs created),
- *    which markets and central banks watch alongside the unemployment
- *    rate/stock figure. Wired using the SAME calendar.json source as every
- *    other column (fetch_ff_calendar.py / calendar-watcher.js already carry
- *    these event titles — no new fetcher needed), with each currency's
- *    title verified directly against live calendar.json before wiring, not
- *    assumed (see CATS entries). USD → 'Non Farm Payrolls' (the headline
- *    print, deliberately not blended with the distinct 'ADP Employment
- *    Change' preview series). GBP/AUD/CAD → bare 'Employment Change'
- *    (excludes each release's Full/Part-Time sub-components). NZD →
- *    'Employment Change QoQ' (NZ's native quarterly cadence, matching its
- *    GDP/CPI columns). EUR → 'Euro Area Employment Change QoQ'/YoY.
- *    Confirmed genuine gaps, left blank rather than guessed: JPY and CHF
- *    have no employment-change-equivalent title in the current source at
- *    all; NOK/SEK's only labor-flow titles ('Unemployed Persons(<Mon>)' /
- *    'Employed Persons(<Mon>)') are raw headcount LEVELS, not a
- *    change/rate figure, and wiring them would silently misrepresent the
- *    column's stated semantics — same principle as not conflating NZD's
- *    PPI Input/Output series elsewhere in this file. index.html's <thead>
- *    and all 10 skeleton <tbody> rows updated in the same change, in the
- *    same position (between PPI and Unemp) — see COLUMNS array warning
- *    comment above.
- *
- * ── v2.5.2 (2026-08-22) — NZD Ind Prod cell: repointed CATS.NZD.prod from
- *    the dead 'Manufacturing Sales YoY' mapping (comment falsely claimed it
- *    was "injected by fetch_supplementary_indicators.py" — that script does
- *    not exist in any repo; the intended replacement never matched a live
- *    NZD event in a full year of calendar.json, audited this session) to
- *    'Industrial Production YoY', fed by new fetch_te_nzd_ind_prod.py
- *    (third-party vendor scrape). Also corrected the header doc block's
- *    "Ind Prod: AUD, NZD, CAD — none of the three..." bullet, stale for
- *    AUD/CAD which were already wired via their own proxies. See
- *    GUIDELINES.md v8.231.0 for the full incident. No other change.
- *
- * ── v2.5.1 (2026-08-19) — ECONMX_POLL_MS 3min → 90s. Backend latency audit
- *    (this session) found the client-side poll was the single heaviest link
- *    in the end-to-end publish→display chain (up to 3min of a ~9-13min
- *    worst-case total) and, unlike the upstream calendar-watcher.js CF Worker
- *    poll (external Myfxbook source, already at its sane floor), carries
- *    effectively no rate-limit risk — this panel only re-reads GlobalInvesting's
- *    own calendar.json off GitHub Pages/CDN, built to serve exactly this kind
- *    of frequent cheap polling. Lowered to 90s to shave ~1.5min off the
- *    worst case without touching any third-party-facing cadence. Synced with
- *    the equivalent change in calendar-panel.js's fetchEconomicCalendar
- *    interval this same session so both panels refresh calendar.json on the
- *    same cadence again (previously 3min here vs 2min there — a drift left
- *    over from calendar-panel.js's own v1.3 2026-06-10 reduction that was
- *    never mirrored here).
- *
- * ── v2.5.0 (2026-08-17) — 10Y Yld / CB Rate went stale for the life of the
- *    session: v2.4.0's periodic refresh only re-fetched calendar.json and
- *    re-rendered against a `_y10Cache`/`_cbCache` snapshot taken once at
- *    first scroll-into-view — reasoned at the time that policy/yield data
- *    "changes far less often" than calendar actuals. False for 10Y specifically:
- *    `extended-data/{CCY}.json` bond10y is written daily by
- *    `fetch_bond_yields.py`, so any tab left open across that daily update
- *    (or open when a fix like the AUD/CAD orphaned-bond10y-field one landed)
- *    kept showing the pre-fix value indefinitely — confirmed live: a
- *    live check showed AUD 4.83%/CAD 3.59%/NOK 4.20% while the underlying
- *    `extended-data/*.json` already had fresh AUD 5.05% (18 Aug)/CAD 3.72%
- *    (17 Aug)/NOK 4.40% (17 Aug) from the v2.10.2 fix — the panel simply
- *    never re-asked. Fixed: the periodic refresh now re-fetches 10Y (cheap,
- *    ten small JSON files) and recomputes CB Rate (no fetch — `getCBRate()`
- *    already reads live `window._STATE_cbRates`, kept via dashboard.js's own
- *    5-min `health.json` sentinel poll; only the econ-matrix.js snapshot of
- *    it was stale) on every tick, same as calendar.json. `load10y()` also
- *    picked up `{cache:'no-store'}` to match `loadCalendarData()`, so the
- *    browser/SW HTTP cache can't hand back a stale copy inside the 3-min
- *    window either. See GUIDELINES.md/CHANGELOG.md v8.154.3.
- * ── v2.4.0 (2026-08-16) — Live polling: panel used to fetch calendar.json
- *    once (on first scroll-into-view) and never again, so a new actual
- *    required a full page reload to appear. Now re-fetches calendar.json
- *    every 3 min (matching calendar-panel.js's cadence) and re-renders with
- *    cached 10Y/CB values — see GUIDELINES.md/CHANGELOG.md v8.163.0.
- * ── v2.3.0 (2026-08-15) — CB Rate subtext date fixed (was always "01 Aug"
- *    for every currency); Unemp column colored as an inverted indicator ──
- * Two issues found after reviewing the live rendering:
- *
- * (1) CB RATE subtext showed the same day-of-month ("Aug 01") for every
- *     single currency, every session — not a rendering bug (fmtDateShort()
- *     itself is correct, proven by the 10Y column using it fine) but a
- *     data-shape mismatch: `getCBRate()`'s date came straight from
- *     `rates/{CCY}.json` observations[0].date, and that file is a FRED-style
- *     MONTHLY series where every observation is stamped to the 1st of its
- *     month by construction (confirmed directly: rates/USD.json's most
- *     recent three observations are 2026-08-01 / 07-01 / 06-01, not real
- *     decision dates) — so "Aug 01" wasn't wrong data, it was real monthly-
- *     bucket data mislabeled with day-level precision it doesn't have.
- *     Fix: `getCBRate()` now also resolves the actual last-meeting date
- *     from `meetings-data/meetings.json`'s per-currency `allMeetings` (real
- *     ISO decision dates, e.g. USD's 2026-07-29 FOMC date) — the most
- *     recent entry not after today — and uses THAT for the subtext instead.
- *     This is the same file `cbrates-modal.js`'s click-through already
- *     reads (`window._STATE_meetings`), so it's reused here the same way
- *     `_STATE_cbRates` already is, with an independent fetch fallback if
- *     that global isn't populated yet. Falls back to the old obs[0].date
- *     behavior only if no meeting data exists for a currency at all.
- *
- * (2) Unemp column reused the generic `trendClass()` (actual > previous →
- *     'up' → var(--up), green) with no inversion — meaning a RISING
- *     unemployment rate rendered green, the same color as rising GDP,
- *     exactly backwards from every other panel in this app. This app
- *     already has one audited, canonical "inverse indicator" keyword list
- *     for this exact problem — `CAL_INVERSE_KW` in calendar-panel.js
- *     (mirrored as `INVERSE_KW` in dashboard.js and `_ESM_INVERSE_KW` in
- *     econ-surprises-modal.js): `['unemployment', 'unemployed', 'jobless',
- *     'claims', 'deficit']` — but econ-matrix.js never adopted it; it was
- *     built independently and this gap was never audited against it until
- *     now. Added the same list here (`MX_INVERSE_KW`) and `trendClass()`
- *     now takes the cell's event title, flipping up/down to down/up when
- *     it matches. Audited every other column's underlying event titles
- *     against this list: GDP/CPI/Core CPI/PPI/Ind Prod/Bus Cond/Rtl Sales/
- *     PCE none match (correct as non-inverted). Cur Acct / Trade Bal titles
- *     ("Current Account", "Trade Balance") also don't literally contain
- *     "deficit" so aren't auto-flagged by this list — their sign is already
- *     baked into the value itself (a worsening balance prints a more
- *     negative number, which parseNum() already reads correctly as "down"),
- *     so no separate inversion is needed there; only Unemp was actually
- *     affected in this file.
- *
- * ── v2.2.9 (2026-08-15) — dropped redundant "10Y"/"Policy" prefix from the
- *    10Y Yld / CB Rate subtext ─────────────────────────────────────────────
- * Two things about v2.2.8's fix needed follow-up: (1) the "Policy" word in
- * the CB Rate subtext is unnecessary — the column header already says
- * "CB RATE"; (2) "10Y · 30 Jul" repeats "10Y", which the column header
- * ("10Y YLD") already states, unlike the calendar-driven columns where the
- * event name genuinely varies row to row. Both cells now show just the
- * date ("30 Jul", "05 Aug") in econmx-ref, nothing else. fmtDateShort()
- * itself is untouched — only the two literal prefix strings in rowHTML()
- * were removed.
- *
- * ── v2.2.8 (2026-08-15) — 10Y Yld / CB Rate cells given the same
- *    value+subtext structure as every other column ──────────────────────
- * 10Y Yld and CB Rate were the only two columns
- * without a date/period line under the value, breaking the pattern every
- * other column follows. Root cause: rowHTML() built those two cells with
- * a bare '<td>{value}%</td>' (date only in the title tooltip) instead of
- * cellHTML()'s '<div class="econmx-val">/<div class="econmx-ref">'
- * two-line structure used everywhere else. Fixed by giving both cells that
- * same structure, with a new fmtDateShort() helper reused from refLabel()'s
- * 'DD Mon' date format so the subtext reads identically to the calendar-
- * driven columns ("10Y · 30 Jul", "Policy · 05 Aug"). No CSS change needed
- * — .econmx-val/.econmx-ref are already generic rules, not scoped to
- * calendar cells specifically. Purely a rendering fix: load10y()/getCBRate()
- * and their underlying sources are untouched, no data or trend-coloring
- * regression risk.
- *
- * ── v2.2.7 (2026-08-14) — SEK Core CPI wired; corrects a wrong "no vendor
- *    equivalent" gap note; CHF/NZD fetcher live-validated ──────────
- * CATS.SEK.core wired to ['Core Inflation Rate YoY'], same source and
- * event title as CHF/NZD. v2.2.6's SEK note was wrong: it only checked
- * Myfxbook (correctly finding no page there) and concluded no vendor
- * equivalent existed either, without actually checking. The vendor does carry
- * this series (see the private script's header for the URL, labelled
- * "CPIF excl. Energy YoY" \u2014 a different display name than CHF/NZD's
- * pages use, which is likely why the earlier pass missed it). Confirmed
- * server-rendered and live-scraped successfully this session \u2014 see
- * fetch_te_core_inflation.py v3.0, which now generalizes the row-label
- * match per currency instead of assuming "Core Inflation Rate" is
- * universal.
- * CHF/NZD's own fetcher wiring (v2.2.6, UNVALIDATED at the time) is now
- * confirmed working end-to-end: the guest:guest API path it was built
- * against returned HTTP 410 (live-tested this session), so the fetcher
- * was rewritten to scrape the public page directly instead \u2014 both cells
- * populated successfully via a production GH Actions run this session.
- *
- * ── v2.2.6 (2026-08-14) — CHF/NZD Core CPI wired to a new non-Myfxbook
- *    source (a third-party vendor, unvalidated pending a live run) ──────────
- * Wired CATS.CHF.core and CATS.NZD.core to ['Core Inflation Rate YoY'],
- * fed by the new fetch_te_core_inflation.py (globalinvesting-scripts repo)
- * rather than Myfxbook, since no Myfxbook page exists for either (re-
- * confirmed this session). IMPORTANT: NZD's series is the vendor's
- * own "Core Inflation Rate" (RBNZ-sourced, ex-gasoline) \u2014 explicitly NOT
- * the RBNZ Sectoral Factor Model figure quoted in financial press (2.7%
- * YoY Q2 2026 vs this series' ~3.2% YoY) \u2014 see fetch_te_core_inflation.py
- * header for the full distinction; do not conflate the two in copy. Both
- * wirings are UNVALIDATED as of this version: the fetcher's live
- * guest:guest access could not be tested from the session's sandbox
- * (no network path to the vendor's domain) \u2014 run it manually once before
- * scheduling it in a workflow. Until then, or if guest access turns out
- * not to cover these indicators, both cells simply render blank, same as
- * before this change \u2014 no regression risk either way.
- * SEK core (CPIF ex Energy) investigated in the same pass \u2014 no equivalent
- * vendor indicator found either, left unwired, still a
- * documented genuine gap (v2.2.4 finding stands).
- * AUD rtl investigated after a still-blank cell was found despite
- * v2.2.3's fix \u2014 confirmed NOT a wiring bug: the live Myfxbook page itself
- * (australia/retail-sales-mom) has no observation newer than 2025-07-31.
-
- * No code change; CATS.AUD.rtl stays as wired in v2.2.3.
- * ── v2.2.5 (2026-08-14) — CHF CPI MoM: same wiring-gap pattern as v2.2.4's
- *    NZD PPI fix. CATS.CHF.cpimom was hardcoded to [] under a stale
- *    "no MoM headline release in current source" comment that was never
- *    re-verified — FSO publishes MoM alongside YoY every release and a live
- *    Myfxbook page exists. Wired to ['Inflation Rate MoM']; one-time value
- *    backfilled via backfill_supplementary_events.py v1.2 (FSO-cited) since
- *    Myfxbook RSS's rolling ~24h window means the live pipeline can't
- *    retroactively pull in a release that already passed. CAD PPI YoY/MoM
- *    and NZD PPI Output QoQ (already correctly wired since v2.2.2/v2.2.4)
- *    got the same one-time backfill treatment for the same reason — see
- *    backfill_supplementary_events.py v1.2 for full citations on all three.
- * ──────────────────────────────────────────────────────────────────────────
- * ── v2.2.4 (2026-08-14) — NZD PPI: wiring gap, not a source gap; upstream fix
- *    (v3.43) had already covered it but econ-matrix.js's CATS list was never
- *    updated to match. SEK core (CPIF ex Energy) re-confirmed as a genuine
- *    gap ──────────────────────────────────────────────────────────────────
- * Continues the gap sweep started in v2.2.3, to chase
- * the two items that pass explicitly deferred (NZD ppi, SEK core).
- *   - NZD ppi: re-checked live against myfxbook.com/forex-economic-calendar/
- *     new-zealand — found a live page for "PPI Output QoQ" (Low impact,
- *     quarterly, Source: Statistics New Zealand) that v2.2.3's sweep missed.
- *     Crucially, the upstream impact-filter fix that would let this event
- *     through (_IMPACT_UPGRADES's "ppi" substring, fetch_ff_calendar.py
- *     v3.43) was ALREADY shipped before this sweep — this was never an
- *     upstream gap, only a downstream wiring miss in econ-matrix.js's own
- *     CATS.NZD.ppi list, which stayed `[]` after the source-side fix landed.
- *     Wired: ppi: ['PPI Output QoQ']. A second live page also exists under
- *     "PPI Input QoQ" — deliberately not wired, since Input measures what
- *     producers pay (not what they receive) and is a distinct series, not an
- *     alternate cadence of Output — every other currency's ppi column is the
- *     output/producer-price concept.
- *   - SEK core (CPIF Excluding Energy): re-checked against the full live
- *     Sweden Myfxbook calendar listing (checked through its ~Sep 2026
- *     horizon) — no calendar page exists under any title for this series.
- *     The underlying data is real (Riksbank/SCB publish it, confirmed via
- *     search) but Myfxbook doesn't carry a page for it. Re-confirmed genuine
- *     gap, left as `[]`.
- * No upstream (fetch_ff_calendar.py / calendar-watcher.js) changes needed
- * this pass — NZD PPI only needed the matrix-side wiring, not a new
- * _IMPACT_UPGRADES entry.
- *
- * ── v2.2.3 (2026-08-14) — Full gap sweep: CHF PPI, JPY CPI MoM, AUD Retail
- *    Sales were the same pipeline bug as v2.2.2's PPI fix, not source gaps ──
- * Prompted by a complete sweep of every "—" cell in the
- * matrix after the v2.2.2 PPI fix shipped. Rather than trust each field's
- * existing "confirmed gap" comment, every one was re-verified against LIVE
- * Myfxbook pages (not calendar.json — see the GUIDELINES.md rule from
- * v8.144.0 on why a derived-file gap check doesn't prove source absence).
- * Three more fields turned out to be the identical impact-filter bug:
- *   - CHF ppi: v2.2.2 had already found the real title ("Producer & Import
- *     Prices YoY/MoM") while investigating the "ppi" substring fix, but
- *     never gave it its own upgrade entry — so it stayed unreachable even
- *     though the title was known. Confirmed live at myfxbook.com/forex-
- *     economic-calendar/switzerland/producer-import-prices-yoy|mom. Fixed
- *     upstream (fetch_ff_calendar.py v3.44, calendar-watcher.js v5.30) and
- *     wired here: ppi: ['Producer & Import Prices YoY', 'Producer & Import
- *     Prices MoM'].
- *   - JPY cpimom: "Inflation Rate MoM" has a live Myfxbook page (japan/
- *     inflation-rate-mom) — YoY already worked because Myfxbook tags it
- *     medium+, MoM is tagged Low and was silently dropped. Fixed upstream,
- *     wired here: cpimom: ['Inflation Rate MoM'].
- *   - AUD rtl: "Retail Sales MoM" has a live Myfxbook page (australia/
- *     retail-sales-mom) — every other G10 currency's retail sales is
- *     already medium+; AUD's alone is Low. Fixed upstream, wired here:
- *     rtl: ['Retail Sales MoM'].
- * All three upstream substring additions were checked against the full live
- * title corpus for accidental collisions before shipping — none found (see
- * fetch_ff_calendar.py v3.44 header for the corpus check).
- * NOT changed (re-investigated, left as-is): NZD ppi — re-confirmed no
- * Myfxbook page exists for NZ producer prices under any title, genuine gap.
- * SEK core (CPIF excluding Energy) — the underlying data is real (Riksbank/
- * SCB actively publish it, confirmed via search), but no Myfxbook calendar
- * page could be located for it in this pass; left as a documented gap
- * rather than wiring an unverified title. Flagged for a follow-up pass with
- * direct Myfxbook access if this is chased further.
- *
- * ── v2.2.2 (2026-08-14) — GBP/JPY/CAD PPI: fixed pipeline bug misdiagnosed
- *    as a source gap in v2.2.0 ──────────────────────────────────────────
- * v2.2.0 documented GBP/JPY/CHF/CAD/NZD as "confirmed genuine gaps — no
- * PPI release in the current source." Re-audited against live Myfxbook
- * pages per currency (not assumed): three of the five were wrong — the
- * releases exist, but fetch_ff_calendar.py's/calendar-watcher.js's
- * IMPACT_UPGRADES table only matched the literal phrase "producer price
- * index", which never appears in Myfxbook's actual titles (always the
- * short form: "PPI YoY", "United Kingdom PPI Output YoY", "Canada PPI
- * MoM"). Myfxbook tags GBP/JPY/CAD's PPI Low impact, so all three were
- * silently dropped by the pipeline's impact filter before ever reaching
- * calendar.json — USD/EUR/AUD/NOK/SEK only ever worked because Myfxbook
- * already tags those medium/high directly, which masked the bug. Fixed
- * upstream (fetch_ff_calendar.py v3.43, calendar-watcher.js v5.29, engine
- * repo) and wired the real titles here: GBP → ['PPI Output YoY', 'PPI
- * Output MoM'], JPY/CAD → ['PPI YoY', 'PPI MoM']. CHF and NZD verified
- * as genuine gaps — CHF's real title ("Producer & Import Prices YoY")
- * doesn't match either the old or new impact-upgrade entry, and NZD has no
- * PPI/producer-price page on Myfxbook at all — both left as-is (empty
- * array, GAP_TITLE stands). See CHANGELOG.md v8.144.0.
- *
- * ── v2.2.1 (2026-08-14) — CRITICAL: fixed index.html column desync caused
- *    by v2.2.0's new PPI column ─────────────────────────────────────────
- * v2.2.0 added 'ppi' to COLUMNS (11 → 12 categories) but index.html's
- * <thead> and 10 skeleton <tbody> rows were never updated to add the
- * matching PPI <th>/<td> — a step this file cannot enforce on its own, since
- * rowHTML() builds cells purely by iterating COLUMNS in order with no
- * awareness of what index.html's static markup declares. Effect: every
- * column from PPI onward rendered shifted one position left of its header —
- * PCE data appeared under the "10Y Yld" header (confirmed by a live check
- * showing a "United States PCE Price Index YoY" tooltip on that
- * cell), the real 10Y yield appeared under "CB Rate", and CB Rate itself was
- * pushed off the end of the table. Found via a live check. Fixed in
- * index.html only (no logic in this file was wrong) —
- * see CHANGELOG.md v8.143.0 for the full incident and the new GUIDELINES.md
- * rule requiring COLUMNS-array changes and index.html's thead/skeleton rows
- * to be edited in the same change.
- *
- * ── v2.2.0 (2026-08-14) — closing out remaining industry-standard gaps:
- *    CHF GDP dead title, EUR Bus Cond gap resolved, new PPI column ────────
- * Prompted by closing out every remaining item after
- * v2.1.0, rather than leave anything flagged-but-unfixed. Three changes:
- *   (1) CHF gdp had the same class of bug as v2.1.0's GBP fix, inverted:
- *       'GDP Growth Rate QoQ Flash' matched ZERO events in the feed (the
- *       real title is 'GDP Growth Rate QoQ', no "Flash") \u2014 QoQ was
- *       silently unreachable for CHF regardless of freshness, not a
- *       deliberate YoY-first policy choice. Fixed the title; the visible
- *       output is unchanged today (YoY still wins most quarters on
- *       freshness \u2014 verified against the live feed), but the fallback
- *       chain the column's tooltip promises now actually works.
- *   (2) EUR Bus Cond ("\u2014" since v2.0.0, see that note) reinvestigated
- *       rather than left as a standing gap: the feed's more recent entries
- *       (~Jun 2026 onward) now carry country-prefixed titles that didn't
- *       exist when v2.0.0 shipped (vendor formatting change, confirmed via
- *       an identical-value overlap date, not new/different data). Germany's
- *       Ifo Business Climate \u2014 a single, clean, continuous, widely-cited
- *       series \u2014 is now shown as EUR's proxy, the same pattern already
- *       used for AUD's RBA Trimmed Mean CPI. Also found the same drift
- *       affects PPI (see below).
- *   (3) New PPI column, per the original feature request for producer-price
- *       coverage. Verified per-currency coverage
- *       against the live feed before wiring anything: real data exists for
- *       USD (MoM only \u2014 no YoY title in this feed), AUD (QoQ \u2014 ABS's
- *       genuine native cadence, not a fallback), NOK (YoY), SEK (YoY+MoM,
- *       YoY preferred), and EUR (Germany's national PPI, per the same
- *       investigation as (2) \u2014 the bare "PPI YoY" title turned out to
- *       ALSO be Germany's series, not a Euro Area aggregate, confirmed by
- *       the identical overlap-date value). GBP/JPY/CHF/CAD/NZD are
- *       confirmed gaps \u2014 no PPI release in the current source \u2014 not
- *       guessed or left ambiguous.
- * Column tooltip and header-comment "intentionally blank" list both
- * updated to match. Not touched this session (out of scope): PMI Services/Composite \u2014 checked against the live
- * feed and found only 2 of 10 currencies (USD, SEK) carry a genuine
- * Services PMI title, and zero carry a Composite PMI title at all. Adding
- * a column that reads "\u2014" for 8-9 of 10 rows would be a worse outcome
- * than the informational PMI-scale note now added to the Bus Cond tooltip
- * instead \u2014 flagged in CHANGELOG as a deliberate non-addition with the
- * reasoning, not silently dropped.
- *
- * ── v2.1.0 (2026-08-14) — GDP column: fixed GBP QoQ omission, tagged USD's
- *    SAAR convention ──────────────────────────────────────────────────────
- * Prompted by a follow-up question after v2.0.0 shipped: is it
- * industry-standard for the GDP column to show different periodicities
- * (QoQ/MoM/YoY) across different currency rows? Investigation found three
- * distinct things bundled under that one question:
- *   (1) GBP bug: the CATS.GBP.gdp prefix list was `['GDP MoM']` only — it
- *       never included the QoQ title at all, even though the UK's ONS DOES
- *       publish a quarterly GDP figure, released the SAME DAY as the
- *       monthly print 3 of every 4 months (confirmed in calendar.json:
- *       "United Kingdom GDP Growth Rate QoQ" and "...GDP MoM" both dated
- *       2026-08-13). This contradicted the column's own documented policy
- *       ("QoQ where published") and meant the cell could never show the
- *       quarterly headline even on a release day. Fixed by adding
- *       'GDP Growth Rate QoQ' ahead of 'GDP MoM' in the prefix list —
- *       findLatestGeneric()'s existing same-date tie-break now resolves to
- *       QoQ on release days, and falls back to MoM (the freshest real data)
- *       in the two in-between months, same as it always did.
- *   (2) CAD reviewed and left as-is: its quarterly print is genuinely stale
- *       (last Q1 2026, from 2026-05-29) relative to the monthly print
- *       (2026-07-31), so the existing freshest-date selection already
- *       surfaces the right cell — not a bug, no change needed.
- *   (3) Bigger institutional-comparability issue, found during this
- *       investigation (not what was asked, but material to "industry
- *       standard"): USD's matched GDP title, "GDP Growth Rate QoQ", is by
- *       the BEA's own convention already seasonally-adjusted ANNUALIZED
- *       (SAAR) — the familiar "grew at an annualized pace of X%" figure.
- *       Every other currency's "GDP Growth Rate QoQ" is the raw,
- *       non-annualized quarterly change. Both were tagged identically as
- *       "QoQ" in the per-cell subtext, which would read as directly
- *       comparable magnitudes when they are not (US 1.5% SAAR vs EA 0.4%
- *       raw QoQ implies the US grew ~4x faster than it actually did in
- *       comparable terms — the non-annualized equivalent is ~0.37%, in
- *       line with the EA print). Fixed by special-casing periodLabel() for
- *       gdp/USD/qoq to render "QoQ SAAR" instead of "QoQ" — every other
- *       cell's tag is unaffected. Column tooltip updated to disclose this
- *       explicitly rather than relying on the reader to already know US
- *       GDP convention.
- * Not changed: CHF's gdp list still prioritizes YoY over its QoQ Flash —
- * this wasn't part of what was asked and needs its own verification pass
- * before touching (see "On the horizon" in CHANGELOG.md).
- *
- *
- * Replaces the third-party TradingView Economic Map widget (tv-economic-map.js)
- * with a native table in the style of an institutional regional economic matrix
- * (e.g. Bloomberg ECMX), built entirely from data the terminal already fetches
- * elsewhere — no new backend script or workflow required.
- *
- * ── v2.0.0 (2026-08-14) — institutional-user data-accuracy audit ──────────
- * Prompted by an institutional-user data-accuracy report flagging: (1) USD CPI YoY
- * showing a stale 4.2% print instead of the then-current 3.4%; (2) AUD CPI
- * showing "102.03" — an index level in points, not a %-rate; (3) no MoM
- * alongside YoY, and no visible reference date per cell; (4) no core/PCE
- * measure. Investigation (see CHANGELOG v8.140.0) found the root cause was
- * NOT stale source data — calendar.json already carried the correct latest
- * prints — but a title-matching bug in `findLatest()`:
- *   - Myfxbook titles the SAME release inconsistently: sometimes bare
- *     ("Inflation Rate YoY"), sometimes country-prefixed ("United States
- *     Inflation Rate YoY"). The old CATS prefix lists only covered a few
- *     observed variants per currency, so on any date where the upstream
- *     title format drifted, `findLatest()` silently fell through to an
- *     older event that happened to match a listed variant — this is what
- *     surfaced the stale-looking 4.2% (a real June print, just not the
- *     latest one).
- *   - AUD CPI: "Australia CPI" (the raw index, e.g. 102.03) and "Australia
- *     Inflation Rate YoY" (the %, e.g. 3.8%) are two DIFFERENT releases that
- *     print on the SAME day. The old code had no way to prefer one over the
- *     other when both matched on the same date, so it non-deterministically
- *     picked whichever appeared later in the day's insertion order — the
- *     index level, on this occasion.
- *   - EUR bare "Business Confidence" was found to silently interleave THREE
- *     unrelated national surveys (three different value ranges — ~87-89,
- *     ~96-105, and negative ~-3 to -6 — with no country field to
- *     disambiguate) under one identical title. This was already a latent
- *     bug caught during this audit, not something reported externally.
- * Fix (see below): (1) country-prefix canonicalisation before matching, so
- * "United States X" and bare "X" key to the same series regardless of which
- * form Myfxbook used that day; (2) EUR is matched WITHOUT canonicalisation,
- * against explicit "Euro Area " literal prefixes only — this is a
- * deliberate asymmetry, not an oversight, because EUR is the one currency
- * where stripping the country prefix would blend in member-state prints
- * (Germany, France, Italy...); (3) strict prefix match (exact, or with a
- * trailing "(" for parenthetical month/quarter suffixes) instead of loose
- * startsWith, so "CPI" never matches "CPI Trimmed-Mean"; (4) deterministic
- * same-day tie-break — the FIRST prefix in a category's list that has a
- * match on the single most-recent date wins, so prefix order is now a real,
- * documented priority ranking, not an accident of iteration order; (5)
- * dropped "Australia CPI" from the AUD cpi prefix list entirely — the index
- * level has no place in a %-rate column; (6) EUR "Bus Cond" is left blank
- * with an explanatory tooltip rather than showing an unverifiable blend of
- * three surveys (see GUIDELINES.md "Data integrity" — never display a value
- * that isn't reliably attributable to a single named release).
- *
- * New in v2.0.0:
- *   - CPI MoM added alongside CPI YoY (a YoY figure can mask a recent trend
- *     reversal from base effects — e.g. an energy spike 12 months ago still
- *     weighing on the annual figure without reflecting current conditions).
- *   - Core CPI YoY added — central banks weight core more than headline,
- *     since headline is dominated by volatile/seasonal food & energy.
- *     AUD uses the RBA Trimmed Mean CPI as its core-equivalent (see RBA's
- *     own published rationale: trimming extreme price moves gives a
- *     cleaner read on persistent underlying inflation — this is the
- *     standard cross-market substitute for "core CPI" in AUD, since
- *     Australia doesn't publish an ex-food-and-energy core CPI the way the
- *     US/UK/EA do). CHF/NZD/SEK have no core measure in the current feed —
- *     left blank with a tooltip rather than guessed at.
- *   - PCE YoY added as a currency-specific column, populated for USD only
- *     (the Fed's preferred inflation gauge) — blank for all other
- *     currencies with a tooltip explaining PCE is a US-specific series;
- *     other central banks target CPI/HICP-based measures instead (e.g. the
- *     RBA's Trimmed Mean, already shown in the Core CPI column, or the
- *     ECB's HICP, already the basis of the EUR CPI columns here).
- *   - Every calendar-derived cell now shows its reference period + date as
- *     a small subtext line under the value (e.g. "YoY · 12 Aug"), so YoY
- *     and QoQ/MoM prints are never visually ambiguous (NZD CPI, for
- *     instance, is quarterly-only and now reads "QoQ · 20 Jul" rather than
- *     a bare "1.5%" that could be mistaken for an annual figure) and
- *     staleness is visible at a glance without opening the tooltip.
- *
- * Column sourcing:
- *   GDP, CPI YoY, CPI MoM, Core CPI, Unemp, Ind Prod, Bus Cond, Rtl Sales,
- *   Cur Acct, Trade Bal, PCE
- *     → calendar-data/calendar.json — latest "actual" print per category per
- *       currency. This file carries ~1yr of history with real released actuals
- *       (unlike economic-data/{CCY}.json, disabled in v7.24.1 for staleness —
- *       see GUIDELINES.md "Data directories").
- *   10Y Yld
- *     → extended-data/{CCY}.json `bond10y` — same field already used by
- *       yc-modal.js for the Yield Curve detail modal. No color/trend shown,
- *       matching the established precedent there (extended-data carries no
- *       intraday delta for this field).
- *   CB Rate
- *     → window._STATE_cbRates (populated by fetchCBRates() in dashboard.js) +
- *       computeCBTrend() for the trend arrow color — reused as-is so this
- *       panel never disagrees with the CB Rates table elsewhere on the page.
- *
- * Documented deviations from the Bloomberg ECMX column set (see CHANGELOG
- * v8.23.0 for full rationale, extended in v8.140.0):
- *   - "Bud %GDP" (fiscal budget balance) has no recurring calendar release
- *     outside the US in the current source, so the column is replaced with
- *     Trade Balance, which the calendar carries for all 10 currencies and is
- *     directly FX-relevant.
- *   - "CA %GDP" is shown as "Cur Acct" — the calendar's raw latest actual, in
- *     each currency's own native reporting units, rather than a %GDP ratio.
- *     The values are not uniformly unit-tagged at the source (some carry a
- *     currency prefix, some don't), so dividing by a GDP denominator would
- *     manufacture false precision. Trend coloring still works (see below).
- *
- * Cells are intentionally left blank ("—") where the underlying release does
- * not exist in the current source for that currency, or where the source
- * data cannot be reliably attributed to a single named release:
- *   - Ind Prod: none of AUD/NZD/CAD have a standalone Ind Prod release on
- *     Myfxbook (this feed's primary source), but all three are populated
- *     via proxies/direct fetches, none of them blank in current production:
- *     AUD via Ai Group Industry Index (Myfxbook), CAD via Manufacturing
- *     Sales MoM (Myfxbook), NZD via the vendor's own "Industrial
- *     Production" series (fetch_te_nzd_ind_prod.py — Myfxbook's RSS feed
- *     never surfaces NZD's equivalent release despite a live page existing
- *     for it; see that script's module docstring for the full incident).
- *     This bullet previously (through v2.4.x) claimed all three were
- *     genuine gaps — stale even for AUD/CAD, which had already been wired;
- *     corrected here per the same-session NZD audit (GUIDELINES.md v8.231.0).
- *   - Rtl Sales: AUD — not currently tracked in the source feed (a feed gap,
- *     the ABS does publish retail trade figures).
- *   - Cur Acct: EUR, AUD — not currently tracked in the source feed for
- *     these two (a feed gap, not a "doesn't exist" fact — both the ECB and
- *     the ABS do publish a current account series).
- *   - Core CPI: CHF, NZD, SEK — no core/underlying-inflation release in the
- *     current source for these three.
- *   - PCE: every currency except USD — PCE is a US-specific series (see
- *     above); this is a genuine "doesn't exist for this economy" fact, not
- *     a feed gap.
- *   - PPI: GBP, JPY, CHF, CAD, NZD — no producer-price release in the
- *     current source for these five (see v2.2.0 note below).
- *
- * Bus Cond fallback — these currencies have no Manufacturing PMI in the
- * current source, so the column falls back to each economy's standard
- * business/industrial confidence survey instead (per the column definition
- * above):
- *   - GBP: CBI Industrial Trends Orders (CBI manufacturing orders survey)
- *   - JPY: Tankan Large Manufacturers Index (BoJ's quarterly tankan survey —
- *     the benchmark Japanese manufacturer-sentiment gauge)
- *
- * Color convention: every calendar-derived cell is colored by the direction
- * of change vs. the previous reading (delta = actual − previous), not by the
- * raw sign of the level. This is purely descriptive (mirrors how price/D%/W%
- * deltas are colored elsewhere in the terminal) and avoids any "good/bad"
- * value judgement on a given print, consistent with GUIDELINES' ban on
- * investment-advice-flavored signal language.
- */
 (function () {
   'use strict';
 
   const CCY_ORDER = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CHF', 'CAD', 'NZD', 'NOK', 'SEK'];
   const FLAG = { USD: 'us', EUR: 'eu', GBP: 'gb', JPY: 'jp', AUD: 'au', CHF: 'ch', CAD: 'ca', NZD: 'nz', NOK: 'no', SEK: 'se' };
 
-  // ⚠ COLUMNS length/order is NOT self-enforcing against index.html. Adding,
-  // removing, or reordering an entry here means index.html's Economic
-  // Matrix <thead> (<th scope="col">) AND all 10 skeleton <tbody> rows'
-  // <td class="flat">—</td> placeholders must be edited in the SAME change,
-  // in the same order, or every column from the edit point onward silently
-  // renders shifted under the wrong header (see v2.2.1 incident above —
-  // this exact bug shipped with v2.2.0's PPI column).
   const COLUMNS = [
     { key: 'gdp',     label: 'GDP',       title: 'Latest GDP growth rate \u2014 QoQ where published, YoY otherwise, falling back to the freshest monthly print for GBP/CAD between quarterly releases (see subtext on each cell for the period actually shown). Note: USD\u2019s QoQ is seasonally-adjusted ANNUALIZED (SAAR) per BEA convention \u2014 tagged \u201cQoQ SAAR\u201d, not directly comparable in magnitude to the raw non-annualized QoQ shown for other currencies.' },
     { key: 'cpi',     label: 'CPI YoY',   title: 'Latest headline CPI / inflation rate, year-on-year \u2014 the primary inflation gauge central banks reference against their target when setting policy rates.' },
     { key: 'cpimom',  label: 'CPI MoM',   title: 'Latest headline CPI / inflation rate, month-on-month \u2014 can reveal a trend reversal the YoY figure masks via base effects' },
     { key: 'core',    label: 'Core CPI',  title: 'Latest core/underlying inflation, year-on-year \u2014 excludes volatile food & energy components; the measure central banks weight most heavily. AUD shows the RBA Trimmed Mean CPI, Australia\u2019s standard core-equivalent.' },
     { key: 'ppi',     label: 'PPI',       title: 'Latest producer-price inflation \u2014 YoY where published, QoQ/MoM otherwise (see subtext on each cell for the period actually shown). EUR shows Germany\u2019s national PPI as a proxy \u2014 no genuine Euro Area-aggregate PPI title exists in the current source. Blank where the currency\u2019s economy has no standalone PPI release in the current source.' },
-    // v2.5.3: added to close a labor-market coverage gap —
-    // Unemp already existed, but the flow/leading indicator (net jobs
-    // created) did not, and central banks + markets watch both. Verified
-    // per-currency titles directly against live calendar-data/calendar.json
-    // (not assumed) before wiring — see CATS entries for per-currency
-    // sourcing notes and confirmed gaps (JPY/CHF/NOK/SEK).
     { key: 'emp',     label: 'Emp Chg',   title: 'Latest employment change \u2014 net jobs created, a flow/leading labor-market indicator distinct from the Unemployment Rate (a stock/lagging indicator). US shows Non-Farm Payrolls, the single most market-watched G10 print. Blank where the currency\u2019s economy has no standalone employment-change release in the current source \u2014 see column-specific per-currency notes.' },
     { key: 'unemp',   label: 'Unemp',     title: 'Latest unemployment rate \u2014 a lagging labor-market indicator central banks weigh alongside inflation when assessing how much slack remains in the economy.' },
     { key: 'prod',    label: 'Ind Prod',  title: 'Latest industrial / manufacturing production change \u2014 a real-economy activity gauge and a common input to leading-indicator composites, typically less market-moving on release day than PMI surveys.' },
@@ -789,15 +20,6 @@
     { key: 'pce',     label: 'PCE YoY',   title: 'Latest PCE Price Index, year-on-year \u2014 the U.S. Federal Reserve\u2019s preferred inflation gauge. US-specific; other economies target CPI/HICP-based measures shown in the CPI/Core CPI columns instead.' },
   ];
 
-  // Country-name prefixes Myfxbook/ForexFactory sometimes (not always)
-  // prepend to an otherwise-bare event title, e.g. "United States Inflation
-  // Rate YoY" vs bare "Inflation Rate YoY" for the identical release. Used to
-  // canonicalise BEFORE matching so title-format drift on any given day never
-  // causes findLatest() to silently fall back to an older event (see v2.0.0
-  // note above \u2014 this was the actual root cause of the reported stale-CPI
-  // symptom). Deliberately mirrors calendar-panel.js's `_CAL_CCY_PFXS` so the
-  // two independent matchers stay conceptually in sync; EUR is excluded on
-  // purpose (see EUR handling below).
   const CCY_PFXS = {
     USD: 'united states ', GBP: 'united kingdom ', JPY: 'japan ', AUD: 'australia ',
     CAD: 'canada ', CHF: 'switzerland ', NZD: 'new zealand ', NOK: 'norway ', SEK: 'sweden ',
@@ -808,92 +30,38 @@
     return title;
   }
 
-  // Strict prefix match: exact title match, or prefix immediately followed by
-  // a parenthetical suffix such as "(Apr)" / "(Q1)" that NOK/SEK titles carry.
-  // Deliberately NOT a loose startsWith \u2014 "CPI" must never match "CPI
-  // Trimmed-Mean" or "CPIF", and "Inflation Rate YoY" must never match
-  // "Inflation Rate YoY Flash" (a different, preliminary release).
   function strictMatch(title, prefix) {
     if (title.length < prefix.length || title.slice(0, prefix.length) !== prefix) return false;
     const rest = title.slice(prefix.length);
     return rest === '' || rest.charAt(0) === '(';
   }
 
-  // Union of accepted ForexFactory/Myfxbook event-title prefixes per
-  // category, per currency, in bare (country-prefix-stripped) canonical
-  // form \u2014 except EUR, which is matched separately (see findLatestEUR).
-  // Order is a real priority ranking: for a same-day tie between two
-  // prefixes in one category, the prefix listed FIRST wins (see AUD cpi \u2014
-  // deliberately does NOT include "CPI", which is the raw index level in
-  // points, not a rate; see v2.0.0 note above). Empty array = confirmed gap
-  // for that currency (see header comment) \u2014 renders "\u2014".
   const CATS = {
     USD: {
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      ppi:   ['PPI MoM'], // confirmed only MoM published in the current source \u2014 no PPI YoY title observed
-      // v2.5.3: 'Non Farm Payrolls' only \u2014 deliberately NOT mixed with 'ADP
-      // Employment Change' (a distinct private-sector preview series released
-      // ~2 days before NFP, not an alternate cadence of the same release,
-      // same non-mixing principle as NZD's PPI Input/Output note below). NFP
-      // is the headline print markets and the Fed anchor to.
+      ppi:   ['PPI MoM'], 
       emp:   ['Non Farm Payrolls'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
       conf:  ['ISM Manufacturing PMI'],
-      // v2.5.11 (2026-08-28): live-audited against the actual calendar.json
-      // (the ForexFactory/Myfxbook-fed source of truth, not a secondary
-      // vendor's own site) — 'Retail Sales YoY' / 'United States Retail
-      // Sales YoY' both confirmed present as a distinct title from MoM in
-      // the live feed. Same omission class as the SEK/CHF/GBP rtl fixes
-      // this session. ppi/prod were also checked the same way and found
-      // to have NO YoY title in the real feed — those stay as-is; the
-      // existing "no PPI YoY observed" comment there is correct.
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade', 'Goods Trade Balance'],
       pce:   ['PCE Price Index YoY'],
     },
     GBP: {
-      // GDP: QoQ is the UK's headline growth figure and IS published — ONS
-      // bundles it into the same release as the monthly print 3 of every 4
-      // months (see v2.1.0 note above). Listed first so the same-day tie
-      // resolves to QoQ; MoM is still what's freshest in the two
-      // in-between months and remains the correct fallback there.
       gdp:   ['GDP Growth Rate QoQ', 'GDP MoM'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      // v2.2.2: NOT a genuine gap \u2014 was a pipeline bug, not a missing source.
-      // Myfxbook's real title is "PPI Output YoY"/"PPI Output MoM" (UK's PPI
-      // has separate Output/Input series; "Output" is the headline one, same
-      // convention BoE/ONS coverage uses). fetch_ff_calendar.py/calendar-
-      // watcher.js's impact-upgrade table only matched the literal phrase
-      // "producer price index", which never appears in Myfxbook's actual
-      // titles \u2014 GBP's PPI (Myfxbook-tagged Low impact) was silently
-      // dropped before it ever reached calendar.json. Fixed upstream in
-      // fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29; wiring the
-      // real title here now that the source will actually carry it.
       ppi:   ['PPI Output YoY', 'PPI Output MoM'],
-      // v2.5.3: bare 'Employment Change'.
       emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
-      // v2.5.11 (2026-08-28): 'S&P Global Manufacturing PMI' was a SILENT
-      // DEAD BRANCH — confirmed zero matches for that exact string across
-      // the entire live calendar.json (3,843 events checked). The feed's
-      // actual title is 'Flash Manufacturing PMI' (there is no separate
-      // "final" reading in this source — only the flash print). This cell
-      // had been quietly running on the CBI Industrial Trends Orders
-      // fallback alone this whole time. Same failure mode as GUIDELINES.md
-      // v8.141.0/v8.142.0 (a prefix string that looks right but was never
-      // actually checked against the live feed at the time it was added).
       conf:  ['Flash Manufacturing PMI', 'CBI Industrial Trends Orders'],
-      // Live-audited against calendar.json: 'Retail Sales YoY' / 'United
-      // Kingdom Retail Sales YoY' confirmed present as a distinct title
-      // from MoM — same omission class as USD/SEK/CHF's rtl fixes.
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Goods Trade Balance', 'Balance of Trade'],
@@ -902,51 +70,13 @@
     JPY: {
       gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
-      // v2.2.3: NOT a genuine gap — same pipeline bug as ppi below. Myfxbook's
-      // real title is bare "Inflation Rate MoM" (live page confirmed:
-      // japan/inflation-rate-mom) — tagged Low impact while YoY is medium+,
-      // so MoM was silently dropped. Fixed upstream in fetch_ff_calendar.py
-      // v3.44 / calendar-watcher.js v5.30.
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      // v2.2.2: NOT a genuine gap \u2014 same pipeline bug as GBP above.
-      // Myfxbook's real title is bare "PPI YoY"/"PPI MoM" (canon() strips
-      // any "Japan " prefix drift the same way it does elsewhere). Fixed
-      // upstream in fetch_ff_calendar.py v3.43 / calendar-watcher.js v5.29.
       ppi:   ['PPI YoY', 'PPI MoM'],
-      // v2.5.7: v2.5.4's "Deliberately still NOT wired" is now stale for
-      // THIS specific approach — "Jobs/applications ratio" is still
-      // correctly excluded (a tightness ratio, not a flow). however, on review,
-      // noted TE's own chart widget for japan/employed-persons exposes a
-      // Value/Chg/Chg% toggle, confirming TE itself treats a MoM delta of
-      // that level as legitimate. That toggle's data isn't reachable via a
-      // static-HTML scrape, but the same "Related" table already gives us
-      // Last/Previous for "Employed Persons" (Thousand), so
-      // fetch_te_employment_change.py v1.2 computes delta = Last −
-      // Previous locally and emits it as an absolute Thousand ("K") value
-      // — matching USD/GBP/AUD/CAD's native NFP-style unit (Employed
-      // Persons' own unit), not a %. Distinct event title
-      // ("Employment Change MoM") from NOK/SEK/CHF's below, both because
-      // it's a locally-computed value, not a vendor-published change
-      // series, and to surface "MoM" cadence in the UI.
       emp:   ['Employment Change MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
-      // CORRECTION (v2.5.14, 2026-08-30): v2.5.11's "zero MoM events"
-      // finding was correct AT THE TIME (0 of 3,843 events that session)
-      // but the premise went stale — 'Japan Retail Sales MoM' printed for
-      // the first time ever on 2026-08-30 (actual 2.4%, fcst 3.1%, prev
-      // -4.1%), same-day as 'Japan Retail Sales YoY' (actual 4.0%),
-      // confirmed against a freshly-downloaded calendar.json. Same
-      // omission class as the SEK/CHF/USD/GBP/CAD rtl fixes and SEK's
-      // prod fix, same session: a title with zero historical prints is
-      // correctly left out, but that absence must be re-checked once a
-      // real print exists, not treated as permanently settled (see
-      // GUIDELINES.md v8.142.0's "a confirmed gap must be periodically
-      // re-checked" rule). MoM listed first, matching this column's
-      // Bloomberg-headline-print convention already used for
-      // USD/GBP/CAD/CHF/SEK/NOK.
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
@@ -954,43 +84,16 @@
     },
     AUD: {
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
-      // Deliberately excludes "CPI" \u2014 that title is the raw index level in
-      // points (e.g. 102.03), not a %-rate. See v2.0.0 note above.
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
-      // RBA Trimmed Mean CPI is AUD's standard core-equivalent (see column def).
       core:  ['RBA Trimmed Mean CPI YoY', 'Quarterly RBA Trimmed Mean CPI YoY'],
-      ppi:   ['PPI QoQ'], // ABS publishes PPI quarterly, not monthly \u2014 QoQ is the genuine native cadence, not a fallback
-      // v2.5.3: bare 'Employment Change' (net, seasonally adjusted) \u2014
-      // deliberately excludes 'Full Time Employment Chg', a sub-component
-      // of the same release, not an alternate cadence (same non-mixing
-      // principle as NZD's PPI Input/Output note below).
+      ppi:   ['PPI QoQ'], 
       emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Ai Group Industry Index'], // Ai Group Performance of Manufacturing \u2014 published monthly by Ai Group Australia
+      prod:  ['Ai Group Industry Index'], 
       conf:  ['NAB Business Confidence'],
-      // CORRECTION (v2.5.12, 2026-08-28): the v2.2.3 comment below claimed
-      // this was fixed upstream (fetch_ff_calendar.py v3.44's "retail sales
-      // mom" impact-upgrade entry) \u2014 that code genuinely exists in the
-      // scripts repo (confirmed: line ~1090, corpus-checked, zero collisions)
-      // but a freshly-downloaded calendar.json (lastUpdate 2026-08-28, 263
-      // AUD events) has ZERO titles containing "retail" for AUD, canon-
-      // stripped or not. This is either (a) the fix hasn't actually reached
-      // a deployed run since it was written, or (b) Myfxbook's own AU retail
-      // sales page stopped publishing/changed title since v2.2.3 was
-      // written. Root cause NOT diagnosed this session \u2014 needs checking
-      // against a live GitHub Actions run of update-ff-calendar.yml before
-      // assuming either cause; flagged as a genuine open gap, not silently
-      // re-fixed. Left as ['Retail Sales MoM'] (currently a dead/no-op
-      // entry \u2014 renders identically to an empty array) rather than reverted
-      // to [], so the next audit sees exactly what title was expected and
-      // can re-check it against the live feed directly.
-      // v2.2.3 (original, now unconfirmed): Myfxbook's real title is bare
-      // "Retail Sales MoM" (live page: australia/retail-sales-mom) \u2014
-      // tagged Low impact while every other G10 currency's retail sales is
-      // medium+, so AUD's alone was silently dropped.
       rtl:   ['Retail Sales MoM'],
-      ca:    ['Current Account'], // ABS BOP quarterly \u2014 injected by fetch_supplementary_indicators.py
+      ca:    ['Current Account'], 
       trade: ['Balance of Trade'],
       pce:   [],
     },
@@ -999,161 +102,41 @@
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      // v2.2.2: NOT a genuine gap \u2014 same pipeline bug as GBP/JPY above.
-      // Myfxbook's real title is bare "PPI YoY"/"PPI MoM" (StatCan's IPPI;
-      // canon() strips any "Canada " prefix drift the same way it does
-      // elsewhere). Fixed upstream in fetch_ff_calendar.py v3.43 /
-      // calendar-watcher.js v5.29.
       ppi:   ['PPI YoY', 'PPI MoM'],
-      // v2.5.3: bare 'Employment Change' \u2014 excludes 'Full/Part Time
-      // Employment Chg' sub-components, same reasoning as AUD above.
       emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], // StatCan via FRED (MoM) or OECD MEI (YoY fallback) \u2014 injected by fetch_supplementary_indicators.py
+      prod:  ['Manufacturing Sales MoM', 'Manufacturing Sales YoY'], 
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
-      // v2.5.12 (2026-08-28): added 'Retail Sales YoY' \u2014 confirmed present
-      // in a freshly-downloaded calendar.json as a distinct title released
-      // same-day alongside MoM (e.g. 2026-08-21: MoM -0.8%, YoY 5.2%), same
-      // omission class as the USD/GBP rtl fix in v2.5.11. Listed last (lowest
-      // tie-break priority) since MoM is StatCan's own headline framing.
       rtl:   ['Retail Sales MoM', 'Retail Sales MoM Final', 'Retail Sales Ex Autos MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
     },
     CHF: {
-      // v2.2.0: 'GDP Growth Rate QoQ Flash' never matched anything in the
-      // feed (real title is 'GDP Growth Rate QoQ') — QoQ was silently
-      // unreachable for CHF, not a deliberate YoY-first choice. Both real
-      // titles now considered; YoY currently wins on freshness most
-      // quarters (its release date consistently trails QoQ's by ~2 weeks
-      // in this feed), same outcome as before but for the right reason.
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
       cpi:   ['Inflation Rate YoY'],
-      // v2.2.5: NOT a genuine gap \u2014 the prior "no MoM headline release in
-      // current source" comment was never re-verified against live Myfxbook.
-      // FSO publishes MoM alongside YoY every release, and a live page
-      // exists (myfxbook.com/forex-economic-calendar/switzerland/
-      // inflation-rate-mom). One-time backfilled via
-      // backfill_supplementary_events.py v1.2 (FSO-cited); live pipeline
-      // will pick up future releases automatically \u2014 canon()'s existing
-      // "Switzerland " prefix stripping needs no new logic.
       cpimom:['Inflation Rate MoM'],
-      // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to a
-      // new non-Myfxbook source instead of left blank. The vendor's
-      // "Switzerland Core Inflation Rate" (FSO-sourced), fetched by
-      // fetch_te_core_inflation.py v1.0. UNVALIDATED as of v2.2.6 \u2014 that
-      // script's live guest:guest access was never confirmed to actually
-      // return this indicator (see its header). If it never populates a
-      // matching event, this cell simply stays blank, same as before \u2014 see
-      // fetch_te_core_inflation.py's header before assuming it's broken.
       core:  ['Core Inflation Rate YoY'],
-      // v2.2.3: NOT a genuine gap \u2014 same pipeline bug as GBP/JPY/CAD (v2.2.2)
-      // above. Myfxbook's real title is "Producer & Import Prices YoY/MoM"
-      // (live page confirmed: switzerland/producer-import-prices-yoy|mom) \u2014
-      // this was already known in v2.2.2 while investigating the "ppi"
-      // substring fix, but never got its own upgrade entry so it stayed
-      // unreachable. Fixed upstream in fetch_ff_calendar.py v3.44 /
-      // calendar-watcher.js v5.30 (new "producer & import prices" entry).
-      // Relies on canon()'s existing "Switzerland " prefix stripping \u2014 no
-      // new stripping logic needed.
       ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
-      // v2.5.6: v2.5.4's "confirmed gap" is now stale for THIS source —
-      // 'Non Farm Payrolls' (FSO) is still correctly excluded as a
-      // quarterly headcount LEVEL, not a change/rate figure. however, on review,
-      // flagged TE's own page menu for Switzerland also lists a genuine
-      // "Employment Change" indicator (distinct from Full Time
-      // Employment/Job Offers, both levels, correctly not used) —
-      // live-fetched tradingeconomics.com/switzerland/employment-change and
-      // confirmed EUROSTAT-sourced, seasonally adjusted, QUARTERLY %
-      // change in persons employed: +0.20% (Mar 2026), a real current
-      // print, same exact definition/template as NOK/SEK below. Switzerland
-      // has a bilateral statistical cooperation agreement with Eurostat
-      // covering this series despite not being EU/EEA — do not assume
-      // Eurostat coverage implies EU/EEA membership elsewhere without
-      // checking per-country (JPY was checked and confirmed to have no
-      // equivalent — no bilateral agreement, no "Employment Change" listed
-      // anywhere in TE's Japan indicator menu).
-      // Fetched by fetch_te_employment_change.py v1.1.
-      // v2.6.4: title changed to 'Employment Change QoQ' (fetcher v1.6) so
-      // periodTag() can show the QoQ badge this genuinely-quarterly figure
-      // was missing — see fetch_te_employment_change.py's v1.6 header.
       emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
-      // v2.5.10 (2026-08-28): same omission class as SEK's rtl fix above —
-      // 'Retail Sales MoM' confirmed live on Myfxbook (e.g. "Switzerland
-      // Retail Sales MoM", -0.2% 2025-10-01, -0.5% 2025-09-01, both same-
-      // day releases alongside the YoY print from the same FSO report) but
-      // was never in this currency's prefix list. MoM listed first per the
-      // same Bloomberg-headline-print convention as USD/GBP/AUD/NOK.
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
       pce:   [],
     },
     NZD: {
-      // v2.5.12 (2026-08-28): added 'GDP Growth Rate YoY' as a secondary
-      // tie-break candidate \u2014 confirmed released same-day as QoQ in a
-      // freshly-downloaded calendar.json (e.g. 2026-06-17: QoQ 0.8%, YoY
-      // 1.5%), same QoQ/YoY pairing already used for AUD's gdp column.
-      // QoQ stays first (unchanged priority) since it's NZ's own headline framing.
       gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
-      // v2.6.6: CORRECTED \u2014 a real 'Inflation Rate YoY' title exists for NZ
-      // (myfxbook.com/forex-economic-calendar/new-zealand/inflation-rate-yoy,
-      // Impact: Low, released same day as QoQ \u2014 e.g. 20 Jul 2026: QoQ 1.5%,
-      // YoY 4.1%). The prior comment here ("NZ does not publish YoY CPI")
-      // was wrong. YoY now PRIMARY to match this column's own header/
-      // definition; QoQ kept as same-day tie-break fallback, same pairing
-      // pattern as the gdp column two entries above.
       cpi:   ['Inflation Rate YoY', 'Inflation Rate QoQ'],
-      cpimom:[], // confirmed gap \u2014 NZ does not publish a monthly CPI
-      // v2.2.6: no Myfxbook page exists for this (re-confirmed) \u2014 wired to
-      // The vendor's "New Zealand Core Inflation Rate" (NZCIR,
-      // RBNZ-sourced, ex-gasoline), via fetch_te_core_inflation.py v1.0.
-      // \u26a0\ufe0f THIS IS NOT THE RBNZ SECTORAL FACTOR MODEL quoted in financial
-      // press after each CPI release (that reading was 2.7% YoY Q2 2026) \u2014
-      // The vendor's NZCIR is a different, older ex-fuel core measure (~3.2% YoY
-      // Q4 2025 at time of writing). Do not relabel this as "Sectoral
-      // Factor Model" anywhere \u2014 see fetch_te_core_inflation.py header for
-      // the full explanation. UNVALIDATED as of v2.2.6 \u2014 live guest:guest
-      // access for this indicator was never confirmed; if the fetcher
-      // never populates a matching event this cell just stays blank.
+      cpimom:[], 
       core:  ['Core Inflation Rate YoY'],
-      // v2.2.4: NOT a genuine gap \u2014 live Myfxbook page confirmed at
-      // myfxbook.com/forex-economic-calendar/new-zealand/ppi-output-qoq
-      // (quarterly, Low impact, Source: Statistics New Zealand). The upstream
-      // \"ppi\" substring in _IMPACT_UPGRADES (fetch_ff_calendar.py v3.43)
-      // already covers this title and has since v3.43 shipped \u2014 this cell
-      // was left blank purely because econ-matrix.js's own CATS list was
-      // never updated to match, even after the upstream fix. A live Myfxbook
-      // page for NZ also exists under \"PPI Input QoQ\" (what producers pay
-      // for inputs) \u2014 deliberately NOT wired here: it is a distinct series
-      // from Output PPI, not an alternate cadence of the same series (unlike
-      // CHF's YoY/MoM pair), and every other currency's ppi column reports
-      // the output/producer-price concept, not an input-cost index.
       ppi:   ['PPI Output QoQ'],
-      // v2.5.3: NZ publishes employment quarterly, same cadence as its
-      // GDP/CPI columns above \u2014 'Employment Change QoQ'.
       emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
-      // v2.5.0: was ['Manufacturing Sales YoY'], commented as "injected by
-      // fetch_supplementary_indicators.py" \u2014 that script does not exist in
-      // any repo (dead reference; the actual intended replacement,
-      // fetch_ff_calendar.py's "manufacturing sales" _IMPACT_UPGRADES entry,
-      // never once matched a live NZD event across a full year of
-      // calendar.json, confirmed by audit). Repointed to the vendor's
-      // "Industrial Production" series (fetch_te_nzd_ind_prod.py), which is
-      // both live and the genuinely correctly-named series for this column
-      // \u2014 not a proxy substitution like AUD/CAD's mappings. See
-      // GUIDELINES.md v8.231.0 for the full incident.
       prod:  ['Industrial Production YoY'],
       conf:  ['Business NZ PMI'],
-      // v2.5.12 (2026-08-28): added 'Retail Sales YoY' \u2014 confirmed
-      // present in a freshly-downloaded calendar.json as a distinct title
-      // released same-day alongside QoQ (2026-08-23: QoQ -0.5%, YoY 3.3%).
-      // QoQ stays first (unchanged priority) \u2014 NZ's own headline framing.
       rtl:   ['Retail Sales QoQ', 'Retail Sales YoY'],
       ca:    ['Current Account'],
       trade: ['Balance of Trade'],
@@ -1163,90 +146,11 @@
       gdp:   ['GDP Growth Rate QoQ'],
       cpi:   ['CPIF YoY'],
       cpimom:['CPIF MoM'],
-      // CORRECTION (v2.2.7, 2026-08-14): v2.2.4's "genuine gap" note below
-      // was checking the wrong source. Myfxbook indeed has no calendar page
-      // for this series, but the vendor does \u2014 see the private script's
-      // header for the URL, labelled "CPIF excl. Energy YoY" (the vendor's
-      // own display name, not "Core Inflation Rate" like CHF/NZD's pages).
-      // Confirmed server-rendered and live-scraped successfully the same
-      // session this was caught \u2014 see fetch_te_core_inflation.py v3.0.
-      // Original v2.2.4 note preserved below for the historical record of
-      // what was actually checked (Myfxbook) and why it looked like a gap.
-      //
-      // v2.2.4 (superseded): full live Sweden calendar listing
-      // (myfxbook.com/forex-economic-calendar/sweden, checked through its
-      // Sep 2026 horizon) carries CPIF YoY/MoM (headline) and Inflation Rate
-      // YoY/MoM but no separate \"CPIF Excluding Energy\" / core title under
-      // any name on Myfxbook specifically.
-      //
-      // v2.6.5 (2026-09-06) — SUPERSEDED AGAIN, by Santiago's explicit
-      // decision, not a live-page correction: the TE-sourced "Core
-      // Inflation Rate YoY" (CPIF-XE, SCB) this cell used since v2.2.7 kept
-      // going stale for months at a time (last real update 1 Jul, 0.6%,
-      // while the rest of the matrix was current) because
-      // fetch_te_core_inflation.py's scrape reliability for this source was
-      // never solid \u2014 see that file's own \"UNVALIDATED\" header notes.
-      // Santiago chose to replace it with Myfxbook's plain \"Inflation Rate
-      // YoY\" (SEK headline CPI \u2014 confirmed live vs Trading Economics:
-      // Jun 0.7%, Jul 0.2%), which the live Myfxbook pipeline already
-      // ingests reliably for the cpi/cpimom-adjacent CPIF titles.
-      // \u26a0\ufe0f THIS IS NOT CORE INFLATION (not ex-food/ex-energy) \u2014 it is
-      // Sweden's headline CPI YoY, a DIFFERENT number from CPIF (the
-      // Riksbank's actual target measure, used in the cpi/cpimom columns
-      // above). Labelled here only because Santiago wanted the freshest
-      // reliably-updating series in this cell over a technically-more-
-      // correct one that kept stalling. See EMP_EUROSTAT_CCY-style tooltip
-      // note wired in below for the on-screen disclosure — do not remove
-      // that note if this mapping is kept, or the column header ("core")
-      // will silently misrepresent this as an ex-volatile-components figure.
       core:  ['Inflation Rate YoY'],
-      ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
-      // v2.5.10 (2026-08-28): CORRECTION — 'rtl' had only ever listed
-      // 'Retail Sales YoY', so the cell was frozen on whatever YoY print
-      // last released (Apr) and silently ignored every intervening MoM
-      // release from the SAME underlying Statistics Sweden report —
-      // confirmed live: \"Sweden Retail Sales MoM\" printed 2026-08-28
-      // (-0.2% vs -0.6% fcst, prev 1.4%) and never reached the matrix
-      // because MoM was never in this currency's prefix list at all. This
-      // is the same \"incomplete prefix list silently overrides the
-      // column's own policy\" class already documented for GBP's GDP
-      // column (GUIDELINES.md v8.141.0) — an omission, not a deliberate
-      // YoY-only choice; nothing in this file's history claims Myfxbook
-      // lacks a Sweden MoM retail sales title. findLatestGeneric() already
-      // picks whichever prefix has the most recent dateISO, so listing
-      // both here (MoM first, matching the Bloomberg-headline-print
-      // convention already used for USD/GBP/AUD/NOK) lets the column
-      // self-correct to the freshest release regardless of period, exactly
-      // like NOK's rtl already does one row below.
+      ppi:   ['PPI YoY', 'PPI MoM'], 
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
-      // v2.5.5: Myfxbook still has no genuine employment-CHANGE title for
-      // SEK (only the raw-LEVEL 'Employed Persons(<Mon>)') \u2014 wired to a
-      // new non-Myfxbook source instead of left blank, the same pattern
-      // already used for CHF/NZD/SEK core inflation (SEK also being the
-      // currency where that exact pattern first paid off, per v2.2.7).
-      // Trading Economics' "Employment Change"
-      // (tradingeconomics.com/sweden/employment-change, EUROSTAT-sourced,
-      // seasonally adjusted QUARTERLY % change in persons employed) is a
-      // genuine change/rate figure, not a level, so it does NOT carry the
-      // level-vs-change conflation risk this column exists to avoid.
-      // Fetched by fetch_te_employment_change.py v1.0. UNVALIDATED end-to-
-      // end as of v2.5.5 \u2014 that script's live requests-based scrape was
-      // never run from a GitHub Actions runner (see its header). If it
-      // never populates a matching event, this cell simply stays blank,
-      // same as before \u2014 see fetch_te_employment_change.py before
-      // assuming it's broken.
-      // v2.6.4: title changed to 'Employment Change QoQ' (fetcher v1.6),
-      // matching CHF/NOK's identical fix \u2014 see that file's v1.6 header.
       emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
-      // v2.5.14 (2026-08-30): CORRECTION — 'prod' had only ever listed
-      // 'Industrial Production YoY', same omission class as this
-      // session's JPY rtl fix and this file's own rtl fix above (v2.5.10):
-      // 'Industrial Production MoM' is confirmed live, released same-day
-      // as YoY every month (e.g. 2026-06-10: MoM 4.2%/YoY 7.1%; 2026-05-08:
-      // MoM -2%/YoY 3%), never previously in this currency's prod prefix
-      // list. MoM listed first per this column's own momentum-indicator
-      // convention (USD/GBP/JPY/NOK/EUR all MoM-first for Ind Prod).
       prod:  ['Industrial Production MoM', 'Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
       ca:    ['Current Account'],
@@ -1254,43 +158,11 @@
       pce:   [],
     },
     NOK: {
-      // v2.6.3 (2026-09-06): CORRECTION — this column only ever listed
-      // 'GDP Growth Rate QoQ' (the nationwide figure incl. petroleum),
-      // never 'GDP Growth Mainland QoQ' (Norges Bank's own preferred GDP
-      // measure, excl. petroleum/shipping — the series Myfxbook's own
-      // page for Norway GDP most prominently surfaces). Live report
-      // (screenshot of myfxbook.com/forex-economic-calendar/norway/
-      // gdp-growth-mainland-qoq): that page already had a 27 Aug 2026
-      // (Q2) release while this cell showed 28 May (Q1) — root-caused to
-      // this incomplete prefix list, the same "incomplete prefix list
-      // silently overrides the column's own freshest-wins policy" class
-      // already documented for GBP's GDP column and SEK's rtl/prod
-      // columns (see GUIDELINES.md v8.141.0). Mainland listed first
-      // (Norges Bank's own preferred measure); findLatestGeneric() picks
-      // whichever of the two has the more recent dateISO, same
-      // self-correcting pattern already used elsewhere in this file.
       gdp:   ['GDP Growth Mainland QoQ', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['Core Inflation Rate YoY'],
-      ppi:   ['PPI YoY'], // parenthetical-month title style (e.g. "PPI YoY(May)") \u2014 strictMatch already handles this
-      // v2.5.5: Myfxbook still has no genuine employment-CHANGE title for
-      // NOK (only the raw-LEVEL 'Unemployed Persons(<Mon>)', excluded for
-      // the same reason as SEK below) \u2014 wired to a new non-Myfxbook
-      // source instead of left blank, the same pattern already used for
-      // CHF/NZD/SEK core inflation. Trading Economics' "Employment Change"
-      // (tradingeconomics.com/norway/employment-change, EUROSTAT-sourced,
-      // seasonally adjusted QUARTERLY % change in persons employed) is a
-      // genuine change/rate figure, not a level, so it does NOT carry the
-      // level-vs-change conflation risk this column exists to avoid.
-      // Fetched by fetch_te_employment_change.py v1.0. UNVALIDATED end-to-
-      // end as of v2.5.5 \u2014 that script's live requests-based scrape was
-      // never run from a GitHub Actions runner (see its header). If it
-      // never populates a matching event, this cell simply stays blank,
-      // same as before \u2014 see fetch_te_employment_change.py before
-      // assuming it's broken.
-      // v2.6.4: title changed to 'Employment Change QoQ' (fetcher v1.6),
-      // matching CHF/SEK's identical fix \u2014 see that file's v1.6 header.
+      ppi:   ['PPI YoY'], 
       emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Production MoM'],
@@ -1302,57 +174,16 @@
     },
   };
 
-  // EUR is matched WITHOUT country-prefix stripping, against explicit
-  // "Euro Area " literal prefixes only \u2014 deliberate asymmetry vs. the other
-  // nine currencies (see v2.0.0 note above: stripping "Euro Area " would let
-  // member-state prints for Germany/France/Italy/etc. leak into the EA
-  // aggregate column). conf is intentionally empty \u2014 see header comment on
-  // the "Business Confidence" contamination finding.
   const CATS_EUR = {
     gdp:   ['Euro Area GDP Growth Rate QoQ'],
     cpi:   ['Euro Area Inflation Rate YoY'],
     cpimom:['Euro Area Inflation Rate MoM'],
     core:  ['Euro Area Core Inflation Rate YoY'],
-    // v2.2.0: no genuine "Euro Area PPI" title exists in the current
-    // source. The bare "PPI YoY" title was checked (not assumed) against
-    // "Germany PPI YoY" — identical value on their one overlapping date
-    // (2026-06-19, both 2.2%) confirms bare "PPI YoY" is actually GERMANY's
-    // national PPI, not an EA aggregate, just without the country prefix
-    // the vendor only started adding partway through the feed's history
-    // (same drift pattern as Ifo above). Shown as Germany's national PPI
-    // \u2014 same proxy pattern as conf above \u2014 rather than mislabeled as
-    // an EA-wide figure.
     ppi:   ['Germany PPI YoY', 'PPI YoY'],
-    // v2.5.3: QoQ listed first (tie-break priority only) to match this
-    // block's own GDP-column convention of QoQ-first for EA headline flow
-    // releases; YoY included as the same-day secondary candidate.
     emp:   ['Euro Area Employment Change QoQ', 'Euro Area Employment Change YoY'],
     unemp: ['Euro Area Unemployment Rate'],
     prod:  ['Euro Area Industrial Production MoM'],
-    // v2.2.0: was previously an intentional gap (see v2.0.0 header note —
-    // bare "Business Confidence" blended 3+ unlabeled national surveys with
-    // no way to disambiguate). Re-investigated: the feed's more recent
-    // entries (from ~Jun 2026) now carry country-prefixed titles
-    // ("France Business Confidence", "Italy Business Confidence", "Germany
-    // Ifo Business Climate", ...) that weren't present when v2.0.0 shipped
-    // — confirmed via calendar.json this is a genuine vendor formatting
-    // change, not new data. "Ifo Business Climate" (bare) and "Germany Ifo
-    // Business Climate" share an identical value on their one overlapping
-    // date (2026-06-19, both 2.2%) confirming they're the SAME continuous
-    // series, just the country-prefix drift already documented for other
-    // currencies. Germany's Ifo is used as the EUR proxy — the same pattern
-    // as AUD's RBA Trimmed Mean CPI: a well-defined, single-attributable
-    // national release standing in for a pan-EA business-confidence
-    // aggregate the feed doesn't otherwise carry, chosen because Ifo is
-    // itself the most widely cited Eurozone business-sentiment bellwether
-    // in FX/macro coverage (Germany being the bloc's largest economy) —
-    // not an arbitrary pick among the now-available national surveys.
     conf:  ['Germany Ifo Business Climate', 'Ifo Business Climate'],
-    // v2.5.12 (2026-08-28): added 'Euro Area Retail Sales YoY' \u2014
-    // confirmed present in a freshly-downloaded calendar.json, already
-    // carrying the genuine EA-wide "Euro Area " prefix (not a national
-    // proxy like ppi/conf above), released same-day alongside MoM
-    // (2026-08-06: MoM -0.3%, YoY 0.7%).
     rtl:   ['Euro Area Retail Sales MoM', 'Euro Area Retail Sales YoY'],
     ca:    ['Euro Area Current Account'],
     trade: ['Euro Area Balance of Trade'],
@@ -1369,39 +200,6 @@
     ppi:  'No producer-price release in the current source for this currency',
   };
 
-  // ── Emp Chg column: official headline vs. in-house proxy ──────────────────
-  // v2.6.2 (2026-09-06) CORRECTION: the original single EMP_PROXY_CCY/NOTE
-  // pair below wrongly grouped CHF/NOK/SEK together with JPY under the same
-  // "in-house estimate, not officially-tracked" language. That's only true
-  // for JPY — its Emp Chg is genuinely computed by this codebase (MoM delta
-  // of TE's "Employed Persons" level, see fetch_te_employment_change.py's
-  // JPY branch). CHF/NOK/SEK's figure is a real, directly-scraped TE-
-  // published release (Eurostat-compiled harmonized Labour Force Survey
-  // change) — Santiago flagged, from a live screenshot, that the tooltip
-  // contradicted TE's own page, which cites a real source (EUROSTAT) for
-  // this exact series. Split into two disclosures: JPY keeps the original
-  // "in-house/computed" language; CHF/NOK/SEK get a factually accurate note
-  // instead — still flagged (†) since it's a different national release
-  // than USD/AUD/CAD/GBP/NZD/EUR's own headline, but never described as an
-  // estimate or as untracked, since it demonstrably isn't either.
-  //
-  // investigated why JPY's Emp Chg magnitude (-360.0K) looked so out of
-  // line with USD's (-23.0K) given Japan's smaller population — verified
-  // the two aren't comparable because they're not the same TYPE of release,
-  // not because of a scaling error. USD/AUD/CAD/GBP/NZD/EUR each have an
-  // OFFICIAL "Employment Change"-equivalent headline release, recognized
-  // and market-tracked as such (ForexFactory: "AU Employment Change", "CA
-  // Employment Change", etc.) — AUD/CAD/GBP/NZD/EUR's version is itself
-  // already a household-survey (Labour Force Survey) figure, same broad
-  // concept as JPY's, only USD's Non Farm Payrolls is the establishment-
-  // survey outlier. JPY/CHF/NOK/SEK have NO such officially-tracked
-  // headline at all — what's wired for those four is a proxy we built
-  // ourselves (CHF/NOK/SEK: TE's Eurostat quarterly % change; JPY: a
-  // locally-computed MoM delta of a level) to fill a real coverage gap,
-  // not a mirror of an existing market-recognized release. Both groups are
-  // accurate data, but they don't carry the same evidentiary weight, so a
-  // reader comparing magnitudes across the column should know which is
-  // which.
   const EMP_COMPUTED_CCY = new Set(['JPY']);
   const EMP_COMPUTED_NOTE = 'In-house estimate, not an officially-tracked headline release ' +
     '(unlike USD/AUD/CAD/GBP/NZD/EUR\u2019s native Employment Change-equivalent).';
@@ -1411,32 +209,11 @@
     'USD/AUD/CAD/GBP/NZD/EUR\u2019s own headline Employment Change.';
   const EMP_PROXY_CCY = new Set([...EMP_COMPUTED_CCY, ...EMP_EUROSTAT_CCY]);
 
-  // ── Core CPI column: SEK cell is headline CPI, not core ────────────────────
-  // v2.6.5 (2026-09-06): SEK's 'core' cell was repointed from a stale
-  // TE-sourced CPIF-XE (Core Inflation Rate YoY) to Myfxbook's plain
-  // "Inflation Rate YoY" (Santiago's explicit call, see CATS.SEK.core note
-  // above) — that source updates reliably, but it is Sweden's HEADLINE CPI,
-  // not an ex-food/ex-energy core measure. Flagging the same way EMP_PROXY_CCY
-  // flags NOK/SEK/CHF's Emp Chg cell, so the "core" column header never
-  // silently implies something this cell isn't.
   const SEK_CORE_IS_HEADLINE_NOTE = 'This is Sweden\u2019s headline CPI YoY (Myfxbook), not an ' +
     'ex-food/ex-energy core measure \u2014 shown here instead of the more volatile TE-sourced CPIF ' +
-    'excl. Energy series by Santiago\u2019s choice, for reliability. See CPI YoY column for CPIF, ' +
+    'excl. Energy series, for reliability. See CPI YoY column for CPIF, ' +
     'the Riksbank\u2019s actual target measure.';
 
-  // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
-  // Purely a display convenience so YoY/QoQ/MoM/Annualized prints are never
-  // visually ambiguous (e.g. NZD CPI is QoQ-only; several GDP prints are YoY
-  // where a currency has no QoQ release). Detected from the event's own
-  // title text, not asserted independently, so it can never drift out of
-  // sync with what was actually matched.
-  // v2.1.0: USD's "GDP Growth Rate QoQ" title is, by the BEA's own reporting
-  // convention, already seasonally-adjusted ANNUALIZED (SAAR) — unlike every
-  // other currency's "GDP Growth Rate QoQ", which is the raw, non-annualized
-  // quarterly change. Tagging both identically as "QoQ" would silently make
-  // US growth look ~4x stronger than an equivalent EA/UK/JPY print in the
-  // same column. Flagged only for gdp/USD/qoq — every other cell's title
-  // already carries an unambiguous, correctly-scaled period tag.
   function periodLabel(title, ccy, colKey) {
     const t = title.toLowerCase();
     if (colKey === 'gdp' && ccy === 'USD' && t.indexOf('qoq') !== -1) return 'QoQ SAAR';
@@ -1448,33 +225,6 @@
     return '';
   }
 
-  // Formats a dateISO ('YYYY-MM-DD') as 'DD Mon' for the subtext line.
-  //
-  // v2.6.1 (2026-09-06): CORRECTION — this used to extract a parenthetical
-  // month/quarter tag ("(Apr)"/"(Q1)") from the NOK/SEK title style when
-  // present (e.g. "Balance of Trade(Jul)"), on the reasoning that the
-  // vendor's own stated reference period is more precise than the release
-  // date. In practice this made NOK/SEK-style cells show ONLY a bare month
-  // ("Jul") with no day, while every other currency's subtext in the same
-  // column shows a full "DD Mon" release date (e.g. "17 Aug") \u2014 a real
-  // inconsistency Santiago flagged from a live screenshot, not a display
-  // preference. Per his explicit call: consistency across columns wins over
-  // showing the reference period: this always formats the event's own
-  // dateISO (release date) as "DD Mon" now, matching every other currency's
-  // subtext in the same column. The reference-period tag is still visible
-  // inside the cell's own event title/tooltip \u2014 only the subtext line
-  // changed. See CHANGELOG.md v8.391.0.
-  // v2.6.2 (2026-09-06): some sources (TE's "Related" table — see
-  // fetch_te_employment_change.py / fetch_te_core_inflation.py /
-  // fetch_te_nzd_ind_prod.py) only publish a reference MONTH+YEAR ("Jun
-  // 2026"), never an exact release day. Those fetchers store dateISO with
-  // a synthetic "-01" day so the event still sorts/dedupes correctly, but
-  // that "01" was never a real release date and must not be displayed as
-  // one — Santiago flagged this from a live tooltip showing a fabricated
-  // day. Events from those fetchers carry `dayPrecision:'month'`; this
-  // function checks that flag and falls back to a bare month for them,
-  // while every other event (a real day-precise release date) keeps the
-  // existing "DD Mon" format unchanged.
   function refLabel(ev) {
     const d = new Date(ev.dateISO + 'T00:00:00Z');
     if (isNaN(d)) return ev.dateISO;
@@ -1484,9 +234,6 @@
     return d.toLocaleDateString('en', { day: '2-digit', month: 'short', timeZone: 'UTC' });
   }
 
-  // Same month-only-precision awareness as refLabel(), for the tooltip's
-  // full date string — showing a raw "2026-06-01" ISO date in the tooltip
-  // has the identical fabricated-day problem as the subtext line did.
   function refDateForTooltip(ev) {
     if (ev.dayPrecision === 'month') {
       const d = new Date(ev.dateISO + 'T00:00:00Z');
@@ -1495,12 +242,6 @@
     return ev.dateISO;
   }
 
-  // ── Value parsing \u2014 sign-aware, unit-agnostic ──────────────────────────────
-  // Calendar "actual"/"previous" strings carry inconsistent prefixes (none,
-  // "$", "CHF", "NZ$", "-SEK", ...) and suffixes ("%", "B"). We only need a
-  // signed numeric value to compute trend direction for coloring \u2014 the cell
-  // itself always displays the original string verbatim, so no precision is
-  // invented and no unit conversion is attempted.
   function parseNum(s) {
     if (s == null) return null;
     const str = String(s).trim().replace(/,/g, '');
@@ -1514,13 +255,6 @@
     return neg ? -v : v;
   }
 
-  // Same canonical list as calendar-panel.js's CAL_INVERSE_KW / dashboard.js's
-  // INVERSE_KW / econ-surprises-modal.js's _ESM_INVERSE_KW — an indicator
-  // whose title matches one of these reads "worse" when it goes up (rising
-  // unemployment, more jobless claims, a wider deficit), so its up/down
-  // coloring must be flipped relative to every other column. See v2.3.0
-  // module header note for the audit of which of this file's columns are
-  // actually affected (only Unemp, as of this file's current COLUMNS list).
   const MX_INVERSE_KW = ['unemployment', 'unemployed', 'jobless', 'claims', 'deficit'];
 
   function trendClass(actual, previous, eventTitle) {
@@ -1533,19 +267,6 @@
     return 'flat';
   }
 
-  // ── Build latest-actual index from calendar-data/calendar.json ────────────
-  // Deterministic same-day tie-break: finds the single most-recent date on
-  // which ANY listed prefix matches, then returns the match for the
-  // FIRST prefix (in priority order) that hit on that date \u2014 so a same-day
-  // clash between two different releases (e.g. AUD's index-level "CPI" vs.
-  // its "Inflation Rate YoY" on the same print day) always resolves to the
-  // category's documented priority, not iteration-order luck.
-  // NOTE: a scheduled-but-not-yet-printed release carries `actual: null` in
-  // the feed (e.g. the NZD Business NZ PMI for the day this file shipped —
-  // dated, but not released yet). Both functions below only consider events
-  // that have actually printed, so a pending release never masks the last
-  // real reading — otherwise "latest by date" would return an empty cell for
-  // a currency that in fact has a perfectly good recent print available.
   function findLatestGeneric(ccy, byCcy, prefixes) {
     if (!prefixes || !prefixes.length) return null;
     const list = byCcy[ccy];
@@ -1627,13 +348,6 @@
     return { byCategory: out, lastUpdate: data.lastUpdate || null };
   }
 
-  // Formats a plain 'YYYY-MM-DD' (or any Date-parseable) string as 'DD Mon'
-  // for the 10Y Yld / CB Rate subtext line \u2014 same 'DD Mon' shape as
-  // refLabel() below uses for the calendar-driven columns, so all 16
-  // columns share one visual subtext pattern. Unlike refLabel(), this has
-  // no parenthetical-tag case to check (10y/CB rate dates never carry one)
-  // and tolerates an already-short/unparseable string by returning it as-is
-  // rather than showing nothing.
   function fmtDateShort(dateStr) {
     if (!dateStr) return '';
     const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? dateStr + 'T00:00:00Z' : dateStr);
@@ -1641,12 +355,6 @@
     return d.toLocaleDateString('en', { day: '2-digit', month: 'short', timeZone: 'UTC' });
   }
 
-  // ── 10Y yield \u2014 extended-data/{CCY}.json, same field as yc-modal.js ────────
-  // {cache:'no-store'} added in v2.5.0 to match loadCalendarData() below \u2014
-  // bond10y is written daily (fetch_bond_yields.py) and this fetch is now
-  // re-run every ECONMX_POLL_MS tick, so a stale HTTP-cached copy could
-  // otherwise re-serve the exact same value the periodic refresh exists to
-  // replace. See CHANGELOG.md v8.154.3.
   async function load10y(ccy) {
     const ext = await fetch('./extended-data/' + ccy + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
     const v = ext && ext.data && ext.data.bond10y;
@@ -1655,7 +363,6 @@
     return { value: v, date };
   }
 
-  // ── CB policy rate \u2014 reuse window._STATE_cbRates + computeCBTrend ─────────
   function waitForCBRates(timeoutMs) {
     return new Promise(resolve => {
       const start = Date.now();
@@ -1680,15 +387,6 @@
     return 'flat';
   }
 
-  // rates/{CCY}.json is a FRED-style MONTHLY series — every observation is
-  // stamped to the 1st of its month by construction, never a real decision
-  // date (confirmed: rates/USD.json's latest three rows are 2026-08-01 /
-  // 07-01 / 06-01). meetings-data/meetings.json's per-currency `allMeetings`
-  // carries the actual ISO decision dates instead; this resolves the most
-  // recent one not after today, i.e. the last meeting that could plausibly
-  // have set the currently-displayed rate. Reuses window._STATE_meetings
-  // (populated by dashboard.js) the same way waitForCBRates() reuses
-  // _STATE_cbRates, with an independent fetch fallback.
   function waitForMeetings(timeoutMs) {
     return new Promise(resolve => {
       const start = Date.now();
@@ -1716,7 +414,7 @@
     const todayISO = new Date().toISOString().slice(0, 10);
     const past = all.filter(d => d <= todayISO);
     if (!past.length) return null;
-    return past[past.length - 1]; // allMeetings is chronological; last past entry = most recent
+    return past[past.length - 1]; 
   }
 
   async function getCBRate(ccy) {
@@ -1727,8 +425,6 @@
       const trend = (typeof window.computeCBTrend === 'function') ? window.computeCBTrend(rec.obs) : simpleTrend(rec.obs);
       return { rate: rec.rate, date: meetingDate || rec.date, trend };
     }
-    // Fallback: independent fetch if STATE never populated (e.g. CB Rates
-    // panel failed to load before this one came into view).
     const data = await fetch('./rates/' + ccy + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
     const obs = data && data.observations;
     if (!obs || !obs.length) return null;
@@ -1737,16 +433,12 @@
     return { rate, date: meetingDate || obs[0].date, trend: simpleTrend(obs) };
   }
 
-  // Full HTML-entity escape for any externally-sourced free-text field
-  // (calendar.json's ev.event/ev.actual/ev.previous) before it reaches an
-  // innerHTML sink — same convention as calendar-panel.js's _escAttr().
   function _emxEscHtml(s) {
     return String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
       .replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
 
-  // ── Render ──────────────────────────────────────────────────────────────────
   function cellHTML(ev, gapKey, ccy) {
     if (!ev) {
       const title = (gapKey && GAP_TITLE[gapKey]) || 'No data available';
@@ -1802,36 +494,8 @@
     return html;
   }
 
-  // v2.4.0 \u2014 live polling. Previously loadEconMatrix() was gated by a
-  // permanent `_loaded` flag, so the panel only ever fetched once (on first
-  // scroll-into-view) and never again \u2014 a page reload was the only way to
-  // see a new actual (see GUIDELINES.md / CHANGELOG.md v8.163.0 for the
-  // incident this fixes). calendar.json itself now refreshes near-real-time
-  // upstream (v8.162.0's repository_dispatch bridge, ~2\u20134 min end-to-end),
-  // so the panel re-fetches it on the same cadence. 10Y yields and CB policy
-  // v2.5.0: the periodic refresh now re-fetches calendar.json, 10Y yield
-  // (extended-data/{CCY}.json \u2014 written daily, ten small files, cheap to
-  // re-ask every tick) and recomputes CB Rate (no network cost \u2014 reads the
-  // live window._STATE_cbRates that dashboard.js's own 5-min health.json
-  // sentinel already keeps fresh) every tick, instead of freezing y10/cb at
-  // whatever they were on first scroll-into-view. See CHANGELOG.md v8.154.3
-  // for the live incident (stale AUD/CAD/NOK 10Y shown after a same-day
-  // backend fix) this replaced the old "cache forever" comment/behavior for.
-  const ECONMX_POLL_MS = 90 * 1000; // v2.5.1: 3min → 90s, matches calendar-panel.js's cadence
+  const ECONMX_POLL_MS = 90 * 1000; 
 
-  // v2.6.0: header tooltips. COLUMNS[].title already existed (added v2.5.3
-  // alongside the Emp Chg column) but was never wired into the DOM — dead
-  // data. index.html's <thead> is static HTML with no title= attributes;
-  // rather than hand-duplicate 16 tooltip strings into index.html (a second
-  // manual-sync surface on top of the COLUMNS-length/order one already
-  // flagged above, and this codebase's proven failure mode — see the
-  // v8.143.0 PPI-column incident), this applies COLUMNS' own title text to
-  // the corresponding <th> at runtime by position, plus explicit copy for
-  // the 3 header cells that live outside COLUMNS (Ccy, 10Y Yld, CB Rate).
-  // Deriving the two trailing offsets from COLUMNS.length (not a hardcoded
-  // index) means a future COLUMNS entry keeps this aligned automatically —
-  // the header TEXT itself still needs the existing manual thead/skeleton
-  // sync, this only removes tooltip text as a second thing to keep in sync.
   const EXTRA_HEADER_TITLES = {
     ccy:     'G10 currency (ISO code) covered by this matrix.',
     bond10y: 'Latest 10-year government bond yield \u2014 the benchmark long-end rate used in cross-currency rate-differential and carry-trade comparisons.',
@@ -1878,8 +542,6 @@
     }
   }
 
-  // Full load \u2014 fetches calendar.json + every 10Y/CB source. Runs once,
-  // on first visibility, and caches y10/cb for subsequent light refreshes.
   async function loadEconMatrix() {
     if (_loading) return;
     _loading = true;
@@ -1900,12 +562,6 @@
     }
   }
 
-  // Light refresh \u2014 re-fetches calendar.json, 10Y yield, and CB Rate every
-  // tick (v2.5.0; previously only calendar.json, leaving y10/cb frozen at
-  // their first-load values for the rest of the session \u2014 see CHANGELOG.md
-  // v8.154.3). Still skipped if the first full load hasn't completed yet, or
-  // if a load is already in flight. On a failed re-fetch, falls back to the
-  // last good y10/cb snapshot rather than blanking the panel.
   async function refreshPanel() {
     if (_loading || !_y10Cache || !_cbCache) return;
     _loading = true;
@@ -1919,8 +575,6 @@
       if (cbAll.some(v => v != null)) _cbCache = cbAll;
       if (cal) renderMatrix(cal, _y10Cache, _cbCache);
     } catch (e) {
-      // Silent \u2014 keep showing the last good render rather than blanking
-      // a working panel over a transient background-refresh failure.
     } finally {
       _loading = false;
     }
@@ -1930,9 +584,7 @@
     const section = document.getElementById('section-econmap');
     if (!section) return;
 
-    applyHeaderTooltips(); // runs immediately — headers are static markup,
-                           // no need to wait on the IntersectionObserver
-                           // below (which only gates the data fetch).
+    applyHeaderTooltips(); 
 
     function start() {
       loadEconMatrix();

@@ -4,18 +4,12 @@
 
   function hideBanner() {
     var banner = document.getElementById('gdpr-banner');
-    // Single style mutation avoids forced reflow from toggling hidden + display separately
     if (banner) { banner.style.display = 'none'; banner.hidden = true; }
   }
 
   function applyConsent(choice) {
     localStorage.setItem(CONSENT_KEY, JSON.stringify({ v: choice, ts: Date.now() }));
     hideBanner();
-    // Update GA4 consent state — must be called before any gtag event fires.
-    // 'denied' keeps GA4 in consent-mode cookieless mode (no cookies, no PII sent).
-    // The Terminal does not use Google AdSense or any ad-serving network, so
-    // only analytics_storage is relevant here (ad_storage/ad_user_data/
-    // ad_personalization were removed along with AdSense — see CHANGELOG.md).
     if (typeof gtag === 'function') {
       gtag('consent', 'update', {
         analytics_storage: choice === 'accepted' ? 'granted' : 'denied',
@@ -41,7 +35,6 @@
       if (stored) {
         var parsed = JSON.parse(stored);
         if (parsed && parsed.ts && (Date.now() - parsed.ts) < 13 * 30 * 24 * 3600 * 1000) {
-          // Restore GA4 consent state from prior session before any events fire.
           if (typeof gtag === 'function') {
             gtag('consent', 'update', {
               analytics_storage: parsed.v === 'accepted' ? 'granted' : 'denied',
@@ -53,7 +46,6 @@
     } catch(e) {}
     var banner = document.getElementById('gdpr-banner');
     if (banner) {
-      // Batch style mutations: set display first (visible), then remove hidden in same task
       banner.style.display = 'flex';
       banner.hidden = false;
       setTimeout(function() { var btn = document.getElementById('gdpr-accept'); if (btn) btn.focus(); }, 300);

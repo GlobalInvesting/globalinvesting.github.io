@@ -1,26 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
-// INLINE PANEL SYSTEM  v1.4.2 — stop force-enabling split-layout on modal
-//   open. _ensureSplit() (renamed _getInlinePanelTargets()) used to add
-//   the split-layout class + persist it to localStorage every time any of
-//   these modals opened, silently overriding a user's explicit choice to
-//   keep the layout unsplit. Now: if split is already active (user turned
-//   it on), route into the existing left/right panes as before; if not,
-//   render the panel across the full #main area instead of switching
-//   layouts. Also fixed _makeShell()'s panel-replacement teardown, which
-//   used to .remove() a previous panel wholesale instead of running its
-//   own close handler — losing transplanted content (e.g. rcm-bd, cbr-bd)
-//   instead of restoring it. More exposed now that multiple modal types
-//   can share the same #main target when split is off.
-// File: assets/inline-panel.js
-//
-//   LEFT center  (#split-upper):  Carry Trade · Heatmap
-//   RIGHT center (#split-lower):  Correlations · CB Rates · COT
-//
-// v1.3.0: Fix height:0 bug. Instead of prepending with height:100%
-//         (which resolves to 0 in a scrollable flex container), we
-//         now HIDE existing children and insert the panel as the sole
-//         visible child, sized with min-height to fill the container.
-// ═══════════════════════════════════════════════════════════════════
 
 (function () {
   'use strict';
@@ -28,17 +5,6 @@
   var IP_ATTR = 'data-inline-panel';
   var HIDDEN_ATTR = 'data-ip-hidden';
 
-  // ── Resolve target panes for inline content ────────────────────────
-  // Split-layout must only ever be active because the user turned it on
-  // with #split-layout-btn — never as a side-effect of opening a panel.
-  // Previously this force-enabled split-layout (and persisted that to
-  // localStorage) every time ANY of these modals opened, silently
-  // overriding a user's explicit choice to keep the layout unsplit.
-  //
-  // When split is already active (user's choice), route into the existing
-  // left/right panes exactly as before. When it isn't, render the panel
-  // across the full central area (#main) instead of switching layouts out
-  // from under the user.
   function _getInlinePanelTargets() {
     var main  = document.getElementById('main');
     var upper = document.getElementById('split-upper');
@@ -48,12 +14,9 @@
     if (main.classList.contains('split-layout')) {
       return { upper: upper, lower: lower };
     }
-    // Split inactive: both "panes" resolve to the full central area so the
-    // panel takes over the whole width instead of forcing a 55/45 split.
     return { upper: main, lower: main };
   }
 
-  // ── Hide existing children of target, return restore function ─────
   function _hideChildren(target) {
     var hidden = [];
     Array.from(target.children).forEach(function(child) {
@@ -71,33 +34,23 @@
     };
   }
 
-  // ── Create inline shell ────────────────────────────────────────────
   function _makeShell(target, title, onClose) {
-    // Tear down any existing inline panel in this target first — via its
-    // own close handler when one was recorded, not a raw DOM removal.
-    // A blind .remove() would delete transplanted content (e.g. rcm-bd,
-    // cbr-bd) along with the shell instead of restoring it to document.body,
-    // permanently losing that modal's DOM node.
     var old = target.querySelector('[' + IP_ATTR + ']');
     if (old) {
       if (typeof old._ipOnClose === 'function') old._ipOnClose();
       else old.remove();
     }
-    // Restore any previously hidden children
     Array.from(target.querySelectorAll('[' + HIDDEN_ATTR + ']')).forEach(function(el) {
       el.style.display = '';
       el.removeAttribute(HIDDEN_ATTR);
     });
 
-    // Hide existing children so the panel can take full height
     var restoreChildren = _hideChildren(target);
 
     var wrap = document.createElement('div');
     wrap.setAttribute(IP_ATTR, '1');
-    // Use min-height instead of height:100% — works correctly in scrollable flex containers
     wrap.style.cssText = 'display:flex;flex-direction:column;min-height:calc(100vh - 100px);background:var(--bg);overflow:hidden;';
 
-    // Header bar
     var hd = document.createElement('div');
     hd.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 10px 4px;border-bottom:1px solid var(--border2);flex-shrink:0;background:var(--bg2);';
 
@@ -111,8 +64,6 @@
     closeBtn.style.cssText = 'background:none;border:none;color:var(--text3);cursor:pointer;font-size:11px;line-height:1;padding:2px 5px;border-radius:3px;transition:color .1s;';
     closeBtn.onmouseenter = function() { closeBtn.style.color = 'var(--text)'; };
     closeBtn.onmouseleave = function() { closeBtn.style.color = 'var(--text3)'; };
-    // Shared close logic — removes shell, restores hidden children, and
-    // tears down the ESC listener before calling the modal's own onClose.
     function _doClose() {
       document.removeEventListener('keydown', _ipEscHandler, true);
       wrap.remove();
@@ -121,10 +72,6 @@
     }
     closeBtn.onclick = _doClose;
 
-    // Capture-phase ESC handler — fires BEFORE the modal's own keydown handler
-    // so restoreChildren() runs even when the modal removes its own DOM node first.
-    // Without this, pressing ESC hides the modal content but leaves the inline-panel
-    // shell in place with all original children still display:none → black panel.
     var _ipEscHandler = function(e) {
       if (e.key === 'Escape') _doClose();
     };
@@ -145,14 +92,6 @@
     return body;
   }
 
-  // ── Synchronously transplant modal into inline body ────────────────
-  // bdExtraCSS (optional, 6th arg): extra rules appended to #*-bd's own
-  // inline style. Default behaviour (omitted) is unchanged for every
-  // existing caller — #*-bd stays 'display:block', sized to its content.
-  // COT passes a value here to give #cot-bd a *definite* resolved height
-  // (flex:1;min-height:0 inside the inline-panel `body`, which is itself
-  // a definite-height flex item). See _transplant() callsite comment in
-  // the COT intercept below for why this is needed.
   function _transplant(body, bdId, modalId, closeId, modalExtraCSS, bdExtraCSS) {
     var bd    = document.getElementById(bdId);
     var modal = document.getElementById(modalId);
@@ -172,7 +111,6 @@
     return true;
   }
 
-  // ── Restore modal back to document.body on panel close ────────────
   function _restore(bdId, closeId, bdOrigCSS, modalId) {
     var bd = document.getElementById(bdId);
     if (!bd) return;
@@ -188,9 +126,6 @@
     }
   }
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: Real Carry Modal → #split-upper (LEFT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenRCM = window.openRealCarryModal;
 
   window.openRealCarryModal = function(longCcy, shortCcy) {
@@ -216,9 +151,6 @@
     document.body.style.overflow = '';
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: Heatmap Modal → #split-upper (LEFT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenHM = window.openHeatmapModal;
 
   window.openHeatmapModal = function(ccy, strengths, rtCache) {
@@ -242,9 +174,6 @@
     document.body.style.overflow = '';
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: Correlation Modal → #split-lower (RIGHT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenCorr = window.openCorrModal;
 
   window.openCorrModal = function(corrObj) {
@@ -279,9 +208,6 @@
     document.body.style.overflow = '';
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: CB Rates Modal → #split-lower (RIGHT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenCBR = window.openCBRatesModal;
 
   window.openCBRatesModal = function(ccy, obs, bankInfo, meetingData) {
@@ -297,14 +223,6 @@
     var bdPre = document.getElementById('cbr-bd');
     if (bdPre) bdPre.style.display = 'none';
 
-    // openCBRatesModal (cb-rates-modal.js) is async: when meetingData is not
-    // pre-cached in window._STATE_meetings (e.g. NOK/SEK, which workflow_meetings.yml
-    // does not populate yet), it awaits a fetch('./meetings-data/meetings.json')
-    // before creating #cbr-bd. That await yields the event loop, so a synchronous
-    // _transplant() call right after firing the function would run BEFORE #cbr-bd
-    // exists — hence the "CB rate data unavailable." placeholder for those currencies.
-    // Currencies with cached meetingData never await and resolve immediately, so
-    // wrapping in Promise.resolve() here is a no-op for them.
     var result = _origOpenCBR && _origOpenCBR(ccy, obs, bankInfo, meetingData);
 
     function doTransplant() {
@@ -321,9 +239,6 @@
     }
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: COT Modal → #split-lower (RIGHT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenCOT = window.openCOTModal;
 
   window.openCOTModal = function(ccy, data, opts) {
@@ -341,23 +256,6 @@
 
     _origOpenCOT && _origOpenCOT(ccy, data, opts);
 
-    // #cot-bd needs an explicit flex:1;min-height:0 here (6th arg) — without
-    // it, #cot-bd stays 'display:block' with NO definite height of its own,
-    // so #cot-modal's 'height:100%!important' (set above in _transplant's
-    // `base`) has nothing real to resolve against and computes to 'auto'.
-    // That breaks the entire flex:1 chain the COT charts depend on to fill
-    // available space (#cot-m-body → .cot-panel.on → .cot-cw → .cot-chart-area
-    // → .cot-lw-wrap), so every chart container reports ~0px height the
-    // first time a tab is built — LightweightCharts then bakes that tiny
-    // (or hardcoded-fallback) height into the DOM, and only LATER, once a
-    // chart's own injected content gives the chain something real to size
-    // against, does the panel appear to "grow into" the correct height.
-    // This is why the bug was timing-shaped (looked like a flex-settling
-    // race) but no setTimeout/rAF delay could ever fix it: the container's
-    // real height was never available to read, at any delay, until a chart
-    // had already (badly) built once. Giving #cot-bd a real resolved height
-    // up front fixes both Net Position and Long/Short on the very first
-    // render, with zero delay.
     if (!_transplant(body, 'cot-bd', 'cot-modal', 'cot-m-close', '',
         'display:flex!important;flex-direction:column!important;flex:1!important;min-height:0!important;')) {
       body.innerHTML = '<div style="padding:12px;font-size:11px;color:var(--text3);">COT data unavailable.</div>';
@@ -365,9 +263,6 @@
     document.body.style.overflow = '';
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: YC Modal → #split-lower (RIGHT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenYC = window.openYCModal;
 
   window.openYCModal = function(tenorData) {
@@ -400,9 +295,6 @@
     document.body.style.overflow = '';
   };
 
-  // ═══════════════════════════════════════════════════════════════════
-  // INTERCEPT: Economic Surprises Modal → #split-lower (RIGHT)
-  // ═══════════════════════════════════════════════════════════════════
   var _origOpenESM = window.openEconSurprisesModal;
 
   window.openEconSurprisesModal = function(ccy) {
@@ -413,10 +305,6 @@
       if (typeof window.closeESModal === 'function') window.closeESModal();
     });
 
-    // Override shell body from overflow-y:auto → overflow:hidden.
-    // Without this, body is a scroll container and esm-modal's height:100%
-    // resolves to auto (circular) — the flex:1;min-height:0 chain collapses,
-    // #esm-events-wrap never scrolls, and position:sticky floats over the chart.
     body.style.overflowY = 'hidden';
 
     var bdPre = document.getElementById('esm-bd');
@@ -430,8 +318,6 @@
     }
     document.body.style.overflow = '';
 
-    // Bug 1 (mobile): split-lower has overflow:visible on mobile so the panel
-    // lands below the fold. Scroll it into view after the transplant.
     requestAnimationFrame(function() {
       var wrap = panels.lower.querySelector('[data-inline-panel]');
       if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });

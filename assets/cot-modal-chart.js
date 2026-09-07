@@ -1,88 +1,4 @@
-// COT MODAL CHART  v3.4 — _lwOpts now sets timeScale.fixRightEdge:true on
-//   every COT modal chart. Root-caused the "Daily Spot Close stays pinned to
-//   the right edge, only stretches" report as a real LWC quirk unrelated to
-//   the sync mechanism (v3.1-3.3 were correct fixes for a real, separate
-//   echo-misroute bug, but didn't touch this one): with no rightOffset
-//   reserved past the last bar, dragging past the right edge clamps "to" at
-//   the last bar while "to"'s counterpart keeps moving, WIDENING the visible
-//   window from the left instead of refusing to move — reads exactly like a
-//   stuck/broken pan. Confirmed via a local LWC v5.0.7 + Playwright repro on
-//   an isolated single chart with zero sync code, then confirmed the fix
-//   (LWC's own fixRightEdge option) resolves it with the two-chart sync
-//   active too, in both drag directions. See GUIDELINES.md.
-// COT MODAL CHART  v3.3 — _lwSyncTimeRanges now gates relay by which chart
-//   container the user is actually interacting with (pointerdown/enter/wheel
-//   on the Net Position vs. Daily Spot Close container), not just a
-//   re-entrancy boolean. A chart's own delayed bar-snapping echo (a frame or
-//   two after a relayed setVisibleRange, since Net's weekly bars and Spot's
-//   daily bars don't snap to identical boundaries) was slipping past the
-//   v3.2 boolean guard and getting relayed onto the OTHER chart — observed
-//   live as Daily Spot Close staying pinned to the current-date edge no
-//   matter how far Net Position was panned. Gating by "which container is
-//   the user on" means a chart's own emitted events are never forwarded
-//   unless that chart is the one being actively dragged/zoomed.
-// COT MODAL CHART  v3.2 — every chart's shared options helper (_lwOpts) now
-//   sets timeScale.lockVisibleTimeRangeOnResize:true. LWC's default resize
-//   behavior holds bar spacing constant across a width change, which SHIFTS
-//   the visible time window rather than leaving it alone — _lwResize()'s
-//   scheduled applyOptions({width,height}) calls during initial chart build
-//   (while the modal's flex layout is still settling) were silently
-//   narrowing the _lwDefaultWindow()-set range before the user ever touched
-//   the chart. Net Position/Daily Spot Close (the only synced pair)
-//   compounded this into a visibly over-zoomed, mismatched opening state.
-// COT MODAL CHART  v3.1 — _lwSyncTimeRanges's re-entrancy guard now clears on
-//   the next animation frame instead of synchronously right after
-//   setVisibleRange(), since a target chart's change notification for a
-//   programmatic call doesn't always fire in the same synchronous tick —
-//   when it arrived late, the guard had already reopened and the echo
-//   bounced straight back, reading as auto-zoom while panning.
-// COT MODAL CHART  v3.0 — Net Position/Daily Spot Close pan-and-zoom sync +
-//   tighter Net Position default window. Net Position now defaults to 1 year
-//   (was 2y) so its weekly bars render wide enough to read individually — 2y
-//   packed ~104 bars into the panel at a width that made them hard to tell
-//   apart. Daily Spot Close mirrors the same 1y opening window, and the two
-//   charts now stay in sync going forward: panning or zooming either one
-//   moves the other by calendar time (_lwSyncTimeRanges) — a logical/bar-
-//   index sync doesn't work here since the two series have different bar
-//   counts (weekly vs. daily) for the same calendar span.
-// COT MODAL CHART  v2.9 — every chart (Net Position, Daily Spot Close,
-//   Long/Short, OI, Participants) now defaults to a 2-year "recent window"
-//   instead of fitContent()'s full-history view. Full history (now up to 522
-//   weeks / ~10 years, per the COT backfill) is still loaded and reachable by
-//   scrolling/zooming the time axis out — fitContent() runs first so short
-//   datasets (a symbol with <2y of history) are unaffected, then
-//   setVisibleRange() narrows the *initial* view only. Previously every chart
-//   opened fully zoomed out across all 10 years, compressing 522 weekly bars
-//   (or ~2,500 daily spot closes) into an unreadable blur.
-// COT MODAL CHART  v2.8 — Daily Spot Close now covers Commodities/Indices tabs,
-//   not just FX: _COT_SPOT extended with XAU→gold.json, XAG→silver.json,
-//   WTI→wti.json, SPX→spx.json, DJ30→dji.json, NAS100→nasdaq.json (same
-//   ohlc-data/ files dashboard.js's own charts already fetch — no new data
-//   source added). COPPER has no matching ohlc-data file and is left showing
-//   "Spot data unavailable" rather than a fabricated source. Title/tooltip label
-//   is now asset-class aware (_cotSpotLabel()) — "XAU"/"WTI"/"SPX" for
-//   commodities/indices vs "EUR/USD" for FX — and the spot chart's decimal
-//   precision now also covers the commodities/indices magnitude range
-//   (≥3 → 2dp) alongside the existing FX-pair tiers.
-// COT MODAL CHART  v2.7 — report-family labels (LF/AM/DD vs MM/SD/PM) now derived
-//   from _cotReportMeta() (dashboard.js) instead of hardcoded everywhere, so this
-//   modal no longer mislabels Commodities-tab (Gold/Silver/Copper/WTI) rows as
-//   "LF"/"AM" — threaded through header, metrics, key-metrics accordion,
-//   participant table, all three tab titles/legends, and the OI/Participants
-//   chart tooltips (_buildOIChart/_buildParticipantsChart now take a meta param).
-// COT MODAL CHART  v2.6 — spot-close chart decimal precision fixed for inverted
-//   pairs (JPY/NOK/SEK): was hardcoded to 2 decimals assuming direct-quote
-//   magnitude, but _fetchCOTSpot inverts these three to CCY/USD (JPY/USD
-//   ~0.0064, NOK & SEK/USD ~0.10), so 2 decimals rounded every close to the
-//   same "0.01"/"0.10" — axis and tooltip showed one repeated value instead
-//   of the real range. Now derives decimals from the data's own magnitude.
-// COT MODAL CHART  v2.5 — in-modal currency switcher (chip + prev/next arrows + arrow-key cycling)
-// COT MODAL CHART  v2.4 — fix .cu/.cd specificity in cot-tbl; fix Net Position left-axis regression
-// COT MODAL CHART  v2.0 — LightweightCharts v5 (replaces Chart.js)
-// File: assets/cot-modal-chart.js
-// ═══════════════════════════════════════════════════════════════════════════
 
-// ── CSS ─────────────────────────────────────────────────────────────────────
 (function () {
   if (document.getElementById('cot-modal2-css')) return;
   const s = document.createElement('style');
@@ -118,7 +34,7 @@
 }
 #cot-m-close:hover { color:var(--text);background:var(--bg3); }
 
-/* ── Currency switcher (in-modal, no need to close/reopen) ─────────────────── */
+
 #cot-m-title-row { display:flex;align-items:center;gap:5px; }
 .cot-ccy-arrow {
   background:none;border:none;color:var(--text3,#4e5c70);font-size:11px;
@@ -205,7 +121,7 @@
 #p-overview.on { display:flex;flex:1;flex-direction:column;min-height:0;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 #p-overview.on::-webkit-scrollbar { width:3px!important; }
 #p-overview.on::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
-/* Overview — KFV single-column layout */
+
 #p-overview .cot-ov-sec {
   display:flex;align-items:center;justify-content:space-between;
   padding:6px 14px 5px;
@@ -217,11 +133,11 @@
 #p-overview .cot-ov-sec:first-child { border-top:none; }
 #p-overview .cot-ov-sec-lbl { font-size:8.5px;font-weight:600;color:var(--text3,#4e5c70);text-transform:uppercase;letter-spacing:.1em;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 #p-overview .cot-ov-sec-note { font-size:8.5px;color:var(--text3,#4e5c70);opacity:.6;letter-spacing:.02em;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
-/* Top row: Positioning + L/S side by side */
+
 #p-overview .cot-ov-top-row { display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border,#252d3d);flex-shrink:0; }
 #p-overview .cot-ov-top-row > .cot-ov-half { padding:12px 14px; }
 #p-overview .cot-ov-top-row > .cot-ov-half:first-child { border-right:1px solid var(--border,#252d3d); }
-/* KFV rows */
+
 #p-overview .cot-kfv { display:flex;align-items:center;padding:5px 14px;border-bottom:1px solid rgba(255,255,255,.04);min-height:28px;flex-shrink:0; }
 #p-overview .cot-kfv:last-child { border-bottom:none; }
 #p-overview .cot-kfv-key { font-size:10px;color:var(--text2,#8b949e);flex:1;min-width:0;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
@@ -233,7 +149,7 @@
 .cot-badge-s { background:color-mix(in srgb, var(--down) 15%, transparent);color:var(--down); }
 .cot-badge-n { background:rgba(88,166,255,.1);color:#58a6ff; }
 .cot-badge-w { background:rgba(243,156,18,.12);color:#f39c12; }
-/* Spark row */
+
 #p-overview .cot-ov-spark-row { padding:10px 0 12px;flex-shrink:0; }
 #p-overview .cot-ov-spark-top { display:flex;justify-content:space-between;margin-bottom:8px;padding:0 14px; }
 #p-overview .cot-ov-spark-trend { font-size:9px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace); }
@@ -308,13 +224,13 @@
 .cd { color:var(--down); }
 .cn { color:var(--text2); }
 
-/* Price overlay legend (Net Position tab) */
+
 #cot-net-legend { display:flex;align-items:center;justify-content:space-between;padding:0 14px 8px;flex-shrink:0; }
 #cot-net-legend .cot-nl-items { display:flex;flex-wrap:wrap;gap:12px;align-items:center;font-size:9.5px;font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);color:var(--text2); }
 #cot-net-legend .cot-nl-item { display:flex;align-items:center;gap:5px; }
 #cot-net-legend .cot-nl-dot { display:inline-block;width:14px;height:3px;border-radius:2px; }
 #cot-net-price-status { font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);transition:opacity .2s; }
-/* OI section in Long/Short tab */
+
 #p-split .cot-oi-section { flex-shrink:0; }
 .cot-oi-note { font-size:9px;color:var(--text3);font-family:var(--font-mono,'JetBrains Mono','Courier New',monospace);margin-top:4px; }
 @media (max-width:480px){
@@ -340,14 +256,11 @@
   document.head.appendChild(s);
 })();
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
 const _monoF = "'JetBrains Mono','Courier New',monospace";
 
-// Read a CSS variable from :root at call time — safe for theme switches
 function _cotTC(cssVar, fallback) {
   return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim() || fallback;
 }
-// Hex + 2-char alpha suffix (e.g. 'cc' = 80%)
 function _cotTCA(cssVar, alpha, fallback) {
   return (_cotTC(cssVar, fallback) + alpha);
 }
@@ -397,7 +310,6 @@ function _posLabel(z) {
   return {txt:'Extreme Short',col:_cotTC('--down','#ef5350')};
 }
 
-// ── Overview helpers ──────────────────────────────────────────────────────────
 function _cotSparkline(history, nWeeks) {
   const vals = history.slice(-nWeeks).map(h => h.levNet ?? ((h.levLong||0)-(h.levShort||0)));
   if (vals.length < 2) return '<div style="height:72px;display:flex;align-items:center;font-size:9px;color:var(--text3)">Insufficient data</div>';
@@ -405,10 +317,10 @@ function _cotSparkline(history, nWeeks) {
   const last = vals[vals.length - 1];
   const isPos = last >= 0;
   const lineCol = isPos ? _cotTC('--up','#26a69a') : _cotTC('--down','#ef5350');
-  const fillCol = isPos ? _cotTCA('--up','2e','#26a69a') : _cotTCA('--down','2e','#ef5350'); // ~18% opacity
+  const fillCol = isPos ? _cotTCA('--up','2e','#26a69a') : _cotTCA('--down','2e','#ef5350'); 
 
-  const W = 1000, H = 72; // viewBox coords — scales to any container width
-  const PAD = { t: 6, b: 6, l: 14, r: 14 }; // horizontal padding keeps line away from edges
+  const W = 1000, H = 72; 
+  const PAD = { t: 6, b: 6, l: 14, r: 14 }; 
   const minV = Math.min(...vals), maxV = Math.max(...vals);
   const range = maxV - minV || 1;
 
@@ -419,10 +331,8 @@ function _cotSparkline(history, nWeeks) {
   const pts = vals.map((v, i) => `${xOf(i).toFixed(1)},${yOf(v).toFixed(1)}`).join(' ');
   const firstX = xOf(0).toFixed(1), lastX = xOf(n-1).toFixed(1), baseY = (H - PAD.b).toFixed(1);
 
-  // Polyline points for the area fill (close at bottom)
   const areaPts = `${firstX},${baseY} ${pts} ${lastX},${baseY}`;
 
-  // Crosshair dot — render at last point; stroke reads --bg at runtime for seamless ring on any theme bg
   const dotX = xOf(n-1).toFixed(1), dotY = yOf(last).toFixed(1);
   const dotBg = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim() || '#131722';
 
@@ -442,8 +352,6 @@ function _cotSparkline(history, nWeeks) {
 }
 
 function _buildSparklineChart(container, history, nWeeks) {
-  // SVG sparkline is now built inline by _cotSparkline() — no LWC chart needed.
-  // This function is kept as a no-op so existing callers don't error.
 }
 
 function _cotTrendLabel(history) {
@@ -496,16 +404,7 @@ function _cotSignalSummary(net, amNet, ddNet, aligned, isCrowded) {
   </div>`).join('');
 }
 
-// ── Spot price helpers (for Net Position overlay) ─────────────────────────────
-// ohlc-data filename + inversion flag for each COT symbol. Same ohlc-data/
-// files dashboard.js's own charts already read (yfinance-sourced) — v2.8
-// extends this from FX-only to also cover the Commodities/Indices COT tabs,
-// reusing gold.json/silver.json/wti.json/spx.json/dji.json/nasdaq.json rather
-// than adding a new fetch. COPPER has no matching ohlc-data file (not one of
-// dashboard.js's tracked instruments) — left out on purpose so the panel
-// honestly reports "Spot data unavailable" instead of fabricating a source.
 const _COT_SPOT = {
-  // FX (COT_DATA_STORE) — value expressed as CCY/USD
   AUD: { file: 'audusd', inv: false },
   EUR: { file: 'eurusd', inv: false },
   GBP: { file: 'gbpusd', inv: false },
@@ -515,35 +414,27 @@ const _COT_SPOT = {
   NZD: { file: 'nzdusd', inv: false },
   NOK: { file: 'usdnok', inv: true  },
   SEK: { file: 'usdsek', inv: true  },
-  // Commodities (COT_DATA_STORE_COMMODITIES) — value is the outright futures close
   XAU:  { file: 'gold',   inv: false },
   XAG:  { file: 'silver', inv: false },
   WTI:  { file: 'wti',    inv: false },
-  // Indices (COT_DATA_STORE_INDICES) — value is the outright futures close
   SPX:    { file: 'spx',     inv: false },
   DJ30:   { file: 'dji',     inv: false },
   NAS100: { file: 'nasdaq',  inv: false },
 };
 
-// Fetch daily closes from local ohlc-data/ (yfinance — same source as dashboard charts)
-// Returns [{time:'YYYY-MM-DD', value:n}] — CCY/USD for FX, outright futures
-// close for commodities/indices (see _COT_SPOT above).
 async function _fetchCOTSpot(ccy) {
   const cfg = _COT_SPOT[ccy];
   if (!cfg) return null;
   try {
     const resp = await fetch(`./ohlc-data/${cfg.file}.json`);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const rows = await resp.json(); // [{time, open, high, low, close, volume}, ...]
+    const rows = await resp.json(); 
     return rows
       .map(r => (r.time && r.close) ? { time: r.time, value: cfg.inv ? 1 / r.close : r.close } : null)
       .filter(Boolean);
   } catch (_) { return null; }
 }
 
-// Display label for the spot chart's title/tooltip: FX pairs read "EUR/USD",
-// commodities/indices read just the symbol ("XAU", "WTI", "SPX") since they're
-// outright futures closes, not currency pairs against USD.
 function _cotSpotLabel(ccy, assetClass) {
   return assetClass === 'commodity' || assetClass === 'equityIndex' ? ccy : ccy + '/USD';
 }
@@ -561,8 +452,7 @@ function _lwOpts(W,H){
   const _t2=cs.getPropertyValue('--text3').trim()||'#6e7681';
   const _border=cs.getPropertyValue('--border').trim()||'#2e2e2e';
   const _text2=cs.getPropertyValue('--text2').trim()||'#9096a0';
-  // Grid: use border color with low opacity — works in both dark and MT5
-  const _grid=_border+'28'; // ~16% opacity
+  const _grid=_border+'28'; 
   return {
     width:W,height:H,
     layout:{background:{type:'solid',color:_bg},textColor:_t2,fontFamily:_monoF,fontSize:10,attributionLogo:false},
@@ -573,40 +463,6 @@ function _lwOpts(W,H){
       horzLine:{color:_text2+'33',style:2,labelVisible:true},
     },
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.12,bottom:0.08}},
-    // lockVisibleTimeRangeOnResize: LWC's default behavior (confirmed against
-    // v5 docs — the option exists specifically to disable it) keeps the same
-    // bar spacing (px/bar) across a width change, which SHIFTS the visible
-    // calendar window rather than leaving it alone. _lwResize() fires
-    // applyOptions({width,height}) repeatedly during initial chart build
-    // (60ms/200ms/500ms, plus an explicit 250ms call in cotTab) while the
-    // modal's flex layout is still settling — each of those resizes was
-    // silently narrowing/shifting the _lwDefaultWindow()-set range before the
-    // user ever touched the chart, which is why the Net Position/Daily Spot
-    // Close pair (the only charts wired through _lwSyncTimeRanges, so each
-    // resize-induced shift on one side also got relayed onto the other,
-    // compounding it) could open already zoomed in tighter than the intended
-    // 1-year default and never recover on its own. Locking this stops any
-    // resize from touching the time window at all — only explicit
-    // setVisibleRange() calls and real user pan/zoom should ever move it.
-    //
-    // fixRightEdge:true — every COT modal chart's data ends at "now" (no
-    // rightOffset/forming-bar whitespace reserved past the last real bar,
-    // unlike e.g. the main price chart's rightOffset:14). Without this,
-    // dragging past the right edge (trying to pan "into the future") hits a
-    // real LWC quirk: the right edge silently clamps at the last bar while
-    // the left edge keeps moving, so continued dragging in that direction
-    // WIDENS the visible window from the left instead of doing nothing —
-    // this reads exactly like "the chart won't pan/is stuck at the right
-    // edge, only stretches", which is what v8.266.1's and v8.266.2's fixes
-    // were chasing in the sync mechanism itself (both of those fixes are
-    // real and correct for the separate bugs they addressed — cross-chart
-    // echo misroute — but neither was the cause of THIS symptom). Confirmed
-    // live via a local Lightweight Charts v5.0.7 + Playwright repro:
-    // isolated single-chart drag-past-right-edge reproduced the exact
-    // asymmetric stretch with zero sync code involved, and fixRightEdge:true
-    // is LWC's own purpose-built, documented option for exactly this case —
-    // it hard-locks the right edge so a drag past it does nothing (not
-    // "stretches"), with zero effect on normal panning/zooming elsewhere.
     timeScale:{borderVisible:false,lockVisibleTimeRangeOnResize:true,fixRightEdge:true},
     handleScroll:{mouseWheel:true,pressedMouseMove:true},
     handleScale:{mouseWheel:true,pinch:true},
@@ -647,15 +503,6 @@ function _lwResize(container,lwChart){
   return apply;
 }
 
-// Default every COT modal chart to a readable "recent window" after the full
-// history loads. fitContent() alone zooms out to fit the ENTIRE dataset (up
-// to 522 weekly bars / ~10 years, or ~2,500 daily spot closes) into whatever
-// width the panel has, which compresses everything into an unreadable blur.
-// Full history stays loaded and reachable by scrolling/zooming the time axis
-// out — this only sets the INITIAL visible range, never the data itself.
-// `times` must be the same ascending array of 'YYYY-MM-DD' strings passed to
-// setData() for the chart's primary series. When the dataset itself already
-// covers less than `yearsBack`, fitContent()'s result is left untouched.
 function _lwDefaultWindow(chart, times, yearsBack) {
   yearsBack = yearsBack || 2;
   chart.timeScale().fitContent();
@@ -667,49 +514,17 @@ function _lwDefaultWindow(chart, times, yearsBack) {
   const cutoff = new Date(lastD);
   cutoff.setUTCFullYear(cutoff.getUTCFullYear() - yearsBack);
   const cutoffStr = cutoff.toISOString().slice(0, 10);
-  if (cutoffStr <= first) return; // dataset is already shorter than the window
+  if (cutoffStr <= first) return; 
   try { chart.timeScale().setVisibleRange({ from: cutoffStr, to: last }); } catch (_) {}
 }
 
-// Mirrors pan/zoom between two Lightweight Charts instances that plot the
-// SAME calendar span at DIFFERENT data resolutions (Net Position: weekly
-// bars; Daily Spot Close: daily closes) — a logical/bar-index range sync
-// (chart.timeScale().setVisibleLogicalRange) doesn't work across mismatched
-// resolutions, since the same calendar window covers a different bar COUNT
-// on each chart. Syncing by calendar time range instead (LWC's documented
-// pattern for multi-chart sync) works regardless of each chart's own bar
-// density.
-//
-// Gated by which container the user is actually interacting with (`active`,
-// set via pointerdown/pointerenter/wheel on elA/elB), not just a re-entrancy
-// boolean. v8.266.1's rAF-cleared `syncing` flag stopped the *immediate*
-// same-tick echo, but a chart's own internal bar-snapping can still emit a
-// SECOND, slightly-different range-change notification a frame or two after
-// the guard already cleared (its snapped daily/weekly boundary isn't
-// identical to what was requested). With only a boolean guard, that delayed
-// echo was indistinguishable from real user input and got relayed straight
-// back onto the other chart — observed live as Daily Spot Close staying
-// pinned to the current-date edge no matter how far the user panned Net
-// Position: every Net drag tick relayed correctly, but Spot's delayed
-// snap-echo kept re-asserting a still image close to the previous position
-// back onto the *chart the user wasn't touching*, and once the user's own
-// drag ended, only that misrouted echo was left standing. Gating relay to
-// "only forward events from the chart whose container the user is
-// currently on" means a chart's own emitted events are never relayed
-// anywhere unless that specific chart is the one being interacted with —
-// structurally removing the echo-misroute path rather than trying to
-// out-time it.
 function _lwSyncTimeRanges(chartA, chartB, elA, elB) {
   if (!chartA || !chartB) return;
-  let active = null; // 'A' | 'B' | null (neither touched yet)
+  let active = null; 
   const markA = () => { active = 'A'; };
   const markB = () => { active = 'B'; };
   if (elA) { elA.addEventListener('pointerdown', markA); elA.addEventListener('pointerenter', markA); elA.addEventListener('wheel', markA, { passive: true }); }
   if (elB) { elB.addEventListener('pointerdown', markB); elB.addEventListener('pointerenter', markB); elB.addEventListener('wheel', markB, { passive: true }); }
-  // Re-entrancy guard: cleared on the NEXT ANIMATION FRAME (v8.266.1), not
-  // synchronously right after setVisibleRange() — kept as defense-in-depth
-  // against a same-active-chart double-fire, on top of the `active` gate
-  // above which is what actually stops cross-chart misrouting.
   let syncing = false;
   function relay(which, to, range) {
     if (active !== which || syncing || !range) return;
@@ -721,7 +536,6 @@ function _lwSyncTimeRanges(chartA, chartB, elA, elB) {
   chartB.timeScale().subscribeVisibleTimeRangeChange(range => relay('B', chartA, range));
 }
 
-// ── Chart builders ────────────────────────────────────────────────────────────
 function _buildNetChart(container, dates, netData, ccy, meta) {
   meta = meta || { primaryAbbr: 'LF' };
   const LWC = window.LightweightCharts; if (!LWC || !container) return null;
@@ -734,12 +548,6 @@ function _buildNetChart(container, dates, netData, ccy, meta) {
     color: '#4f7fff', priceLineVisible: false, lastValueVisible: true, base: 0,
   });
   hist.setData(dates.map((d, i) => ({ time: d, value: netData[i] ?? 0, color: (netData[i] ?? 0) >= 0 ? (_up + 'd1') : (_dn + 'd1') })));
-  // Net Position uses a 1-year default (not the 2-year default the other
-  // charts use) — at 2 years, ~104 weekly bars packed into this panel's width
-  // render too thin to read individually; 1 year (~52 bars) gives each bar
-  // roughly double the pixel width. Daily Spot Close (below) is synced to
-  // mirror whatever window Net Position ends up showing (see
-  // _lwSyncTimeRanges in cotTab), so it opens at the same 1-year window too.
   _lwDefaultWindow(chart, dates, 1);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => hist, param => {
@@ -779,15 +587,6 @@ function _buildSpotChart(container, spotData, label) {
   const LWC = window.LightweightCharts; if (!LWC || !container || !spotData?.length) return null;
   const W = container.offsetWidth || 600, H = container.offsetHeight || container.parentElement?.offsetHeight || 140;
   const opts = _lwOpts(W, H);
-  // Decimal precision by data magnitude, not a hardcoded ccy/assetClass list:
-  // JPY/NOK/SEK are inverted to CCY/USD by _fetchCOTSpot (see _COT_SPOT.inv
-  // above), which puts them one to two orders of magnitude below the
-  // direct-quote FX pairs (JPY/USD ~0.0064, NOK & SEK/USD ~0.10, vs.
-  // EUR/USD ~1.15) — a fixed 2-decimal precision for that trio rounds every
-  // close to a single repeated value. Commodities/indices (v2.8) sit at the
-  // opposite extreme (WTI ~82, gold ~4,437, SPX ~7,786, DJ30 ~53,732) where
-  // 4 decimals is noise, not precision — 2 decimals covers outright futures
-  // closes the same way a Bloomberg/Eikon ticker would display them.
   const _maxAbs = spotData.reduce((m, p) => Math.max(m, Math.abs(p.value || 0)), 0);
   const _dec = _maxAbs >= 3 ? 2 : (_maxAbs >= 0.02 ? 4 : 5);
   opts.localization = { priceFormatter: v => v != null ? v.toFixed(_dec) : '—' };
@@ -799,10 +598,6 @@ function _buildSpotChart(container, spotData, label) {
     priceLineVisible: false, lastValueVisible: true, crosshairMarkerRadius: 4,
   });
   spotS.setData(spotData);
-  // Matches Net Position's 1-year default (see _buildNetChart) so both charts
-  // open on the same window before the pan/zoom sync (_lwSyncTimeRanges) even
-  // fires once — not load-bearing for staying in sync (the subscription
-  // handles that), but avoids a visible jump-to-match on first render.
   _lwDefaultWindow(chart, spotData.map(p => p.time), 1);
   _lwResize(container, chart);
   _mkTooltip(container, chart, () => spotS, param => {
@@ -871,8 +666,6 @@ function _buildParticipantsChart(container,dates,netData,amData,ddData,ccy,meta)
   return chart;
 }
 
-// ── Main open function ────────────────────────────────────────────────────────
-// Ensure LightweightCharts is loaded (mirrors dashboard.js loader — idempotent)
 let _cotLwLibPromise = null;
 function _cotEnsureLWLib() {
   if (window.LightweightCharts) return Promise.resolve();
@@ -890,12 +683,6 @@ function _cotEnsureLWLib() {
 function openCOTModal(ccy,data,opts){
   const _preserveTab = opts && opts.preserveTab;
   closeCOTModal();
-  // v2.7 — report-family meta (Leveraged Funds/Asset Manager/Dealers for the
-  // TFF report used by FX & Indices vs Managed Money/Swap Dealers/Producer-
-  // Merchant for the Disaggregated report used by Commodities). Reuses
-  // dashboard.js's _cotReportMeta() rather than a second hardcoded copy, so
-  // this modal never mislabels commodity rows "LF"/"AM" again the way it did
-  // pre-v8.161.1 — see that CHANGELOG entry's "Scope note".
   const meta = (typeof _cotReportMeta === 'function')
     ? _cotReportMeta(data)
     : { report:'TFF', primaryLabel:'Leveraged Funds', primaryAbbr:'LF', secondaryLabel:'Asset Manager', secondaryAbbr:'AM', tertiaryLabel:'Dealers', tertiaryAbbr:'DD' };
@@ -926,16 +713,6 @@ function openCOTModal(ccy,data,opts){
   const amData=history.map(h=>h.assetManagerNet??null);
   const ddData=history.map(h=>h.dealerNet??null);
 
-  // Currency/symbol switcher — cycles/picks from whatever is already cached in the
-  // matching store, so switching never triggers a re-fetch.
-  // FIX (v8.161.4): this always read window.COT_DATA_STORE (FX only) with the G10_CCYS
-  // order, regardless of what asset class the modal was actually showing — so opening
-  // the switcher on a commodity (XAU) or index (DJ30) row listed FX currencies that
-  // don't even exist in that store, instead of sibling commodities/indices. The three
-  // tabs (FX/Indices/Commodities) each populate their own store
-  // (COT_DATA_STORE / COT_DATA_STORE_INDICES / COT_DATA_STORE_COMMODITIES, see
-  // dashboard.js _renderCOTRows call sites) — the switcher must pick the store+order
-  // matching data.assetClass, not assume FX every time.
   const _assetClass=data.assetClass||'currency';
   const _storeByClass={
     commodity:   {store:window.COT_DATA_STORE_COMMODITIES, order:(typeof COT_COMMODITIES!=='undefined'?COT_COMMODITIES:['XAU','XAG','COPPER','WTI'])},
@@ -1063,13 +840,6 @@ function openCOTModal(ccy,data,opts){
         <span class="cot-ov-sec-lbl">52-Week Range</span>
       </div>
       ${(()=>{
-        // v8.263.2: explicit 52-week slice — this stat's own header is the
-        // static "52-Week Range" label above, so it must always measure the
-        // trailing 52 weeks specifically (the standard 52w-high/low
-        // convention), regardless of how much total history the underlying
-        // file now carries (widened to ~10y this session). Previously read
-        // the full `history` array unsliced, which was harmless only by
-        // coincidence — the file itself never held more than 52 weeks total.
         const vals = history.slice(-52).map(h=>h.levNet??((h.levLong||0)-(h.levShort||0))).filter(v=>v!=null);
         if (vals.length < 2) return '<div class="cot-kfv"><span class="cot-kfv-key" style="color:var(--text3)">Insufficient data</span></div>';
         const hi = Math.max(...vals), lo = Math.min(...vals);
@@ -1175,7 +945,6 @@ function openCOTModal(ccy,data,opts){
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const pin=document.getElementById('cot-pin');if(pin)pin.style.left=gaugeLeft;
     bd.scrollIntoView({behavior:'smooth',block:'start'});
-    // Sparkline is now inline SVG — no async build needed
   }));
 
   const tbody=document.getElementById('cot-hist-body');
@@ -1204,7 +973,6 @@ function openCOTModal(ccy,data,opts){
 
   bd.addEventListener('click',e=>{
     if(e.target===bd)closeCOTModal();
-    // click outside the switcher closes the dropdown without closing the modal
     const dd=document.getElementById('cot-ccy-dd');
     if(dd&&dd.classList.contains('open')&&!e.target.closest('#cot-ccy-switch')){dd.classList.remove('open');document.getElementById('cot-ccy-chip')?.setAttribute('aria-expanded','false');}
   });
@@ -1221,21 +989,15 @@ function openCOTModal(ccy,data,opts){
   bd._cotData={dates,netData,lngData,shrtData,amData,ddData,ccy,history,meta,assetClass:_assetClass};
   bd._ccy=ccy;bd._availCcys=_avail;bd._assetClass=_assetClass;
 
-  // Restore whichever tab was active before switching currency (better UX than
-  // Bloomberg/Eikon, which reset to the default view on instrument change).
   if(_preserveTab&&_preserveTab!=='overview'){
     const tabEl=document.querySelector(`.cot-tab[data-tab="${_preserveTab}"]`);
     if(tabEl)cotTab(tabEl,_preserveTab);
   }
 }
 
-// Switch to a specific currency, keeping the modal open and the active tab intact.
 function cotSwitchCcy(newCcy){
   const bd=document.getElementById('cot-bd');
   if(!bd||newCcy===bd._ccy)return;
-  // FIX (v8.161.4): must read from the same store the switcher list was built from
-  // (COT_DATA_STORE_COMMODITIES / _INDICES / plain FX), not always FX — see
-  // openCOTModal's _storeByClass for the matching lookup this mirrors.
   const _storeMap={
     commodity:   window.COT_DATA_STORE_COMMODITIES,
     equityIndex: window.COT_DATA_STORE_INDICES,
@@ -1249,7 +1011,6 @@ function cotSwitchCcy(newCcy){
   openCOTModal(newCcy,data,{preserveTab:activeTab});
 }
 
-// Cycle to the previous (-1) or next (+1) currency in the switcher's G10 order.
 function cotCycleCcy(dir){
   const bd=document.getElementById('cot-bd');
   if(!bd||!bd._availCcys)return;
@@ -1282,12 +1043,10 @@ function cotTab(el,tabId){
       const w=document.getElementById('cot-lw-net');
       const ws=document.getElementById('cot-lw-spot');
       if((w&&!w._built)||(ws&&!ws._built)){
-        // Build both charts together after flex heights settle (same pattern as split tab)
         const statusEl=document.getElementById('cot-net-price-status');
         const titleEl=document.getElementById('cot-spot-ct');
         const spotLabel=_cotSpotLabel(d.ccy,d.assetClass);
         if(titleEl)titleEl.textContent=spotLabel+' · DAILY SPOT CLOSE';
-        // Kick off async fetch immediately so it overlaps with the 150ms wait
         const spotPromise=_fetchCOTSpot(d.ccy);
         setTimeout(()=>requestAnimationFrame(()=>{
           let _netChart=null,_spotChart=null;
@@ -1301,9 +1060,6 @@ function cotTab(el,tabId){
                 if(statusEl)statusEl.textContent='';
                 _spotChart=_buildSpotChart(ws,filtered,spotLabel);
                 ws._lwChart=_spotChart;
-                // Mirror pan/zoom both ways once both charts exist — see
-                // _lwSyncTimeRanges for why this needs calendar-time sync,
-                // not logical-range sync (weekly bars vs. daily closes).
                 if(_netChart&&_spotChart)_lwSyncTimeRanges(_netChart,_spotChart,w,ws);
               } else {
                 if(statusEl)statusEl.textContent='Spot data unavailable';
@@ -1322,7 +1078,6 @@ function cotTab(el,tabId){
       const w=document.getElementById('cot-lw-split');
       const wo=document.getElementById('cot-lw-oi');
       if((w&&!w._built)||(wo&&!wo._built)){
-        // Wait 150ms then one rAF so flex heights are computed before LWC measures containers
         setTimeout(()=>requestAnimationFrame(()=>{
           if(w&&!w._built){w._built=true;_buildSplitChart(w,d.dates,d.lngData,d.shrtData,d.ccy);}
           if(wo&&!wo._built){
@@ -1338,7 +1093,7 @@ function cotTab(el,tabId){
       }
     }
     if(tabId==='participants'){const w=document.getElementById('cot-lw-part');if(w&&!w._built){w._built=true;_buildParticipantsChart(w,d.dates,d.netData,d.amData,d.ddData,d.ccy,d.meta);}else if(w&&w._lwResize)w._lwResize();}
-    if(tabId==='overview'){ /* sparkline is inline SVG — no build needed */ }
+    if(tabId==='overview'){  }
     setTimeout(()=>{['cot-lw-net','cot-lw-spot','cot-lw-split','cot-lw-oi','cot-lw-part'].forEach(id=>{const w=document.getElementById(id);if(w&&w._lwResize)w._lwResize();});},120);
   }));
 }
@@ -1356,24 +1111,17 @@ function closeCOTModal(){
 window.openCOTModal=openCOTModal;window.closeCOTModal=closeCOTModal;window.cotTab=cotTab;
 window.cotSwitchCcy=cotSwitchCcy;window.cotCycleCcy=cotCycleCcy;window.cotToggleCcyDropdown=cotToggleCcyDropdown;
 
-// ── Theme-change listener — rebuild LWC charts when dark↔MT5 switches ────────
-// Charts are built once with _built=true flag and LWC series colors are fixed at
-// addSeries() time. On theme switch: destroy existing charts, clear _built flags,
-// and re-trigger the active tab so charts rebuild with the new CSS var values.
 window.addEventListener('gi-theme-change', function() {
   const bd = document.getElementById('cot-bd');
-  if (!bd) return; // modal not open — nothing to do
+  if (!bd) return; 
 
-  // Destroy existing LWC instances (clears canvas, removes resize observers)
   _destroyCOTCharts();
 
-  // Clear _built flag on all chart containers so builders re-run
   ['cot-lw-net','cot-lw-spot','cot-lw-split','cot-lw-oi','cot-lw-part'].forEach(function(id) {
     const w = document.getElementById(id);
     if (w) { w._built = false; if (w._lwResize) { window.removeEventListener('resize', w._lwResize); w._lwResize = null; } if (w._lwRo) { w._lwRo.disconnect(); w._lwRo = null; } }
   });
 
-  // Re-trigger the currently active tab so the chart rebuilds immediately
   const activeTab = bd.querySelector('.cot-tab.active, .cot-tab.on');
   if (activeTab && typeof cotTab === 'function') {
     cotTab(activeTab, activeTab.dataset.tab || 'overview');

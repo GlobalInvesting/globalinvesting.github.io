@@ -1,35 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════
-// dashboard.test.js — Automated test suite for the Global Investing FX Terminal
-//
-// REGENERATED v1 (2026-08-14): this file was accidentally deleted from the
-// working tree. It has been rebuilt from scratch against the current
-// assets/dashboard.js and the coverage table documented in GUIDELINES.md
-// ("Automated tests — non-negotiable" section). Test count drifts as
-// coverage is added/removed (e.g. the Fair Value regression mirror below
-// was removed in v8.349.0 when that logic moved server-side) — run the
-// file itself for the current authoritative pass count rather than
-// trusting a number in a comment.
-//
-// Run with: node assets/dashboard.test.js
-// Exits 0 on all-pass, 1 on any failure (safe for CI / pre-deploy gating).
-//
-// Why the tested functions are re-declared here instead of `require()`-d
-// from dashboard.js: dashboard.js is a browser script that references
-// `document`, `window`, `navigator`, and STATE-mutating globals starting
-// at module load (IIFEs run on parse, e.g. the theme-manager block at the
-// top of the file). It has no CommonJS exports and was never designed to
-// be loaded standalone in Node. Rather than stub a fake DOM (which would
-// let the *harness* silently diverge from the real page over time), each
-// pure/testable function below is mirrored line-for-line from its current
-// dashboard.js (or, for HV30/Pearson, fetch_intraday_quotes.py) source.
-// The exact source location is cited above each mirror so a future editor
-// can diff the two and re-sync if the original changes.
-//
-// Per GUIDELINES.md rule: tests must be deterministic — no Math.random(),
-// no Date.now() dependency without a fixed input. Business-date and
-// session functions below all take an explicit reference Date instead of
-// reading the system clock.
-// ═══════════════════════════════════════════════════════════════════
 
 const assert = require('assert');
 
@@ -51,37 +19,24 @@ function section(title) {
   console.log(`\n${title}`);
 }
 
-// ─────────────────────────────────────────────────────────────────────
-// Mirrors of dashboard.js (site/assets/dashboard.js)
-// ─────────────────────────────────────────────────────────────────────
 
-// Source: dashboard.js ~L126-136
 function fmt(val, dec) {
   if (val == null || isNaN(val)) return '—';
   return Number(val).toFixed(dec);
 }
 
-// Source: dashboard.js ~L132-136
 function clsDir(val) {
   if (val > 0.0001) return 'up';
   if (val < -0.0001) return 'down';
   return 'flat';
 }
 
-// Source: dashboard.js ~L138-142
 function pctStr(val) {
   if (val == null || isNaN(val)) return '—';
   const sign = val >= 0 ? '+' : '';
   return sign + val.toFixed(2) + '%';
 }
 
-// Source: dashboard.js ~L3292-3311 (_sentimentSourceOneUsable)
-// Regression coverage for the 2026-09-06 live incident: sentiment-data/
-// myfxbook.json's apiBlocked=true (a failed live-refresh attempt) used to be
-// treated as disqualifying the cached `pairs` data outright, discarding a
-// perfectly good, still-fresh cached read and falling through to the
-// Dukascopy/static-fallback sources instead. Freshness of `updated` is the
-// only thing that should gate usability.
 function _sentimentSourceOneUsable(d, nowMs) {
   if (!d || !d.pairs || d.pairs.length < 5) return false;
   const updatedMs = d.updated ? new Date(d.updated).getTime() : 0;
@@ -89,13 +44,10 @@ function _sentimentSourceOneUsable(d, nowMs) {
   return ageMin < 900;
 }
 
-// Source: dashboard.js ~L167-169
 function isOpen(openH, closeH, h) {
   return openH < closeH ? (h >= openH && h < closeH) : (h >= openH || h < closeH);
 }
 
-// Source: dashboard.js computeRate() ~L304-321
-// Mirrors the STATE.rates USD-base-rate lookup exactly (direct / invert / cross).
 function computeRate(pair, rates) {
   const r = rates;
   if (!r) return null;
@@ -113,9 +65,6 @@ function computeRate(pair, rates) {
   }
 }
 
-// Source: dashboard.js getLatestBizDate() / getPrevBizDate() ~L286-300
-// Parameterised on a reference Date (instead of `new Date()`) so tests are
-// deterministic. Logic (weekend-skip loop, UTC day-of-week) is unchanged.
 function getLatestBizDate(refDate) {
   const d = new Date(refDate.getTime());
   while (d.getUTCDay() === 0 || d.getUTCDay() === 6) d.setUTCDate(d.getUTCDate() - 1);
@@ -130,29 +79,17 @@ function getPrevBizDate(refDate) {
   return d.toISOString().slice(0, 10);
 }
 
-// Source: dashboard.js, inside the alerts-container render block ~L10041-10052
-// The locale/timezone conversion itself (toLocaleTimeString) is environment-
-// dependent and out of scope for a deterministic unit test; what's tested
-// here is the guard logic (falsy passthrough, NaN/bad-format passthrough)
-// which is exactly what protects the render call from throwing on bad data.
-// The happy-path branch is mirrored using a fixed UTC formatter instead of
-// navigator.language so the expected output is stable in any CI environment.
 function localizeSignalTime(timeStr) {
   if (!timeStr || timeStr === '--:--') return timeStr || '--:--';
   try {
     const [h, m] = timeStr.split(':').map(Number);
     if (isNaN(h) || isNaN(m)) return timeStr;
-    // Deterministic stand-in for the real toLocaleTimeString(navigator.language, {timeZone: local})
-    // call — pads back to HH:MM, 24h, same shape the real function guarantees.
     return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
   } catch {
     return timeStr;
   }
 }
 
-// Source: dashboard.js risk-regime block ~L2660-2696 (Regime assessment)
-// Returns { stressScore, regime, regimeSub } exactly mirroring the scoring
-// order and thresholds in dashboard.js.
 function computeStressScore(byId) {
   const vix = byId.vix.close;
   const isInverted = !!(byId.us10y && byId.us3m && (byId.us10y.close < byId.us3m.close));
@@ -179,9 +116,6 @@ function computeStressScore(byId) {
   return { stressScore, regime, regimeSub, isInverted };
 }
 
-// Source: dashboard.js updatePairDetail()-style bond spread block ~L7760-7778
-// ΔY = Yield(base) − Yield(quote); 2Y preferred, falls back to 10Y when
-// either leg's 2Y is missing or stale; sign flipped unless the pair is a cross.
 function computeBondSpread(bondBase, bondQuote, invert, isCross) {
   let bondTenor = null, bondDiff = null;
   if (bondBase && bondQuote) {
@@ -202,14 +136,7 @@ function computeBondSpread(bondBase, bondQuote, invert, isCross) {
   return { bondTenor, bondDiff };
 }
 
-// ─────────────────────────────────────────────────────────────────────
-// Mirrors of the Python engine (globalinvesting-scripts/fetch_intraday_quotes.py)
-// ─────────────────────────────────────────────────────────────────────
 
-// Source: fetch_intraday_quotes.py compute_hv30() ~L571-590
-// Min 22 closes → 21 returns is NOT enough; needs 22 closes minimum per the
-// Python docstring ("Necesitamos al menos 22 cierres para 21 retornos diarios").
-// Uses last 31 prices → 30 log-returns, sample variance (n-1), annualised √252×100.
 function computeHV30(closesSeries) {
   try {
     const prices = closesSeries.filter(c => c != null && Number(c) > 0).map(Number);
@@ -224,13 +151,12 @@ function computeHV30(closesSeries) {
     const variance = returns.reduce((a, r) => a + (r - mean) ** 2, 0) / (n - 1);
     const hvDaily = Math.sqrt(variance);
     const hvAnnual = hvDaily * Math.sqrt(252) * 100;
-    return Math.round(hvAnnual * 100) / 100; // round to 2dp, mirrors Python round(x, 2)
+    return Math.round(hvAnnual * 100) / 100; 
   } catch {
     return null;
   }
 }
 
-// Source: fetch_intraday_quotes.py pearson() ~L730-741
 function pearson(x, y) {
   const n = x.length;
   if (n < 10) return null;
@@ -245,12 +171,9 @@ function pearson(x, y) {
   denX = Math.sqrt(denX);
   denY = Math.sqrt(denY);
   if (denX === 0 || denY === 0) return null;
-  return Math.round((num / (denX * denY)) * 1000) / 1000; // round to 3dp, mirrors Python round(x, 3)
+  return Math.round((num / (denX * denY)) * 1000) / 1000; 
 }
 
-// ═══════════════════════════════════════════════════════════════════
-// fmt / clsDir / pctStr — 15 tests
-// ═══════════════════════════════════════════════════════════════════
 section('fmt / clsDir / pctStr');
 
 test('fmt: null returns em-dash', () => assert.strictEqual(fmt(null, 2), '—'));
@@ -271,19 +194,14 @@ test('pctStr: positive value gets + sign', () => assert.strictEqual(pctStr(1.5),
 test('pctStr: zero gets + sign (>=0)', () => assert.strictEqual(pctStr(0), '+0.00%'));
 test('pctStr: negative value keeps - sign, no extra +', () => assert.strictEqual(pctStr(-2.345), '-2.35%'));
 
-// ═══════════════════════════════════════════════════════════════════
-// isOpen — 12 tests (including midnight wrap-around, Sydney-style session)
-// ═══════════════════════════════════════════════════════════════════
 section('isOpen');
 
-// Normal (non-wrapping) range, e.g. London 8-17
 test('isOpen: normal range, mid-session → true', () => assert.strictEqual(isOpen(8, 17, 12), true));
 test('isOpen: normal range, before open → false', () => assert.strictEqual(isOpen(8, 17, 7), false));
 test('isOpen: normal range, after close → false', () => assert.strictEqual(isOpen(8, 17, 17), false));
 test('isOpen: normal range, at open boundary (inclusive) → true', () => assert.strictEqual(isOpen(8, 17, 8), true));
 test('isOpen: normal range, one hour before close → true', () => assert.strictEqual(isOpen(8, 17, 16), true));
 
-// Wrap-around range (Sydney session in UTC: local 08-17 AEDT ≈ UTC 21-06, crosses midnight)
 test('isOpen: wrap-around, within evening segment → true', () => assert.strictEqual(isOpen(21, 6, 23), true));
 test('isOpen: wrap-around, within early-morning segment → true', () => assert.strictEqual(isOpen(21, 6, 3), true));
 test('isOpen: wrap-around, at midnight → true', () => assert.strictEqual(isOpen(21, 6, 0), true));
@@ -292,9 +210,6 @@ test('isOpen: wrap-around, at close boundary (exclusive) → false', () => asser
 test('isOpen: wrap-around, mid-day outside session → false', () => assert.strictEqual(isOpen(21, 6, 12), false));
 test('isOpen: wrap-around, one hour before open → false', () => assert.strictEqual(isOpen(21, 6, 20), false));
 
-// ═══════════════════════════════════════════════════════════════════
-// computeRate — 7 tests (Direct, inverted, cross, null legs)
-// ═══════════════════════════════════════════════════════════════════
 section('computeRate');
 
 test('computeRate: direct pair (USD/JPY-style)', () => {
@@ -333,9 +248,6 @@ test('computeRate: cross pair with one missing leg → null', () => {
   assert.strictEqual(computeRate(pair, rates), null);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// Stress scoring — 18 tests
-// ═══════════════════════════════════════════════════════════════════
 section('Stress scoring (risk regime)');
 
 test('Stress: VIX 18 exactly (boundary, not >18) + nothing else → RISK-ON, score 0', () => {
@@ -407,7 +319,6 @@ test('Stress: USD/JPY weak alone (no AUD/JPY confirmation) → no add', () => {
 });
 test('Stress: USD/JPY weak AND AUD/JPY weak together → +1 (confirmed)', () => {
   const r = computeStressScore({ vix: { close: 10 }, usdjpy: { pct: -1.5 }, audjpy: { pct: -1.6 } });
-  // AUD/JPY < -1.5 also independently adds +1, so total is +2 here
   assert.strictEqual(r.stressScore, 2);
 });
 test('Stress: HY OAS 20d Δ exactly 15 (boundary, not >15) → no add', () => {
@@ -416,18 +327,15 @@ test('Stress: HY OAS 20d Δ exactly 15 (boundary, not >15) → no add', () => {
 });
 test('Stress: combined score >=4 → RISK-OFF with inverted-curve note', () => {
   const r = computeStressScore({
-    vix: { close: 26 },            // +2
-    us10y: { close: 3.5 }, us3m: { close: 4.0 }, // inverted +1
-    move: { close: 105 },          // +1
+    vix: { close: 26 },            
+    us10y: { close: 3.5 }, us3m: { close: 4.0 }, 
+    move: { close: 105 },          
   });
   assert.strictEqual(r.stressScore, 4);
   assert.strictEqual(r.regime, 'RISK-OFF');
   assert.ok(!r.regimeSub.includes('inverted curve'), 'RISK-OFF regimeSub omits the inverted-curve suffix (only added when regime !== RISK-OFF)');
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// localizeSignalTime — 6 tests
-// ═══════════════════════════════════════════════════════════════════
 section('localizeSignalTime');
 
 test('localizeSignalTime: null → placeholder', () => assert.strictEqual(localizeSignalTime(null), '--:--'));
@@ -437,17 +345,13 @@ test('localizeSignalTime: bad format (non-numeric) returns original string', () 
 test('localizeSignalTime: midnight "00:00" formats cleanly', () => assert.strictEqual(localizeSignalTime('00:00'), '00:00'));
 test('localizeSignalTime: end-of-day "23:59" formats cleanly', () => assert.strictEqual(localizeSignalTime('23:59'), '23:59'));
 
-// ═══════════════════════════════════════════════════════════════════
-// Business dates — 7 tests (Mon–Fri, Sat, Sun, Mon→Fri prev)
-// ═══════════════════════════════════════════════════════════════════
 section('Business dates');
 
-// All reference dates are UTC noon to avoid any local-TZ date-rollover ambiguity.
-const MON = new Date('2026-08-10T12:00:00Z'); // Monday
-const WED = new Date('2026-08-12T12:00:00Z'); // Wednesday
-const FRI = new Date('2026-08-14T12:00:00Z'); // Friday
-const SAT = new Date('2026-08-15T12:00:00Z'); // Saturday
-const SUN = new Date('2026-08-16T12:00:00Z'); // Sunday
+const MON = new Date('2026-08-10T12:00:00Z'); 
+const WED = new Date('2026-08-12T12:00:00Z'); 
+const FRI = new Date('2026-08-14T12:00:00Z'); 
+const SAT = new Date('2026-08-15T12:00:00Z'); 
+const SUN = new Date('2026-08-16T12:00:00Z'); 
 
 test('getLatestBizDate: Monday → same day', () => assert.strictEqual(getLatestBizDate(MON), '2026-08-10'));
 test('getLatestBizDate: Wednesday → same day', () => assert.strictEqual(getLatestBizDate(WED), '2026-08-12'));
@@ -457,41 +361,29 @@ test('getLatestBizDate: Sunday → rolls back to Friday', () => assert.strictEqu
 test('getPrevBizDate: Monday → previous Friday', () => assert.strictEqual(getPrevBizDate(MON), '2026-08-07'));
 test('getPrevBizDate: Wednesday → previous Tuesday', () => assert.strictEqual(getPrevBizDate(WED), '2026-08-11'));
 
-// ═══════════════════════════════════════════════════════════════════
-// Yield spreads — 4 tests (Normal, inverted, flat, US-DE 10Y fallback)
-// ═══════════════════════════════════════════════════════════════════
 section('Yield spreads');
 
 test('Yield spread: normal (2Y available both legs, base > quote)', () => {
-  // USD/JPY-style, not cross, not invert: base=JPY 2Y 4.10, quote=USD 2Y 4.60
   const { bondTenor, bondDiff } = computeBondSpread({ y2: 4.10 }, { y2: 4.60 }, false, false);
   assert.strictEqual(bondTenor, '2Y');
-  // raw diff base-quote = -0.50, sign flipped (invert=false) → +0.50
   assert.ok(Math.abs(bondDiff - 0.50) < 1e-9);
 });
 test('Yield spread: inverted pair flips sign correctly', () => {
-  // EUR/USD-style, invert=true: base=EUR 2Y 2.80, quote=USD 2Y 4.60
   const { bondDiff } = computeBondSpread({ y2: 2.80 }, { y2: 4.60 }, true, false);
-  // raw diff = 2.80 - 4.60 = -1.80, invert=true → no sign flip
   assert.ok(Math.abs(bondDiff - (-1.80)) < 1e-9);
 });
 test('Yield spread: flat (equal 2Y yields) → zero spread', () => {
   const { bondDiff } = computeBondSpread({ y2: 3.75 }, { y2: 3.75 }, false, false);
-  // Equal legs produce a raw diff of 0, then the sign-flip (-0) is mathematically
-  // still zero — compare with == rather than strictEqual/Object.is (which treats -0 ≠ 0).
   assert.ok(bondDiff === 0, `expected zero spread, got ${bondDiff}`);
 });
 test('Yield spread: US-DE, 2Y unavailable on DE leg → falls back to 10Y', () => {
   const bondUS = { y2: 4.60, y10: 4.20 };
-  const bondDE = { y2: null, y10: 2.45 }; // EUR/DE 2Y not covered — mirrors JPY/NZD/NOK/SEK pattern
+  const bondDE = { y2: null, y10: 2.45 }; 
   const { bondTenor, bondDiff } = computeBondSpread(bondUS, bondDE, false, false);
   assert.strictEqual(bondTenor, '10Y');
   assert.ok(Math.abs(bondDiff - (-(4.20 - 2.45))) < 1e-9);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// computeHV30 — 9 tests
-// ═══════════════════════════════════════════════════════════════════
 section('computeHV30');
 
 test('computeHV30: fewer than 22 closes → null', () => {
@@ -513,12 +405,10 @@ test('computeHV30: zero/negative prices are filtered out before the length check
 });
 test('computeHV30: uses only the last 31 prices when more are supplied', () => {
   const tail31 = Array.from({ length: 31 }, (_, i) => 100 + (i % 2 === 0 ? 1 : -1));
-  const withJunkPrefix = [9999, 1, 2, 3, ...tail31]; // junk earlier prices must not affect result
+  const withJunkPrefix = [9999, 1, 2, 3, ...tail31]; 
   assert.strictEqual(computeHV30(withJunkPrefix), computeHV30(tail31));
 });
 test('computeHV30: known alternating-return sequence produces exact expected value', () => {
-  // 22 closes alternating +5%/-5% (approx) around 100 — deterministic known result,
-  // computed independently via the same n-1 sample-variance formula.
   const window = [];
   let p = 100;
   for (let i = 0; i < 22; i++) {
@@ -542,9 +432,6 @@ test('computeHV30: constant price series → zero volatility', () => {
   const closes = Array.from({ length: 25 }, () => 100);
   assert.strictEqual(computeHV30(closes), 0);
 });
-// ═══════════════════════════════════════════════════════════════════
-// Pearson correlation — 7 tests
-// ═══════════════════════════════════════════════════════════════════
 section('Pearson correlation');
 
 test('pearson: perfect positive correlation → +1', () => {
@@ -569,7 +456,7 @@ test('pearson: fewer than 10 points → null', () => {
   assert.strictEqual(pearson(x, y), null);
 });
 test('pearson: zero variance in one series → null (division-by-zero guard)', () => {
-  const x = Array.from({ length: 10 }, () => 5); // constant
+  const x = Array.from({ length: 10 }, () => 5); 
   const y = Array.from({ length: 10 }, (_, i) => i);
   assert.strictEqual(pearson(x, y), null);
 });
@@ -580,23 +467,12 @@ test('pearson: result is always bounded within [-1, 1]', () => {
   assert.ok(result >= -1 && result <= 1, `pearson out of bounds: ${result}`);
 });
 test('pearson: EUR/USD vs DXY — expected inverse relationship in sample data', () => {
-  // Synthetic but representative: DXY up days broadly coincide with EUR/USD down days.
   const eurusd = [1.080, 1.078, 1.082, 1.075, 1.079, 1.073, 1.077, 1.070, 1.074, 1.068, 1.071];
   const dxy    = [103.2, 103.5, 102.9, 104.1, 103.4, 104.5, 103.8, 105.0, 104.3, 105.5, 104.9];
   const result = pearson(eurusd, dxy);
   assert.ok(result < 0, `expected negative correlation between EUR/USD and DXY, got ${result}`);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// Correlation matrices' date-safe join — mirrored from assets/dashboard.js's
-// _sortDateKeys() / _logReturnsByDate() / _pearsonCorrByDate() (v8.273.0,
-// fixing a positional-array join bug shared by both the docked currency
-// Matrix and the fullscreen Pairs matrix — see GUIDELINES.md v8.180.0's
-// original "join by calendar date, never trailing position" rule, first
-// applied to fetch_correlations() on the backend and now extended to these
-// two frontend-only correlation grids, which read ohlc-data/*.json directly
-// and never went through that backend fix).
-// ═══════════════════════════════════════════════════════════════════
 function _pearsonCorr(a, b) {
   const n = Math.min(a.length, b.length);
   if (n < 5) return null;
@@ -637,9 +513,6 @@ function _pearsonCorrByDate(retsA, retsB, maxN) {
 
 section('Correlation matrices — date-safe join (_sortDateKeys / _logReturnsByDate / _pearsonCorrByDate)');
 test('_sortDateKeys: sorts Unix-timestamp-number keys numerically, not lexicographically', () => {
-  // Lexicographic sort would misorder these once digit counts differ; here
-  // all three share 10 digits so a lexicographic sort would happen to look
-  // right — the real point is it must still produce true numeric order.
   const keys = ['1725580800', '1725573600', '1725577200'];
   assert.deepStrictEqual(_sortDateKeys(keys.slice()), ['1725573600', '1725577200', '1725580800']);
 });
@@ -648,20 +521,17 @@ test('_sortDateKeys: sorts ISO date-string keys chronologically', () => {
   assert.deepStrictEqual(_sortDateKeys(keys.slice()), ['2026-08-01', '2026-08-15', '2026-08-27']);
 });
 test('_logReturnsByDate: computes each return only against its own series\' immediately-preceding date, not array position', () => {
-  const closes = { '2026-08-03': 1.10, '2026-08-01': 1.00, '2026-08-02': 1.05 }; // inserted out of order
+  const closes = { '2026-08-03': 1.10, '2026-08-01': 1.00, '2026-08-02': 1.05 }; 
   const rets = _logReturnsByDate(closes);
   assert.ok(Math.abs(rets['2026-08-02'] - Math.log(1.05 / 1.00)) < 1e-12);
   assert.ok(Math.abs(rets['2026-08-03'] - Math.log(1.10 / 1.05)) < 1e-12);
-  assert.strictEqual(Object.keys(rets).length, 2); // no return for the first date (no prior)
+  assert.strictEqual(Object.keys(rets).length, 2); 
 });
 test('_logReturnsByDate: null on fewer than 2 dates', () => {
   assert.strictEqual(_logReturnsByDate({ '2026-08-01': 1.10 }), null);
   assert.strictEqual(_logReturnsByDate(null), null);
 });
 test('_pearsonCorrByDate: joins on shared dates only, ignoring a date only one series has', () => {
-  // Series A has an extra date (08-05) that B lacks — a positional
-  // .slice(-n)-style join would have silently misaligned everything from
-  // that point on; the date-safe join must simply drop the unshared date.
   const retsA = { '2026-08-01': 0.01, '2026-08-02': -0.02, '2026-08-03': 0.015, '2026-08-04': -0.01, '2026-08-05': 0.02, '2026-08-06': -0.005 };
   const retsB = { '2026-08-01': 0.012, '2026-08-02': -0.018, '2026-08-03': 0.017, '2026-08-04': -0.011,                    '2026-08-06': -0.004 };
   const result = _pearsonCorrByDate(retsA, retsB);
@@ -673,46 +543,14 @@ test('_pearsonCorrByDate: null when fewer than 5 dates are shared', () => {
   assert.strictEqual(_pearsonCorrByDate(retsA, retsB), null);
 });
 test('_pearsonCorrByDate: a pair-specific gap does not desync two otherwise-identical series (regression case)', () => {
-  // This is the exact failure class fixed in v8.273.0: series A is missing
-  // one date in the middle that series B has. A positional trailing-slice
-  // join would shift every later element of A one slot out of true
-  // calendar alignment with B; the date-safe join must instead recognize
-  // A and B are simply co-moving (both derived from the same trend) and
-  // still report a strong positive correlation.
   const dates = ['2026-08-01','2026-08-02','2026-08-03','2026-08-04','2026-08-05','2026-08-06','2026-08-07','2026-08-08'];
   const trend = [0.010, -0.015, 0.020, -0.005, 0.012, -0.018, 0.022, -0.008];
   const retsB = {}; dates.forEach((d, i) => retsB[d] = trend[i]);
-  const retsA = {}; dates.forEach((d, i) => { if (i !== 3) retsA[d] = trend[i]; }); // A missing 08-04
+  const retsA = {}; dates.forEach((d, i) => { if (i !== 3) retsA[d] = trend[i]; }); 
   const result = _pearsonCorrByDate(retsA, retsB);
   assert.ok(result !== null && result > 0.95, `expected near-perfect correlation once correctly date-joined, got ${result}`);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// FX Fair Value regression — moved server-side (v8.349.0)
-// ═══════════════════════════════════════════════════════════════════
-// This file used to mirror dashboard.js's _solveLinearSystem() /
-// _fvStandardize() / _fvBuildDesign() / _fvRidgeSolve() / _fvChooseLambda()
-// / _fvRegress() here for unit testing (v8.197.0 → v8.200.0 5-var →
-// v8.341.0 6-var [prod_diff] → v8.341.5 switched OLS → cross-validated
-// ridge) — a second independently-maintained copy of the same regression,
-// which the project's own dual-implementation-drift rule flags as a risk
-// (and which drifted for real at least once: this mirror missed prod_diff
-// from v8.341.0 until v8.341.6 caught it).
-//
-// As of v8.349.0 the regression itself lives in exactly one place —
-// globalinvesting-scripts/compute_fair_value.py — and dashboard.js reads
-// its output (fair-value-data/summary.json) rather than computing anything.
-// There is no longer a second copy of the regression in this repo to keep
-// in sync, so this mirror and its unit tests were removed rather than
-// updated. The regression's own correctness is verified in
-// compute_fair_value.py's module docstring (0 mismatches at 1e-9 relative
-// tolerance vs. a live extraction of the original dashboard.js functions,
-// across all 32 real pairs) and by fv_core.py, which exposes the same
-// logic as pure functions for any future Python-side testing.
-//
-// What this file still verifies for Fair Value: that renderFairValue()
-// reads fair-value-data/summary.json (not a per-pair recomputation) — see
-// the smoke-level check below.
 test('renderFairValue: reads the precomputed summary file, not a per-pair recomputation', () => {
   const src = require('fs').readFileSync(require('path').join(__dirname, 'dashboard.js'), 'utf8');
   const fnMatch = src.match(/async function renderFairValue\(\)[\s\S]*?\n}\n/);
@@ -755,9 +593,6 @@ test('apiBlocked=true with stale updated correctly falls through to SOURCE 2/3',
   assert.strictEqual(_sentimentSourceOneUsable(d, now), false);
 });
 
-// ═══════════════════════════════════════════════════════════════════
-// Summary
-// ═══════════════════════════════════════════════════════════════════
 console.log(`\n${'─'.repeat(60)}`);
 if (fail === 0) {
   console.log(`${pass} passed, ${fail} failed`);

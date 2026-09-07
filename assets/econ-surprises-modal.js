@@ -1,33 +1,10 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// ECONOMIC SURPRISES MODAL  v1.3.9
-// File: assets/econ-surprises-modal.js
-//
-// v1.3.9 (2026-08-29) — Industry-standard audit: real stored-XSS fixed in
-//   _esmRenderTable() — r.event/r.actual/r.forecast (calendar.json's external
-//   free-text fields, same source as the identical bug already fixed in
-//   calendar-panel.js/econ-matrix.js) were injected into innerHTML content
-//   and a title attribute unescaped. Fixed with a new _esmEscHtml() helper
-//   applied at all 4 sites.
-//
-// Triggered by clicking any row in the Economic Surprises sidebar table.
-// Mounts into #split-lower (right inline panel) via inline-panel.js intercept —
-// same behaviour as COT / CB Rates / Yield Curve modals.
-//
-// DOM shape mirrors the other modals:
-//   #esm-bd    (outer wrapper — position:static when transplanted)
-//     #esm-modal (inner flex column — full width/height)
-//
-// Tabs: 10 major currencies (G10) with flag-icons (.fi.fi-xx) matching CB Rates convention.
-// Chart: LightweightCharts v5 AreaSeries — rolling 30d surprise index, weekly.
-// Table: Individual releases 90d window — beat/miss/in-line badge, H/M impact.
-// ═══════════════════════════════════════════════════════════════════════════
 
 (function () {
   if (document.getElementById('esm-css')) return;
   const s = document.createElement('style');
   s.id = 'esm-css';
   s.textContent = `
-/* ── Desktop: inline panel layout (no fixed height on #esm-bd) ── */
+
 #esm-bd { display:block!important; }
 #esm-modal {
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
@@ -96,10 +73,10 @@
 .esm-tab:hover { color:var(--text,#d1d4dc); }
 .esm-tab.on { color:var(--text,#d1d4dc);border-bottom-color:var(--blue,#4f7fff); }
 
-/* ── Desktop #esm-body: flex column, chart fixed height, events scroll internally ── */
+
 #esm-body {
   display:flex;flex-direction:column;background:var(--bg,#131722);
-  /* Desktop: contained scroll within the panel */
+  
   flex:1;min-height:0;overflow:hidden;
 }
 #esm-chart-wrap {
@@ -176,30 +153,26 @@
   font-family:var(--font-ui,'Inter',-apple-system,sans-serif);
 }
 
-/* ── Mobile (≤900px): fixed bottom-sheet overlay ──────────────────────────────
-   Fixes Bug 1 (no scroll needed) and Bug 2 (layout has a defined height so
-   flex:1;min-height:0 works and #esm-events-wrap scrolls internally).
-   Uses 900px to match the terminal's own mobile breakpoint.
-─────────────────────────────────────────────────────────────────────────────── */
+
 @media(max-width:900px){
   #esm-bd {
     position:fixed!important;inset:0!important;
     background:rgba(0,0,0,.55)!important;
     z-index:9800!important;
     display:flex!important;align-items:flex-end!important;
-    /* Tap backdrop to close */
+    
     cursor:pointer;
   }
   #esm-modal {
     position:relative!important;
     width:100%!important;
-    /* 80dvh gives enough room; fallback to 80vh */
+    
     height:80vh!important;height:80dvh!important;
     max-height:80dvh!important;
     border-radius:12px 12px 0 0!important;
     box-shadow:0 -8px 40px rgba(0,0,0,.6)!important;
     animation:_esmSlideUp .22s cubic-bezier(.16,1,.3,1) both!important;
-    /* Prevent backdrop tap from closing when tapping modal content */
+    
     cursor:default;
     overflow:hidden!important;
   }
@@ -207,16 +180,16 @@
     from { transform:translateY(100%); opacity:.6; }
     to   { transform:translateY(0);    opacity:1;  }
   }
-  /* With a fixed height on #esm-modal, flex:1 + min-height:0 work correctly */
+  
   #esm-body {
     flex:1!important;min-height:0!important;overflow:hidden!important;
   }
   #esm-events-wrap {
-    /* overflow-y:auto now works because the parent chain has a defined height */
+    
     flex:1!important;min-height:0!important;overflow-y:auto!important;
     -webkit-overflow-scrolling:touch;
   }
-  /* The sticky header is inside a scrollable container — no longer floats over chart */
+  
   #esm-events-hd { position:sticky!important;top:0!important; }
   #esm-metrics { grid-template-columns:repeat(3,1fr); }
   .esm-mm:nth-child(3) { border-right:none; }
@@ -227,7 +200,6 @@
   document.head.appendChild(s);
 })();
 
-// ── Constants ────────────────────────────────────────────────────────────────
 const _esmMonoF = "var(--font-mono,'JetBrains Mono','Courier New',monospace)";
 
 const _ESM_CCY_META = {
@@ -245,17 +217,8 @@ const _ESM_CCY_META = {
 
 const _ESM_G8 = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
 
-// v8.27.0: "trade balance" removed — Trade Balance is a SIGNED net level (deficit
-// negative, surplus positive), same as Current Account which this list already
-// correctly excludes. No inversion needed for a signed balance. Must stay in sync
-// with INVERSE_KW in dashboard.js, INVERSE_EVENTS in fetch_economic_calendar.py, and
-// (as of v8.100.6) CAL_INVERSE_KW in calendar-panel.js.
-// v8.100.7: added "unemployed" — see dashboard.js INVERSE_KW comment for rationale
-// ("Unemployed Persons" is not a substring match of "unemployment").
 const _ESM_INVERSE_KW = ['unemployment','unemployed','jobless','claims','deficit'];
 
-// _canonEsi — shared global defined in dashboard.js (loads before this file).
-// _ESM_CCY_PFXS removed: _CCY_PFXS in dashboard.js is the single source of truth.
 
 const _ESM_NOISE_KW = [
   'cftc','baker hughes','rig count','auction','api weekly',
@@ -274,19 +237,10 @@ const _ESM_NOISE_KW = [
   'tic net','net long-term tic','total net tic',
   'interest rate projection',
   'eia crude oil','eia crude',
-  // v8.51.15: keep in sync with NOISE_KW in dashboard.js — Myfxbook retail
-  // "Sentiment" releases are not official macro data (no real consensus
-  // forecast; calendar.json backfills `forecast` from `previous`, fabricating
-  // a beat/miss vs. last week's reading). Keyword is 'myfxbook' specifically
-  // so legitimate sentiment surveys (Michigan, ZEW, IFO, GfK) stay scored.
   'myfxbook',
 ];
 
-// ── LWC loader ───────────────────────────────────────────────────────────────
 let _esmLwcPromise = null;
-// Full HTML-entity escape for externally-sourced free-text fields
-// (calendar.json's event/actual/forecast) before they reach an innerHTML
-// sink — same convention as calendar-panel.js's _escAttr().
 function _esmEscHtml(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
@@ -306,26 +260,15 @@ function _esmEnsureLWC() {
   return _esmLwcPromise;
 }
 
-// ── State ────────────────────────────────────────────────────────────────────
 let _esmChart     = null;
 let _esmCalData   = null;
 let _esmActiveCcy = 'USD';
-let _esmRo           = null;   // active ResizeObserver — disconnected on destroy
-let _esmTimers       = [];     // pending setTimeout IDs — cleared on destroy
-let _esmResizeApply  = null;   // active window 'resize' handler — removed on destroy
+let _esmRo           = null;   
+let _esmTimers       = [];     
+let _esmResizeApply  = null;   
 
-// ── Time-decay constant (CESI convention, half-life 45d) ───────────────────────
-// w = e^(-λ·ageDays), λ = ln(2)/45. Mirrors DECAY_LAMBDA in dashboard.js exactly.
 const _ESM_DECAY_LAMBDA = Math.LN2 / 45;
 
-// ── Sign-aware numeric parser — mirrors dashboard.js _scorePass exactly ────────
-// parseFloat("$-226.8B") / parseFloat("CHF15.5B") / parseFloat("NZ$-1.01B") all
-// return NaN because parseFloat cannot parse a leading currency-symbol prefix.
-// Every Trade Balance / Current Account event for every G10 currency carries
-// one of these prefixes, so the old parseFloat-based scoring here silently
-// dropped them — same bug as dashboard.js _scorePass (fixed v8.25.8), just not
-// yet ported to this file. Strip everything except digits/decimal, then
-// restore the sign from the presence of '-' anywhere in the original string.
 const _esmParseNum = s => {
   if (s == null || s === '') return NaN;
   const str = String(s).replace(/,/g, '');
@@ -335,11 +278,6 @@ const _esmParseNum = s => {
   return isNaN(n) ? NaN : (neg ? -n : n);
 };
 
-// ── Score helpers ─────────────────────────────────────────────────────
-// Decay-weighted scorer — mirrors dashboard.js renderEconSurprises() exactly.
-// w = e^(-_ESM_DECAY_LAMBDA · ageDays), anchored to endMs (window right edge).
-// For the 90d summary: endMs = now, w(0d)=1.0, w(45d)=0.5, w(90d)=0.25.
-// For chart history: endMs = point date, keeping each slice consistent.
 function _esmScoreWindow(events, ccy, startMs, endMs) {
   const seen = new Set();
   let total = 0, beats = 0, misses = 0;
@@ -373,7 +311,6 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
     const miss = isInverse ? actual > forecast : actual < forecast;
     const surprise = isInverse ? -(actual - forecast) : (actual - forecast);
 
-    // Decay weight × impact weight anchored to window right edge
     const ageDays    = (endMs - t) / 86400000;
     const impactMult = ev.impact === 'high' ? 1.0 : 0.5;
     const w          = Math.exp(-_ESM_DECAY_LAMBDA * ageDays) * impactMult;
@@ -396,7 +333,6 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
 
   if (!total) return null;
 
-  // Identical formula to dashboard.js
   let idx100;
   const zFrac = zWTotal / wTotal;
   if (zWTotal >= 10 || (zWTotal > 0 && zFrac >= 0.30)) {
@@ -412,15 +348,10 @@ function _esmScoreWindow(events, ccy, startMs, endMs) {
 
   return { idx: idx100, beats, misses, total };
 }
-// Builds the rolling time-series for the chart.
-// CESI convention: 90d rolling window, weekly step.
-// Each point is the decay-weighted index over [pointDate-90d, pointDate].
-// Decay anchor = pointDate (endMs), so the curve is consistent with the
-// current-period score which anchors to now.
 function _esmBuildSeries(events, ccy) {
   const nowMs     = Date.now();
-  const WINDOW_MS = 90 * 24 * 60 * 60 * 1000; // 90d — CESI standard
-  const STEP_MS   =  7 * 24 * 60 * 60 * 1000; // weekly step
+  const WINDOW_MS = 90 * 24 * 60 * 60 * 1000; 
+  const STEP_MS   =  7 * 24 * 60 * 60 * 1000; 
 
   const ccyEvts = events.filter(ev =>
     ev.currency === ccy && ev.actual && ev.actual !== '' && ev.actual !== '-'
@@ -428,18 +359,6 @@ function _esmBuildSeries(events, ccy) {
   if (!ccyEvts.length) return [];
 
   const minDate = Math.min(...ccyEvts.map(ev => new Date(ev.dateISO).getTime()).filter(t => !isNaN(t)));
-  // Map, not array — keyed by calendar-day ISO string. The last weekly cursor
-  // before the loop exits is clamped to nowMs (`Math.min(cursor, nowMs)`), and
-  // whenever that clamp lands on the same calendar day as the preceding
-  // regular weekly step (happens whenever minDate's 7-day grid aligns with
-  // "today" — roughly 1-in-7 currencies on any given day), both iterations
-  // format to the identical ISO date string. LightweightCharts' setData()
-  // requires strictly ascending, unique times and throws on a duplicate —
-  // an uncaught throw here (observed on GBP/CHF/NZD/SEK) silently aborted the
-  // rest of _esmRenderChart, leaving an empty chart with axes but no series.
-  // Map.set on an existing key updates the value in place without moving its
-  // position, so chronological order is preserved and the later (more
-  // current, nowMs-anchored) score simply wins for that day.
   const byDate  = new Map();
   let cursor    = minDate + WINDOW_MS;
 
@@ -460,12 +379,8 @@ function _esmCurrentScore(events, ccy) {
   const nowMs  = Date.now();
   const W90_MS  = 90  * 24 * 60 * 60 * 1000;
   const W180_MS = 180 * 24 * 60 * 60 * 1000;
-  // Pass 0: standard 90d window — mirrors dashboard.js renderEconSurprises() pass 0.
   const r0 = _esmScoreWindow(events, ccy, nowMs - W90_MS, nowMs);
   if (r0 !== null) return { ...r0, widened: false };
-  // Pass 1: 90–180d extension band — only reached when no 90d data exists.
-  // Applies the same impact filter and decay function as pass 0; widening the
-  // window does NOT lower methodology standards (identical to EA v8.4.3+).
   const r1 = _esmScoreWindow(events, ccy, nowMs - W180_MS, nowMs - W90_MS);
   return r1 ? { ...r1, widened: true } : null;
 }
@@ -475,8 +390,6 @@ function _esmGetEvents(events, ccy) {
   const W90_MS  = 90  * 24 * 60 * 60 * 1000;
   const W180_MS = 180 * 24 * 60 * 60 * 1000;
 
-  // Determine effective window: check if any medium/high events exist in 90d.
-  // Matches the adaptive window logic in _esmCurrentScore / dashboard.js pass 0/1.
   const has90d = events.some(ev => {
     if (ev.currency !== ccy) return false;
     const t = new Date(ev.dateISO).getTime();
@@ -532,11 +445,7 @@ function _esmGetEvents(events, ccy) {
   return { rows: result, widened: !has90d };
 }
 
-// ── Chart ─────────────────────────────────────────────────────────────────────
 function _esmDestroyChart() {
-  // Cancel pending resize timers before removing the chart — prevents
-  // "Object is disposed" errors from ResizeObserver / setTimeout callbacks
-  // that fire applyOptions() on an already-removed LWC instance.
   _esmTimers.forEach(id => clearTimeout(id));
   _esmTimers = [];
   if (_esmRo) { try { _esmRo.disconnect(); } catch (_) {} _esmRo = null; }
@@ -548,9 +457,6 @@ function _esmRenderChart(ccy) {
   const LWC = window.LightweightCharts;
   if (!LWC || !_esmCalData) return;
 
-  // Read dimensions BEFORE destroy — _esmChart.remove() causes LWC to clear the
-  // container innerHTML which zeros offsetHeight in the same frame.
-  // getBoundingClientRect() is more reliable (mirrors the COT modal fix).
   const container = document.getElementById('esm-chart-inner');
   if (!container) return;
   const _rect = container.getBoundingClientRect();
@@ -586,7 +492,6 @@ function _esmRenderChart(ccy) {
   });
   _esmChart = chart;
 
-  // Zero line
   const zeroLine = chart.addSeries(LWC.LineSeries, {
     color: 'rgba(110,118,129,0.4)', lineWidth: 1, lineStyle: 2,
     priceLineVisible: false, lastValueVisible: false, crosshairMarkerVisible: false,
@@ -612,7 +517,6 @@ function _esmRenderChart(ccy) {
 
   if (series.length > 0) { areaSeries.setData(series); chart.timeScale().fitContent(); }
 
-  // Tooltip
   const tip = document.createElement('div');
   tip.className = 'esm-lw-tooltip';
   container.style.position = 'relative';
@@ -646,15 +550,9 @@ function _esmRenderChart(ccy) {
     tip.style.top  = Math.max(0, ty) + 'px';
   });
 
-  // Resize — store observer and timer IDs so _esmDestroyChart() can cancel them.
-  // IMPORTANT: store `apply` in _esmResizeApply so the window 'resize' listener
-  // can be removed on destroy. Without this, each tab switch leaks a listener
-  // that holds a stale closure over the old `container` ref — `container.offsetHeight`
-  // returns 0 after LWC clears the DOM, causing chart.applyOptions({ height: 0 })
-  // which collapses the time-axis row and hides the date labels permanently.
   const apply = () => {
     requestAnimationFrame(() => {
-      if (!_esmChart) return;   // guard: chart may have been destroyed before rAF fires
+      if (!_esmChart) return;   
       const r = container.getBoundingClientRect();
       const w = Math.round(r.width)  || container.offsetWidth  || 600;
       const h = Math.round(r.height) || container.offsetHeight
@@ -675,7 +573,6 @@ function _esmRenderChart(ccy) {
   ];
 }
 
-// ── Metrics ───────────────────────────────────────────────────────────────────
 function _esmRenderMetrics(ccy) {
   if (!_esmCalData) return;
   const s = _esmCurrentScore(_esmCalData.events || [], ccy);
@@ -692,8 +589,6 @@ function _esmRenderMetrics(ccy) {
   const idxCol = idx > 5 ? 'var(--up,#26a69a)' : idx < -5 ? 'var(--down,#ef5350)' : 'var(--text,#d1d4dc)';
   const beatRt = s.total > 0 ? (s.beats / s.total * 100).toFixed(0) + '%' : '—';
 
-  // Update the "N (90d)" metric label — when widened, change to "N (90d/180d)" to
-  // match EA's subtitle "Citi methodology * 90D/180D" convention (g_esi_window_days).
   const nLbl = el('esm-m-n')?.closest('.esm-mm')?.querySelector('.esm-mm-lbl');
   if (nLbl) nLbl.textContent = s.widened ? 'N (90d/180d)' : 'N (90d)';
 
@@ -708,11 +603,9 @@ function _esmRenderMetrics(ccy) {
     mr.style.color = parseFloat(beatRt) >= 50 ? 'var(--up,#26a69a)' : 'var(--down,#ef5350)';
   }
 
-  // Update the Index metric label and sub-header when widened.
   const indexLbl = el('esm-m-index')?.closest('.esm-mm')?.querySelector('.esm-mm-lbl');
   if (indexLbl) indexLbl.textContent = s.widened ? 'Index (90d/180d)' : 'Index (90d)';
 
-  // Update the header sub-line to reflect the adaptive window when in use.
   const sub = el('esm-sub');
   if (sub) {
     sub.textContent = s.widened
@@ -721,7 +614,6 @@ function _esmRenderMetrics(ccy) {
   }
 }
 
-// ── Events table ──────────────────────────────────────────────────────────────
 function _esmRenderTable(ccy) {
   const tbody = document.getElementById('esm-evt-tbody');
   if (!tbody) return;
@@ -729,7 +621,6 @@ function _esmRenderTable(ccy) {
 
   const { rows, widened } = _esmGetEvents(_esmCalData.events || [], ccy);
 
-  // Update the "Events · 90d rolling window" header label when widened.
   const evHdTitle = document.getElementById('esm-events-hd-title');
   if (evHdTitle) evHdTitle.textContent = widened ? `Events · 90d/180d adaptive window` : `Events · 90d rolling window`;
 
@@ -755,7 +646,6 @@ function _esmRenderTable(ccy) {
   }).join('');
 }
 
-// ── Tab switch ────────────────────────────────────────────────────────────────
 function esmTab(el, ccy) {
   document.querySelectorAll('.esm-tab').forEach(t => {
     t.classList.remove('on');
@@ -767,7 +657,6 @@ function esmTab(el, ccy) {
   el.setAttribute('tabindex','0');
   _esmActiveCcy = ccy;
 
-  // Update title flag
   const titleEl = document.getElementById('esm-title');
   if (titleEl) {
     const meta = _ESM_CCY_META[ccy] || {};
@@ -780,7 +669,6 @@ function esmTab(el, ccy) {
   _esmRenderTable(ccy);
 }
 
-// ── Close ─────────────────────────────────────────────────────────────────────
 function closeESModal() {
   _esmDestroyChart();
   const bd = document.getElementById('esm-bd');
@@ -790,7 +678,6 @@ function closeESModal() {
 
 function _esmKeydown(e) { if (e.key === 'Escape') closeESModal(); }
 
-// ── Open ──────────────────────────────────────────────────────────────────────
 async function openEconSurprisesModal(initialCcy) {
   closeESModal();
   const ccy  = _ESM_G8.includes(initialCcy) ? initialCcy : 'USD';
@@ -799,7 +686,6 @@ async function openEconSurprisesModal(initialCcy) {
   const initMeta = _ESM_CCY_META[ccy] || {};
   const initFlag = initMeta.flag ? `<span class="fi fi-${initMeta.flag}"></span>` : '';
 
-  // outer #esm-bd → inner #esm-modal  (matches _transplant pattern)
   const bd = document.createElement('div');
   bd.id = 'esm-bd';
 
@@ -882,12 +768,10 @@ async function openEconSurprisesModal(initialCcy) {
   document.body.appendChild(bd);
   document.addEventListener('keydown', _esmKeydown);
 
-  // Mobile: tap the dark backdrop (not the modal itself) to close
   bd.addEventListener('click', function(e) {
     if (e.target === bd) closeESModal();
   });
 
-  // Fetch calendar
   try {
     const res = await fetch('./calendar-data/calendar.json').catch(() => null);
     if (res?.ok) {

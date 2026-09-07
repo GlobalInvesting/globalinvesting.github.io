@@ -1,61 +1,3 @@
-// ═══════════════════════════════════════════════════════════════════════════
-// CB RATES MODAL  v2.9 — Persistent decision markers removed; hover tooltip only
-// v2.8 (2026-08-25): Per user feedback, removed _buildDecisionOverlay()
-//   entirely (was already dead code — zero call sites after this session's
-//   edit) instead of keeping the tick-mark fallback from v2.7. The Rate
-//   Chart no longer draws any on-chart decision markers at all; the
-//   crosshair tooltip (_attachCBRTooltip, unchanged) remains the sole way
-//   to see a decision's exact date/rate/±bp, on hover, at any zoom level.
-//   Also removed a stray closeCBRatesModal() cleanup line querying
-//   '.cbr-decision-svg' — that element is never created anymore, so the
-//   querySelector always resolved to null; harmless (guarded by `?.`) but
-//   dead code left over from the same removal. See CHANGELOG.md.
-// CB RATES MODAL  v2.7 — Fix: decision labels stacking/overlapping on long-history views
-// v2.7 (2026-08-25): _buildDecisionOverlay()'s 3-tier stacking previously
-//   forced a label into the least-crowded tier even when NONE had room,
-//   stacking it on top of a neighbor instead of skipping it — with decades
-//   of history zoomed to fit, this produced a wall of overlapping +25bp/-25bp
-//   boxes. Now a decision with no free tier renders a thin tick mark instead
-//   of a label; the crosshair tooltip (independent overlay) still shows the
-//   exact decision on hover at any zoom level, so no information is lost,
-//   only the persistent on-chart label at high density. See CHANGELOG.md.
-// CB RATES MODAL  v2.6 — Fix: Rate Chart grew oversized after the v2.5 fix
-// v2.6 (2026-08-02): The chart took up far more room than before, right after
-//   v2.5. Root cause: v2.5's #cbr-bd{flex:1;min-height:0}
-//   fix worked as intended — #cbr-bd now genuinely stretches inside
-//   inline-panel.js's flex-column body — but that gave #cbr-modal's inline
-//   height:100% (set by _transplant()) a much larger real height to resolve
-//   against than before, which flowed down the flex chain (#cbr-m-body →
-//   #cbr-p-chart → .cbr-cw.fill, all flex:1) and inflated the chart's own
-//   flex:1 sizing well past its previous size — the same growth mechanism
-//   the v2.5 fix intentionally avoided giving to .cbr-ps-wrap, but the chart
-//   container itself was still flex:1 and absorbed it instead.
-//   Fix: .cbr-cw.fill switched from flex:1 to a fixed height:240px (matching
-//   yc-modal's #ycm-chart-wrap fix), so it no longer grows with the now-taller
-//   panel. With the chart fixed, .cbr-ps-wrap can safely take flex:1 for the
-//   freed-up space (the competition risk noted in v2.5 no longer applies,
-//   since the chart isn't flex:1 anymore) — same outcome as yc-modal, reached
-//   by the same fixed-chart-height route instead of a bounded max-height cap.
-//   _cbrDims() simplified accordingly: no more panelH measurement or
-//   bd._chartH caching — the chart is just always 240px on desktop.
-// v2.5 (2026-08-02): Fixed Market Commentary capped well below available
-//   panel height, leaving unused space (same symptom as yc-modal v2.4/v2.5).
-//   Added #cbr-bd{flex:1;min-height:0}; raised .cbr-ps-wrap cap 220px→340px
-//   and article cap slice(0,3)→slice(0,6). (Superseded above — .cbr-ps-wrap
-//   is flex:1 now, not capped.)
-// v2.4 (2026-06-15): Fix infinite chart height grow on Decisions→Rate Chart tab-switch
-// Fluid layout, terminal CSS variables throughout.
-// v2.2 (2026-06-15): CB News tab added (superseded by v2.3).
-// v2.3 (2026-06-15): Tab approach replaced with inline Policy Summary block.
-// v2.4 (2026-06-15): Fix infinite chart height grow on Decisions→Rate Chart round-trip.
-//   Root cause: _cbrDims() re-measured from flex layout that had already been
-//   influenced by the chart container's own explicit px height (circular dependency).
-//   Fix: first open stores the measured height on bd._chartH; all tab-switch rebuilds
-//   return the cached value directly via _cbrDims(), breaking the measurement loop.
-//   Renders below context strip in Rate Chart panel. Fetches news-data/news.json,
-//   filters to 3 most recent CB-relevant articles for the selected currency,
-//   displays source + title (linked) + full expand paragraph. Lazy, non-blocking.
-// ═══════════════════════════════════════════════════════════════════════════
 (function(){
   if(document.getElementById('cbr-modal-css'))return;
   const s=document.createElement('style');s.id='cbr-modal-css';
@@ -153,28 +95,22 @@ let _cbrLwChart=null;
 function _destroyCBRChart(){if(_cbrLwChart){try{_cbrLwChart.remove();}catch(_){}  _cbrLwChart=null;}}
 
 function _cbrBuildContextStrip(decisions, chronData, currentRate, meetingData, nMonths){
-  // Rate Context Strip — Bloomberg-style summary of the full policy cycle.
-  // Shows: days to next meeting, meetings remaining this year, cycle duration,
-  // cycle high/low, avg change per decision, hold streak (consecutive holds).
   if(!decisions||!chronData||!chronData.length)return'';
 
   const now=new Date();
 
-  // Days to next meeting
   let daysToNext='—';
   if(meetingData?.nextMeetingISO){
     const diff=Math.round((new Date(meetingData.nextMeetingISO)-now)/(864e5));
     daysToNext=diff>=0?diff+'d':'—';
   }
 
-  // Meetings remaining this year (from allMeetings)
   let mtgsLeft='—';
   if(Array.isArray(meetingData?.allMeetings)){
     const future=meetingData.allMeetings.filter(d=>new Date(d)>now);
     mtgsLeft=future.length;
   }
 
-  // Cycle duration in months (from first decision in current direction streak)
   const lastDec=decisions[decisions.length-1];
   const lastDir=lastDec?Math.sign(lastDec.delta):0;
   let cycleStart=null;
@@ -191,18 +127,15 @@ function _cbrBuildContextStrip(decisions, chronData, currentRate, meetingData, n
     cycleDurTxt=mo+'m';
   }
 
-  // Cycle high / low (all-time in dataset)
   const rates=chronData.map(d=>d.value);
   const hi=Math.max(...rates),lo=Math.min(...rates);
 
-  // Avg change per decision (bp)
   let avgChg='—';
   if(decisions.length){
     const totalBp=decisions.reduce((s,d)=>s+Math.abs(d.delta),0);
     avgChg=(Math.round(totalBp/decisions.length*100))+'bp';
   }
 
-  // Hold streak — how many consecutive months since last decision
   let holdStreak='—';
   if(lastDec){
     const msSinceLast=now-new Date(lastDec.time);
@@ -248,14 +181,6 @@ function _cbrLwOptions(){
     grid:{vertLines:{color:'rgba(255,255,255,0.04)'},horzLines:{color:'rgba(255,255,255,0.04)'}},
     crosshair:{mode:window.LightweightCharts?.CrosshairMode?.Normal??1,vertLine:{color:'rgba(255,255,255,0.2)',style:2,labelVisible:false},horzLine:{color:'rgba(255,255,255,0.12)',style:2,labelVisible:true}},
     rightPriceScale:{borderVisible:false,scaleMargins:{top:0.15,bottom:0.1}},
-    // fixRightEdge:true — same fix as cot-modal-chart.js v3.4 (see
-    // GUIDELINES.md "chart pan/sync bug that looks like an echo/timing bug"
-    // rule): this chart's data ends at (or one synthetic month past) the
-    // latest real rate observation, with fixRightEdge left at its old
-    // default (false) and no rightOffset reserved — the same LWC quirk
-    // applies whenever a user zooms in and then drags past the right edge.
-    // Flagged as a candidate in v8.267.0's CHANGELOG entry, confirmed and
-    // fixed here per the same native-option pattern.
     timeScale:{borderVisible:false,timeVisible:false,fixLeftEdge:false,fixRightEdge:true,animation:{duration:0}},
     handleScroll:{mouseWheel:true,pressedMouseMove:true},
     handleScale:{mouseWheel:true,pinch:true},
@@ -285,16 +210,10 @@ function _cbrDims(){
   const modal=document.getElementById('cbr-modal');
   if(!modal)return{w:600,h:240};
 
-  // Width is always safe to compute from the modal.
   const w=Math.max(modal.offsetWidth-28,200);
 
-  // Mobile: smaller fixed chart height (unchanged from before).
   if(window.innerWidth<=600) return{w,h:220};
 
-  // Desktop: .cbr-cw.fill is now a fixed 240px box (see CSS above), not
-  // flex:1, so there is no panel height to measure and no circular-
-  // dependency/infinite-grow risk left to guard against — the chart is
-  // simply always 240px tall, matching yc-modal's fixed-height chart.
   return{w,h:240};
 }
 
@@ -304,8 +223,6 @@ function _buildCBRChart(data){
   _destroyCBRChart();
   const parent=container.parentElement;
   const{w:initW,h:initH}=_cbrDims();
-  // Set explicit px height on the wrapper so LWC measures it correctly
-  // regardless of whether the flex chain has resolved yet.
   container.style.width=initW+'px';
   container.style.height=initH+'px';
   const opts=_cbrLwOptions();
@@ -326,9 +243,6 @@ function _buildCBRChart(data){
     fwdSeries.setData([{time:last.time,value:last.value},{time:fwdTime,value:fwdRate}]);
   }
   _cbrLwChart.timeScale().fitContent();
-  // v2.8: persistent decision markers removed — see _buildDecisionOverlay's
-  // header note. _attachCBRTooltip below still receives `decisions` and
-  // surfaces the exact date/rate/±bp on hover, unchanged.
   _attachCBRTooltip(container,_cbrLwChart,mainSeries,fwdSeries,decisions);
   const apply=()=>{
     const{w,h}=_cbrDims();
@@ -337,8 +251,6 @@ function _buildCBRChart(data){
       _cbrLwChart.applyOptions({width:w,height:h});_cbrLwChart.timeScale().fitContent();
     }
   };
-  // No ResizeObserver — modal is fixed height; canvas observation causes infinite loops.
-  // window.resize handles viewport changes; no setTimeout needed since dimensions set explicitly above.
   window.addEventListener('resize',apply);container._cbrResize=apply;
 }
 
@@ -368,16 +280,12 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   const bias=meetingData?.bias??null,nextMtg=meetingData?.nextMeeting??'—';
   const biasLabel=bias==='cut'?'\u2193 Cut':bias==='hike'?'\u2191 Hike':'\u2192 Hold';
   const biasCol=bias==='cut'?'var(--down)':bias==='hike'?'var(--up)':'var(--text2)';
-  // Bloomberg standard: accept fwdRate=0 and negative values.
-  // CHF/JPY OIS-implied rates can be below zero — rejecting 0 as "missing" is wrong.
   let fwdRate=null,fwdDisplay='—',fwdIsEst=false,fwdIsProbEst=false;
   if(meetingData?.fwdRate!=null&&!isNaN(meetingData.fwdRate)){fwdRate=parseFloat(meetingData.fwdRate);fwdDisplay=fwdRate.toFixed(2)+'%';}
   else{
     const pCut=meetingData?.cutProb!=null?Math.min(100,Math.max(0,meetingData.cutProb)):null;
     const pHike=meetingData?.hikeProb!=null?Math.min(100,Math.max(0,meetingData.hikeProb)):null;
-    // Priority 2: probability-weighted — no floor, OIS-implied negative rates are valid.
     if(pCut!==null||pHike!==null){const cut=pCut??0,hike=Math.min(pHike??0,100-cut);const cbStepModal=ccy==='JPY'?0.10:0.25;fwdRate=currentRate+(hike/100)*cbStepModal-(cut/100)*cbStepModal;fwdDisplay=fwdRate.toFixed(2)+'%';fwdIsProbEst=true;}
-    // Priority 3: heuristic only — floor retained (directional estimate, no probability data).
     else{const step=bias==='cut'?-0.25:bias==='hike'?0.25:0;fwdRate=Math.max(0,currentRate+step);fwdDisplay='~'+fwdRate.toFixed(2)+'%';fwdIsEst=true;}
   }
   const bankName=bankInfo?.name||ccy,bankShort=bankInfo?.short||ccy;
@@ -456,23 +364,13 @@ async function openCBRatesModal(ccy,obs,bankInfo,meetingData){
   bd._chartData={chronData,decisions,fwdRate,bias,currentRate};
   bd._ccy=ccy;
   requestAnimationFrame(()=>requestAnimationFrame(()=>_buildCBRChart(bd._chartData)));
-  // Load policy summary non-blocking after chart render
   setTimeout(()=>_cbrLoadPolicySummary(ccy, bankShort), 100);
 }
 
-// HTML-escape externally-sourced free text (news-data/news.json article title/
-// source) before it goes into innerHTML content. Same class of gap already
-// fixed once in calendar-panel.js (v8.304.0, _escAttr) — this file's own
-// Market Commentary block never inherited that escaping discipline, since
-// the two files don't share any module/import.
 function _escHtml(s) {
   return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
-// Policy Summary — Bloomberg/TE-style text block rendered inline below the context strip.
-// Fetches news-data/news.json, selects up to 3 most recent high-quality articles tagged
-// with the selected CB's currency, and renders title + full expand paragraph for each.
-// Lazy-fetched: triggered on modal open, non-blocking (runs after chart render).
 async function _cbrLoadPolicySummary(ccy, bankShort){
   const wrap=document.getElementById('cbr-policy-summary');
   if(!wrap)return;
@@ -482,7 +380,6 @@ async function _cbrLoadPolicySummary(ccy, bankShort){
     const j=await res.json();
     const CB_KW=['rate','hike','cut','hold','hawkish','dovish','inflation','gdp','policy','central bank',
       'meeting','basis point','monetary','forecast','outlook','economy'];
-    // Filter by currency, prefer articles with substantive expand text and CB-relevant content
     const articles=(j.articles||[])
       .filter(a=>{
         if(a.cur!==ccy)return false;
@@ -509,7 +406,6 @@ async function _cbrLoadPolicySummary(ccy, bankShort){
     const articlesHtml=articles.map(a=>{
       const timeStr=[a.date,a.time].filter(Boolean).join(' · ');
       const exp=(a.expand||'').replace(/&#\d+;/g,'').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
-      // Truncate at last full sentence within ~500 chars
       let body=exp;
       if(body.length>500){
         const cut=body.slice(0,500);

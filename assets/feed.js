@@ -1,10 +1,3 @@
-/**
- * feed.js — RSS / JSON Feed subscription popover
- * Renders a compact popover from the statusbar RSS button.
- * No external dependencies. Uses the same CSS variable palette as the terminal.
- *
- * Global: toggleRssPopover()
- */
 
 (function () {
   'use strict';
@@ -12,24 +5,14 @@
   const FEED_XML  = 'https://globalinvesting.github.io/feed.xml';
   const FEED_JSON = 'https://globalinvesting.github.io/feed.json';
 
-  // ── Build popover DOM once ───────────────────────────────────────────────
 
   function positionPopover(container) {
     const btn    = document.getElementById('rss-btn');
     const rect   = btn ? btn.getBoundingClientRect() : null;
     const GAP    = 8;
-    const MARGIN = 8; // minimum gap kept from either viewport edge
-    // Matches the CSS 'max-width:calc(100vw - 16px)' rule in buildPopover —
-    // computed here (not measured via offsetWidth) because this function also
-    // runs while the popover is still display:none (see toggleRssPopover),
-    // where offsetWidth would read 0 and defeat the clamp below.
+    const MARGIN = 8; 
     const W = Math.min(260, window.innerWidth - MARGIN * 2);
     let right = rect ? (window.innerWidth - rect.right) : 16;
-    // Clamp: on mobile the RSS button sits near the left edge of a narrow
-    // status bar — a naive right-anchored offset then pushes most of the
-    // 260px-wide popover off-screen to the left, with the cut-off content
-    // unreachable (confirmed bug, mobile only). Keep the popover's left edge
-    // at or past MARGIN regardless of where the button is positioned.
     const maxRight = window.innerWidth - MARGIN - W;
     right = Math.max(MARGIN, Math.min(right, maxRight));
     container.style.right = right + 'px';
@@ -89,13 +72,11 @@
       </p>
     `;
 
-    // Close button
     container.querySelector('#rss-close').addEventListener('click', function (e) {
       e.stopPropagation();
       closeRssPopover();
     });
 
-    // Hover effect on links
     ['rss-link-xml', 'rss-link-json'].forEach(function (id) {
       const el = container.querySelector('#' + id);
       if (!el) return;
@@ -108,7 +89,6 @@
     });
   }
 
-  // ── Public toggle ────────────────────────────────────────────────────────
 
   function closeRssPopover() {
     const popover = document.getElementById('rss-popover');
@@ -137,25 +117,20 @@
       return;
     }
 
-    // Build content lazily on first open
     if (!popover._built) {
       buildPopover(popover);
       popover._built = true;
     }
 
-    // Re-position on every open so the popover tracks the button
-    // correctly after any window resize since the last open.
     positionPopover(popover);
     popover.style.display = 'block';
     if (btn) btn.setAttribute('aria-expanded', 'true');
 
-    // Close on outside click (next tick so this event doesn't immediately close it)
     setTimeout(function () {
       document.addEventListener('click', _outsideClick);
     }, 0);
   };
 
-  // ── Escape key closes popover ────────────────────────────────────────────
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {

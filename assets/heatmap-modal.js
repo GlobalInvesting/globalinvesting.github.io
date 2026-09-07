@@ -1,97 +1,11 @@
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.5 — Market Commentary follow-up:
-//   the 2-line clamp from v2.6.3 cut the article text; the correct behavior is
-//   fewer visible at once with a scroll to reach the older ones (same idea as
-//   cb-rates-modal.js's .cbr-ps-wrap).
-//   Reverted -webkit-line-clamp on .hm-news-art-body (full text again, still
-//   subject to the existing 400-char/sentence-boundary safeguard in
-//   _hmLoadSessionNews()). Instead added max-height:210px (~2 full articles)
-//   to .hm-news-wrap, on top of its existing flex:1/overflow-y:auto — box now
-//   shows ~2 articles and scrolls to reveal the 3rd (older) one. Article
-//   fetch cap unchanged at 3 (v2.6.0).
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.3 — Currency switcher: arrows flanking
-//   the chip, matching the original ‹ NZD ▾ › spec — reverted from v2.6.1/
-//   v2.6.2's grouped-arrow layouts back to one
-//   arrow on each side of the chip — [flag] — text ‹ [chip] ›. #hm-ccy-arrows
-//   wrapper removed; #hm-ccy-prev now sits directly before #hm-ccy-switch and
-//   #hm-ccy-next directly after it, both still plain flex children of
-//   #hm-title-row (existing 5px gap). Pure DOM-order/CSS change — IDs
-//   unchanged, hmCycleCcy/hmToggleCcyDropdown/hmPivotCcy/_hmUpdateCcySwitcher
-//   all look up #hm-ccy-prev/#hm-ccy-next/#hm-ccy-chip/#hm-ccy-dd by ID.
-//   Also: Session tab Market Commentary article body now clamped to 2 lines
-//   (`-webkit-line-clamp:2` on .hm-news-art-body, a 2-line-max convention) —
-//   the existing 400-char/sentence-boundary cut in
-//   _hmLoadSessionNews() is a length safeguard, not a line-count one, so long
-//   paragraphs were still running 4-5 visual lines. .hm-news-wrap was already
-//   flex:1/overflow-y:auto (same scroll pattern as cb-rates-modal.js's
-//   .cbr-ps-wrap); with bodies now clamped to 2 lines, ~2 articles fit in the
-//   .hm-cw's existing 140px min-height before the 3rd needs that scroll.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.2 — Currency switcher layout fix #2:
-//   v2.6.1 moved the arrows next to the chip but kept the chip immediately
-//   after the flag, ahead of the full-name text. Correct order: [flag] — full
-//   name text [‹›] [chip].
-//   Reordered #hm-title-row's children (title text, then arrows, then the
-//   switcher) so the flag+name reads first as the primary label, with the
-//   picker (arrows + chip) trailing it as a secondary control. Pure DOM-order
-//   change again — no logic touched, all lookups are by ID.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.1 — Currency switcher layout fix: the
-//   ‹/› arrows previously flanked the chip (‹ [USD▾] ›), so the
-//   left arrow sat immediately after the flag, ahead of the currency chip itself —
-//   read oddly, like it belonged to the flag rather than to the switcher. Reordered
-//   to [flag] [USD▾ chip] [‹›] — text: chip stays right after the flag, both arrows
-//   now grouped together to its right as a single control. Purely a DOM-order/CSS
-//   change (#hm-ccy-arrows wraps the two buttons with a tight 1px gap) — no change
-//   to hmCycleCcy/hmToggleCcyDropdown/hmPivotCcy logic, ID lookups unaffected.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.6.0 — Session tab follow-up: (1) fixed
-//   the Market Commentary block flickering — it was
-//   re-fetching and re-rendering (loading spinner → articles) on every
-//   Finnhub RT tick via _hmRefreshIfOpen's populateSession() call, even
-//   though news doesn't change tick-to-tick; now gated by a _hmNewsCcy
-//   currency-tracking guard so it only re-runs on an actual currency change.
-//   (2) capped Market Commentary at 3 articles (was 6). (3) added an in-modal
-//   currency switcher (‹ NZD ▾ ›, dropdown + prev/next arrows + ArrowLeft/
-//   ArrowRight keys) to the header, mirroring cot-modal-chart.js's existing
-//   switcher — wired through the existing hmPivotCcy() pivot path so Session/
-//   CSI only re-render when their tab is actually visible, same lazy pattern
-//   hmTab() already uses.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.5.0 — Session tab: added a Market Commentary
-//   fill block below Session Context, same shape/source as cb-rates-modal.js's
-//   _cbrLoadPolicySummary() (news-data/news.json, filtered to the modal's active
-//   currency via `cur`, up to 6 articles). On tall/large screens the Session
-//   tab left visible empty space below Session
-//   Context, since neither of its two .hm-cw cards grow to fill .hm-panel.on's
-//   flex column. Third .hm-cw card takes flex:1 (same pattern already used by
-//   Rel. Strength's first .hm-cw, and by .cbr-ps-wrap in cb-rates-modal.js) so it
-//   absorbs the leftover vertical space instead of leaving it blank. Not filtered
-//   by CB_KW like the CB modal's version — this tab covers the currency generally.
-// CURRENCY STRENGTH HEATMAP MODAL  v2.4.0 — CSI chart: replaced the two-row Interval+Range control (added earlier this session) with a single industry-standard range selector (1D/1W/1M/3M/6M/1Y/All), each mapping internally to both a lookback and an auto-selected OHLC resolution — confirmed against TradingView's own docs and CSM-specific tools (FXSSI, MarketMilk), which all expose exactly one range control, never two. Also: added chart.timeScale().fitContent() after loading series data, which was missing entirely — without it LWC used a fixed bar-spacing default instead of stretching the loaded range to fill the chart width, so ranges with few bars left visible empty space and chart width looked inconsistent across timeframes
-// CURRENCY STRENGTH HEATMAP MODAL  v2.3.4 — CSI chart: normalize each currency's daily return by ACTUAL per-date pair coverage instead of a fixed pair count, so a legitimately-missing bar for one pair (e.g. fetch_ohlc.py's flat-bar guard dropping a degenerate O=H=L=C bar) no longer systematically understates that currency's move for that one bar
-// CURRENCY STRENGTH HEATMAP MODAL  v2.3.3 — CSI chart: added "Interval" / "Range" group labels above the TF and period button rows (Bloomberg-style) so the two rows read as distinct controls instead of duplicate-looking buttons (both rows can show "1D"/"1W" text since they answer different questions — interval vs. lookback)
-// CURRENCY STRENGTH HEATMAP MODAL  v2.3.2 — CSI chart: fixed _updateCSILiveBar() still rebasing the live RT point against a bar-count cutoff (missed in v2.3.1's calendar-day migration), which snapped every currency's most recent point to a wildly different baseline than the rest of the series on every RT tick — visible as all CSI lines jumping/converging together at the chart's right edge
-// CURRENCY STRENGTH HEATMAP MODAL  v2.3.1 — CSI chart: TF+period controls merged into one row with uniform button sizing; TF buttons moved off the shared .lw-tf-btn class onto their own .hm-csi-btn (was cross-contaminating with the main chart's global TF-button selector); period presets switched from an assumed bar-count to real calendar-day cutoffs (bar-count drifted for H1/H4/W1 depending on incidental weekend placement in the trailing window)
-// CURRENCY STRENGTH HEATMAP MODAL  v2.3.0 — CSI chart: added H1/H4/1D/1W timeframe selector (reuses main chart's intraday ohlc-data/h1|h4 sources; 1W is a telescoping downsample of the daily series, no new data source needed); fixed tooltip showing raw unix seconds for intraday TFs
-// CURRENCY STRENGTH HEATMAP MODAL  v2.2.4 — CSI chart: ResizeObserver keeps chart width in sync with container (was fixed at creation-time offsetWidth, so a browser resize while the modal was open left the chart clipped/misaligned)
-// CURRENCY STRENGTH HEATMAP MODAL  v2.2 — audit fixes: tooltipEl bug, keyframes, tab a11y, labels
-// CURRENCY STRENGTH HEATMAP MODAL  v1.1.0
-// File: assets/heatmap-modal.js
-// Loaded AFTER dashboard.js (see index.html)
-//
-// Public API (called from dashboard.js populateHeatmap):
-//   openHeatmapModal(ccy, strengths, rtCache)
-//   closeHeatmapModal()
-//   hmTab(el, tabId)
-//
-// Pattern mirrors cb-rates-modal.js and corr-modal.js.
-// All IDs prefixed hm- to avoid CSS collisions.
-// ═══════════════════════════════════════════════════════════════════════════
 
 (function () {
 
-  // ── CSS ───────────────────────────────────────────────────────────────────
   if (document.getElementById('hm-modal2-css')) return;
   const s = document.createElement('style');
   s.id = 'hm-modal2-css';
   s.textContent = `
-/* ── Heatmap Modal — cohesive with Real Carry Modal ── */
+
 
 #hm-bd {
   display:block!important;
@@ -111,7 +25,7 @@
   display:none;
 }
 
-/* ── Header ── */
+
 #hm-hd {
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px 9px;
@@ -133,8 +47,7 @@
 }
 #hm-close:hover { color:var(--text);background:var(--bg3); }
 
-/* Currency switcher (in-modal, no need to close/reopen) — same pattern as
-   cot-modal-chart.js's #cot-ccy-switch, namespaced hm- for this file. */
+
 .hm-ccy-arrow {
   background:none;border:none;color:var(--text3,#4e5c70);font-size:11px;
   cursor:pointer;padding:2px 4px;border-radius:3px;line-height:1;flex-shrink:0;
@@ -172,7 +85,7 @@
 .hm-ccy-dd-item:hover { color:var(--text);background:var(--bg3); }
 .hm-ccy-dd-item.on { color:var(--blue);background:var(--bg3); }
 
-/* ── Metrics strip ── */
+
 #hm-metrics {
   display:grid;grid-template-columns:repeat(6,1fr);
   border-bottom:1px solid var(--border2);
@@ -204,7 +117,7 @@
 .hm-mm-sub.up   { color:var(--up); }
 .hm-mm-sub.down { color:var(--down); }
 
-/* ── Tabs ── */
+
 #hm-tabs {
   display:flex;padding:0 14px;
   border-bottom:1px solid var(--border,#252d3d);
@@ -219,14 +132,14 @@
   border-bottom:2px solid transparent;
   transition:color .12s;white-space:nowrap;user-select:none;
   font-family:var(--font-ui,sans-serif);
-  /* button reset — keeps visual identical to former div */
+  
   background:none;border-top:none;border-left:none;border-right:none;outline:none;
 }
 .hm-tab:focus-visible { outline:2px solid var(--blue);outline-offset:-2px;border-radius:2px; }
 .hm-tab:hover { color:var(--text2); }
 .hm-tab.on { color:var(--text);border-bottom-color:var(--blue); }
 
-/* ── Body ── */
+
 #hm-body {
   flex:1;min-height:0;
   overflow-y:auto;
@@ -242,7 +155,7 @@
 .hm-panel { display:none;padding:0; }
 .hm-panel.on { display:flex;flex:1;flex-direction:column;min-height:0; }
 
-/* ── Card wrapper ── */
+
 .hm-cw {
   background:var(--bg);
   border:none;
@@ -258,11 +171,7 @@
 .hm-cw::-webkit-scrollbar { height:3px; }
 .hm-cw::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
 
-/* Session tab — Market Commentary fill block (v2.5.0). Mirrors cb-rates-modal's
-   .cbr-ps-wrap fill pattern: this card takes flex:1 inside .hm-panel.on's
-   column flex so it absorbs whatever vertical space the fixed-height session
-   grid + AI notes above it don't use, instead of leaving it empty on tall
-   viewports. Same reason correlations' first .hm-cw is flex:1 (line ~745). */
+
 .hm-news-wrap { flex:1;min-height:0;max-height:210px;overflow-y:auto;margin-top:8px;scrollbar-width:thin;scrollbar-color:var(--border2,#2e3a50) transparent; }
 .hm-news-wrap::-webkit-scrollbar { width:3px!important; }
 .hm-news-wrap::-webkit-scrollbar-thumb { background:var(--border2,#2e3a50);border-radius:2px; }
@@ -277,7 +186,7 @@
 .hm-news-art-body { font-size:10px;color:var(--text2);line-height:1.55;font-family:var(--font-ui,'Inter',-apple-system,sans-serif); }
 .hm-news-loading, .hm-news-empty { padding:14px 0;font-size:10px;color:var(--text2);font-family:var(--font-mono); }
 
-/* Section label */
+
 .hm-ct {
   font-size:8.5px;font-family:var(--font-ui,'Inter',-apple-system,sans-serif);color:var(--text3,#4e5c70);
   letter-spacing:.07em;margin-bottom:10px;
@@ -285,7 +194,7 @@
   text-transform:uppercase;
 }
 
-/* ── Pair breakdown table ── */
+
 .hm-tbl {
   width:100%;border-collapse:collapse;
   font-size:11.5px;font-family:var(--font-mono,monospace);
@@ -318,12 +227,12 @@
 .imp-bar-bg { width:36px;height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden; }
 .imp-bar-fill { height:100%;border-radius:2px; }
 
-/* ── Color classes ── */
+
 .up   { color:var(--up); }
 .down,.dn { color:var(--down); }
 .flat { color:var(--text2); }
 
-/* ── Ranking bars ── */
+
 .hm-rank-row { display:flex;align-items:center;gap:8px;margin-bottom:5px; }
 .hm-rank-ccy {
   width:34px;font-size:10px;font-weight:600;
@@ -340,7 +249,7 @@
 .hm-rank-val { width:56px;text-align:right;font-size:10px;font-family:var(--font-mono,monospace);color:var(--text2); }
 .hm-rank-sublbl { font-size:8.5px;font-family:var(--font-mono,monospace);color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px; }
 
-/* ── Session tab ── */
+
 .sess-grid { display:grid;grid-template-columns:80px 1fr 60px;align-items:center;gap:5px 8px;font-family:var(--font-mono,monospace);font-size:10px; }
 .sess-lbl { color:var(--text2);text-align:right;letter-spacing:.04em; }
 .sess-lbl.hl { color:var(--blue); }
@@ -348,7 +257,7 @@
 .sess-fill { height:100%;border-radius:2px; }
 .sess-val { text-align:right; }
 
-/* State chips */
+
 .state-chip {
   display:inline-flex;align-items:center;
   font-size:8px;font-family:var(--font-mono,monospace);font-weight:700;
@@ -364,8 +273,8 @@
 .sess-note-name { font-size:10px;font-family:var(--font-mono,monospace);font-weight:600;letter-spacing:.04em;color:var(--text); }
 .sess-note-body { font-size:10.5px;font-family:var(--font-mono,monospace);color:var(--text2);line-height:1.6;padding-left:2px; }
 
-/* ── Rel. Strength tab (Strength Differential matrix) ── */
-/* ── Strength matrix — rcm-matrix aesthetic ── */
+
+
 .corr-wrap { overflow:auto;flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#444c56 transparent; }
 .corr-wrap::-webkit-scrollbar { width:4px;height:4px; }
 .corr-wrap::-webkit-scrollbar-track { background:transparent; }
@@ -383,17 +292,17 @@
 .corr-matrix td.empty { background:transparent;border:none; }
 .corr-matrix td.comp-col { border-left:2px solid rgba(255,255,255,.10); }
 .corr-matrix tr.comp-row td { border-top:2px solid rgba(255,255,255,.10); }
-/* cell shading — terminal palette */
+
 .corr-cell-pos-hi { background:rgba(38,166,154,.25);color:var(--up);font-weight:700; }
 .corr-cell-pos    { background:rgba(38,166,154,.10);color:var(--up); }
 .corr-cell-neg-hi { background:rgba(239,83,80,.25);color:var(--down);font-weight:700; }
 .corr-cell-neg    { background:rgba(239,83,80,.10);color:var(--down); }
 .corr-cell-flat   { color:var(--text2); }
 .corr-cell-focal  { outline:1px solid rgba(56,139,253,.35); }
-/* legend — mirrors rcm-matrix-legend */
+
 .corr-legend { display:flex;gap:16px;flex-wrap:wrap;font-size:9px;font-family:var(--font-mono,monospace);color:var(--text2);margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);align-items:center;flex-shrink:0; }
 
-/* ── Top-3 drivers ── */
+
 .driver-row { display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;font-family:var(--font-mono,monospace); }
 .driver-pair { font-size:11px;font-weight:600;color:var(--text);width:72px;padding-top:1px;flex-shrink:0; }
 .driver-body { flex:1; }
@@ -402,14 +311,8 @@
 .driver-vs   { font-size:11px;color:var(--text2); }
 .driver-note { font-size:10px;color:var(--text2);margin-top:3px;line-height:1.5; }
 
-/* ── CSI chart ── */
-/* Single range-selector row (2026-08-07 redesign, replacing an earlier
-   same-day two-row Interval+Range design). Industry-standard chart range
-   bars (TradingView, Google/Yahoo Finance-style, and CSM-specific tools
-   like FXSSI) expose exactly ONE user-facing control — the lookback range
-   — and pick bar resolution automatically underneath; see the
-   _CSI_RANGE_CONFIG comment in the script block below for the full
-   rationale and the range→resolution mapping. */
+
+
 #hm-csi-controls { display:flex;align-items:center;gap:2px;margin-bottom:10px;flex-wrap:wrap; }
 #hm-csi-wrap,.csi-wrap {
   position:relative;height:280px;
@@ -462,7 +365,7 @@
   letter-spacing:.04em;background:var(--bg);
 }
 
-/* ── Source note ── */
+
 .hm-src-note {
   font-size:9px;font-family:var(--font-mono,monospace);color:var(--text2);
   margin-top:10px;padding-top:9px;
@@ -470,7 +373,7 @@
   line-height:1.6;
 }
 
-/* ── Footer ── */
+
 #hm-footer {
   padding:8px 18px;
   border-top:1px solid var(--border2);
@@ -479,7 +382,7 @@
 }
 #hm-footer-meta { font-size:9px;font-family:var(--font-mono,monospace);color:var(--text2);letter-spacing:.03em; }
 
-/* ── Mobile ── */
+
 @media (max-width:640px) {
   #hm-modal {
   width:100%!important;max-width:none!important;height:auto!important;max-height:none!important;
@@ -505,7 +408,6 @@
 `;
   document.head.appendChild(s);
 
-  // ── Currency metadata ────────────────────────────────────────────────────
   const CCY_META = {
     EUR: { flag: 'eu', full: 'Euro' },
     GBP: { flag: 'gb', full: 'Brit. Pound' },
@@ -519,7 +421,6 @@
     SEK: { flag: 'se', full: 'Swedish Krona' },
   };
 
-  // All 28 10 G10 currency pair definitions (same as populateHeatmap in dashboard.js)
   const PAIR_DEFS = [
     { id:'eurusd', base:'EUR', quote:'USD', sign:1 },
     { id:'gbpusd', base:'GBP', quote:'USD', sign:1 },
@@ -549,14 +450,12 @@
     { id:'cadjpy', base:'CAD', quote:'JPY', sign:1 },
     { id:'cadchf', base:'CAD', quote:'CHF', sign:1 },
     { id:'chfjpy', base:'CHF', quote:'JPY', sign:1 },
-    // G10 Scandinavian
     { id:'usdnok', base:'USD', quote:'NOK', sign:1 },
     { id:'usdsek', base:'USD', quote:'SEK', sign:1 },
     { id:'eurnok', base:'EUR', quote:'NOK', sign:1 },
     { id:'eursek', base:'EUR', quote:'SEK', sign:1 },
   ];
 
-  // Session windows (UTC hours, start inclusive)
   const SESSIONS = [
     { name:'Sydney',  utcStart:21, utcEnd:6  },
     { name:'Tokyo',   utcStart:0,  utcEnd:9  },
@@ -564,58 +463,27 @@
     { name:'New York',utcStart:12, utcEnd:21 },
   ];
 
-  // ── State ────────────────────────────────────────────────────────────────
   let _ccy      = null;
   let _strengths = null;
   let _rtCache  = null;
-  let _driversCache  = null;   // { generated_at, drivers: { USD: "...", EUR: "...", ... } }
+  let _driversCache  = null;   
   let _driversFetched = false;
-  let _catalystsCache  = null; // { generated_at, currencies: { EUR: { catalyst, sources, updated }, ... } }
+  let _catalystsCache  = null; 
   let _catalystsFetched = false;
-  let _sessionCtxCache = null; // { generated_at, sessions: { EUR: { Sydney: "...", ... }, ... } }
+  let _sessionCtxCache = null; 
   let _sessionCtxFetched = false;
-  let _sessionCtxIsWeekend = false; // true when session-context.json was generated in closed-market mode
+  let _sessionCtxIsWeekend = false; 
 
-  // CSI state
-  let _csiData       = null;  // { dates: [...], series: { EUR: [...], GBP: [...], ... } } — CLOSED sessions only (ohlc-data/*.json)
-  let _csiDataLive   = null;  // same shape as _csiData, with one extra live in-progress-session point per ccy appended
-  let _csiChart      = null;  // LWC chart instance
-  let _csiResizeObs  = null;  // ResizeObserver keeping _csiChart width in sync with #hm-csi-wrap
-  let _csiTf         = 'D1';  // H1 | H4 | D1 | W1 — bar/return granularity feeding the accumulated-% line. Derived from _csiRange via _CSI_RANGE_CONFIG (2026-08-07) — not a separately user-facing control, see below.
-  let _csiPeriodDays = 91;    // default 3M — literal calendar days back from the series' last date (see _csiCutoffDate). Derived from _csiRange.
-  let _csiRange      = '3M';  // the ONE user-facing control (2026-08-07 redesign) — see _CSI_RANGE_CONFIG
-  let _csiSeriesMap  = {};    // { EUR: LineSeries, ... } — kept for focal-line styling
+  let _csiData       = null;  
+  let _csiDataLive   = null;  
+  let _csiChart      = null;  
+  let _csiResizeObs  = null;  
+  let _csiTf         = 'D1';  
+  let _csiPeriodDays = 91;    
+  let _csiRange      = '3M';  
+  let _csiSeriesMap  = {};    
   let _csiInited     = false;
 
-  // ── CSI range selector — single control, industry-standard (2026-08-07) ───
-  // Earlier same-day iterations of this panel exposed TWO controls: an
-  // "Interval" row (H1/H4/1D/1W bar granularity) and a "Range" row
-  // (lookback period). That doesn't match how range selectors actually work
-  // anywhere in the industry — confirmed against
-  // TradingView's own docs: "When users switch a time frame... The chart
-  // resolution changes. The bars scale horizontally to cover the entire
-  // requested date/time range" (Time-Scale docs) — i.e. every reference
-  // implementation (TradingView, Google/Yahoo Finance-style range bars, and
-  // CSM-specific tools like FXSSI) exposes exactly ONE control (the range),
-  // and picks bar resolution automatically underneath so the chart stays
-  // readable. Two independent controls that can both show "1D"/"1W" text
-  // for two different questions (candle interval vs. lookback) is not a
-  // pattern used anywhere in the reference implementations checked.
-  //
-  // Fix: back to a single #hm-csi-controls row. Each range button maps to
-  // BOTH a lookback (`days`, calendar days via _csiCutoffDate — unchanged
-  // from the earlier v2.3.1 fix) and the OHLC resolution needed to render
-  // it readably (`tf`) — chosen so every range shows on the order of
-  // 25-260 bars, never a handful of dots or thousands of overlapping ones:
-  //   1D/1W  → H1 (hourly)     ~24 / ~120 bars
-  //   1M     → H4 (4-hourly)   ~180 bars
-  //   3M/6M/1Y → D1 (daily)    ~65 / ~130 / ~260 bars
-  //   All    → W1 (weekly)     full history, still readable
-  // `_csiTf`/`_csiPeriodDays` remain as internal derived state (read by
-  // _csiCutoffDate, _renderCSIChart, _renderCSIStats, _updateCSILiveBar —
-  // none of that logic needed to change) — they're just no longer set by
-  // two independent user clicks, only by csiSetRange() picking one config
-  // entry as a unit.
   const _CSI_RANGE_CONFIG = [
     { key: '1D', label: '1D', tf: 'H1', days: 1   },
     { key: '1W', label: '1W', tf: 'H1', days: 7   },
@@ -627,13 +495,6 @@
   ];
   const _CSI_TF_TITLE = { H1: 'H1', H4: 'H4', D1: 'DAILY', W1: 'WEEKLY' };
 
-  // Resolve a period-button "days" value into an actual cutoff — the first
-  // date/timestamp that should be INCLUDED in the visible window — anchored
-  // to the series' own last date (not "today", since the series may lag by
-  // one closed session). Returns null for days<=0 (means "show everything").
-  // Handles both date-string series ('YYYY-MM-DD', for D1/W1) and
-  // unix-second-number series (H1/H4) since _loadCSIData's `time` field
-  // type depends on tf.
   function _csiCutoffDate(lastDate, days) {
     if (!days || days <= 0 || lastDate == null) return null;
     if (typeof lastDate === 'number') return lastDate - days * 86400;
@@ -642,8 +503,6 @@
     return d.toISOString().slice(0, 10);
   }
 
-  // Fetch currency-drivers.json once per page load (lazy, on first modal open).
-  // Falls back silently — the drivers note is additive, never blocking.
   function fetchDrivers() {
     if (_driversFetched) return;
     _driversFetched = true;
@@ -654,13 +513,9 @@
           _driversCache = data;
         }
       })
-      .catch(() => { /* silent fallback — drivers are additive */ });
+      .catch(() => {  });
   }
 
-  // Fetch currency-catalysts.json once per page load (lazy, on first modal open).
-  // Substantive per-currency catalyst paragraph with named sources (v8.32.0) — distinct
-  // from currency-drivers.json (pair-level COT/carry boilerplate repeated across pairs).
-  // Falls back silently — the catalyst block is additive, never blocking.
   function fetchCatalysts() {
     if (_catalystsFetched) return;
     _catalystsFetched = true;
@@ -669,21 +524,14 @@
       .then(data => {
         if (data && data.currencies && typeof data.currencies === 'object') {
           _catalystsCache = data;
-          // Macro Drivers is now a persistent block rendered synchronously at modal
-          // open — if this fetch resolves afterward (the common case), re-render it
-          // in place with real data instead of leaving the "not available yet" copy.
           if (_ccy && document.getElementById('hm-bd')?.style.display !== 'none') {
             populateMacroDrivers(_ccy);
           }
         }
       })
-      .catch(() => { /* silent fallback — catalyst block is additive */ });
+      .catch(() => {  });
   }
 
-  // Fetch session-context.json once per page load (lazy, on first modal open).
-  // Falls back silently — session notes are additive, never blocking.
-  // On weekends, the file contains AI-generated recap notes
-  // generate_session_context_closed() — same schema, market_closed:true flag added.
   function fetchSessionContext() {
     if (_sessionCtxFetched) return;
     _sessionCtxFetched = true;
@@ -692,16 +540,12 @@
       .then(data => {
         if (data && data.sessions && typeof data.sessions === 'object') {
           _sessionCtxCache = data;
-          // market_closed flag in JSON tells us notes are weekend recaps —
-          // used by populateSession() to apply correct framing regardless of
-          // whether the client clock says weekend (handles edge cases at open/close).
           _sessionCtxIsWeekend = !!data.market_closed;
         }
       })
-      .catch(() => { /* silent fallback */ });
+      .catch(() => {  });
   }
 
-  // ── Helpers ──────────────────────────────────────────────────────────────
   function fmt2(v) {
     if (v == null || isNaN(v)) return '—';
     const s = v >= 0 ? '+' : '';
@@ -718,40 +562,28 @@
     return v > 0 ? 'up' : v < 0 ? 'down' : 'flat';
   }
 
-  // Returns true when the FX market is closed for the weekend.
-  // FX convention (industry standard):
-  //   Closes:  Friday    21:00 UTC  (New York close)
-  //   Opens:   Sunday    21:00 UTC  (Sydney open)
-  // UTC day: 0=Sun, 1=Mon, …, 5=Fri, 6=Sat
   function isMarketWeekend() {
     const now  = new Date();
     const day  = now.getUTCDay();
     const hour = now.getUTCHours();
     return (
-      day === 6 ||                    // All of Saturday
-      (day === 5 && hour >= 21) ||    // Friday from 21:00 UTC onward
-      (day === 0 && hour < 21)        // Sunday before 21:00 UTC
+      day === 6 ||                    
+      (day === 5 && hour >= 21) ||    
+      (day === 0 && hour < 21)        
     );
   }
 
-  // Returns a Set of all session names that are currently active (handles overlaps).
-  // Returns an empty Set during the FX weekend (Fri 21:00 – Sun 21:00 UTC).
   function getActiveSessions() {
     if (isMarketWeekend()) return new Set();
     const h = new Date().getUTCHours();
     const active = new Set();
-    // Sydney: 21:00–06:00 UTC (crosses midnight)
     if (h >= 21 || h < 6)  active.add('Sydney');
-    // Tokyo: 00:00–09:00 UTC
     if (h >= 0  && h < 9)  active.add('Tokyo');
-    // London: 07:00–16:00 UTC
     if (h >= 7  && h < 16) active.add('London');
-    // New York: 12:00–21:00 UTC
     if (h >= 12 && h < 21) active.add('New York');
     return active;
   }
 
-  // Legacy helper — returns the single "primary" active session for fallback text.
   function currentSessionName() {
     const active = getActiveSessions();
     for (const s of ['London', 'New York', 'Tokyo', 'Sydney']) {
@@ -760,7 +592,6 @@
     return 'London';
   }
 
-  // ── Build HTML ───────────────────────────────────────────────────────────
   function buildModal() {
     if (document.getElementById('hm-bd')) return;
     const el = document.createElement('div');
@@ -921,7 +752,6 @@
     document.getElementById('hm-close').addEventListener('click', closeHeatmapModal);
     el.addEventListener('click', function(e) {
       if (e.target === el) { closeHeatmapModal(); return; }
-      // Click outside the currency switcher closes its dropdown without closing the modal
       if (!e.target.closest('#hm-ccy-switch')) _hmCloseCcyDropdown();
     });
     document.addEventListener('keydown', _onKey);
@@ -938,14 +768,12 @@
     if (e.key === 'ArrowRight') { window.hmCycleCcy(1); return; }
   }
 
-  // ── Populate ─────────────────────────────────────────────────────────────
   function populateMetrics(ccy, strengths, rtCache) {
     const sorted = [...strengths].sort((a,b) => b.pct - a.pct);
     const rank   = sorted.findIndex(s => s.ccy === ccy) + 1;
     const self   = strengths.find(s => s.ccy === ccy);
     if (!self) return;
 
-    // Pairs for this currency
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
     let won = 0;
     let bestPair = null, bestPct = -Infinity;
@@ -967,7 +795,6 @@
     compositeEl.textContent = fmt2(v);
     compositeEl.className   = 'hm-mm-val ' + pctClass(v);
 
-    // Count how many pairs actually contributed to this currency's composite
     const compPairCnt = myPairs.filter(p => {
       const d = rtCache[p.id];
       return d && d.pct != null;
@@ -976,7 +803,6 @@
       compositeSubEl.textContent = compPairCnt + ' pair' + (compPairCnt !== 1 ? 's' : '') + ' · intraday';
     }
 
-    // 1W composite — same equal-weighted model but using pct1w per pair
     let w1sum = 0, w1n = 0;
     myPairs.forEach(p => {
       const d = rtCache[p.id];
@@ -1016,8 +842,6 @@
     }
   }
 
-  // _skipAnim: true when called from _updateBreakdownRT on sort-order changes
-  //            (modal already open — bars should appear at target width, not animate from 0)
   function populateBreakdown(ccy, strengths, rtCache, _skipAnim) {
     document.getElementById('hm-pairs-title').textContent =
       ccy + ' DIRECT PAIRS · INTRADAY % CHANGE · vs PREV CLOSE';
@@ -1030,9 +854,7 @@
       const isCcyBase = p.base === ccy;
       const opp = isCcyBase ? p.quote : p.base;
       const rawPct = d?.pct ?? null;
-      // impact on the selected ccy: positive = ccy gained vs opp
       const impact = rawPct != null ? rawPct * p.sign * (isCcyBase ? 1 : -1) : null;
-      // 1W impact — same sign convention as intraday
       const raw1w  = d?.pct1w ?? null;
       const imp1w  = raw1w != null ? raw1w * p.sign * (isCcyBase ? 1 : -1) : null;
       const close  = isCcyBase ? (d?.close ?? null) : (d?.close != null ? 1/d.close : null);
@@ -1041,11 +863,10 @@
       const lo     = isCcyBase ? (d?.low   ?? null) : (d?.low   != null ? 1/d.low   : null);
       const label  = isCcyBase
         ? (p.base + '/' + p.quote)
-        : (p.quote + '/' + p.base);   // show ccy first
+        : (p.quote + '/' + p.base);   
       impacts.push({ label, opp, close, open, hi, lo, impact, rawPct, imp1w });
     });
 
-    // Sort: biggest positive impact first
     impacts.sort((a,b) => (b.impact??-99) - (a.impact??-99));
     const maxImp = Math.max(...impacts.map(i => Math.abs(i.impact ?? 0)), 0.001);
 
@@ -1070,7 +891,6 @@
       </tr>`;
     }).join('');
 
-    // Ranking
     const sorted   = [...strengths].sort((a,b) => b.pct - a.pct);
     const maxAbsPct = Math.max(...sorted.map(s => Math.abs(s.pct)), 0.001);
     const container = document.getElementById('hm-ranking-rows');
@@ -1082,7 +902,6 @@
       const row   = document.createElement('div');
       row.className = 'hm-rank-row';
       row.dataset.rankCcy = s.ccy;
-      // On RT rebuilds (_skipAnim) set final width directly — no 0→target animation that causes flash
       const initW = _skipAnim ? fillW + '%' : '0';
       row.innerHTML = `
         <div class="hm-rank-ccy${isHL?' hl':''}">${s.ccy}</div>
@@ -1092,7 +911,6 @@
         <div class="hm-rank-val ${pctClass(s.pct)}" data-rank-val>${fmt2(s.pct)}</div>`;
       container.appendChild(row);
     });
-    // Only run the entry animation on first open (not on RT sort-order rebuilds)
     if (!_skipAnim) {
       requestAnimationFrame(() => {
         container.querySelectorAll('.hm-rank-fill').forEach(el => {
@@ -1101,14 +919,13 @@
       });
     }
 
-    // 1W Ranking — compute G10 composite weekly strength from pct1w across all G10 pairs
     const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
     const w1map = {};
     ccys.forEach(c => { w1map[c] = { sum: 0, n: 0 }; });
     PAIR_DEFS.forEach(p => {
       const d = rtCache[p.id];
       if (!d || d.pct1w == null) return;
-      const v = d.pct1w * p.sign;   // positive = base strengthened vs quote
+      const v = d.pct1w * p.sign;   
       w1map[p.base].sum += v;  w1map[p.base].n++;
       w1map[p.quote].sum -= v; w1map[p.quote].n++;
     });
@@ -1149,20 +966,16 @@
     }
   }
 
-  // Convert a UTC hour to local HH:MM string (respects user's timezone)
   function utcHourToLocalStr(utcHour) {
     const d = new Date();
     d.setUTCHours(utcHour, 0, 0, 0);
     return d.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit', hour12: false });
   }
 
-  // Returns the user's timezone abbreviation (e.g. "EST", "GMT+3")
   function localTzAbbr() {
     return new Date().toLocaleTimeString('en', { timeZoneName: 'short' }).split(' ').pop() || 'LT';
   }
 
-  // Replaces all "HH:MM UTC" patterns in a Groq-generated note with the user's
-  // local equivalent. E.g. "PMI at 12:00 UTC" becomes "PMI at 09:00 GMT-3".
   function convertUtcTimesInNote(text) {
     if (!text) return text;
     const tzAbbr = localTzAbbr();
@@ -1174,53 +987,27 @@
     });
   }
 
-  // Returns the temporal state of a session at the current UTC hour:
-  //   'active'   — session is currently open
-  //   'past'     — session opened and closed earlier today (result is real)
-  //   'upcoming' — session has not yet opened today
-  // Industry convention (Bloomberg FXGO, Refinitiv Eikon):
-  //   Bars and values are shown for active and past sessions only.
-  //   Upcoming sessions show a placeholder track — no fabricated data.
   function getBarSessionState(sess) {
-    if (isMarketWeekend()) return 'past'; // weekend: all bars show last-close (dimmed)
+    if (isMarketWeekend()) return 'past'; 
     const h = new Date().getUTCHours();
     const isActive = getActiveSessions().has(sess.name);
     if (isActive) return 'active';
-    // Sydney crosses midnight: closed when 06:00 <= h < 21:00
     if (sess.name === 'Sydney') return (h >= 6 && h < 21) ? 'past' : 'upcoming';
-    // All other sessions: past if current hour is past their close, upcoming if before their open
     return h >= sess.utcEnd ? 'past' : 'upcoming';
   }
 
-  // Returns the fraction [0,1] of how far the CURRENT trading window has
-  // progressed for an active session — minute-resolution, handles the
-  // midnight-crossing Sydney window. Meaningless (but harmless) for a
-  // session that isn't currently active; callers only use this for 'active'.
   function getSessionProgress(sess) {
     const now    = new Date();
     const nowMin = now.getUTCHours() * 60 + now.getUTCMinutes();
     let startMin = sess.utcStart * 60;
     let endMin   = sess.utcEnd   * 60;
-    if (endMin <= startMin) endMin += 24 * 60; // crosses midnight (Sydney)
+    if (endMin <= startMin) endMin += 24 * 60; 
     let elapsedMin = nowMin - startMin;
-    if (elapsedMin < 0) elapsedMin += 24 * 60; // wrap: now is past midnight, before startMin numerically
+    if (elapsedMin < 0) elapsedMin += 24 * 60; 
     const durationMin = endMin - startMin;
     return Math.max(0, Math.min(1, elapsedMin / durationMin));
   }
 
-  // Reorders SESSIONS into a chronological-narrative sequence — past sessions
-  // first (oldest to most recent), then the currently active session(s), then
-  // upcoming sessions — instead of the fixed Sydney→Tokyo→London→New York
-  // cycle order. Fixed order breaks down as a reading order once a session
-  // has wrapped past midnight: e.g. once Sydney reopens for a new day while
-  // Tokyo/London/New York show as CLOSED from the *previous* cycle, listing
-  // Sydney first makes the closed sessions below it read as upcoming/future
-  // rather than the history that already happened. Bloomberg/Eikon session
-  // panels read left-to-right as a timeline (what already happened → what's
-  // live now → what's next); this keeps the bars and the AI session notes
-  // consistent with that convention. Relative order within each group is
-  // preserved from the fixed cycle. Weekend: no active/past distinction
-  // (all bars are last-close), so the fixed order is left untouched.
   function getOrderedSessions() {
     if (isMarketWeekend()) return SESSIONS;
     const past = [], active = [], upcoming = [];
@@ -1233,31 +1020,12 @@
     return past.concat(active, upcoming);
   }
 
-  // Session tab — Market Commentary fill block (v2.6.0). Same source and shape
-  // as cb-rates-modal.js's _cbrLoadPolicySummary(): fetches news-data/news.json,
-  // filters to this currency's articles, renders title + expand paragraph for
-  // up to 3. Unlike the CB modal it doesn't filter by CB_KW — this tab is about
-  // the currency generally, not central-bank policy specifically.
-  //
-  // v2.6.0 fix: _hmRefreshIfOpen calls populateSession() on every Finnhub RT
-  // tick while the Session tab is active (intentionally — see that function's
-  // own "flash-free" comment), which previously called this function on every
-  // tick too, replacing the wrap's innerHTML with a loading spinner and then
-  // the same articles over and over — a visible flicker.
-  // News doesn't change tick-to-tick, so this now only fetches/re-renders when
-  // the currency actually changes (tracked via _hmNewsCcy); repeat calls for
-  // the same currency are a no-op.
-  // HTML-escape externally-sourced free text (news-data/news.json article
-  // title/source) before it goes into innerHTML content. Same class of gap
-  // already fixed once in calendar-panel.js (v8.304.0, _escAttr) — this
-  // file's own Session News block never inherited that escaping discipline,
-  // since the two files don't share any module/import.
   function _hmEscHtml(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
   let _hmNewsCcy = null;
   async function _hmLoadSessionNews(ccy) {
-    if (ccy === _hmNewsCcy) return; // same currency already loaded/loading — skip, no flicker
+    if (ccy === _hmNewsCcy) return; 
     _hmNewsCcy = ccy;
     const wrap = document.getElementById('hm-sess-news');
     if (!wrap) return;
@@ -1266,7 +1034,7 @@
       const res = await fetch('./news-data/news.json', { cache: 'no-store' }).catch(() => null);
       if (!res || !res.ok) throw new Error('fetch failed');
       const j = await res.json();
-      if (ccy !== _hmNewsCcy) return; // stale response guard — ccy moved on again while this was in flight
+      if (ccy !== _hmNewsCcy) return; 
       const articles = (j.articles || [])
         .filter(a => {
           if (a.cur !== ccy) return false;
@@ -1315,16 +1083,12 @@
       ccy + ' INTRADAY COMPOSITE · SESSION WINDOW STATUS · ' + tzAbbr;
     const newsTitleEl = document.getElementById('hm-sess-news-title');
     if (newsTitleEl) newsTitleEl.textContent = 'MARKET COMMENTARY \u00b7 ' + ccy;
-    _hmLoadSessionNews(ccy); // fill-space block below Session Context — non-blocking
+    _hmLoadSessionNews(ccy); 
 
     const myPairs      = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
-    const activeSessions = getActiveSessions();   // empty Set on weekends
-    const activeSess   = currentSessionName();    // legacy fallback text
+    const activeSessions = getActiveSessions();   
+    const activeSess   = currentSessionName();    
 
-    // Compute the single intraday composite once — this is the day % vs prev close
-    // weighted equally across all direct pairs. Bloomberg convention: when session-specific
-    // OHLC is not available, show the full-day composite alongside session window status
-    // rather than fabricating per-session values from volume weights.
     let compositeSum = 0, compositeCnt = 0;
     myPairs.forEach(p => {
       const d = rtCache[p.id];
@@ -1334,17 +1098,11 @@
     });
     const dayComposite = compositeCnt > 0 ? compositeSum / compositeCnt : null;
 
-    // Volume share labels — used as context markers, not bar values
     const volShare = { 'New York': '38%', 'London': '35%', 'Tokyo': '18%', 'Sydney': '9%' };
 
-    // Session bar data: active and past sessions show the day composite (honest label).
-    // Upcoming sessions show no bar — Bloomberg/Eikon do not fabricate forward values.
     const sessionData = getOrderedSessions().map(sess => {
       const barState = getBarSessionState(sess);
       const showBar  = barState === 'active' || barState === 'past';
-      // All shown sessions display the same day composite — this is transparent about
-      // data availability. The session window context is conveyed by the state indicator
-      // and AI notes, not by fabricated per-session performance figures.
       const pct = showBar ? dayComposite : null;
       return { ...sess, pct, barState, isActive: barState === 'active' };
     });
@@ -1352,8 +1110,6 @@
     const grid = document.createElement('div');
     grid.className = 'sess-grid';
 
-    // Bar color: --blue (terminal design system) — active at full opacity, past dimmed.
-    // This matches Proposal A: bars represent session window status, not directional sign.
     const compositePos = dayComposite != null && dayComposite >= 0;
     const barClr = getComputedStyle(document.documentElement).getPropertyValue('--blue').trim() || '#4f7fff';
 
@@ -1363,9 +1119,9 @@
 
       let labelText = s.name.toUpperCase();
       if (s.barState === 'active') {
-        labelText += ' \u25CF';        // ● active
+        labelText += ' \u25CF';        
       } else if (s.barState === 'upcoming' && !weekend) {
-        labelText += ' \u25CB';        // ○ upcoming
+        labelText += ' \u25CB';        
       }
       lbl.textContent = labelText;
 
@@ -1375,20 +1131,14 @@
       const val = document.createElement('div');
 
       if (s.barState === 'upcoming' || s.pct == null) {
-        // Upcoming: empty track, no value — Bloomberg/Eikon show no forward bar
         lbl.style.cssText = 'opacity:.35;color:var(--orange,#f6941c)';
         track.style.opacity = '0.08';
         val.className = 'sess-val flat';
         val.style.cssText = 'opacity:.35;font-size:9px;color:var(--text3,#6b7280)';
-        val.textContent = utcHourToLocalStr(s.utcStart);  // show open time as hint
+        val.textContent = utcHourToLocalStr(s.utcStart);  
       } else {
         const fill = document.createElement('div');
         fill.className = 'sess-fill';
-        // Active: bar fills proportionally to elapsed time within the session
-        // window — matches the MT5 EA's on-chart session indicator (live
-        // session, result still in progress). Past: full-width dimmed bar —
-        // closed session, final result (Bloomberg convention). Weekend: all
-        // bars full-width dimmed (last-close convention).
         const isActive  = s.barState === 'active' && !weekend;
         const dimBar    = !isActive;
         const fillWidth = isActive ? (getSessionProgress(s) * 100).toFixed(1) + '%' : '100%';
@@ -1408,18 +1158,15 @@
       grid.appendChild(val);
     });
 
-    // Data note: explain the bars represent full-day composite (institutional transparency)
     const dataNote = document.createElement('div');
     dataNote.style.cssText = 'font-size:9px;color:var(--text3,#6b7280);font-family:var(--font-mono,\'JetBrains Mono\',\'Courier New\',monospace);letter-spacing:.02em;margin-top:6px;opacity:.7';
     dataNote.textContent = 'Day % vs prev close \xb7 session-specific OHLC not available';
 
-    // Weekend: no banner, no status line — dimmed bars only (Bloomberg/Eikon convention)
     const content = document.getElementById('hm-sess-content');
     content.innerHTML = '';
     content.appendChild(grid);
     content.appendChild(dataNote);
 
-    // Session context notes — suspended on weekends; otherwise show Groq or fallback
     const notes = document.getElementById('hm-sess-notes');
     const _now    = new Date();
     const localHH = String(_now.getHours()).padStart(2,'0');
@@ -1427,11 +1174,6 @@
     const localStr = localHH + ':' + localMM;
 
     if (weekend) {
-      // Weekend: show recap notes from session-context.json (generated by
-      // generate_session_context_closed() — Bloomberg weekend desk note style).
-      // If Groq notes are available, display them with "WEEKLY RECAP" framing.
-      // Each note maps to: Sydney=Friday close, Tokyo=weekly range,
-      // London=main catalyst, New York=Monday outlook.
       const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
         ? _sessionCtxCache.sessions[ccy]
         : null;
@@ -1460,7 +1202,6 @@
         'font-family:var(--font-mono);letter-spacing:.03em;">' +
         'AI Analytics \xb7 Weekly recap \xb7 Resumes at Sunday 21:00 UTC</div>';
       } else {
-        // Groq notes not yet available for weekend (first run after Friday close)
         notes.innerHTML =
           '<div style="font-size:10px;color:var(--text3,#6b7280);' +
           'font-family:var(--font-mono,\'JetBrains Mono\',\'Courier New\',monospace);line-height:1.6;">' +
@@ -1471,30 +1212,11 @@
       return;
     }
 
-    // Weekday: check if Groq session context is available for this currency
     const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
       ? _sessionCtxCache.sessions[ccy]
       : null;
 
     if (groqSessions && Object.keys(groqSessions).length >= 3) {
-      // Render session notes using getBarSessionState for consistent classification
-      // with the bar section above (same UTC boundary logic, single source of truth).
-      // Industry convention (Bloomberg FXGO, Refinitiv Eikon):
-      //   active   — blue label + ● + full-brightness AI note (live session)
-      //   past     — gray label + AI note dimmed + CLOSED badge (result, historical fact)
-      //   upcoming — amber label + ○ + "opens HH:MM" placeholder, no AI note
-      //              AI-generated text for a future session is an outlook written at
-      //              06:00 UTC; showing it at full brightness before the session opens
-      //              makes a forward projection read as an accomplished result.
-      // Session notes: state-first layout (Bloomberg convention)
-      //   LIVE chip     — blue, session currently open
-      //   CLOSED chip   — muted gray on its own line above note (result is historical fact)
-      //   UPCOMING chip — amber, session not yet open; AI note suppressed to prevent
-      //                   outlook text from reading as accomplished result
-      // Order matches the bars above: past → active → upcoming (see
-      // getOrderedSessions()), not the fixed Sydney→Tokyo→London→New York
-      // cycle — keeps closed sessions from a prior cycle reading as future
-      // notes once a new session (e.g. Sydney) has reopened.
       const sessOrder = getOrderedSessions().map(s => s.name);
       notes.innerHTML = sessOrder.map(sName => {
         const sess  = SESSIONS.find(s => s.name === sName);
@@ -1507,19 +1229,16 @@
         const textColor  = state === 'active'   ? 'var(--text,#d1d4dc)'
                          : state === 'past'      ? 'var(--text3,#6b7280)'
                          :                         'var(--text3,#6b7280)';
-        const labelDot   = state === 'active'   ? ' \u25CF'    // ●
-                         : state === 'upcoming' ? ' \u25CB'    // ○
+        const labelDot   = state === 'active'   ? ' \u25CF'    
+                         : state === 'upcoming' ? ' \u25CB'    
                          :                        '';
 
-        // State chip on the header line: unambiguous before reading the note text
         const stateChip  = state === 'active'
           ? '<span style="font-size:8px;background:rgba(79,127,255,.15);color:var(--blue,#4f7fff);border-radius:2px;padding:1px 4px;letter-spacing:.07em;font-weight:700;margin-left:6px;vertical-align:middle">LIVE</span>'
           : state === 'past'
           ? '<span style="font-size:8px;color:var(--text3,#6b7280);letter-spacing:.07em;opacity:.6;margin-left:6px;vertical-align:middle">CLOSED</span>'
           : '<span style="font-size:8px;background:rgba(246,148,28,.10);color:var(--orange,#f6941c);border-radius:2px;padding:1px 4px;letter-spacing:.07em;opacity:.8;margin-left:6px;vertical-align:middle">UPCOMING</span>';
 
-        // Upcoming: replace AI outlook with open time — AI note suppressed
-        // (generated at 06:00 UTC; showing it before open reads as accomplished fact)
         const displayNote = state === 'upcoming'
           ? '<span style="color:var(--text3,#6b7280);font-style:italic">Opens ' + utcHourToLocalStr(sess.utcStart) + ' \u2014 context generated daily at 06:00 UTC</span>'
           : aiNote;
@@ -1547,14 +1266,12 @@
         : '~2h refresh') +
       ' &nbsp;|&nbsp; ' + tzAbbr + ' ' + localStr + '</div>';
     } else {
-      // Fallback: basic intraday stats (no Groq data yet)
       notes.innerHTML =
         `Active session: <span class="up">${activeSess}</span> &nbsp;|&nbsp; ` +
         `${tzAbbr} ${localStr}<br>` +
         `Session attribution weighted by typical volume distribution.<br>` +
         `Intraday strength: <span class="${pctClass(0)}" id="hm-sess-intra">—</span>`;
 
-      // Update intraday note
       let sum = 0, cnt = 0;
       myPairs.forEach(p => {
         const d = rtCache[p.id];
@@ -1571,14 +1288,6 @@
     }
   }
 
-  // Per-currency catalyst paragraph + named sources (v8.32.0; v8.56.1: relocated to a
-  // persistent block above the tabs — see hm-macro — so it's visible regardless of
-  // which tab is active, matching Bloomberg's separation of narrative (NI) from
-  // quantitative ranking functions (WCRS) rather than nesting one inside the other).
-  // Distinct from the pair-level driver notes in the Rel. Strength tab: this is a
-  // substantive, sourced writeup of WHY the currency is moving (named officials,
-  // decisions, dates), in the style of Bloomberg FXFB / Reuters wires — not a
-  // repeated COT/carry boilerplate.
   function populateMacroDrivers(ccy) {
     const titleEl = document.getElementById('hm-catalyst-title');
     if (titleEl) titleEl.textContent = ccy + ' MACRO DRIVERS';
@@ -1615,12 +1324,9 @@
 
     const ccys = ['EUR','GBP','JPY','AUD','CHF','CAD','NZD','USD','NOK','SEK'];
 
-    // Build 8×8 strength differential matrix
-    // cell[i][j] = strengths[i] - strengths[j]  (positive = row ccy stronger)
     const pctMap = {};
     strengths.forEach(s => { pctMap[s.ccy] = s.pct; });
 
-    // ── Helper: classify diff into CSS class (mirrors rcm-matrix logic, terminal palette) ──
     function corrCellClass(diff) {
       if (diff == null) return 'corr-cell-flat';
       if (diff >=  0.40) return 'corr-cell-pos-hi';
@@ -1635,22 +1341,18 @@
       return (v > 0 ? '+' : '') + v.toFixed(2);
     }
 
-    // ── Build <table> identical in structure to rcm-matrix ───────────────
     const matrix = document.getElementById('hm-corr-matrix');
     const wrap   = document.createElement('div');
     wrap.className = 'corr-wrap';
 
-    // Header row
     const headerCells = `<th class="row-head" scope="col" title="Row − Column = strength differential. Positive = row currency outperforms column currency today.">Δ Strength (row − col)</th>` +
       ccys.map(c => `<th scope="col"${c === ccy ? ' class="focal"' : ''} style="cursor:pointer" title="Click to pivot this panel to ${c}" onclick="hmPivotCcy('${c}')">${c}</th>`).join('') +
       `<th scope="col" class="focal" title="Equal-weighted composite — avg % vs all ${ccys.length - 1} major currency peers">Comp.</th>`;
 
-    // Data rows
     const bodyRows = ccys.map(rowCcy => {
       const isFocalRow = rowCcy === ccy;
       const cells = ccys.map(colCcy => {
         if (rowCcy === colCcy) {
-          // Diagonal: absolute composite strength
           const abs = pctMap[rowCcy] ?? 0;
           return `<td class="diag" data-diag="${rowCcy}" title="${rowCcy} composite: ${corrFmt(abs)}">${corrFmt(abs)}</td>`;
         }
@@ -1660,7 +1362,6 @@
         return `<td class="${cls}${focalCls}" data-r="${rowCcy}" data-c="${colCcy}" title="${rowCcy} vs ${colCcy}: ${corrFmt(diff)}">${corrFmt(diff)}</td>`;
       }).join('');
 
-      // Comp. column (row composite)
       const rowComp = pctMap[rowCcy] ?? 0;
       const compCls = corrCellClass(rowComp);
       const compFocalCls = isFocalRow ? ' corr-cell-focal' : '';
@@ -1669,7 +1370,6 @@
       return `<tr><td class="row-head${isFocalRow ? ' focal' : ''}" style="cursor:pointer" title="Click to pivot this panel to ${rowCcy}" onclick="hmPivotCcy('${rowCcy}')">${rowCcy}</td>${cells}${compCell}</tr>`;
     }).join('');
 
-    // Footer row (column composites)
     const footCells = ccys.map(colCcy => {
       const cv  = pctMap[colCcy] ?? 0;
       const cls = corrCellClass(cv);
@@ -1695,7 +1395,6 @@
     matrix.appendChild(wrap);
     matrix.insertAdjacentHTML('beforeend', legend);
 
-    // Top 3 drivers
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
     const driven  = [];
     myPairs.forEach(p => {
@@ -1704,7 +1403,7 @@
       const impact = d.pct * p.sign * (p.base === ccy ? 1 : -1);
       const opp    = p.base === ccy ? p.quote : p.base;
       const label  = p.base === ccy ? (p.base+'/'+p.quote) : (p.quote+'/'+p.base);
-      const canon  = p.base + '/' + p.quote;   // canonical key matching currency-drivers.json
+      const canon  = p.base + '/' + p.quote;   
       driven.push({ label, opp, impact, canon });
     });
     driven.sort((a,b) => Math.abs(b.impact) - Math.abs(a.impact));
@@ -1716,10 +1415,6 @@
       return;
     }
 
-    // Per-pair AI notes from ai-analysis/currency-drivers.json (v8.34.0: free
-    // institutional prose, web-search grounded — replaces the old per-field
-    // COT/carry/CB-hold template). Sources are captured per CURRENCY (one grounded
-    // call covers all 7 of that currency's pairs), not per individual pair.
     const ccyNotes = (_driversCache && _driversCache.drivers && _driversCache.drivers[ccy])
       ? _driversCache.drivers[ccy]
       : null;
@@ -1756,68 +1451,35 @@
       : '');
   }
 
-  // ── CSI (Currency Strength Index) ────────────────────────────────────────
-  // Bloomberg WCRS convention: normalized cumulative log-return from period start.
-  // All 8 series start at 0bp on day 0 — divergence represents relative performance.
 
-  // Colour palette — 8 distinct, accessible colours matching terminal design language
   const CSI_COLORS = {
-    EUR: '#4f7fff',  // --blue
-    GBP: '#26a69a',  // --up (teal)
-    JPY: '#ef5350',  // --down (red)
-    AUD: '#f6941c',  // --orange
-    CAD: '#a78bfa',  // purple
-    CHF: '#34d399',  // emerald
-    NZD: '#fb923c',  // amber
-    USD: '#94a3b8',  // slate (USD neutral)
-    NOK: '#0097b2',  // Norges Bank blue
-    SEK: '#fecc00',  // Riksbank gold
+    EUR: '#4f7fff',  
+    GBP: '#26a69a',  
+    JPY: '#ef5350',  
+    AUD: '#f6941c',  
+    CAD: '#a78bfa',  
+    CHF: '#34d399',  
+    NZD: '#fb923c',  
+    USD: '#94a3b8',  
+    NOK: '#0097b2',  
+    SEK: '#fecc00',  
   };
 
   const CCY_ORDER = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
 
-  // Pairs sign convention for deriving ccy strength from OHLC:
-  // +1 = pair close goes up → base strengthens; -1 = inverse.
-  // v8.28.4: every entry is +1 by definition — log(close/prevClose) of any
-  // base/quote pair already represents the base currency's return, regardless
-  // of which currency is base. There is no pair that needs inversion. Matches
-  // the EA's CSI_Score(): `sum += is_base ? ret : -ret` with no per-pair
-  // special-casing. Do not reintroduce sign:-1 for USD-base pairs (usdjpy,
-  // usdchf, usdcad, usdnok, usdsek) — that was the root cause of the CSI/
-  // composite divergence between the web terminal and the EA fixed in v8.28.4.
   const PAIR_SIGN = {};
   PAIR_DEFS.forEach(p => { PAIR_SIGN[p.id] = p.sign; });
 
-  // Load all 28 OHLC files in parallel, compute per-currency daily log-returns
-  // and accumulate into the CSI series.
-  // ── CSI TF → data source (2026-08-07) ───────────────────────────────────
-  // H1/H4 reuse the exact same intraday OHLC files the main price chart
-  // already fetches for those timeframes (ohlc-data/h1|h4/{pair}.json,
-  // unix-second bar times) — see dashboard.js _isIntradayTf. D1 is the
-  // original daily source (ohlc-data/{pair}.json, 'YYYY-MM-DD' bar times).
-  // W1 has no separate source file: it reuses the D1 daily bars and the
-  // resulting cumulative series is downsampled to one point per ISO week
-  // in _resampleCSIWeekly() below — mathematically equivalent to computing
-  // returns from weekly closes directly, since the cumulative log-return
-  // sum telescopes (see that function's comment for the proof).
   function _csiBasePathForTf(tf) {
     if (tf === 'H1') return './ohlc-data/h1/';
     if (tf === 'H4') return './ohlc-data/h4/';
-    return './ohlc-data/'; // D1 and W1 both source daily bars
+    return './ohlc-data/'; 
   }
 
   async function _loadCSIData(tf) {
     tf = tf || 'D1';
     const pairIds = PAIR_DEFS.map(p => p.id);
     const basePath = _csiBasePathForTf(tf);
-    // Cache-buster (?_=Date.now()) — matches the pattern already used by the
-    // other fetches in this file (currency-drivers.json, currency-catalysts.json,
-    // session-context.json, below). Without it, this was the only fetch in the
-    // file relying on default browser/CDN HTTP caching, which could serve a
-    // stale ohlc-data/{pair}.json — e.g. missing a same-day rally — while the
-    // 1W Strength tile and heatmap (sourced from the cache-busted
-    // intraday-data/quotes.json) already reflected it. Same staleness class as
-    // documented in GUIDELINES.md re: GitHub Pages/CDN caching.
     const fetches = pairIds.map(id =>
       fetch(basePath + id + '.json?_=' + Date.now())
         .then(r => r.ok ? r.json() : [])
@@ -1825,10 +1487,6 @@
     );
     const allOHLC = await Promise.all(fetches);
 
-    // Build a date-keyed map of log-returns for each pair
-    // pairRet[id][date] = log(close/prevClose) * sign * (base=ccy ? +1 : -1)
-    // "date" here is whatever the source bar's time field is — a
-    // 'YYYY-MM-DD' string for D1/W1, a unix-second number for H1/H4.
     const pairRet = {};
     const allDates = new Set();
 
@@ -1839,23 +1497,13 @@
       for (let j = 1; j < bars.length; j++) {
         const date = bars[j].time;
         const ret  = Math.log(bars[j].close / bars[j - 1].close);
-        pairRet[id][date] = ret * p.sign;  // positive = base ccy gained vs quote
+        pairRet[id][date] = ret * p.sign;  
         allDates.add(date);
       }
     });
 
-    // Sort dates — explicit comparator rather than the default .sort()
-    // (which stringifies). It happens to give the right order for same-
-    // length unix-second numbers too, but that's coincidence, not a
-    // guarantee, so this is correct for both the D1/W1 string dates and
-    // the H1/H4 numeric ones on purpose rather than by luck.
     const dates = [...allDates].sort((a, b) => (a < b ? -1 : a > b ? 1 : 0));
 
-    // For each ccy and each date: average log-return across its participating
-    // pairs (sign-corrected so positive always = this ccy strengthened).
-    // Also track COVERAGE (how many of that ccy's pairs actually reported a
-    // bar for this exact date) alongside the sum — see normalization fix
-    // below (2026-08-07).
     const ccyDailyRet = {};
     const ccyDailyCov = {};
     CCY_ORDER.forEach(ccy => { ccyDailyRet[ccy] = {}; ccyDailyCov[ccy] = {}; });
@@ -1864,7 +1512,6 @@
       PAIR_DEFS.forEach(p => {
         const ret = pairRet[p.id][date];
         if (ret == null || isNaN(ret)) return;
-        // base ccy gets +ret, quote ccy gets -ret
         if (ccyDailyRet[p.base]) {
           ccyDailyRet[p.base][date] = (ccyDailyRet[p.base][date] || 0) + ret;
           ccyDailyCov[p.base][date] = (ccyDailyCov[p.base][date] || 0) + 1;
@@ -1876,22 +1523,6 @@
       });
     });
 
-    // Normalize by ACTUAL per-date coverage, not the fixed full pair count
-    // (2026-08-07 fix). Previously divided by `pairsForCcy` (e.g. 9 for
-    // USD) unconditionally. That's correct when all 9 pairs reported a bar
-    // for a given date, but on any date where one pair's bar was legitimately
-    // missing — e.g. fetch_ohlc.py's flat-bar guard (`o==h==l==c`) correctly
-    // dropping a degenerate O=H=L=C bar yfinance occasionally returns for a
-    // symbol's most recent in-progress hour — dividing the remaining 8
-    // pairs' summed return by the full count of 9 systematically understated
-    // that ccy's move for that one bar (biased toward zero, not just noisier).
-    // Dividing by the pair count that ACTUALLY contributed each date is the
-    // unbiased estimator: it's identical to the old behavior on every date
-    // with full coverage (the overwhelming majority of history — cov ===
-    // pairsForCcy there) and only changes the rare partial-coverage bar to a
-    // correct per-pair average instead of a diluted one. `cov` is guaranteed
-    // >=1 whenever `sum` is non-null (see the accumulation loop above), so no
-    // divide-by-zero risk.
     const series = {};
     CCY_ORDER.forEach(ccy => {
       let cum = 0;
@@ -1899,7 +1530,6 @@
         const sum = ccyDailyRet[ccy][date];
         const cov = ccyDailyCov[ccy][date];
         if (sum != null && cov) cum += sum / cov;
-        // Convert to % (×100) for display
         return { time: date, value: parseFloat((cum * 100).toFixed(4)) };
       });
     });
@@ -1908,30 +1538,17 @@
     return { dates, series };
   }
 
-  // ── _resampleCSIWeekly — downsample the daily CSI series to one point per
-  // ISO week (2026-08-07) ──────────────────────────────────────────────────
-  // Keeps only the LAST daily point in each Mon–Sun week, labeled by that
-  // week's Monday. This is mathematically identical to computing the series
-  // directly from weekly closes: the CSI series is a running SUM of daily
-  // log-returns, and a sum telescopes — cum(week N's last day) already
-  // equals the sum of every daily return up to and including that week, the
-  // same number you'd get log-ing (week N close / series-start close)
-  // directly. So no separate weekly ohlc-data source is needed; this is a
-  // pure downsample, not a re-derivation.
   function _resampleCSIWeekly(daily) {
     const { dates, series } = daily;
     if (!dates.length) return daily;
 
     function isoMonday(dateStr) {
       const d = new Date(dateStr + 'T00:00:00Z');
-      const dow = d.getUTCDay() || 7; // Sun(0) -> 7, so Mon=1..Sun=7
+      const dow = d.getUTCDay() || 7; 
       if (dow !== 1) d.setUTCDate(d.getUTCDate() - (dow - 1));
       return d.toISOString().slice(0, 10);
     }
 
-    // Last index in `dates` for each ISO week, in chronological order
-    // (dates is already sorted ascending, so Map insertion/iteration order
-    // stays chronological as later same-week dates simply overwrite it).
     const lastIdxForWeek = new Map();
     dates.forEach((date, i) => lastIdxForWeek.set(isoMonday(date), i));
 
@@ -1951,28 +1568,7 @@
     return { dates: weekKeys, series: wSeries };
   }
 
-  // ── Live in-progress-session point (mirrors dashboard.js _lwBuildTodayBar) ──
-  // _loadCSIData() only ever returns CLOSED daily sessions: ohlc-data/*.json is
-  // written by fetch_ohlc.py, which by design strips the in-progress today-bar
-  // before writing (see that script's own header comment) so a candle with
-  // truncated H/L wicks never persists. The main price chart compensates for
-  // this via _lwBuildTodayBar()/_lwUpdateTodayBar() in dashboard.js, sourced
-  // live from STOOQ_RT_CACHE — the CSI chart had no equivalent, so its most
-  // recent day lagged behind the 1W Strength tile and heatmap (both read the
-  // same STOOQ_RT_CACHE) until the OHLC workflow's next session-close run
-  // (~21:00-22:30 UTC).
-  //
-  // This derives one extra point per currency for the session currently in
-  // progress, using the exact same per-pair sign convention and log-return
-  // math as _loadCSIData() above (Math.log(close/prevClose) * sign, averaged
-  // across each currency's participating pairs) so the live point is
-  // numerically consistent with the historical series, not just visually
-  // appended to it.
 
-  // FX session-open date convention (21:00 UTC boundary) — same rule
-  // _lwBuildTodayBar()'s isFxBar branch uses in dashboard.js: a bar forming
-  // at/after 21:00 UTC belongs to the session fetch_ohlc.py will date
-  // tomorrow.
   function _csiLiveDateStr() {
     const now = new Date();
     if (now.getUTCHours() >= 21) {
@@ -1983,32 +1579,16 @@
     return now.toISOString().slice(0, 10);
   }
 
-  // Returns { dates, series } with a live point appended to each currency's
-  // series, or the plain historical _csiData when there's nothing live to
-  // add (market closed, no rtCache yet, or the OHLC workflow has already
-  // closed out today's session and the historical series already has it).
   function _computeCSILiveView() {
     if (!_csiData) return null;
-    // Scope boundary (2026-08-07): the live in-progress-session point below
-    // is built specifically from STOOQ_RT_CACHE's daily close/prev_close
-    // fields and a 21:00-UTC daily-session-boundary rule — it has no
-    // equivalent for H1/H4 intraday bars or W1's resampled weekly bars, so
-    // it's skipped for any TF other than D1. Those TFs still show fully
-    // up-to-date data as of the last completed bar; they just don't get the
-    // extra "session still in progress" point D1 gets. A live intraday
-    // point is a materially different feature (would need its own
-    // resolution-aware boundary logic) — flagged as a possible follow-up.
     if (_csiTf !== 'D1') return _csiData;
     if (isMarketWeekend() || !_rtCache) return _csiData;
 
     const { dates, series } = _csiData;
     const liveDate     = _csiLiveDateStr();
     const lastHistDate = dates.length ? dates[dates.length - 1] : null;
-    if (liveDate === lastHistDate) return _csiData;  // already closed out and in the JSON — nothing to append
+    if (liveDate === lastHistDate) return _csiData;  
 
-    // Per-currency live return: average the signed log-return across each
-    // currency's participating pairs, using STOOQ_RT_CACHE's close/prev_close
-    // — the same fields _lwBuildTodayBar() reads for the main chart's live bar.
     const liveRet = {};
     CCY_ORDER.forEach(ccy => {
       const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
@@ -2034,11 +1614,10 @@
       anyLive = true;
     });
 
-    if (!anyLive) return _csiData;  // rtCache present but no usable pair data yet (e.g. right at session open)
+    if (!anyLive) return _csiData;  
     return { dates: dates.concat([liveDate]), series: liveSeries };
   }
 
-  // Render or update the LWC chart with the current period
   function _renderCSIChart(ccy) {
     const LWC = window.LightweightCharts;
     if (!LWC || !_csiData) return;
@@ -2049,15 +1628,10 @@
     const tooltipEl = document.getElementById('hm-csi-tooltip');
     if (!wrap || !chartEl) return;
 
-    // Determine date slice — real calendar-day cutoff anchored to the
-    // series' own last date (see _csiCutoffDate; 2026-08-07 fix, replaces
-    // the old bar-count offset that made the visible start point drift for
-    // H1/H4/W1 depending on incidental weekend placement).
     const allDates  = csiView.dates;
     const lastDate  = allDates.length ? allDates[allDates.length - 1] : null;
     const cutoffDate = _csiPeriodDays > 0 ? _csiCutoffDate(lastDate, _csiPeriodDays) : (allDates.length ? allDates[0] : null);
 
-    // Destroy old chart if it exists
     if (_csiResizeObs) {
       try { _csiResizeObs.disconnect(); } catch(e) {}
       _csiResizeObs = null;
@@ -2094,7 +1668,7 @@
       },
       timeScale: {
         borderColor: 'rgba(255,255,255,.08)',
-        timeVisible: (_csiTf === 'H1' || _csiTf === 'H4'), // intraday TFs need hour granularity on the axis, or repeated same-day bars all show an identical date label
+        timeVisible: (_csiTf === 'H1' || _csiTf === 'H4'), 
         fixLeftEdge: true,
         fixRightEdge: true,
       },
@@ -2102,12 +1676,6 @@
       height: 280,
     });
 
-    // Keep chart width in sync with its container — without this, a browser
-    // resize (or the panel becoming visible after a layout shift) leaves the
-    // chart frozen at whatever width `wrap.offsetWidth` happened to be at
-    // creation time, which can visually clip or misalign the plotted lines.
-    // Mirrors the ResizeObserver pattern already used for the main chart in
-    // dashboard.js (_lwResizeObs).
     if (typeof ResizeObserver !== 'undefined') {
       _csiResizeObs = new ResizeObserver(entries => {
         const cr = entries[0] && entries[0].contentRect;
@@ -2141,17 +1709,8 @@
       _csiSeriesMap[c] = ls;
     });
 
-    // FIX (2026-08-07): without this, Lightweight Charts falls back to its
-    // default fixed bar-spacing (~6px) instead of stretching the loaded
-    // range to fill the container — so a range with few bars (e.g. "1D" on
-    // H1, ~24 bars) left visible empty space instead of spanning the full
-    // chart width, while the width itself looked inconsistent switching
-    // between ranges with very different bar counts. fitContent() sizes bar
-    // spacing so the currently-loaded data always fills the available width,
-    // for every range.
     _csiChart.timeScale().fitContent();
 
-    // Zero baseline
     const firstSeries = _csiSeriesMap[CCY_ORDER[0]];
     if (firstSeries) {
       firstSeries.createPriceLine({
@@ -2164,14 +1723,6 @@
       });
     }
 
-    // Bloomberg-style multi-series crosshair tooltip
-  // Bloomberg-style multi-series crosshair tooltip
-  // param.time's shape depends on what Time type fed the series: a plain
-  // 'YYYY-MM-DD' string for D1/W1 (LWC may normalize this to a
-  // {year,month,day} BusinessDay object depending on version — handled
-  // below), or a raw unix-second number for H1/H4 (2026-08-07 — previously
-  // this concatenated param.time directly into the tooltip, which would
-  // have shown a raw epoch number like "1786068000" once H1/H4 existed).
   function _csiFormatTooltipTime(t) {
     if (typeof t === 'number') {
       const d = new Date(t * 1000);
@@ -2208,7 +1759,6 @@
         }).join('');
       tooltipEl.style.display = 'block';
 
-      // Position: keep within wrap bounds
       const wrapRect = wrap.getBoundingClientRect();
       const x = param.point ? param.point.x : 0;
       const y = param.point ? param.point.y : 0;
@@ -2219,7 +1769,6 @@
       tooltipEl.style.top  = top  + 'px';
     });
 
-    // Update legend with final values
     _updateCSILegend(ccy, cutoffDate);
   }
 
@@ -2228,7 +1777,6 @@
     if (!legendEl || !_csiData) return;
     const csiView = _csiDataLive || _csiData;
 
-    // Get final value for each ccy in the current period — rebased to 0 at period start
     const vals = CCY_ORDER.map(c => {
       const allPts   = csiView.series[c];
       const sliceIdx = allPts.findIndex(pt => pt.time >= cutoffDate);
@@ -2236,7 +1784,7 @@
       const baseVal  = allPts[sliceIdx].value;
       const filtered = allPts.slice(sliceIdx).map(pt => pt.value - baseVal);
       const last  = filtered.length ? filtered[filtered.length - 1] : null;
-      const first = 0; // always 0 after rebase
+      const first = 0; 
       return { ccy: c, val: last != null ? parseFloat(last.toFixed(4)) : null, change: last };
     }).sort((a, b) => (b.val ?? -99) - (a.val ?? -99));
 
@@ -2312,11 +1860,9 @@
   async function populateCSI(ccy) {
     const loadingEl = document.getElementById('hm-csi-loading');
 
-    // Only fetch OHLC data once per page session
     if (!_csiData) {
       if (loadingEl) loadingEl.style.display = 'flex';
 
-      // Ensure LWC is loaded (reuse dashboard.js loadLWC pattern)
       if (!window.LightweightCharts) {
         await new Promise((res, rej) => {
           const s = document.createElement('script');
@@ -2342,10 +1888,6 @@
     _renderCSIStats(ccy);
   }
 
-  // ── Currency switcher (Session tab request, v2.6.0) — mirrors cot-modal-chart.js's
-  // cotCycleCcy/cotToggleCcyDropdown/cotSwitchCcy trio, driven off _strengths (already
-  // holds all 10 G10 currencies passed in from dashboard.js's window._hmStrengths, no
-  // separate data store needed the way COT's per-currency lazy-fetch cache requires).
   const _G10_ORDER = ['USD', 'EUR', 'GBP', 'JPY', 'AUD', 'CAD', 'CHF', 'NZD', 'NOK', 'SEK'];
   let _hmAvailCcys = [];
 
@@ -2358,7 +1900,7 @@
     if (!flagSpan) {
       flagSpan = document.createElement('span');
       flagSpan.style.cssText = 'border-radius:2px;font-size:15px;vertical-align:middle;flex-shrink:0;';
-      titleRow.insertBefore(flagSpan, titleRow.firstChild); // flag leads the row: [flag] — text ‹ [chip] ›
+      titleRow.insertBefore(flagSpan, titleRow.firstChild); 
     }
     flagSpan.className = `fi fi-${meta.flag}`;
   }
@@ -2406,7 +1948,6 @@
     }
   }
 
-  // ── Public API ─────────────────────────────────────────────────────────────
 
   window.openHeatmapModal = function(ccy, strengths, rtCache) {
     _ccy       = ccy;
@@ -2418,7 +1959,6 @@
     _hmSetTitle(ccy);
     _hmUpdateCcySwitcher(ccy);
 
-    // Reset to first tab
     document.querySelectorAll('.hm-tab').forEach(t => {
       t.classList.toggle('on', t.dataset.tab === 'breakdown');
       t.setAttribute('aria-selected', t.dataset.tab === 'breakdown' ? 'true' : 'false');
@@ -2429,12 +1969,11 @@
 
     populateMetrics(ccy, strengths, rtCache);
     populateBreakdown(ccy, strengths, rtCache);
-    populateMacroDrivers(ccy); // persistent block — render immediately with whatever's cached so far
-    fetchDrivers();        // lazy-load AI driver notes in the background
-    fetchCatalysts();      // lazy-load AI per-currency catalyst notes; re-renders macro drivers on arrival
-    fetchSessionContext(); // lazy-load AI session context notes in the background
+    populateMacroDrivers(ccy); 
+    fetchDrivers();        
+    fetchCatalysts();      
+    fetchSessionContext(); 
 
-    // Update source labels to reflect active data source (Finnhub live vs yfinance)
     _updateModalSourceLabels();
 
     const bd = document.getElementById('hm-bd');
@@ -2443,14 +1982,6 @@
   };
 
 
-  // ── csiSetRange — the ONE user-facing CSI control (2026-08-07 redesign) ────
-  // Replaces the earlier same-day csiSetTf()/csiPeriod()/_renderCSIPeriodBtns()
-  // trio (two independent controls) with a single range switch. Looks up both
-  // the lookback (`days`) and the resolution (`tf`) from one _CSI_RANGE_CONFIG
-  // entry, so picking "1D" always means exactly one thing.
-  // Only re-fetches OHLC data when the resolution actually changes (e.g. 1D→1W
-  // both use H1 — switching between them just re-slices/re-renders already-
-  // loaded data; 1W→1M changes H1→H4 and needs a real fetch).
   window.csiSetRange = function(btn, rangeKey) {
     if (_csiRange === rangeKey) return;
     const cfg = _CSI_RANGE_CONFIG.find(r => r.key === rangeKey);
@@ -2468,9 +1999,6 @@
     if (!_ccy) return;
 
     if (!tfChanged) {
-      // Same underlying resolution already loaded (e.g. 1D <-> 1W, both H1;
-      // or 3M <-> 6M <-> 1Y, all D1) — just re-slice at the new cutoff and
-      // re-render, no need to hit the network again.
       _csiDataLive = _computeCSILiveView();
       _renderCSIChart(_ccy);
       _renderCSIStats(_ccy);
@@ -2483,9 +2011,6 @@
     if (chartEl) chartEl.style.display = 'none';
 
     _loadCSIData(cfg.tf).then(data => {
-      // Stale-response guard: if the user clicked a different range again
-      // before this fetch resolved, drop this result — _csiRange has
-      // already moved on and applying it now would show the wrong data.
       if (_csiRange !== rangeKey) return;
       _csiData = data;
       _csiDataLive = _computeCSILiveView();
@@ -2503,7 +2028,6 @@
     const bd = document.getElementById('hm-bd');
     if (bd) bd.style.display = 'none';
     document.removeEventListener('keydown', _onKey);
-    // Destroy chart so it re-renders at correct size on next open
     if (_csiResizeObs) { try { _csiResizeObs.disconnect(); } catch(e) {} _csiResizeObs = null; }
     if (_csiChart) { try { _csiChart.remove(); } catch(e) {} _csiChart = null; }
   };
@@ -2517,7 +2041,6 @@
       p.classList.toggle('on', p.id === 'hm-p-' + tabId);
     });
 
-    // Lazy-populate on first switch
     if (tabId === 'session' && _ccy) {
       populateSession(_ccy, _rtCache);
     } else if (tabId === 'correlations' && _ccy) {
@@ -2527,11 +2050,6 @@
     }
   };
 
-  // Pivot the whole modal to a different focal currency without closing it — clicking
-  // a row/column header in the Rel. Strength matrix, or a currency chip in the CSI
-  // legend, calls this (Bloomberg/Eikon-style in-panel instrument pivot, instead of
-  // forcing the user to close and reopen from the heatmap for every currency they
-  // want to inspect).
   window.hmPivotCcy = function(newCcy) {
     if (!newCcy || newCcy === _ccy || !_strengths || !_rtCache) return;
     _ccy = newCcy;
@@ -2542,18 +2060,14 @@
 
     populateMetrics(newCcy, _strengths, _rtCache);
     populateBreakdown(newCcy, _strengths, _rtCache, true);
-    populateMacroDrivers(newCcy); // persistent block — must follow the pivot too, not just the active tab
+    populateMacroDrivers(newCcy); 
     populateCorrelations(newCcy, _strengths, _rtCache);
-    // Session and CSI each have their own chart/canvas or fetch cost, so only
-    // refresh them when that tab is actually the one on screen — matching the
-    // lazy-populate pattern hmTab() already uses on first switch.
     const sessionPanel = document.getElementById('hm-p-session');
     if (sessionPanel && sessionPanel.classList.contains('on')) populateSession(newCcy, _rtCache);
     const csiPanel = document.getElementById('hm-p-csi');
     if (csiPanel && csiPanel.classList.contains('on')) populateCSI(newCcy);
   };
 
-  // ── Live source label — updates hm-sub and hm-footer-meta to reflect active source ──
   function _updateModalSourceLabels() {
     const hasFh = window.STOOQ_RT_CACHE
       ? Object.values(window.STOOQ_RT_CACHE).some(e => e?.fromFinnhub)
@@ -2570,19 +2084,14 @@
     if (footerEl) footerEl.textContent = footerLabel;
   }
 
-  // ── _updateBreakdownRT — flash-free in-place update for the Breakdown tab ──────────
-  // Called by _hmRefreshIfOpen on every Finnhub tick instead of full populateBreakdown().
-  // Updates only textContent/className/style on already-rendered DOM nodes.
-  // Falls back to full populateBreakdown() if the DOM structure is stale (e.g. ccy changed).
   function _updateBreakdownRT(ccy, strengths, rtCache) {
     const tbody = document.getElementById('hm-pair-tbody');
     if (!tbody || tbody.children.length === 0) {
       populateMetrics(ccy, strengths, rtCache);
-      populateBreakdown(ccy, strengths, rtCache, true); // _skipAnim: modal already open
+      populateBreakdown(ccy, strengths, rtCache, true); 
       return;
     }
 
-    // Re-compute impacts (same logic as populateBreakdown but no DOM rebuild)
     const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
     const impacts = [];
     myPairs.forEach(p => {
@@ -2603,17 +2112,15 @@
     impacts.sort((a,b) => (b.impact??-99) - (a.impact??-99));
     const maxImp = Math.max(...impacts.map(i => Math.abs(i.impact ?? 0)), 0.001);
 
-    // Check if sort order changed — if so, fall back to full render (with _skipAnim to avoid flash)
     const rows = Array.from(tbody.querySelectorAll('tr[data-pair]'));
     const currentOrder = rows.map(r => r.dataset.pair);
     const newOrder = impacts.map(r => r.label);
     if (currentOrder.join(',') !== newOrder.join(',')) {
       populateMetrics(ccy, strengths, rtCache);
-      populateBreakdown(ccy, strengths, rtCache, true); // _skipAnim: modal already open
+      populateBreakdown(ccy, strengths, rtCache, true); 
       return;
     }
 
-    // In-place update only — no innerHTML touches
     impacts.forEach(r => {
       const row = tbody.querySelector(`tr[data-pair="${r.label}"]`);
       if (!row) return;
@@ -2637,10 +2144,8 @@
       if (rngCell)    rngCell.textContent   = rng;
     });
 
-    // Update metrics header (already in-place — populateMetrics uses textContent throughout)
     populateMetrics(ccy, strengths, rtCache);
 
-    // Update day% ranking in-place
     const container = document.getElementById('hm-ranking-rows');
     if (container) {
       const sorted    = [...strengths].sort((a,b) => b.pct - a.pct);
@@ -2666,7 +2171,6 @@
       });
     }
 
-    // Update 1W ranking in-place
     const cont1w = document.getElementById('hm-ranking-1w-rows');
     if (cont1w && cont1w.querySelector('[data-rank-ccy]')) {
       const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
@@ -2703,9 +2207,6 @@
     }
   }
 
-  // ── _updateCorrelationsRT — flash-free in-place update for the Correlations tab ──
-  // Updates only cell values/classes in the already-rendered corr matrix.
-  // Falls back to full populateCorrelations() if the table is missing (shouldn't happen).
   function _updateCorrelationsRT(ccy, strengths, rtCache) {
     const matrix = document.getElementById('hm-corr-matrix');
     if (!matrix || !matrix.querySelector('[data-r]')) {
@@ -2713,7 +2214,6 @@
       return;
     }
 
-    // Re-compute pctMap
     const ccys = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD','USD','NOK','SEK'];
     const pctMap = {};
     ccys.forEach(c => { pctMap[c] = null; });
@@ -2733,7 +2233,6 @@
       return 'corr-cell-flat';
     }
 
-    // Update body cells
     matrix.querySelectorAll('td[data-r][data-c]').forEach(td => {
       const r = td.dataset.r, c = td.dataset.c;
       const diff = (pctMap[r] ?? 0) - (pctMap[c] ?? 0);
@@ -2743,7 +2242,6 @@
       td.title = `${r} vs ${c}: ${corrFmt(diff)}`;
     });
 
-    // Update diagonal cells
     matrix.querySelectorAll('td[data-diag]').forEach(td => {
       const r = td.dataset.diag;
       const abs = pctMap[r] ?? 0;
@@ -2751,7 +2249,6 @@
       td.title = `${r} composite: ${corrFmt(abs)}`;
     });
 
-    // Update Comp. column cells (row composites)
     matrix.querySelectorAll('td[data-comp-row]').forEach(td => {
       const r = td.dataset.compRow;
       const v = pctMap[r] ?? 0;
@@ -2761,7 +2258,6 @@
       td.title = `${r} composite vs major currency peers: ${corrFmt(v)}`;
     });
 
-    // Update footer cells (column composites)
     matrix.querySelectorAll('td[data-comp-col]').forEach(td => {
       const c = td.dataset.compCol;
       const v = pctMap[c] ?? 0;
@@ -2771,7 +2267,6 @@
       td.title = `${c} composite vs major currency peers: ${corrFmt(v)}`;
     });
 
-    // Update top-3 drivers in-place (just the pct values, no layout change)
     const driversEl = document.getElementById('hm-drivers');
     if (driversEl) {
       const myPairs = PAIR_DEFS.filter(p => p.base === ccy || p.quote === ccy);
@@ -2795,35 +2290,12 @@
     }
   }
 
-  // ── _updateCSILiveBar — flash-free in-place update for the CSI tab ─────────────
-  // Recomputes the live in-progress-session point and pushes it onto each
-  // already-rendered LWC series via .update() (adds if newer, replaces if same
-  // date — LWC's standard incremental-update behavior), instead of tearing down
-  // and rebuilding the whole chart on every RT tick the way _renderCSIChart()
-  // does for period changes / tab switches.
   function _updateCSILiveBar() {
     if (!_csiChart || !_csiData || !_ccy) return;
 
     _csiDataLive = _computeCSILiveView();
     const csiView = _csiDataLive || _csiData;
 
-    // BUG FIX (2026-08-07): this cutoff used to be computed as
-    // `allDates.length - _csiPeriodDays`, i.e. treating _csiPeriodDays as a
-    // BAR-COUNT offset into the array — the exact bar-count model that was
-    // deliberately replaced everywhere else (_renderCSIChart, _renderCSIStats)
-    // by the calendar-day _csiCutoffDate() cutoff earlier in this same
-    // 2026-08-07 session. This function was missed in that migration, so on
-    // every RT tick it rebased the LIVE point against a baseline only
-    // _csiPeriodDays BARS back (e.g. 7 bars = 7 hours on H1) while every
-    // other point already on the chart was rebased against the true
-    // _csiCutoffDate() baseline (e.g. 7 CALENDAR days = ~120 H1 bars back).
-    // Those two baselines differ by however much the series moved over that
-    // gap, so the live point snapped to a value on a totally different
-    // footing from its neighbors every time a tick came in — visible as all
-    // currencies' lines jumping/converging together at the most recent bar.
-    // Fix: use the exact same _csiCutoffDate()-based cutoff and baseVal
-    // lookup as _renderCSIChart, so the live-updated point stays on the same
-    // footing as the rest of the series.
     const allDates   = csiView.dates;
     const lastDate    = allDates.length ? allDates[allDates.length - 1] : null;
     const cutoffDate  = _csiPeriodDays > 0 ? _csiCutoffDate(lastDate, _csiPeriodDays) : (allDates.length ? allDates[0] : null);
@@ -2843,39 +2315,26 @@
     _renderCSIStats(_ccy);
   }
 
-    // ── _hmRefreshIfOpen — called by dashboard.js populateHeatmap() on every RT update ──
-  // Refreshes whichever tab is currently active without closing/reopening the modal.
-  // Only runs when the modal is actually visible — no-op otherwise.
-  // This is the mechanism that makes the modal update in real time from Finnhub ticks.
   window._hmRefreshIfOpen = function(newStrengths, newRtCache) {
     const bd = document.getElementById('hm-bd');
     if (!bd || bd.style.display === 'none' || !_ccy) return;
 
-    // Update stored references so tab switches also get fresh data
     _strengths = newStrengths;
     _rtCache   = newRtCache;
 
-    // Update source labels in header and footer
     _updateModalSourceLabels();
 
-    // Refresh the active tab with flash-free in-place updates
     const activeTab = document.querySelector('.hm-tab.on');
     if (!activeTab) return;
     const tabId = activeTab.dataset.tab;
 
     if (tabId === 'breakdown') {
-      // In-place update — no innerHTML rebuild, no flash
       _updateBreakdownRT(_ccy, _strengths, _rtCache);
     } else if (tabId === 'session') {
-      // Session data is from session_high/low (changes slowly) — full render acceptable
       populateSession(_ccy, _rtCache);
     } else if (tabId === 'correlations') {
-      // In-place update — only cell values/classes, no table rebuild
       _updateCorrelationsRT(_ccy, _strengths, _rtCache);
     } else if (tabId === 'csi') {
-      // In-place update — pushes/refreshes only the live in-progress-session
-      // point on each existing LWC series (no chart teardown/rebuild, so no
-      // flash), same intent as dashboard.js's _lwUpdateTodayBar().
       _updateCSILiveBar();
     }
   };
