@@ -1,4 +1,4 @@
-name: Update Myfxbook Sentiment — v1.0 (private scripts)
+name: Update Myfxbook Sentiment — v2.0 (private scripts, persistent session)
 
 # ESTRATEGIA DE TRIGGER
 #
@@ -14,6 +14,17 @@ name: Update Myfxbook Sentiment — v1.0 (private scripts)
 # y GUIDELINES.md "Public workflow files must not name data/infra vendors"
 # para el criterio ya establecido con update-fx-liquidity.yml y el resto de
 # los workflows públicos.
+#
+# v2.0 (2026-09-07): la corrida ya NO se loguea contra la API en cada tick.
+# fetch_myfxbook_sentiment.py v8.4 reutiliza un token de sesión persistido
+# en el repo PRIVADO globalinvesting-scripts (ops-state/myfxbook-session.json)
+# y solo llama a login.json cuando no hay sesión cacheada o la cacheada fue
+# rechazada — 24 logins/día (con logout explícito en cada uno) resultó ser
+# el patrón que disparó un bloqueo de cuenta por parte del proveedor,
+# independiente de que las credenciales fueran correctas. Ver GUIDELINES.md
+# y el docstring de fetch_myfxbook_sentiment.py para el incidente completo.
+# Este workflow ahora necesita un segundo commit+push — al repo PRIVADO,
+# no al público — para persistir el token actualizado entre corridas.
 
 on:
   schedule:
@@ -54,10 +65,56 @@ jobs:
 
       - name: Fetch sentiment data
         env:
-          MYFXBOOK_EMAIL:    ${{ secrets.MYFXBOOK_EMAIL }}
-          MYFXBOOK_PASSWORD: ${{ secrets.MYFXBOOK_PASSWORD }}
-          OUTPUT_PATH:       sentiment-data/myfxbook.json
+          MYFXBOOK_EMAIL:      ${{ secrets.MYFXBOOK_EMAIL }}
+          MYFXBOOK_PASSWORD:   ${{ secrets.MYFXBOOK_PASSWORD }}
+          OUTPUT_PATH:         sentiment-data/myfxbook.json
+          SESSION_STATE_PATH:  private-scripts/ops-state/myfxbook-session.json
         run: python3 private-scripts/fetch_myfxbook_sentiment.py
+
+      - name: Commit and push session state (private repo)
+        id: push_session
+        # Este paso persiste el token de sesión reutilizable en el repo
+        # PRIVADO (globalinvesting-scripts), NO en el público — un token de
+        # auth vivo no debe terminar nunca en un archivo servido por GitHub
+        # Pages, aunque los datos que desbloquea (community outlook) no sean
+        # sensibles en sí mismos. SCRIPTS_PAT ya tiene Contents: Read and
+        # write sobre este repo (el mismo token usado para el checkout).
+        # Si este paso falla (sin PAT, sin cambios, etc.) no es motivo para
+        # abortar el resto del workflow — el próximo run simplemente vuelve
+        # a loguearse fresco, igual que un cold start.
+        working-directory: private-scripts
+        continue-on-error: true
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ ! -f ops-state/myfxbook-session.json ]; then
+            echo "No session file written this run (fallback path) — nothing to persist."
+            exit 0
+          fi
+          # Same pattern as the public-repo push step below: snapshot the
+          # freshly-written file BEFORE any reset, since a retry's
+          # `git reset --hard origin/main` would otherwise wipe the new
+          # token from the working tree too, not just un-stage it.
+          cp ops-state/myfxbook-session.json /tmp/myfxbook_session_fresh.json
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+          for i in 1 2 3; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/myfxbook_session_fresh.json ops-state/myfxbook-session.json
+            git add ops-state/myfxbook-session.json
+            if git diff --staged --quiet; then
+              echo "Session token unchanged — skipping commit."
+              exit 0
+            fi
+            git commit -m "Session token refresh — ${TIMESTAMP}"
+            if git push origin main; then
+              echo "✅ Session state push succeeded on attempt $i."
+              exit 0
+            fi
+            sleep $((i * 2))
+          done
+          echo "⚠️  Session state push exhausted — next run will treat this as a cold start (re-login), no data impact."
 
       - name: Commit and push
         id: push
