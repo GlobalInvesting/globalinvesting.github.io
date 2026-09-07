@@ -95,8 +95,6 @@ a { color: inherit; text-decoration: none; }
 
 .guide-wrap { display: flex; gap: 32px; max-width: 1040px; margin: 0 auto; padding: 40px 28px 24px; animation: fadeUp .35s ease both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── TOC sidebar ── */
 .toc { width: 196px; flex-shrink: 0; }
 .toc-inner { position: sticky; top: 52px; }
 .toc-head { font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -106,11 +104,7 @@ a { color: inherit; text-decoration: none; }
 .toc-divider { height: 1px; background: var(--border); margin: 10px 0; }
 .toc-item.toc-related { font-size: 12.1px; color: var(--text3); }
 .toc-item.toc-related:hover { color: var(--text2); }
-
-/* ── Guide content ── */
 .guide-content { flex: 1; min-width: 0; }
-
-/* ── Hero ── */
 .page-hero { padding-bottom: 28px; margin-bottom: 36px; border-bottom: 1px solid var(--border); position: relative; }
 .page-hero::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 48px; height: 1px; background: var(--blue); }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
@@ -120,8 +114,6 @@ a { color: inherit; text-decoration: none; }
 .hero-video-link { display: inline-flex; align-items: center; gap: 7px; margin-top: 16px; font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; letter-spacing: .04em; color: var(--blue); text-decoration: none; }
 .hero-video-link:hover { opacity: .85; }
 .hero-video-link::before { content: "▶"; font-size: 9px; }
-
-/* ── Sections ── */
 .guide-section { margin-bottom: 44px; scroll-margin-top: 52px; }
 .guide-section h2 { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
 .guide-section h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, var(--border2), transparent); }
@@ -140,10 +132,6 @@ a { color: inherit; text-decoration: none; }
 .scr-meta strong { color: var(--text2); font-weight: 600; }
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
-
-/* ── Info / warn boxes ── */
-
-/* ── Data tables ── */
 .data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
 .data-table thead { background: var(--head-bg); }
 .data-table th { text-align: left; font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
@@ -151,27 +139,19 @@ a { color: inherit; text-decoration: none; }
 .data-table tbody tr:hover td { background: var(--bg2); }
 .data-table td:first-child { color: var(--text); font-weight: 500; }
 .data-table tr:last-child td { border-bottom: none; }
-
-/* ── Tags ── */
 .tag { display: inline-block; font-size: 9.9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: .04em; vertical-align: middle; }
 .tag-bull { background: rgba(38,166,154,.12); color: var(--up); border: 1px solid rgba(38,166,154,.2); }
 .tag-bear { background: rgba(239,83,80,.10); color: var(--down); border: 1px solid rgba(239,83,80,.2); }
 .tag-neut { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
 
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
-
-/* ── Callouts ── */
 .callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
 .callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
 .callout-orange .callout-label { color: var(--orange); }
 .callout-green  .callout-label { color: var(--up); }
 .callout-red    .callout-label { color: var(--down); }
-
-/* ── Layout visual diagram ── */
 .layout-visual { margin-bottom: 20px; }
-
-/* ── Regime grid ── */
 .regime-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
 .regime-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; transition: border-color .15s; }
 .regime-card:hover { border-color: var(--border2); }
@@ -183,12 +163,9 @@ a { color: inherit; text-decoration: none; }
 .regime-label.neutral  { color: var(--text3); }
 .regime-desc { font-size: 13.8px; color: var(--text2); line-height: 1.7; }
 @media (max-width: 600px) { .regime-grid { grid-template-columns: 1fr; } }
-
-/* ── Mobile layout screenshots ── */
 .mobile-shots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 18px 0 24px; }
 .mobile-shots-grid .scr-hero-wrap { margin: 0; }
 @media (max-width: 700px) { .mobile-shots-grid { grid-template-columns: 1fr; } }
-/* ── pd-inline: Pair Detail expand strip (mirrored from dashboard.css) ─────── */
 .pd-inline-scroll{display:flex;overflow-x:auto;overflow-y:hidden;width:100%;box-sizing:border-box;}
 .pd-inline{display:flex;align-items:stretch;padding:0;font-family:var(--font-ui);width:100%;}
 .pd-inline-price{display:flex;flex-direction:column;justify-content:center;padding:6px 10px;border-right:1px solid var(--border2);min-width:100px;flex-shrink:0;}
@@ -924,7 +901,7 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
-    <!-- DERIVATIVES SECTION -->
+    
     <div class="guide-section" id="derivatives">
     <h2>Derivatives</h2>
     <p>The <strong>Derivatives</strong> section is accessible via the topbar navigation tab (keyboard shortcut: <kbd style="font-family:var(--font-mono);font-size:11px;background:var(--bg3);border:1px solid var(--border2);border-radius:3px;padding:1px 5px;">D</kbd>). It is hidden by default and replaces the main content area when selected. It consolidates five derivative and reference data panels not found elsewhere in the terminal.</p>
@@ -1010,7 +987,6 @@ a { color: inherit; text-decoration: none; }
 
 
 <script>
-// aria-expanded on site menu button
 const btn = document.querySelector('.site-menu-btn');
 const menu = document.querySelector('.site-menu');
 if (btn && menu) {

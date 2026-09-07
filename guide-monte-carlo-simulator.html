@@ -95,8 +95,6 @@ a { color: inherit; text-decoration: none; }
 
 .guide-wrap { display: flex; gap: 32px; max-width: 1040px; margin: 0 auto; padding: 40px 28px 24px; animation: fadeUp .35s ease both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── TOC sidebar ── */
 .toc { width: 196px; flex-shrink: 0; }
 .toc-inner { position: sticky; top: 52px; }
 .toc-head { font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -106,19 +104,13 @@ a { color: inherit; text-decoration: none; }
 .toc-divider { height: 1px; background: var(--border); margin: 10px 0; }
 .toc-item.toc-related { font-size: 12.1px; color: var(--text3); }
 .toc-item.toc-related:hover { color: var(--text2); }
-
-/* ── Guide content ── */
 .guide-content { flex: 1; min-width: 0; }
-
-/* ── Hero ── */
 .page-hero { padding-bottom: 28px; margin-bottom: 36px; border-bottom: 1px solid var(--border); position: relative; }
 .page-hero::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 48px; height: 1px; background: var(--blue); }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ""; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
 .page-hero h1 { font-size: 42px; font-weight: 700; color: #e8edf8; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
 .page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
-
-/* ── Sections ── */
 .guide-section { margin-bottom: 44px; scroll-margin-top: 52px; }
 .guide-section h2 { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
 .guide-section h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, var(--border2), transparent); }
@@ -135,10 +127,6 @@ a { color: inherit; text-decoration: none; }
 
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
-
-/* ── Info / warn boxes ── */
-
-/* ── Data tables ── */
 .data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
 .data-table thead { background: var(--head-bg); }
 .data-table th { text-align: left; font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
@@ -148,16 +136,12 @@ a { color: inherit; text-decoration: none; }
 .data-table tr:last-child td { border-bottom: none; }
 
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
-
-/* ── Callouts ── */
 .callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
 .callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
 .callout-orange .callout-label { color: var(--orange); }
 .callout-green  .callout-label { color: var(--up); }
 .callout-red    .callout-label { color: var(--down); }
-
-/* ── Screenshot ── */
 .scr-hero-wrap { margin: 18px 0 24px; }
 .scr-hero { cursor: zoom-in; border-radius: 4px; overflow: hidden; border: 1px solid var(--border); transition: border-color .18s; }
 .scr-hero:hover { border-color: var(--border2); }
@@ -500,8 +484,8 @@ a { color: inherit; text-decoration: none; }
       </details>
     </div>
 
-  </div><!-- /.guide-content -->
-</div><!-- /.guide-wrap -->
+  </div>
+</div>
 </main>
 
 
@@ -513,7 +497,6 @@ a { color: inherit; text-decoration: none; }
 
 
 <script>
-// aria-expanded on site menu button
 const btn = document.querySelector('.site-menu-btn');
 const menu = document.querySelector('.site-menu');
 if (btn && menu) {
@@ -541,7 +524,6 @@ sections.forEach(s => observer.observe(s));
 </script>
 
 <script>
-// Screenshot lightbox (single hero image on this page)
 (function() {
   const hero = document.querySelector('.scr-hero[role="button"]');
   if (!hero) return;

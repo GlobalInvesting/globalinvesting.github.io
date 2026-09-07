@@ -95,8 +95,6 @@ a { color: inherit; text-decoration: none; }
 
 .guide-wrap { display: flex; gap: 32px; max-width: 1040px; margin: 0 auto; padding: 40px 28px 24px; animation: fadeUp .35s ease both; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-/* ── TOC sidebar ── */
 .toc { width: 196px; flex-shrink: 0; }
 .toc-inner { position: sticky; top: 52px; }
 .toc-head { font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
@@ -106,19 +104,13 @@ a { color: inherit; text-decoration: none; }
 .toc-divider { height: 1px; background: var(--border); margin: 10px 0; }
 .toc-item.toc-related { font-size: 12.1px; color: var(--text3); }
 .toc-item.toc-related:hover { color: var(--text2); }
-
-/* ── Guide content ── */
 .guide-content { flex: 1; min-width: 0; }
-
-/* ── Hero ── */
 .page-hero { padding-bottom: 28px; margin-bottom: 36px; border-bottom: 1px solid var(--border); position: relative; }
 .page-hero::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 48px; height: 1px; background: var(--blue); }
 .page-hero-label { font-size: 9.9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
 .page-hero-label::before { content: ""; display: inline-block; width: 16px; height: 1px; background: var(--blue); }
 .page-hero h1 { font-size: 42px; font-weight: 700; color: #e8edf8; line-height: 1.25; margin-bottom: 12px; letter-spacing: -.3px; }
 .page-hero p { font-size: 15.4px; color: var(--text2); line-height: 1.8; }
-
-/* ── Sections ── */
 .guide-section { margin-bottom: 44px; scroll-margin-top: 52px; }
 .guide-section h2 { font-size: 11px; font-weight: 700; color: var(--text3); letter-spacing: .14em; text-transform: uppercase; padding-bottom: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
 .guide-section h2::after { content: ""; flex: 1; height: 1px; background: linear-gradient(to right, var(--border2), transparent); }
@@ -135,10 +127,6 @@ a { color: inherit; text-decoration: none; }
 
 .guide-section ul { color: var(--text2); font-size: 15.4px; padding-left: 18px; margin-bottom: 14px; }
 .guide-section li { margin-bottom: 7px; line-height: 1.7; }
-
-/* ── Info / warn boxes ── */
-
-/* ── Data tables ── */
 .data-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
 .data-table thead { background: var(--head-bg); }
 .data-table th { text-align: left; font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
@@ -146,24 +134,18 @@ a { color: inherit; text-decoration: none; }
 .data-table tbody tr:hover td { background: var(--bg2); }
 .data-table td:first-child { color: var(--text); font-weight: 500; }
 .data-table tr:last-child td { border-bottom: none; }
-
-/* ── Tags ── */
 .tag { display: inline-block; font-size: 9.9px; font-weight: 700; padding: 2px 7px; border-radius: 3px; letter-spacing: .04em; vertical-align: middle; }
 .tag-bull { background: rgba(38,166,154,.12); color: var(--up); border: 1px solid rgba(38,166,154,.2); }
 .tag-bear { background: rgba(239,83,80,.10); color: var(--down); border: 1px solid rgba(239,83,80,.2); }
 .tag-neut { background: var(--bg3); color: var(--text3); border: 1px solid var(--border2); }
 
 @media (max-width: 768px) { .guide-wrap { flex-direction: column; padding: 24px 16px 48px; } .toc { width: 100%; } .toc-inner { position: static; } }
-
-/* ── Callouts ── */
 .callout { background: var(--bg2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 20px; margin: 18px 0; font-size: 14.3px; color: var(--text2); line-height: 1.7; }
 .callout-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--blue); }
 .callout-label::before { content: ''; display: inline-block; width: 14px; height: 1px; background: currentColor; }
 .callout-orange .callout-label { color: var(--orange); }
 .callout-green  .callout-label { color: var(--up); }
 .callout-red    .callout-label { color: var(--down); }
-
-/* ── Session cards ── */
 .session-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin: 18px 0; }
 .session-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px; transition: border-color .15s; }
 .session-card:hover { border-color: var(--border2); }
@@ -172,13 +154,9 @@ a { color: inherit; text-decoration: none; }
 .sess-detail { font-size: 13.8px; color: var(--text2); line-height: 1.7; margin-bottom: 10px; }
 .sess-pairs { font-size: 12.1px; color: var(--text3); border-top: 1px solid var(--border); padding-top: 8px; }
 @media (max-width: 600px) { .session-cards { grid-template-columns: 1fr; } }
-
-/* ── Liquidity bar demo ── */
 .liq-canvas-demo { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; margin: 18px 0; overflow: hidden; }
 .liq-bar-row { display: flex; gap: 2px; height: 36px; align-items: flex-end; margin-bottom: 4px; }
 .liq-time-row { display: flex; justify-content: space-between; font-size: 9.9px; color: var(--text3); font-family: var(--font-mono); padding-top: 4px; }
-
-/* ── Vol table ── */
 .vol-table { width: 100%; border-collapse: collapse; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; margin: 16px 0; }
 .vol-table thead { background: var(--head-bg); }
 .vol-table th { text-align: left; font-size: 9.9px; font-weight: 700; color: var(--text3); text-transform: uppercase; letter-spacing: .1em; padding: 9px 12px; border-bottom: 1px solid var(--border2); }
@@ -390,21 +368,21 @@ a { color: inherit; text-decoration: none; }
     <linearGradient id="liqPast" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4f7fff" stop-opacity="0.32"/><stop offset="100%" stop-color="#4f7fff" stop-opacity="0.04"/></linearGradient>
     <linearGradient id="liqFut" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4f7fff" stop-opacity="0.10"/><stop offset="100%" stop-color="#4f7fff" stop-opacity="0.01"/></linearGradient>
   </defs>
-  <!-- Session bands -->
+  
   <rect x="4.0" y="6" width="207.0" height="58" fill="rgba(79,127,255,0.05)"/>
   <rect x="188.0" y="6" width="207.0" height="58" fill="rgba(38,166,154,0.07)"/>
   <rect x="303.0" y="6" width="207.0" height="58" fill="rgba(246,148,28,0.05)"/>
-  <!-- Past fill -->
+  
   <polygon points="4.0,58.2 15.7,59.4 27.5,59.9 39.2,60.5 51.0,55.3 62.7,52.4 74.5,46.6 86.2,42.0 98.0,37.9 109.7,33.8 121.4,32.1 133.2,35.0 144.9,40.8 156.7,43.7 168.4,46.6 180.2,47.8 191.9,26.3 203.7,18.8 215.4,14.7 227.1,13.0 238.9,11.8 238.9,64.0 4,64.0" fill="url(#liqPast)"/>
-  <!-- Future fill -->
+  
   <polygon points="238.9,11.8 250.6,10.1 262.4,8.9 274.1,8.3 285.9,7.7 297.6,6.0 309.4,6.0 321.1,6.6 332.9,7.2 344.6,8.3 356.3,9.5 368.1,11.8 379.8,14.7 391.6,18.8 403.3,23.4 415.1,29.2 426.8,36.2 438.6,42.0 450.3,47.8 462.0,51.2 473.8,53.6 485.5,55.9 497.3,57.0 509.0,57.6 520.8,58.2 532.5,58.8 544.3,59.4 556.0,59.4 556.0,64.0 234.0,64.0" fill="url(#liqFut)"/>
-  <!-- Past line — solid blue -->
+  
   <polyline points="4.0,58.2 15.7,59.4 27.5,59.9 39.2,60.5 51.0,55.3 62.7,52.4 74.5,46.6 86.2,42.0 98.0,37.9 109.7,33.8 121.4,32.1 133.2,35.0 144.9,40.8 156.7,43.7 168.4,46.6 180.2,47.8 191.9,26.3 203.7,18.8 215.4,14.7 227.1,13.0 238.9,11.8" fill="none" stroke="#4f7fff" stroke-width="1.5" stroke-linejoin="round"/>
-  <!-- Future line — dashed blue -->
+  
   <polyline points="238.9,11.8 250.6,10.1 262.4,8.9 274.1,8.3 285.9,7.7 297.6,6.0 309.4,6.0 321.1,6.6 332.9,7.2 344.6,8.3 356.3,9.5 368.1,11.8 379.8,14.7 391.6,18.8 403.3,23.4 415.1,29.2 426.8,36.2 438.6,42.0 450.3,47.8 462.0,51.2 473.8,53.6 485.5,55.9 497.3,57.0 509.0,57.6 520.8,58.2 532.5,58.8 544.3,59.4 556.0,59.4" fill="none" stroke="rgba(79,127,255,0.35)" stroke-width="1.2" stroke-dasharray="3 4" stroke-linejoin="round"/>
-  <!-- Now-line — orange dashed -->
+  
   <line x1="234.0" y1="6" x2="234.0" y2="64" stroke="rgba(246,148,28,0.7)" stroke-width="1" stroke-dasharray="2 3"/>
-  <!-- Time labels -->
+  
   <text x="4" y="78" fill="#4c525e" font-size="8" font-family="monospace" text-anchor="middle">00:00</text>
   <text x="96" y="78" fill="#4c525e" font-size="8" font-family="monospace" text-anchor="middle">04:00</text>
   <text x="188" y="78" fill="#4c525e" font-size="8" font-family="monospace" text-anchor="middle">08:00</text>
@@ -595,8 +573,8 @@ a { color: inherit; text-decoration: none; }
       </details>
     </div>
 
-  </div><!-- /.guide-content -->
-</div><!-- /.guide-wrap -->
+  </div>
+</div>
 </main>
 
 <footer id="statusbar" role="contentinfo" aria-label="Status bar">
@@ -607,7 +585,6 @@ a { color: inherit; text-decoration: none; }
 
 
 <script>
-// aria-expanded on site menu button
 const btn = document.querySelector('.site-menu-btn');
 const menu = document.querySelector('.site-menu');
 if (btn && menu) {
