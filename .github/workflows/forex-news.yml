@@ -1,23 +1,11 @@
 name: Fetch Forex News
 on:
-  # ── PRIMARY TRIGGER: external clock service, reliable, no GitHub throttling ─
-  # An external scheduler fires a repository_dispatch every 10 minutes via HTTP
-  # POST. This bypasses GitHub's scheduler entirely — no throttling, no skipped
-  # runs. Setup detail and provider name kept in the private engine repo's ops
-  # runbook, not here — see GUIDELINES.md "Public workflow files must not name
-  # data/infra vendors".
-  #
-  # NEWS_MODE logic (applied on both dispatch and schedule triggers):
-  #   Minute :05 of any hour → MODE=full (all configured sources)
-  #   All other minutes      → MODE=fast (primary sources only, no quota-limited extras)
   repository_dispatch:
-    types: [trigger-forex-news]   # ← fired by the external dispatcher every 10 min
+    types: [trigger-forex-news]
 
-  # ── FALLBACK: GitHub native cron (unreliable at high frequency, kept as safety net) ──
-  # GitHub may skip or delay these under load. The external dispatcher above is the primary clock.
   schedule:
-    - cron: '0,10,20,30,40,50 * * * *'   # every 10 min fallback — NEWS_MODE=fast
-    - cron: '5 * * * *'                   # hourly at :05 fallback — NEWS_MODE=full
+    - cron: '0,10,20,30,40,50 * * * *'
+    - cron: '5 * * * *'
 
   workflow_dispatch:
     inputs:
@@ -26,12 +14,9 @@ on:
         required: false
         default: 'full'
 
-# Runs in the PUBLIC repo → minutos ilimitados (sin consumo de cuota privada).
-# Script fetch_news.py vive en el repo privado globalinvesting-scripts (checkout
-# explícito vía SCRIPTS_PAT) para proteger la lógica propietaria del scraper.
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: forex-news
@@ -39,7 +24,7 @@ concurrency:
 
 permissions:
   contents: write
-  actions: write   # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+  actions: write
 
 jobs:
   fetch-news:
@@ -71,11 +56,6 @@ jobs:
       - name: Set NEWS_MODE
         id: news_mode
         run: |
-          # Determine NEWS_MODE for this run.
-          # workflow_dispatch: use the input value (default 'full').
-          # repository_dispatch (external clock) + schedule (fallback): use clock minute.
-          #   :05 of any hour → full (all configured sources, hourly quota run)
-          #   all other minutes → fast (primary sources only, no quota-limited extras consumed)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             MODE="${{ inputs.news_mode }}"
             MODE="${MODE:-full}"
@@ -131,9 +111,6 @@ jobs:
           exit 0
 
       - name: Trigger Pages deploy
-        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
-        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
-        # explicitly, only when this run actually pushed new data.
         if: steps.push.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}

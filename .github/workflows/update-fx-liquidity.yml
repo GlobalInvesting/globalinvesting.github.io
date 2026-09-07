@@ -1,48 +1,25 @@
 name: Update FX Liquidity Profile — v2.1 (private scripts)
 
-# ESTRATEGIA DE TRIGGER
-#
-# Corre cada hora en días de semana durante horario de mercado FX:
-#   - Domingo 21:00 UTC (Sydney open) → Viernes 21:00 UTC (NY close)
-#   - Schedule: cada hora, 7 días (el script ignora fins de semana en el output)
-#
-# Adicionalmente: workflow_dispatch para test manual.
-#
-# DURACIÓN ESTIMADA: ~45 seg (5 pares × 35d × 1h = ~840 filas por par, fetch en batch)
-# Sin riesgo de solapamiento a 1h de intervalo.
-#
-# PLACEMENT: script fetch_fx_liquidity.py vive en el repo privado globalinvesting-scripts
-# (checkout explícito vía SCRIPTS_PAT). Los minutos de Actions se consumen en este
-# repo público → ilimitados y sin costo.
-#
-# TRIGGER STRATEGY: dispatch de un reloj externo (primario) + GH schedule fallback.
-# GitHub's native cron puede saltear ejecuciones bajo carga del sistema — el reloj
-# externo actúa como respaldo confiable, disparando cada hora en punto vía
-# repository_dispatch. Detalle de setup y proveedor en el runbook privado del
-# repo engine, no acá — ver GUIDELINES.md "Public workflow files must not name
-# data/infra vendors".
 
 on:
   repository_dispatch:
-    types: [trigger-fx-liquidity]   # ← dispatched by the external clock, hourly
+    types: [trigger-fx-liquidity]
 
   schedule:
-    # Fallback — cada hora, todos los días. El script maneja fins de semana internamente
-    # (si no hay datos intraday, el fallback LIQ_BASE se activa automáticamente)
     - cron: '0 * * * *'
 
-  workflow_dispatch:   # trigger manual desde GitHub UI para test
+  workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: update-fx-liquidity
-  cancel-in-progress: false   # no cancelar un fetch en curso — esperar
+  cancel-in-progress: false
 
 permissions:
-  contents: write   # necesario para git push al mismo repo
-  actions: write    # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+  contents: write
+  actions: write
 
 jobs:
   fetch-fx-liquidity:
@@ -136,9 +113,6 @@ jobs:
           exit 0
 
       - name: Trigger Pages deploy
-        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
-        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
-        # explicitly, only when this run actually pushed new data.
         if: steps.push.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}

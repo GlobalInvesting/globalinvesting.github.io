@@ -1,46 +1,21 @@
 name: Update Myfxbook Sentiment — v2.0 (private scripts, persistent session)
 
-# ESTRATEGIA DE TRIGGER
-#
-# Corre cada hora, todos los días (schedule nativo de GitHub).
-#
-# DURACIÓN ESTIMADA: ~1-2 min por corrida.
-#
-# PLACEMENT: script fetch_myfxbook_sentiment.py vive en el repo privado
-# globalinvesting-scripts (checkout explícito vía SCRIPTS_PAT). Los minutos
-# de Actions se consumen en este repo público → ilimitados y sin costo.
-# Movido desde globalinvesting-scripts (repo privado) el 2026-08-27 —
-# ver CHANGELOG.md "Migración a Actions gratuitas — Fase 1 (myfxbook-sentiment)"
-# y GUIDELINES.md "Public workflow files must not name data/infra vendors"
-# para el criterio ya establecido con update-fx-liquidity.yml y el resto de
-# los workflows públicos.
-#
-# v2.0 (2026-09-07): la corrida ya NO se loguea contra la API en cada tick.
-# fetch_myfxbook_sentiment.py v8.4 reutiliza un token de sesión persistido
-# en el repo PRIVADO globalinvesting-scripts (ops-state/myfxbook-session.json)
-# y solo llama a login.json cuando no hay sesión cacheada o la cacheada fue
-# rechazada — 24 logins/día (con logout explícito en cada uno) resultó ser
-# el patrón que disparó un bloqueo de cuenta por parte del proveedor,
-# independiente de que las credenciales fueran correctas. Ver GUIDELINES.md
-# y el docstring de fetch_myfxbook_sentiment.py para el incidente completo.
-# Este workflow ahora necesita un segundo commit+push — al repo PRIVADO,
-# no al público — para persistir el token actualizado entre corridas.
 
 on:
   schedule:
-    - cron: '20 * * * *'   # cada hora, minuto 20
-  workflow_dispatch:   # trigger manual desde GitHub UI para test
+    - cron: '20 * * * *'
+  workflow_dispatch:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: update-myfxbook-sentiment
-  cancel-in-progress: false   # no cancelar un fetch en curso — esperar
+  cancel-in-progress: false
 
 permissions:
-  contents: write   # necesario para git push al mismo repo
-  actions: write    # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+  contents: write
+  actions: write
 
 jobs:
   fetch-sentiment:
@@ -73,15 +48,6 @@ jobs:
 
       - name: Commit and push session state (private repo)
         id: push_session
-        # Este paso persiste el token de sesión reutilizable en el repo
-        # PRIVADO (globalinvesting-scripts), NO en el público — un token de
-        # auth vivo no debe terminar nunca en un archivo servido por GitHub
-        # Pages, aunque los datos que desbloquea (community outlook) no sean
-        # sensibles en sí mismos. SCRIPTS_PAT ya tiene Contents: Read and
-        # write sobre este repo (el mismo token usado para el checkout).
-        # Si este paso falla (sin PAT, sin cambios, etc.) no es motivo para
-        # abortar el resto del workflow — el próximo run simplemente vuelve
-        # a loguearse fresco, igual que un cold start.
         working-directory: private-scripts
         continue-on-error: true
         run: |
@@ -91,10 +57,6 @@ jobs:
             echo "No session file written this run (fallback path) — nothing to persist."
             exit 0
           fi
-          # Same pattern as the public-repo push step below: snapshot the
-          # freshly-written file BEFORE any reset, since a retry's
-          # `git reset --hard origin/main` would otherwise wipe the new
-          # token from the working tree too, not just un-stage it.
           cp ops-state/myfxbook-session.json /tmp/myfxbook_session_fresh.json
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
           for i in 1 2 3; do
@@ -147,10 +109,6 @@ jobs:
           exit 0
 
       - name: Trigger Pages deploy
-        # Pushes hechos con el GITHUB_TOKEN por default NO disparan otros
-        # workflows on:push (regla anti-loop de GitHub) — hay que disparar
-        # deploy-pages.yml explícitamente, y solo si esta corrida pusheó datos
-        # nuevos. Mismo patrón que update-fx-liquidity.yml.
         if: steps.push.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}

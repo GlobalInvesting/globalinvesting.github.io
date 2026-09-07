@@ -1,28 +1,5 @@
 name: Update Sitemap
 
-# Regenerates sitemap.xml with accurate lastmod dates derived from git history.
-# Runs automatically on every push to main that touches an HTML page, key data
-# files, or this workflow/script itself.
-#
-# Why: previously all lastmod values were hardcoded to the same date.
-# Google uses lastmod to prioritise re-crawl scheduling — stale or uniform
-# dates reduce crawl efficiency and delay ranking updates after content changes.
-#
-# Approach: scripts/update_sitemap.py calls `git log -1 --format=%cI <file>`
-# for each page and its data dependencies, picks the most recent commit date,
-# and writes a fresh sitemap.xml. For the terminal (index.html), AI narrative
-# JSON is included as a dependency so daily AI updates also bump the lastmod.
-#
-# No secrets required — reads only public git history.
-# Schedule: also runs weekly (Sunday 01:00 UTC) as a safety net.
-#
-# TRIGGER STRATEGY: the push trigger above already fires this workflow constantly
-# (every data-pipeline commit that touches the watched paths), so the weekly cron
-# is a rarely-exercised last resort. Since it's a single weekly shot with no buffer,
-# a GitHub cron skip means a full week of stale lastmod dates. An external clock
-# service adds a reliable backup dispatch for that same weekly slot — setup detail
-# and provider name kept in the private engine repo's ops runbook, not here — see
-# GUIDELINES.md "Public workflow files must not name data/infra vendors".
 
 on:
   push:
@@ -39,10 +16,10 @@ on:
       - '.github/workflows/update-sitemap.yml'
 
   repository_dispatch:
-    types: [trigger-sitemap]   # ← dispatched by the external clock, weekly (Sunday 01:00 UTC)
+    types: [trigger-sitemap]
 
   schedule:
-    - cron: '0 1 * * 0'   # Fallback — Sunday 01:00 UTC weekly safety run
+    - cron: '0 1 * * 0'
   workflow_dispatch:
 
 concurrency:
@@ -51,7 +28,7 @@ concurrency:
 
 permissions:
   contents: write
-  actions: write   # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+  actions: write
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -65,7 +42,7 @@ jobs:
       - name: Checkout repo (full history for git log dates)
         uses: actions/checkout@v6
         with:
-          fetch-depth: 0   # full history required — git log -1 needs commit ancestry
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -88,7 +65,6 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
 
-            # Re-run against fresh checkout to avoid stale working tree
             python3 scripts/update_sitemap.py
 
             git add sitemap.xml
@@ -111,9 +87,6 @@ jobs:
           exit 0
 
       - name: Trigger Pages deploy
-        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
-        # workflows (GitHub's loop-prevention rule) — dispatch deploy-pages.yml
-        # explicitly, only when this run actually pushed new data.
         if: steps.push.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}

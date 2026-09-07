@@ -1,65 +1,25 @@
 name: Update Intraday Quotes — v1.7
 
-# TRIGGER STRATEGY
-#
-# GitHub Actions' native cron (schedule) is NOT reliable for short intervals:
-# in practice it skips runs under GitHub system load.
-#
-# Solution: an external clock service dispatches this workflow exactly every
-# 5 minutes via HTTP POST to the repository_dispatch endpoint (setup detail
-# and provider name kept in the private engine repo's ops runbook, not here —
-# see GUIDELINES.md "Public workflow files must not name data/infra vendors").
-#
-# GitHub's schedule is kept as a SAFETY NET (fallback),
-# but running only every 5 min — so if the external clock fails, the max gap is 5 min.
-#
-# ✅ Average job duration: ~30 sec → no overlap risk at a 5-min interval.
-# ✅ Primary quote source has no formal rate limit at this call volume; the
-#    secondary (gold-only) fallback source runs well within its free-tier quota.
-#
-# fetch_intraday_quotes.py lives in the private globalinvesting-scripts repo
-# (explicit checkout via SCRIPTS_PAT) to protect the fetcher's proprietary logic
-# and API keys. Actions minutes are consumed in this public repo → unlimited
-# and at no cost — this is also why the orchestration file itself must live
-# here rather than in the private repo.
 
 on:
   repository_dispatch:
-    types: [trigger-intraday-quotes]   # ← dispatched by the external clock every 5 min exactly
+    types: [trigger-intraday-quotes]
 
-  # schedule: SAFETY NET (v7.58.6) — only kicks in when the external dispatcher is down.
-  #
-  # History:
-  #   v7.14.4: schedule removed because GitHub's cron collided with the external dispatch
-  #            → two simultaneous runs → git rebase failed → repeated failure emails.
-  #   v7.14.5: exit 1 on push replaced with exit 0. Simultaneous runs no longer cause failures.
-  #   v7.58.6: schedule restored as fallback. The push-loop + concurrency:
-  #            cancel-in-progress:false already serializes simultaneous runs without errors.
-  #            If the external dispatcher goes down, quotes.json freezes indefinitely —
-  #            the dashboard shows stale data forever. GitHub's schedule covers that gap:
-  #            at most ~15 min of stale data instead of hours or days. Doesn't send
-  #            failure emails (exit 0 in the push-loop).
-  #
-  # Frequency: */5 is the minimum GitHub allows. In practice it runs every 5–15 min
-  # under load, which is acceptable as a fallback (not as the primary clock).
-  # Outside FX trading hours (Saturday 21:00 UTC – Sunday 21:00 UTC) runs still fire,
-  # but fetch_intraday_quotes.py writes weekend data with no real changes —
-  # the push-loop detects "No changes vs remote HEAD" and exits 0 without a commit.
   schedule:
-    - cron: '*/5 * * * *'             # fallback: runs every 5 min if the external dispatcher goes down
+    - cron: '*/5 * * * *'
 
-  workflow_dispatch:                   # manual trigger from the GitHub UI
+  workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in (mandatory before June 2 2026)
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 concurrency:
   group: update-intraday-quotes
-  cancel-in-progress: false            # no cancelar un fetch en curso — esperar
+  cancel-in-progress: false
 
 permissions:
-  contents: write                      # necesario para hacer git push al mismo repo
-  actions: write                       # necesario para disparar deploy-pages.yml (ver step "Trigger Pages deploy")
+  contents: write
+  actions: write
 
 jobs:
   fetch-intraday-quotes:
@@ -83,13 +43,6 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        # statsmodels (pinned — see engine repo's scripts/requirements.txt for the
-        # same "don't leave a version unpinned" convention) added in v3.21 for the
-        # correlations pairs-signal's Engle-Granger cointegration test
-        # (statsmodels.tsa.stattools.coint). fetch_intraday_quotes.py degrades to
-        # "no pairs signal" if this install is ever missing/broken — it will not
-        # crash the quotes.json build — but must still ship in the same change as
-        # any code that imports it (see GUIDELINES.md).
         run: pip install yfinance requests statsmodels==0.14.6 --break-system-packages
 
       - name: Create output directory
@@ -108,33 +61,17 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Save the freshly-fetched file to a temp path so we can safely reset
-          # the working tree without losing our new data in the retry loop.
           cp intraday-data/quotes.json /tmp/quotes_fresh.json
 
           TIMESTAMP=$(date -u +'%Y-%m-%d %H:%M UTC')
 
-          # Push loop — up to 5 attempts to handle concurrent-run collisions.
-          #
-          # Per-attempt strategy (no rebase — avoids "unstaged changes" errors):
-          #   1. Hard-reset to current remote HEAD so git history is clean.
-          #   2. Re-apply the fresh file (our data always wins — it is the newest).
-          #   3. Commit only if there is a real diff vs remote HEAD.
-          #   4. Push.  If rejected, another run beat us in the window — loop.
-          #
-          # Exit 0 on all paths: a push collision is not a real failure.
-          # The next dispatch from the external clock (≤5 min) will carry fresh data.
-          # Exiting with non-zero would trigger GitHub failure emails on every
-          # concurrent-run collision, which is the problem this block fixes.
 
           for i in 1 2 3 4 5; do
             echo "--- Attempt $i ---"
 
-            # Sync local HEAD to remote without rebasing
             git fetch origin main
             git reset --hard origin/main
 
-            # Re-apply our freshly-fetched data
             cp /tmp/quotes_fresh.json intraday-data/quotes.json
             git add intraday-data/quotes.json
 
@@ -161,10 +98,6 @@ jobs:
           exit 0
 
       - name: Trigger Pages deploy
-        # Pushes made with the default GITHUB_TOKEN do NOT trigger other on:push
-        # workflows (GitHub's loop-prevention rule) — deploy-pages.yml listens for
-        # push to main but never actually fires from this workflow's commit alone.
-        # Dispatch it explicitly, only when this run actually pushed new data.
         if: steps.push.outputs.pushed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}

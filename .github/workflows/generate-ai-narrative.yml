@@ -1,98 +1,21 @@
 name: Generate AI Narrative & Market Signals
 
-# Runs 4×/day covering the 4 major FX session transitions, plus a Friday post-COT run.
-# MODE: intraday — generates narrative + signals only.
-# Structural outputs (session context + currency drivers) are handled by
-# generate-structural-context.yml (1×/day, separate key pool) — Tiered Refresh Architecture.
-#
-# Writes to the PUBLIC site repo:
-#   ai-analysis/index.json           ← Narrative bar + regime label
-#   ai-analysis/signals.json         ← Alerts & Market Signals panel
-#   ai-analysis/session-context.json ← Session tab notes (moved from structural, v7.64.6)
-#                                       Refreshes ~every 2h so CLOSED/ACTIVE/UPCOMING notes
-#                                       reflect live intraday data at each session open.
-#
-# Schedule (UTC) — 5 runs/week-mix covering all 4 session opens/transitions + a post-COT
-# refresh (v7.80.0, reduced from the earlier 6-run schedule to stay within the Actions-minutes
-# budget — see the `on.schedule` block below for the live cron list). Times
-# below are corrected as of v8.337.0 to match the site's own canonical session-open source
-# of truth (`SESSION_DEFS`/`localHourToUTC()` in dashboard.js — DST-aware via Intl), verified
-# for today's date (2026-08-31, both US/EDT and UK/BST in effect):
-#   00:00 — Asia open (Tokyo, JST has no DST — always 00:00 UTC)
-#   06:55 — 5 min ahead of London's real open (08:00 Europe/London local = 07:00 UTC in BST)
-#   11:55 — 5 min ahead of NY's real open (08:00 America/New_York local = 12:00 UTC in EDT)
-#   20:55 — 5 min ahead of NY's real close (17:00 America/New_York local = 21:00 UTC in EDT)
-#   Fri 22:25 — post-COT refresh, 5 min ahead of the matching cron-job.org slot (COT workflow
-#     runs 21:30, ~45min runtime → data ready ~22:15)
-# CAVEAT (flagged, not fixed): this native cron is a fixed UTC schedule with no DST awareness
-# — unlike SESSION_DEFS above, it will silently drift ~1h off real session opens for London/NY
-# whenever US/UK DST status changes (next: UK ends 2026-10-25, US ends 2026-11-01) until these
-# cron expressions are manually re-derived from SESSION_DEFS for the new DST state. The
-# cron-job.org backup (see TRIGGER STRATEGY below) has the same limitation and needs the same
-# manual seasonal correction — neither clock self-adjusts.
-#
-# Token/quota budget: see docs/ops-runbook.md "Data vendors by workflow" for the
-# real per-key capacity numbers and narrative/signals key-pool split. Change detection
-# skips the AI fallback provider entirely when market data is unchanged, so actual
-# spend runs below the theoretical worst case documented there.
-#
-# Required secrets:
-#   AI provider (fallback) — narrative primary/secondary + signals primary/secondary +
-#     narrative overflow. Live in this repo (public site). Exact key count: see
-#     docs/ops-runbook.md "Data vendors by workflow".
-#   AI provider (primary) — signals auditor (closed-market only) + rotation pool.
-#     Live in this repo (public site). Exact key count: see docs/ops-runbook.md.
-#   PAT_TOKEN — GitHub PAT with READ access to the private globalinvesting-engine repo
-#     (checkout of engine/scripts/generate_narrative_signals.py, which stays private —
-#     only this .yml moved to the public repo). Push access to THIS repo comes from the
-#     default GITHUB_TOKEN via `permissions: contents: write` below, not from PAT_TOKEN —
-#     PAT_TOKEN's role flipped direction when this workflow moved here; it used to grant
-#     write access to what was then an external public site, now it grants read access
-#     to what is now an external private engine.
-#   (v8.340.0: secret names genericized — AI_FALLBACK_KEY[_N] / AI_PRIMARY_KEY[_N] /
-#   WEB_SEARCH_KEY — closing the residual flagged since v8.166.0. Old vendor-named
-#   secrets [GROQ_API_KEY*, GEMINI_API_KEY*, TAVILY_API_KEY] can be deleted from this
-#   repo's Settings → Secrets once a live run off the new names is confirmed green.)
 
-# FIX-19: Added FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 to suppress Node.js 20 deprecation
-#         warnings from actions/checkout@v4, actions/setup-python@v5. Without this env
-#         var the deprecation warning appears in every run and the forced upgrade to
-#         Node.js 24 on 2026-06-02 may cause unexpected behaviour.
 
-# TRIGGER STRATEGY: two independent trigger sources — native `schedule` (below) and
-# cron-job.org's `repository_dispatch` — are deliberate defense-in-depth against GitHub's
-# own documented schedule-trigger delays/skips under platform load. Don't remove either
-# without replacing the redundancy it provides.
-#
-# Both clocks must agree with SESSION_DEFS (dashboard.js) before either is edited — a past
-# incident (native and external clocks drifting ~30min-2h30 apart) caused duplicate runs
-# and a real Actions-minutes overage. Full incident writeup and the correction history:
-# CHANGELOG.md v8.288.0 (idempotency guard added), v8.336.0/v8.337.0 (schedule drift +
-# correction). Current cron-job.org dispatch times: 00:00/07:00/12:00/21:00 UTC + Fri 22:30.
 
 on:
   repository_dispatch:
-    types: [trigger-ai-narrative]   # ← dispatched by cron-job.org, one job per slot below
+    types: [trigger-ai-narrative]
   schedule:
-    # 4×/day — reduced from 6 in v7.80.0 to stay within the Actions-minutes budget.
-    # Covers all 4 major FX session transitions; change detection skips the AI calls when
-    # market data is materially unchanged between runs (gaps ≤ 8h at most).
-    # Re-derived v8.337.0 from SESSION_DEFS' real session-open times (dashboard.js), 5 min
-    # ahead of the matching cron-job.org slot — see the Schedule (UTC) comment block above.
-    - cron: '0  0  * * *'   # 00:00 UTC — Asia open (Tokyo, no DST)
-    - cron: '55 6  * * *'   # 06:55 UTC — 5min ahead of London open (07:00 UTC in BST)
-    - cron: '55 11 * * *'   # 11:55 UTC — 5min ahead of NY open (12:00 UTC in EDT)
-    - cron: '55 20 * * *'   # 20:55 UTC — 5min ahead of NY close (21:00 UTC in EDT)
-    - cron: '25 22 * * 5'   # Friday 22:25 UTC — 5min ahead of the Fri 22:30 post-COT slot
+    - cron: '0  0  * * *'
+    - cron: '55 6  * * *'
+    - cron: '55 11 * * *'
+    - cron: '55 20 * * *'
+    - cron: '25 22 * * 5'
   workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # FIX-19: Node.js 20 → 24 opt-in
-  # v8.343.0: without this, Python's default block-buffering (stdout isn't a TTY
-  # inside a GH Actions run: step) means print()/safe_print() output can sit
-  # unflushed for minutes during a slow network call (e.g. a Gemini timeout),
-  # making the job LOOK hung in the live log even though it's actively retrying
-  # keys in the background. Forces line-by-line flushing instead.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   PYTHONUNBUFFERED: "1"
 
 concurrency:
@@ -119,11 +42,6 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           path: engine
 
-      # IDEMPOTENCY GUARD: skips a full duplicate run when the two trigger sources (see
-      # TRIGGER STRATEGY above) land close together — `concurrency: cancel-in-progress:false`
-      # above already serializes overlapping runs, so this reads the just-finished sibling
-      # run's commit timestamp and skips if it's within the window below. workflow_dispatch
-      # (manual) always bypasses it. Full rationale: CHANGELOG.md v8.288.0.
       - name: Idempotency guard — skip if a sibling trigger already ran this cycle
         id: guard
         run: |
@@ -137,11 +55,6 @@ jobs:
           age = (datetime.now(timezone.utc) - datetime.fromisoformat(ts)).total_seconds() / 60
           print(int(age))
           " 2>/dev/null || echo 9999)
-              # 20 min: intended sibling-trigger offset is ~5 min by design, so this leaves
-              # margin for GitHub's own documented schedule-trigger delays without risking
-              # suppression of a genuine later slot (schedule gaps are 4h+ minimum). Only
-              # helps if both triggers are actually configured close together — see
-              # CHANGELOG.md v8.336.0.
               if [ "$AGE_MIN" -lt 20 ] 2>/dev/null; then
                 echo "site/ai-analysis/index.json was generated ${AGE_MIN} min ago (< 20 min) — a sibling trigger already completed this cycle. Skipping the rest of this run."
                 SKIP=true
@@ -176,13 +89,8 @@ jobs:
           AI_PRIMARY_KEY:   ${{ secrets.AI_PRIMARY_KEY }}
           AI_PRIMARY_KEY_2: ${{ secrets.AI_PRIMARY_KEY_2 }}
           AI_PRIMARY_KEY_5: ${{ secrets.AI_PRIMARY_KEY_5 }}
-          # v8.37.0: external web search (primary search path, ahead of AI-native grounding).
           WEB_SEARCH_KEY: ${{ secrets.WEB_SEARCH_KEY }}
         run: |
-          # Manual trigger (workflow_dispatch) always regenerates — skip change detection.
-          # Scheduled runs use change detection to avoid redundant AI-generation calls.
-          # If narrative is >20h old (change detection has been skipping on flat weekends),
-          # force regeneration regardless — FIX-23: prevents 30h+ stale narrative on weekends.
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "Manual trigger — forcing regeneration (--force)"
             python ../engine/scripts/generate_narrative_signals.py --mode intraday --force
@@ -240,10 +148,6 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           mkdir -p /tmp/ai_analysis_fresh
-          # index.json, signals.json, context_snapshot.json are always written by mode=intraday.
-          # currency-drivers.json and session-context.json are written by mode=structural only
-          # (generate-structural-context.yml, 1x/day). Guard their cp so a missing structural
-          # file does not abort the commit step on this workflow.
           cp ai-analysis/index.json ai-analysis/signals.json ai-analysis/context_snapshot.json \
              /tmp/ai_analysis_fresh/
           [ -f ai-analysis/currency-drivers.json ] && cp ai-analysis/currency-drivers.json /tmp/ai_analysis_fresh/

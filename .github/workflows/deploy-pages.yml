@@ -1,116 +1,35 @@
 name: Deploy GitHub Pages
 
-# ─────────────────────────────────────────────────────────────────────────
-# Reemplaza el pipeline implícito de Pages ("Deploy from a branch"), que
-# tiene un límite BLANDO de 10 builds/hora documentado por GitHub. Con 6
-# workflows de datos pusheando a main cada 5-30 min, ese límite se supera
-# regularmente y produce el error "Deployment failed, try again later."
-#
-# Un workflow de GitHub Actions explícito (este archivo) NO está sujeto a
-# ese límite: https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits
-#
-# Requisito único: en Settings → Pages → Build and deployment → Source,
-# cambiar de "Deploy from a branch" a "GitHub Actions".
-# ─────────────────────────────────────────────────────────────────────────
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # permite disparo manual desde la UI para test/backfill
+  workflow_dispatch:
 
 env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true   # Node.js 20 → 24 opt-in — mismo estándar (FIX-12/FIX-19)
-                                              # ya aplicado en el resto de workflows del proyecto; este
-                                              # es el que más corre (cada push a main) y era el único
-                                              # workflow activo sin la variable.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 permissions:
   contents: read
   pages: write
   id-token: write
-  actions: write   # NEW (v2.1) — required for `gh run list`/`gh run cancel` in the
-                    # new "Clear stuck queued runs" step below (actions:read alone
-                    # is enough to list runs, but cancelling needs actions:write)
+  actions: write
 
-# v2 (2026-07-20): concurrency moved from workflow-level to per-job (see BUG
-# note on the "build" job below). No workflow-level concurrency block here
-# anymore — each job declares its own group.
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10   # NEW (v2.1) — neither job had an explicit timeout before;
-                           # a hung job now self-terminates instead of blocking the
-                           # queue indefinitely, the same failure mode as the
-                           # incident this version's own first step guards against.
-    # BUG FOUND 2026-07-20: the original v1 setup had ONE workflow-level
-    # "pages" concurrency group shared by both build and deploy, with
-    # cancel-in-progress:false — kept deliberately so a *deploy* is never
-    # cut off mid-way (a probable cause of intermittent failures seen
-    # before v1; see the header comment above). But sharing that single
-    # group meant EVERY push's build+deploy also queued and ran to full
-    # completion in FIFO order, with none skipped. With ~5 data workflows
-    # (update-ff-calendar, update-intraday-quotes, forex-news,
-    # update-fx-liquidity, update-ohlc) pushing every 2-10 min — more
-    # overlap during release windows — a commit that had just written a
-    # fresh actual into ff_calendar.json could sit behind several minutes
-    # of already-queued deploys of now-superseded commits before its own
-    # deploy even started. calendar-panel.js's v1.6 minute-bucketed
-    # cache-buster can't help here — it only defeats Fastly's URL-level edge
-    # cache; the URL it fetches still resolves to whatever artifact GitHub
-    # Pages has actually published, which was stuck behind the backlog.
-    # Matches the 2026-07-15 incident logged in calendar-panel.js v1.6's own
-    # header ("4 new actuals, panel still showed '—' 23min later") — that
-    # fix addressed CDN caching only and never touched this queue-depth
-    # cause, so the same symptom (workflow confirms the write, frontend
-    # doesn't show it for many minutes) kept recurring.
-    # Fix: give the BUILD job its OWN group with cancel-in-progress:true.
-    # Packaging the artifact has no external side effects, so cancelling a
-    # superseded build is safe — only the build for the latest commit on
-    # main needs to survive to the deploy step. The DEPLOY job below keeps
-    # a separate group with cancel-in-progress:false, so a publish that has
-    # actually started is still never interrupted — preserving the original
-    # v1 guarantee while eliminating the backlog.
+    timeout-minutes: 10
     concurrency:
       group: "pages-build"
       cancel-in-progress: true
     steps:
       - name: Clear stuck queued runs of this workflow
-        # v2.1 FIX (2026-09-04): root cause of a 7h+ site-wide stale-data
-        # incident — 7 independent workflows (update-ff-calendar,
-        # update-intraday-quotes, forex-news, update-fx-liquidity,
-        # update-ohlc, update-myfxbook-sentiment, update-sitemap) each
-        # dispatch this workflow independently via `gh workflow run
-        # deploy-pages.yml`, with no coordination between them. GitHub's own
-        # `github-pages` deployment environment serializes actual publishes
-        # to one at a time — separate from this file's own `concurrency:`
-        # blocks, which only govern OUR job queue, not GitHub's
-        # environment-level one. When a run gets stuck in "Queued" against
-        # that environment (observed live 2026-09-04, 11:11 UTC — cause on
-        # GitHub's platform side, not this repo's own workflow logic), every
-        # subsequent dispatch cancels automatically instead of queuing
-        # behind it (GitHub only keeps one pending run per concurrency
-        # group), and nothing surfaced this — the site silently stopped
-        # redeploying for 7+ hours until manually caught and cancelled via
-        # the Actions UI.
-        # This step self-heals: before starting a new build, cancel any of
-        # this workflow's own runs still `queued` after 10+ minutes, so a
-        # future stuck run clears itself within one dispatch cycle instead
-        # of requiring someone to notice and cancel it by hand. Uses the
-        # workflow's own filename (not a hardcoded numeric ID) so it keeps
-        # working if the workflow is ever renamed.
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           THRESHOLD_MIN=10
-          # v2.2 FIX (2026-09-04): live first-run failure — "failed to determine
-          # base repo: fatal: not a git repository" — this step deliberately
-          # runs BEFORE the Checkout step below (it must clear a stuck queue
-          # slot before the build even starts), so there is no local git repo
-          # for `gh` to auto-detect the target repo from. Passing --repo
-          # explicitly removes that dependency entirely, regardless of step
-          # order or whether a checkout has happened yet.
           gh run list --repo "${{ github.repository }}" \
             --workflow=deploy-pages.yml --status=queued \
             --json databaseId,createdAt --limit 20 > /tmp/queued_runs.json
@@ -140,26 +59,10 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Sync version tag from CACHE_VERSION
-        # Single source of truth: sw.js's CACHE_VERSION constant, which is
-        # already bumped on every deploy that changes static assets (see
-        # GUIDELINES.md "Any new fetch(...) call ... must bump CACHE_VERSION
-        # in the same change"). Every HTML page's statusbar tag
-        # (`<span class="sb-v">FX Terminal {{CACHE_VERSION}}</span>`)
-        # carries a literal `{{CACHE_VERSION}}` placeholder in the committed
-        # source — never a real number — and this step substitutes it with
-        # the real value ONLY in this ephemeral runner checkout, right
-        # before packaging, never committing the substituted value back to
-        # the repo. This closes a real drift incident: 18 pages carried a
-        # hand-edited version tag last synced in April 2026 (v7.39.6),
-        # ranging v8.1.1–v8.72.7 by the time CACHE_VERSION had reached
-        # v8.309.0 — no mechanism ever forced them to agree. Runs on every
-        # deploy (i.e. every push to main), so it can never go stale again.
         shell: bash
         run: |
           set -euo pipefail
           RAW=$(grep -oE "CACHE_VERSION = '[^']+'" sw.js | sed -E "s/CACHE_VERSION = '(.*)'/\1/")
-          # sw.js format is "gi-vX.Y.Z" — the statusbar tag only ever showed
-          # the bare "vX.Y.Z" part, so strip the "gi-" prefix.
           VERSION="${RAW#gi-}"
           if [[ ! "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo "::error::CACHE_VERSION in sw.js did not match the expected 'gi-vX.Y.Z' format (got '$RAW') — refusing to deploy with an unparsed version tag."
@@ -168,7 +71,6 @@ jobs:
           COUNT=$(grep -l '{{CACHE_VERSION}}' *.html | wc -l)
           echo "Substituting {{CACHE_VERSION}} -> $VERSION in $COUNT HTML page(s)"
           sed -i "s/{{CACHE_VERSION}}/${VERSION}/g" *.html
-          # Verify no placeholder survived and no page was missed.
           if grep -rl '{{CACHE_VERSION}}' *.html; then
             echo "::error::Placeholder survived substitution in the file(s) listed above."
             exit 1
@@ -180,21 +82,15 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Sitio estático servido tal cual desde la raíz del repo — sin
-          # paso de build. Ajustar `path` si en algún momento se agrega
-          # un bundler (Vite/Webpack/etc.) con salida a /dist.
           path: '.'
 
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15   # NEW (v2.1) — see the build job's own timeout comment above
+    timeout-minutes: 15
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    # Own group, cancel-in-progress:false — never interrupt a deploy that
-    # has already started (the guarantee the old workflow-level block
-    # protected; unchanged here).
     concurrency:
       group: "pages-deploy"
       cancel-in-progress: false
