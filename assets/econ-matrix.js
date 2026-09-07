@@ -1,5 +1,29 @@
 /**
- * econ-matrix.js v2.6.1 — Native Economic Matrix panel
+ * econ-matrix.js v2.6.2 — Native Economic Matrix panel
+ *
+ * ── v2.6.2 (2026-09-06) — Two fixes, both from a live screenshot report
+ *    (Santiago): (1) refLabel()/the tooltip no longer show a fabricated
+ *    "DD" day for events whose source only ever published a reference
+ *    MONTH+YEAR (TE's "Related" table, via fetch_te_employment_change.py/
+ *    fetch_te_core_inflation.py/fetch_te_nzd_ind_prod.py) — those events
+ *    now carry `dayPrecision:'month'` and render/tooltip as a bare month,
+ *    while every day-precise event is unchanged. This deliberately
+ *    reverts part of v2.6.1: v2.6.1's "always show DD Mon" fix was correct
+ *    for NOK/SEK's Myfxbook-sourced cells (which DO have a real release
+ *    day, just previously mis-displayed as a reference-period tag instead)
+ *    but wrongly forced a fabricated day onto genuinely month-only TE
+ *    cells added since — the two cases need different handling, not one
+ *    uniform rule. (2) The Emp Chg column's "in-house estimate, not an
+ *    officially-tracked headline release" disclosure incorrectly grouped
+ *    CHF/NOK/SEK together with JPY — CHF/NOK/SEK's figure is a real,
+ *    directly-scraped, Eurostat-compiled published release (TE's own page
+ *    cites EUROSTAT as source), not something this codebase estimated;
+ *    only JPY's is genuinely locally-computed (a MoM delta of a level).
+ *    Split into EMP_COMPUTED_CCY (JPY, keeps the original language) and
+ *    EMP_EUROSTAT_CCY (CHF/NOK/SEK, new accurate wording) — both still
+ *    carry the dagger marker (different national series than USD/AUD/CAD/
+ *    GBP/NZD/EUR's own headline), neither implies the CHF/NOK/SEK figure
+ *    is untracked or invented. See CHANGELOG.md v8.394.0.
  *
  * ── v2.6.1 (2026-09-06) — refLabel() no longer extracts a bare "(Mon)"
  *    reference-period tag from NOK/SEK-style titles for the subtext line;
@@ -1244,6 +1268,21 @@
   };
 
   // ── Emp Chg column: official headline vs. in-house proxy ──────────────────
+  // v2.6.2 (2026-09-06) CORRECTION: the original single EMP_PROXY_CCY/NOTE
+  // pair below wrongly grouped CHF/NOK/SEK together with JPY under the same
+  // "in-house estimate, not officially-tracked" language. That's only true
+  // for JPY — its Emp Chg is genuinely computed by this codebase (MoM delta
+  // of TE's "Employed Persons" level, see fetch_te_employment_change.py's
+  // JPY branch). CHF/NOK/SEK's figure is a real, directly-scraped TE-
+  // published release (Eurostat-compiled harmonized Labour Force Survey
+  // change) — Santiago flagged, from a live screenshot, that the tooltip
+  // contradicted TE's own page, which cites a real source (EUROSTAT) for
+  // this exact series. Split into two disclosures: JPY keeps the original
+  // "in-house/computed" language; CHF/NOK/SEK get a factually accurate note
+  // instead — still flagged (†) since it's a different national release
+  // than USD/AUD/CAD/GBP/NZD/EUR's own headline, but never described as an
+  // estimate or as untracked, since it demonstrably isn't either.
+  //
   // investigated why JPY's Emp Chg magnitude (-360.0K) looked so out of
   // line with USD's (-23.0K) given Japan's smaller population — verified
   // the two aren't comparable because they're not the same TYPE of release,
@@ -1261,9 +1300,14 @@
   // accurate data, but they don't carry the same evidentiary weight, so a
   // reader comparing magnitudes across the column should know which is
   // which.
-  const EMP_PROXY_CCY = new Set(['JPY', 'CHF', 'NOK', 'SEK']);
-  const EMP_PROXY_NOTE = 'In-house estimate, not an officially-tracked headline release ' +
+  const EMP_COMPUTED_CCY = new Set(['JPY']);
+  const EMP_COMPUTED_NOTE = 'In-house estimate, not an officially-tracked headline release ' +
     '(unlike USD/AUD/CAD/GBP/NZD/EUR\u2019s native Employment Change-equivalent).';
+  const EMP_EUROSTAT_CCY = new Set(['CHF', 'NOK', 'SEK']);
+  const EMP_EUROSTAT_NOTE = 'Eurostat-compiled Employment Change (harmonized Labour Force ' +
+    'Survey) \u2014 a real, published release, just a different national series than ' +
+    'USD/AUD/CAD/GBP/NZD/EUR\u2019s own headline Employment Change.';
+  const EMP_PROXY_CCY = new Set([...EMP_COMPUTED_CCY, ...EMP_EUROSTAT_CCY]);
 
   // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
   // Purely a display convenience so YoY/QoQ/MoM/Annualized prints are never
@@ -1305,10 +1349,35 @@
   // subtext in the same column. The reference-period tag is still visible
   // inside the cell's own event title/tooltip \u2014 only the subtext line
   // changed. See CHANGELOG.md v8.391.0.
+  // v2.6.2 (2026-09-06): some sources (TE's "Related" table — see
+  // fetch_te_employment_change.py / fetch_te_core_inflation.py /
+  // fetch_te_nzd_ind_prod.py) only publish a reference MONTH+YEAR ("Jun
+  // 2026"), never an exact release day. Those fetchers store dateISO with
+  // a synthetic "-01" day so the event still sorts/dedupes correctly, but
+  // that "01" was never a real release date and must not be displayed as
+  // one — Santiago flagged this from a live tooltip showing a fabricated
+  // day. Events from those fetchers carry `dayPrecision:'month'`; this
+  // function checks that flag and falls back to a bare month for them,
+  // while every other event (a real day-precise release date) keeps the
+  // existing "DD Mon" format unchanged.
   function refLabel(ev) {
     const d = new Date(ev.dateISO + 'T00:00:00Z');
     if (isNaN(d)) return ev.dateISO;
+    if (ev.dayPrecision === 'month') {
+      return d.toLocaleDateString('en', { month: 'short', timeZone: 'UTC' });
+    }
     return d.toLocaleDateString('en', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+  }
+
+  // Same month-only-precision awareness as refLabel(), for the tooltip's
+  // full date string — showing a raw "2026-06-01" ISO date in the tooltip
+  // has the identical fabricated-day problem as the subtext line did.
+  function refDateForTooltip(ev) {
+    if (ev.dayPrecision === 'month') {
+      const d = new Date(ev.dateISO + 'T00:00:00Z');
+      if (!isNaN(d)) return d.toLocaleDateString('en', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    }
+    return ev.dateISO;
   }
 
   // ── Value parsing \u2014 sign-aware, unit-agnostic ──────────────────────────────
@@ -1573,8 +1642,9 @@
     const ref = refLabel(ev);
     const sub = (period ? period + ' \u00b7 ' : '') + ref;
     const isEmpProxy = gapKey === 'emp' && EMP_PROXY_CCY.has(ccy);
-    let title = ev.event + ' \u00b7 ' + ev.dateISO + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
-    if (isEmpProxy) title += ' \u00b7 ' + EMP_PROXY_NOTE;
+    let title = ev.event + ' \u00b7 ' + refDateForTooltip(ev) + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
+    if (gapKey === 'emp' && EMP_COMPUTED_CCY.has(ccy)) title += ' \u00b7 ' + EMP_COMPUTED_NOTE;
+    else if (gapKey === 'emp' && EMP_EUROSTAT_CCY.has(ccy)) title += ' \u00b7 ' + EMP_EUROSTAT_NOTE;
     const marker = isEmpProxy
       ? '<sup style="color:var(--text3);font-size:8px;margin-left:2px;">\u2020</sup>'
       : '';
