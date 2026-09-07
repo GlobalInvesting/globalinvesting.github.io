@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-07T09:01:18Z",
-  "generatedAt": "2026-09-07T09:01:18Z",
+  "lastUpdate": "2026-09-07T09:06:59Z",
+  "generatedAt": "2026-09-07T09:06:59Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1417,6 +1417,11 @@
       "n": 2,
       "mean": 0.2,
       "std": 0.0
+    },
+    "EUR/gdp growth rate yoy": {
+      "n": 2,
+      "mean": 0.35,
+      "std": 0.212132
     },
     "EUR/netherlands inflation rate yoy": {
       "n": 2,
@@ -49085,7 +49090,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area GDP Growth Rate YoY",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.2%",
       "forecast": "1.0%",
       "previous": "0.5%"
     },
@@ -49163,7 +49168,7 @@
       "flag": "🇪🇺",
       "event": "Greece Balance of Trade",
       "impact": "medium",
-      "actual": null,
+      "actual": "€-3.1B",
       "forecast": "€-2.9B",
       "previous": "€-2.6B"
     },
