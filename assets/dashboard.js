@@ -11134,11 +11134,57 @@ async function fetchCarryData() {
 async function fetchCrossAssetData() {
   // stooq() helper removed — yfinance JSON used exclusively
 
+  // v8.406.0: which G10 currency (if any) has a bank holiday today, per
+  // calendar-data/ff_calendar.json's `holidays[]` field (now reliably
+  // persisted — see fetch_ff_calendar.py v3.56.0 / GUIDELINES.md). Used to
+  // show a "Closed — holiday" state instead of a misleading "→ +0.00%" on
+  // instruments whose home market isn't trading today. Same cache-busting
+  // bucket pattern already used by calendar-panel.js's fetchEconomicCalendar()
+  // — ./calendar-data/ is already in sw.js's DATA_PATH_PREFIXES, no SW change
+  // needed. Best-effort: any failure here just means no closed badge shows,
+  // never blocks the rest of the panel.
+  let _caHolidayCcys = new Set();
+  try {
+    const _cb = '?_=' + Math.floor(Date.now() / 120000);
+    const _ffRes = await fetch('./calendar-data/ff_calendar.json' + _cb, { cache: 'no-store' });
+    if (_ffRes.ok) {
+      const _ffJson = await _ffRes.json();
+      const _todayIso = new Date().toISOString().slice(0, 10);
+      for (const h of (_ffJson?.holidays || [])) {
+        if (h?.dateISO === _todayIso && h?.currency) _caHolidayCcys.add(h.currency.toUpperCase());
+      }
+    }
+  } catch {}
+
+  // Which currency's holiday closes each cross-asset symbol's home market.
+  // btc deliberately excluded — trades 24/7, no exchange holiday applies.
+  const CA_HOLIDAY_CCY_MAP = {
+    gold: 'USD', wti: 'USD', spx: 'USD', dxy: 'USD', us10y: 'USD',
+    nikkei: 'JPY', stoxx: 'EUR',
+  };
+  function _caClosedCcy(id) {
+    const ccy = CA_HOLIDAY_CCY_MAP[id];
+    return (ccy && _caHolidayCcys.has(ccy)) ? ccy : null;
+  }
+
   function setCA(id, val, chgPct, isYield, chgAbs) {
     const vEl = document.getElementById('ca-' + id);
     const cEl = document.getElementById('cac-' + id);
     if (!vEl || !cEl) return;
     if (val == null) return;
+    const closedCcy = _caClosedCcy(id);
+    if (closedCcy) {
+      // Market genuinely closed for a holiday — show the last known price
+      // (still useful context) but never a fabricated "+0.00%" move.
+      vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
+      vEl.className = 'ca-val flat';
+      cEl.textContent = closedCcy + ' holiday — closed';
+      cEl.className = 'ca-chg flat';
+      cEl.style.opacity = '0.65';
+      return;
+    } else {
+      cEl.style.removeProperty('opacity');
+    }
     if (chgPct == null) {
       vEl.textContent = isYield ? val.toFixed(2) + '%' : val.toLocaleString(undefined, { maximumFractionDigits: val > 100 ? 2 : 4 });
       vEl.className = 'ca-val flat';
