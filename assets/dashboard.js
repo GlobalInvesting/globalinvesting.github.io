@@ -2196,13 +2196,47 @@ const STOOQ_RT_CACHE = {};
 window.STOOQ_RT_CACHE = STOOQ_RT_CACHE;  
 
 let _CA_HOLIDAY_CCYS = new Set();
+
 const CA_HOLIDAY_CCY_MAP = {
-  gold: 'USD', wti: 'USD', spx: 'USD', dxy: 'USD', us10y: 'USD',
   nikkei: 'JPY', stoxx: 'EUR',
 };
+
+const CME_FULL_CLOSURE_DATES_USD = new Set([
+  '2026-04-03',
+  '2026-12-25',
+]);
+const CME_PARTIAL_PAUSE_USD = {
+  '2026-01-19': ['18:00', '23:00', '19:30', '23:00'],
+  '2026-02-16': ['18:00', '23:00', '19:30', '23:00'],
+  '2026-05-25': ['17:00', '22:00', '18:30', '22:00'],
+  '2026-09-07': ['17:00', '22:00', '18:30', '22:00'],
+  '2026-11-26': ['18:00', '23:00', '19:30', '23:00'],
+};
+const CA_PARTIAL_PAUSE_GROUP = { spx: 'equityRate', us10y: 'equityRate', gold: 'energyMetal', wti: 'energyMetal' };
+
+function _utcHHMMToday(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  const now = new Date();
+  return Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), h, m);
+}
+
 function _caClosedCcy(id) {
   const ccy = CA_HOLIDAY_CCY_MAP[id];
-  return (ccy && _CA_HOLIDAY_CCYS.has(ccy)) ? ccy : null;
+  if (ccy && _CA_HOLIDAY_CCYS.has(ccy)) return ccy;
+
+  const todayIso = new Date().toISOString().slice(0, 10);
+  if (['gold', 'wti', 'spx', 'dxy', 'us10y'].includes(id) && _CA_HOLIDAY_CCYS.has('USD')) {
+    if (CME_FULL_CLOSURE_DATES_USD.has(todayIso)) return 'USD';
+    const group = CA_PARTIAL_PAUSE_GROUP[id];
+    const pause = group && CME_PARTIAL_PAUSE_USD[todayIso];
+    if (pause) {
+      const [eqStart, eqEnd, enStart, enEnd] = pause;
+      const [startHHMM, endHHMM] = group === 'equityRate' ? [eqStart, eqEnd] : [enStart, enEnd];
+      const nowMs = Date.now();
+      if (nowMs >= _utcHHMMToday(startHHMM) && nowMs < _utcHHMMToday(endHHMM)) return 'USD';
+    }
+  }
+  return null;
 }
 
 
