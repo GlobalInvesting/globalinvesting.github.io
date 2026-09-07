@@ -1,6 +1,20 @@
 /**
  * econ-matrix.js v2.6.3 — Native Economic Matrix panel
  *
+ * ── v2.6.4 (2026-09-06) — CHF/NOK/SEK's emp column prefix list read the
+ *    bare 'Employment Change' title, which carries no MoM/YoY/QoQ substring
+ *    for periodTag() to match — even though this figure is a genuine
+ *    Eurostat-compiled QUARTERLY % change (see fetch_te_employment_change.py's
+ *    own header). Live-verified this was the one column in the Economic
+ *    Matrix showing a bare percentage with no period badge, next to every
+ *    other classified cell in the same row. Fetcher v1.6 now emits
+ *    'Employment Change QoQ'; the three prefix lists here updated to match
+ *    in the same change. Same session: re-applied two prior-session
+ *    _IMPACT_UPGRADES fixes ("cpif", "manufacturing production") that a
+ *    fresh zip export showed had never actually reached fetch_ff_calendar.py
+ *    (v8.161.5 pattern again), plus a new one ("swedbank manufacturing
+ *    pmi") for a live report that SEK's Bus Cond cell was 3 months stale —
+ *    see fetch_ff_calendar.py v3.54.0 and CHANGELOG.md.
  * ── v2.6.3 (2026-09-06) — NOK's gdp column prefix list only ever listed
  *    'GDP Growth Rate QoQ' (nationwide, incl. petroleum), never 'GDP
  *    Growth Mainland QoQ' (Norges Bank's own preferred, ex-petroleum GDP
@@ -1042,7 +1056,10 @@
       // equivalent — no bilateral agreement, no "Employment Change" listed
       // anywhere in TE's Japan indicator menu).
       // Fetched by fetch_te_employment_change.py v1.1.
-      emp:   ['Employment Change'],
+      // v2.6.4: title changed to 'Employment Change QoQ' (fetcher v1.6) so
+      // periodTag() can show the QoQ badge this genuinely-quarterly figure
+      // was missing — see fetch_te_employment_change.py's v1.6 header.
+      emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production YoY'],
       conf:  ['procure.ch Manufacturing PMI'],
@@ -1171,7 +1188,9 @@
       // never populates a matching event, this cell simply stays blank,
       // same as before \u2014 see fetch_te_employment_change.py before
       // assuming it's broken.
-      emp:   ['Employment Change'],
+      // v2.6.4: title changed to 'Employment Change QoQ' (fetcher v1.6),
+      // matching CHF/NOK's identical fix \u2014 see that file's v1.6 header.
+      emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
       // v2.5.14 (2026-08-30): CORRECTION — 'prod' had only ever listed
       // 'Industrial Production YoY', same omission class as this
@@ -1223,7 +1242,9 @@
       // never populates a matching event, this cell simply stays blank,
       // same as before \u2014 see fetch_te_employment_change.py before
       // assuming it's broken.
-      emp:   ['Employment Change'],
+      // v2.6.4: title changed to 'Employment Change QoQ' (fetcher v1.6),
+      // matching CHF/SEK's identical fix \u2014 see that file's v1.6 header.
+      emp:   ['Employment Change QoQ'],
       unemp: ['Unemployment Rate'],
       prod:  ['Manufacturing Production MoM'],
       conf:  ['Industrial Confidence'],
