@@ -1152,7 +1152,28 @@
       // Sep 2026 horizon) carries CPIF YoY/MoM (headline) and Inflation Rate
       // YoY/MoM but no separate \"CPIF Excluding Energy\" / core title under
       // any name on Myfxbook specifically.
-      core:  ['Core Inflation Rate YoY'],
+      //
+      // v2.6.5 (2026-09-06) — SUPERSEDED AGAIN, by Santiago's explicit
+      // decision, not a live-page correction: the TE-sourced "Core
+      // Inflation Rate YoY" (CPIF-XE, SCB) this cell used since v2.2.7 kept
+      // going stale for months at a time (last real update 1 Jul, 0.6%,
+      // while the rest of the matrix was current) because
+      // fetch_te_core_inflation.py's scrape reliability for this source was
+      // never solid \u2014 see that file's own \"UNVALIDATED\" header notes.
+      // Santiago chose to replace it with Myfxbook's plain \"Inflation Rate
+      // YoY\" (SEK headline CPI \u2014 confirmed live vs Trading Economics:
+      // Jun 0.7%, Jul 0.2%), which the live Myfxbook pipeline already
+      // ingests reliably for the cpi/cpimom-adjacent CPIF titles.
+      // \u26a0\ufe0f THIS IS NOT CORE INFLATION (not ex-food/ex-energy) \u2014 it is
+      // Sweden's headline CPI YoY, a DIFFERENT number from CPIF (the
+      // Riksbank's actual target measure, used in the cpi/cpimom columns
+      // above). Labelled here only because Santiago wanted the freshest
+      // reliably-updating series in this cell over a technically-more-
+      // correct one that kept stalling. See EMP_EUROSTAT_CCY-style tooltip
+      // note wired in below for the on-screen disclosure — do not remove
+      // that note if this mapping is kept, or the column header ("core")
+      // will silently misrepresent this as an ex-volatile-components figure.
+      core:  ['Inflation Rate YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], // both published; YoY preferred per column policy
       // v2.5.10 (2026-08-28): CORRECTION — 'rtl' had only ever listed
       // 'Retail Sales YoY', so the cell was frozen on whatever YoY print
@@ -1363,6 +1384,19 @@
     'Survey) \u2014 a real, published release, just a different national series than ' +
     'USD/AUD/CAD/GBP/NZD/EUR\u2019s own headline Employment Change.';
   const EMP_PROXY_CCY = new Set([...EMP_COMPUTED_CCY, ...EMP_EUROSTAT_CCY]);
+
+  // ── Core CPI column: SEK cell is headline CPI, not core ────────────────────
+  // v2.6.5 (2026-09-06): SEK's 'core' cell was repointed from a stale
+  // TE-sourced CPIF-XE (Core Inflation Rate YoY) to Myfxbook's plain
+  // "Inflation Rate YoY" (Santiago's explicit call, see CATS.SEK.core note
+  // above) — that source updates reliably, but it is Sweden's HEADLINE CPI,
+  // not an ex-food/ex-energy core measure. Flagging the same way EMP_PROXY_CCY
+  // flags NOK/SEK/CHF's Emp Chg cell, so the "core" column header never
+  // silently implies something this cell isn't.
+  const SEK_CORE_IS_HEADLINE_NOTE = 'This is Sweden\u2019s headline CPI YoY (Myfxbook), not an ' +
+    'ex-food/ex-energy core measure \u2014 shown here instead of the more volatile TE-sourced CPIF ' +
+    'excl. Energy series by Santiago\u2019s choice, for reliability. See CPI YoY column for CPIF, ' +
+    'the Riksbank\u2019s actual target measure.';
 
   // ── Period-label detection \u2014 for the per-cell reference-date subtext ──────
   // Purely a display convenience so YoY/QoQ/MoM/Annualized prints are never
@@ -1697,10 +1731,12 @@
     const ref = refLabel(ev);
     const sub = (period ? period + ' \u00b7 ' : '') + ref;
     const isEmpProxy = gapKey === 'emp' && EMP_PROXY_CCY.has(ccy);
+    const isSekCoreHeadline = gapKey === 'core' && ccy === 'SEK';
     let title = ev.event + ' \u00b7 ' + refDateForTooltip(ev) + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
     if (gapKey === 'emp' && EMP_COMPUTED_CCY.has(ccy)) title += ' \u00b7 ' + EMP_COMPUTED_NOTE;
     else if (gapKey === 'emp' && EMP_EUROSTAT_CCY.has(ccy)) title += ' \u00b7 ' + EMP_EUROSTAT_NOTE;
-    const marker = isEmpProxy
+    else if (isSekCoreHeadline) title += ' \u00b7 ' + SEK_CORE_IS_HEADLINE_NOTE;
+    const marker = (isEmpProxy || isSekCoreHeadline)
       ? '<sup style="color:var(--text3);font-size:8px;margin-left:2px;">\u2020</sup>'
       : '';
     return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + _emxEscHtml(title) + '">' +
