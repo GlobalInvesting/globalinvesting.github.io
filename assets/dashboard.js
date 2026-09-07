@@ -3014,6 +3014,29 @@ function intradayQuote(cache, id) {
 const STOOQ_RT_CACHE = {};  // id → { close, open, chg, pct }
 window.STOOQ_RT_CACHE = STOOQ_RT_CACHE;  // expose for fx-websocket.js (const doesn't auto-bind to window)
 
+// v8.407.0: which G10 currency (if any) has a bank holiday today, per
+// calendar-data/ff_calendar.json's `holidays[]`. Hoisted to module scope
+// (was previously a local inside fetchCrossAssetData()) because setCA_rt()
+// — the real-time Finnhub-tick path inside updateFxPairsTableRT() — writes
+// to the same ca-gold/ca-wti DOM nodes on every tick and needs the same
+// closed-state check; a local variable scoped only to fetchCrossAssetData()
+// left setCA_rt() blind to it, so a Finnhub tick landing after the 2-min
+// fetchCrossAssetData() refresh silently overwrote "USD holiday — closed"
+// with a fabricated "→ +0.00%" a few seconds later. Populated by
+// fetchCrossAssetData() (which owns the ff_calendar.json fetch); read by
+// both setCA() and setCA_rt(). Which cross-asset symbol's home market is
+// closed by which currency's holiday. btc deliberately excluded — trades
+// 24/7, no exchange holiday applies to it.
+let _CA_HOLIDAY_CCYS = new Set();
+const CA_HOLIDAY_CCY_MAP = {
+  gold: 'USD', wti: 'USD', spx: 'USD', dxy: 'USD', us10y: 'USD',
+  nikkei: 'JPY', stoxx: 'EUR',
+};
+function _caClosedCcy(id) {
+  const ccy = CA_HOLIDAY_CCY_MAP[id];
+  return (ccy && _CA_HOLIDAY_CCYS.has(ccy)) ? ccy : null;
+}
+
 // proxyUrls / proxyUrlsYahoo removed — all data now comes from
 // intraday-data/quotes.json (yfinance via GitHub Action, same-origin).
 // No CORS proxies needed.
@@ -3192,6 +3215,19 @@ function updateFxPairsTableRT() {
     const vEl = document.getElementById('ca-' + caId);
     const cEl = document.getElementById('cac-' + caId);
     if (!vEl || !cEl) return;
+    // v8.407.0: a Finnhub tick must not clobber the holiday-closed badge
+    // that fetchCrossAssetData()'s setCA() already rendered — same check,
+    // shared module-level state (see _CA_HOLIDAY_CCYS above).
+    const closedCcy = _caClosedCcy(caId);
+    if (closedCcy) {
+      vEl.textContent = data.close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      vEl.className = 'ca-val flat';
+      cEl.textContent = closedCcy + ' holiday — closed';
+      cEl.className = 'ca-chg flat';
+      cEl.style.opacity = '0.65';
+      return;
+    }
+    cEl.style.removeProperty('opacity');
     const cls   = data.pct > 0.05 ? 'up' : data.pct < -0.05 ? 'down' : '';
     const arrow = data.pct > 0.05 ? '▲' : data.pct < -0.05 ? '▼' : '→';
     const sign  = data.pct >= 0 ? '+' : '';
@@ -11134,38 +11170,30 @@ async function fetchCarryData() {
 async function fetchCrossAssetData() {
   // stooq() helper removed — yfinance JSON used exclusively
 
-  // v8.406.0: which G10 currency (if any) has a bank holiday today, per
-  // calendar-data/ff_calendar.json's `holidays[]` field (now reliably
-  // persisted — see fetch_ff_calendar.py v3.56.0 / GUIDELINES.md). Used to
-  // show a "Closed — holiday" state instead of a misleading "→ +0.00%" on
-  // instruments whose home market isn't trading today. Same cache-busting
-  // bucket pattern already used by calendar-panel.js's fetchEconomicCalendar()
-  // — ./calendar-data/ is already in sw.js's DATA_PATH_PREFIXES, no SW change
-  // needed. Best-effort: any failure here just means no closed badge shows,
-  // never blocks the rest of the panel.
-  let _caHolidayCcys = new Set();
+  // v8.406.0/v8.407.0: which G10 currency (if any) has a bank holiday today,
+  // per calendar-data/ff_calendar.json's `holidays[]` field (now reliably
+  // persisted — see fetch_ff_calendar.py v3.56.0 / GUIDELINES.md). Refreshes
+  // the module-level _CA_HOLIDAY_CCYS (declared near STOOQ_RT_CACHE) so both
+  // this function's setCA() and updateFxPairsTableRT()'s setCA_rt() (the
+  // Finnhub real-time tick path) see the same closed-state — see that
+  // declaration's comment for why this was hoisted out of a function-local.
+  // Same cache-busting bucket pattern already used by calendar-panel.js's
+  // fetchEconomicCalendar() — ./calendar-data/ is already in sw.js's
+  // DATA_PATH_PREFIXES, no SW change needed. Best-effort: any failure here
+  // just means no closed badge shows, never blocks the rest of the panel.
   try {
     const _cb = '?_=' + Math.floor(Date.now() / 120000);
     const _ffRes = await fetch('./calendar-data/ff_calendar.json' + _cb, { cache: 'no-store' });
     if (_ffRes.ok) {
       const _ffJson = await _ffRes.json();
       const _todayIso = new Date().toISOString().slice(0, 10);
+      const _next = new Set();
       for (const h of (_ffJson?.holidays || [])) {
-        if (h?.dateISO === _todayIso && h?.currency) _caHolidayCcys.add(h.currency.toUpperCase());
+        if (h?.dateISO === _todayIso && h?.currency) _next.add(h.currency.toUpperCase());
       }
+      _CA_HOLIDAY_CCYS = _next;
     }
   } catch {}
-
-  // Which currency's holiday closes each cross-asset symbol's home market.
-  // btc deliberately excluded — trades 24/7, no exchange holiday applies.
-  const CA_HOLIDAY_CCY_MAP = {
-    gold: 'USD', wti: 'USD', spx: 'USD', dxy: 'USD', us10y: 'USD',
-    nikkei: 'JPY', stoxx: 'EUR',
-  };
-  function _caClosedCcy(id) {
-    const ccy = CA_HOLIDAY_CCY_MAP[id];
-    return (ccy && _caHolidayCcys.has(ccy)) ? ccy : null;
-  }
 
   function setCA(id, val, chgPct, isYield, chgAbs) {
     const vEl = document.getElementById('ca-' + id);
