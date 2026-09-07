@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-07T08:07:01Z",
-  "generatedAt": "2026-09-07T08:07:01Z",
+  "lastUpdate": "2026-09-07T08:32:59Z",
+  "generatedAt": "2026-09-07T08:32:59Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1250,8 +1250,8 @@
     },
     "EUR/germany industrial production mom": {
       "n": 3,
-      "mean": -0.2,
-      "std": 1.081665
+      "mean": -0.133333,
+      "std": 0.971253
     },
     "GBP/halifax house price index mom": {
       "n": 2,
@@ -48941,7 +48941,7 @@
       "event": "Germany Industrial Production MoM",
       "impact": "medium",
       "actual": "-1.1%",
-      "forecast": "0.3%",
+      "forecast": "0.1%",
       "previous": "0.0%"
     },
     {
@@ -49051,6 +49051,19 @@
     {
       "date": "7 Sep",
       "dateISO": "2026-09-07",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Chancellor John Healey Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "7 Sep",
+      "dateISO": "2026-09-07",
       "timeUTC": "09:00",
       "country": "EUR",
       "currency": "EUR",
@@ -49138,19 +49151,6 @@
       "actual": null,
       "forecast": "€-2.9B",
       "previous": "€-2.6B"
-    },
-    {
-      "date": "7 Sep",
-      "dateISO": "2026-09-07",
-      "timeUTC": "12:30",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom Chancellor John Healey Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "7 Sep",
