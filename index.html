@@ -85,10 +85,21 @@ gtag('consent', 'default', {
 
 <!-- ═══════════════════════════════════════
      Favicon
-     ═══════════════════════════════════════ -->
+     ═══════════════════════════════════════
+     192x192 listed FIRST — Google's own favicon guidelines require a
+     square PNG whose side is a multiple of 48px to render sharp in search
+     results; this file already existed in the repo (verified 192x192,
+     not mislabeled) but was never declared in <head>, so Googlebot only
+     ever saw the 32x32 tag below and served that low-res version,
+     cached, in search results. 32x32/16x16 kept for browser tab
+     rendering (where a small icon is actually correct), apple-touch-icon
+     for iOS home-screen bookmarks, and an explicit shortcut icon link
+     for older browsers that don't infer it from /favicon.ico alone. -->
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="shortcut icon" href="/favicon.ico">
 
 <!-- ═══════════════════════════════════════
      Structured Data — WebSite + WebApplication
