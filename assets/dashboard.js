@@ -8606,7 +8606,7 @@ async function fetchCrossAssetData() {
 
   try {
     const _cb = '?_=' + Math.floor(Date.now() / 120000);
-    const _ffRes = await fetch('./calendar-data/ff_calendar.json' + _cb, { cache: 'no-store' });
+    const _ffRes = await fetch('./calendar-data/economic-events.json' + _cb, { cache: 'no-store' });
     if (_ffRes.ok) {
       const _ffJson = await _ffRes.json();
       const _todayIso = new Date().toISOString().slice(0, 10);
@@ -10578,7 +10578,7 @@ const ECO_FP_KEY = 'gi_eco_fp';
 
 async function _buildEcoActualFp(currencies) {
   try {
-    const res = await fetch('./calendar-data/ff_calendar.json', { cache: 'no-store' }).catch(() => null);
+    const res = await fetch('./calendar-data/economic-events.json', { cache: 'no-store' }).catch(() => null);
     if (!res?.ok) return null;
     const ffj = await res.json();
     const todayISO = new Date().toISOString().slice(0, 10);
@@ -12054,7 +12054,7 @@ async function renderEconSurprises() {
 
   if (!calEvents.length) {
     try {
-      const res2 = await fetch('./calendar-data/ff_calendar.json').catch(() => null);
+      const res2 = await fetch('./calendar-data/economic-events.json').catch(() => null);
       if (res2?.ok) {
         const ffj = await res2.json();
         const win21 = 21 * 24 * 60 * 60 * 1000;

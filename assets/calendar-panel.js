@@ -1369,7 +1369,7 @@
     try {
       const _cb = '?_=' + Math.floor(Date.now() / 120000);
       const [ffRes, calRes] = await Promise.all([
-        fetch('./calendar-data/ff_calendar.json' + _cb, { cache: 'no-store' }).catch(() => null),
+        fetch('./calendar-data/economic-events.json' + _cb, { cache: 'no-store' }).catch(() => null),
         fetch('./calendar-data/calendar.json' + _cb, { cache: 'no-store' }).catch(() => null)
       ]);
       const ffJson  = ffRes?.ok  ? await ffRes.json().catch(() => null)  : null;
