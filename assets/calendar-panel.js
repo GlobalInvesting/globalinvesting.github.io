@@ -1355,9 +1355,17 @@
       let source   = ffJson?.source || calJson?.source || 'ForexFactory';
       let holidays = Array.isArray(ffJson?.holidays) ? ffJson.holidays : [];
 
-      const todayISO = new Date().toISOString().slice(0, 10);
-      const ffPastDates = new Set(ffEvents.filter(e => e.dateISO < todayISO).map(e => e.dateISO));
-      if (ffPastDates.size < 2 && calEvents.length) {
+      // Always fill in any calendar.json event not already present in
+      // ff_calendar.json (keyed on currency+dateISO+time+title), regardless
+      // of ff_calendar.json's own health. This used to be gated behind
+      // `ffPastDates.size < 2` (only merge when ff_calendar.json itself
+      // looked degraded/stale) — that gate meant a healthy Myfxbook feed
+      // silently hid every secondary-source event (the calendar-completeness
+      // backfill's new AUD/JPY/etc. events, or any future genuine gap-fill),
+      // even though calendar.json is already merge-only / never overwrites
+      // an existing ff_calendar.json value, so there was no real conflict
+      // risk it was ever protecting against. See CHANGELOG.md v8.421.0.
+      if (calEvents.length) {
         const seen = new Set(ffEvents.map(e => `${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
         const fill = calEvents.filter(e => !seen.has(`${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
         events = ffEvents.concat(fill);
