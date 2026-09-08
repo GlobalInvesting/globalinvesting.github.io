@@ -4670,7 +4670,7 @@ async function _renderLWChart(ohlcId, label) {
       };
       const relevantCBs = _CB_MAP[ohlcId] || [];
       if (relevantCBs.length === 0) return;
-      const mtgData = window._STATE_meetings || await fetch('./meetings-data/meetings.json')
+      const mtgData = window._STATE_meetings || await fetch('./meetings-data/meetings.json', { cache: 'no-store' })
         .then(r => r.ok ? r.json() : null).catch(() => null);
       if (!mtgData?.meetings) return;
       const barDates = new Set(bars.map(b => b.time));
@@ -8823,7 +8823,7 @@ async function fetchFedExpectations() {
     if (!tbody) return;
 
     const [meetingsRes, ...rateResponses] = await Promise.all([
-      fetch('./meetings-data/meetings.json').then(r => r.ok ? r.json() : null).catch(() => null),
+      fetch('./meetings-data/meetings.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
       ...['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].map(c =>
         fetch(`./rates/${c}.json`).then(r => r.ok ? r.json() : null).catch(() => null)
       )
