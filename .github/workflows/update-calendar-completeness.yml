@@ -1,19 +1,8 @@
 name: Update Calendar Completeness (secondary source)
 
-# Weekly full-calendar refresh from a secondary calendar source (see the
-# private scripts repo for source details) — this workflow's job is
-# calendar COMPLETENESS (new events, real per-event impact tags) rather
-# than minute-level actuals speed. The existing minute-level pipeline
-# (update-ff-calendar.yml) stays on its own tight schedule and now acts
-# as the fast-actuals fallback layer between this workflow's weekly
-# passes. Merge-only writer discipline (never overwrites an existing
-# non-null actual/previous/forecast/impact) means running this alongside
-# the existing calendar pipeline is safe by construction — see the
-# private script's merge_full_events_into_calendar().
-
 on:
   schedule:
-    - cron: '0 3 * * 1'   # every Monday, 03:00 UTC
+    - cron: '0 3 * * 1'
   workflow_dispatch:
 
 env:
