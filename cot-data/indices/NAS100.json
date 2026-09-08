@@ -1,21 +1,20 @@
 {
-  "netPosition": -14535,
-  "longPositions": 49901,
-  "shortPositions": 64436,
+  "netPosition": -10559,
+  "longPositions": 55330,
+  "shortPositions": 65889,
   "positionCategory": "Leveraged Funds (speculative)",
   "secondaryCategory": "Asset Manager/Institutional",
   "tertiaryCategory": "Dealer/Intermediary",
   "assetClass": "equityIndex",
-  "displayName": "Nasdaq-100",
-  "openInterestTotal": 355834,
-  "contractMultiplier": 20,
-  "contractUnit": "USD",
-  "assetManagerNet": 71642,
+  "displayName": "Nasdaq 100",
+  "assetManagerNet": 70632,
   "assetManagerLong": 108635,
   "assetManagerShort": 36993,
-  "dealerNet": -71089,
+  "dealerNet": -80148,
   "dealerLong": 58023,
   "dealerShort": 129112,
+  "wowNetChange": 26175,
+  "levNetPctOI": -8.7,
   "history": [
     {
       "weekEnding": "2022-02-08",
@@ -1915,19 +1914,19 @@
     },
     {
       "weekEnding": "2026-08-25",
-      "levNet": -39846,
-      "levLong": 47192,
-      "levShort": 87038,
-      "assetManagerNet": 72960,
-      "dealerNet": -57058
+      "levNet": -36734,
+      "levLong": 52354,
+      "levShort": 89088,
+      "assetManagerNet": 71945,
+      "dealerNet": -65630
     },
     {
       "weekEnding": "2026-09-01",
-      "levNet": -14535,
-      "levLong": 49901,
-      "levShort": 64436,
-      "assetManagerNet": 71642,
-      "dealerNet": -71089
+      "levNet": -10559,
+      "levLong": 55330,
+      "levShort": 65889,
+      "assetManagerNet": 70632,
+      "dealerNet": -80148
     }
   ],
   "sourceType": "options_futures_combined",
