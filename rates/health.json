@@ -1,6 +1,6 @@
 {
-  "runTimestamp": "2026-09-07T14:08:24.046335Z",
-  "runDate": "2026-09-07",
+  "runTimestamp": "2026-09-08T08:35:53.547560Z",
+  "runDate": "2026-09-08",
   "frankfurterOk": true,
   "currencies": {
     "USD": {
@@ -21,7 +21,7 @@
       "status": "ok",
       "rate": "3.75",
       "source": "BoE-CSV",
-      "date": "2026-09-04",
+      "date": "2026-09-07",
       "issues": []
     },
     "JPY": {
@@ -49,7 +49,7 @@
       "status": "ok",
       "rate": "0.00",
       "source": "SNB-scraping",
-      "date": "2026-09-07",
+      "date": "2026-09-08",
       "issues": []
     },
     "NZD": {
@@ -75,9 +75,6 @@
     }
   },
   "issues": [],
-  "warnings": [
-    "CAD: kept cached 2026-09-01 value over older BoC-Valet candidate (2026-08-31) \u2014 likely a laggy fallback source",
-    "NZD: kept cached 2026-09-01 value over older BIS-CBPOL candidate (2026-07-01) \u2014 likely a laggy fallback source"
-  ],
-  "overallStatus": "degraded_cached"
+  "warnings": [],
+  "overallStatus": "ok"
 }
