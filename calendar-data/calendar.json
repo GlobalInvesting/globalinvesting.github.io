@@ -1,98 +1,33 @@
 {
-  "lastUpdate": "2026-09-07T22:54:41Z",
-  "generatedAt": "2026-09-07T22:54:41Z",
+  "lastUpdate": "2026-09-08T00:08:26Z",
+  "generatedAt": "2026-09-08T00:08:26Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Primary + backfill calendar feed",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-09-07",
+  "rangeFrom": "2025-09-08",
   "rangeTo": "2026-09-12",
-  "totalEvents": 3909,
+  "totalEvents": 3906,
   "currencyCounts": {
-    "JPY": 224,
     "EUR": 919,
     "GBP": 443,
     "AUD": 264,
     "USD": 1276,
     "NZD": 96,
     "CAD": 269,
+    "JPY": 221,
     "CHF": 131,
     "SEK": 183,
     "NOK": 104
   },
   "impactCounts": {
-    "medium": 1955,
     "high": 1690,
+    "medium": 1952,
     "low": 264
   },
   "surpriseStats": {
-    "AUD/westpac consumer confidence index": {
-      "n": 3,
-      "mean": 2.366667,
-      "std": 4.398106
-    },
-    "AUD/westpac consumer confidence change": {
-      "n": 3,
-      "mean": 2.833333,
-      "std": 5.259594
-    },
-    "AUD/nab business confidence": {
-      "n": 3,
-      "mean": 5.0,
-      "std": 4.358899
-    },
-    "NOK/ppi yoy": {
-      "n": 2,
-      "mean": 3.45,
-      "std": 7.707464
-    },
-    "EUR/industrial production mom": {
-      "n": 6,
-      "mean": -0.016667,
-      "std": 0.348807
-    },
-    "EUR/balance of trade": {
-      "n": 6,
-      "mean": -1.382833,
-      "std": 6.773348
-    },
-    "CAD/balance of trade": {
-      "n": 4,
-      "mean": -0.1275,
-      "std": 1.870247
-    },
-    "USD/imports": {
-      "n": 4,
-      "mean": -0.025,
-      "std": 2.991516
-    },
-    "USD/exports": {
-      "n": 4,
-      "mean": 1.65,
-      "std": 2.511971
-    },
-    "USD/balance of trade": {
-      "n": 4,
-      "mean": 0.55,
-      "std": 0.750555
-    },
-    "USD/existing home sales mom": {
-      "n": 3,
-      "mean": -0.466667,
-      "std": 2.936551
-    },
-    "USD/existing home sales": {
-      "n": 3,
-      "mean": -0.0,
-      "std": 0.105357
-    },
-    "USD/api crude oil stock change": {
-      "n": 12,
-      "mean": 1.09625,
-      "std": 4.600028
-    },
     "NOK/inflation rate yoy": {
       "n": 2,
       "mean": 0.25,
@@ -112,6 +47,11 @@
       "n": 3,
       "mean": 0.2,
       "std": 0.1
+    },
+    "EUR/industrial production mom": {
+      "n": 5,
+      "mean": -0.02,
+      "std": 0.389872
     },
     "USD/cpi s.a": {
       "n": 3,
@@ -293,6 +233,11 @@
       "mean": -0.5,
       "std": 0.57735
     },
+    "EUR/balance of trade": {
+      "n": 5,
+      "mean": -1.5594,
+      "std": 7.55738
+    },
     "EUR/italy balance of trade": {
       "n": 3,
       "mean": -0.370667,
@@ -367,6 +312,11 @@
       "n": 4,
       "mean": 0.0065,
       "std": 0.045996
+    },
+    "USD/api crude oil stock change": {
+      "n": 11,
+      "mean": 1.715818,
+      "std": 4.267232
     },
     "NZD/current account": {
       "n": 2,
@@ -1268,6 +1218,26 @@
       "mean": -0.5,
       "std": 1.697056
     },
+    "CAD/balance of trade": {
+      "n": 3,
+      "mean": -0.21,
+      "std": 2.281644
+    },
+    "USD/balance of trade": {
+      "n": 3,
+      "mean": 0.666667,
+      "std": 0.873689
+    },
+    "USD/imports": {
+      "n": 3,
+      "mean": 1.3,
+      "std": 1.7
+    },
+    "USD/exports": {
+      "n": 3,
+      "mean": 2.866667,
+      "std": 0.763763
+    },
     "CAD/ivey pmi s.a": {
       "n": 3,
       "mean": 1.6,
@@ -1307,6 +1277,16 @@
       "n": 2,
       "mean": 11.9,
       "std": 4.949747
+    },
+    "USD/existing home sales mom": {
+      "n": 2,
+      "mean": -2.05,
+      "std": 1.484924
+    },
+    "USD/existing home sales": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.084853
     },
     "EUR/italy industrial production mom": {
       "n": 2,
@@ -1357,6 +1337,21 @@
       "n": 2,
       "mean": -0.85,
       "std": 0.494975
+    },
+    "AUD/westpac consumer confidence index": {
+      "n": 2,
+      "mean": 4.25,
+      "std": 4.17193
+    },
+    "AUD/westpac consumer confidence change": {
+      "n": 2,
+      "mean": 5.1,
+      "std": 4.949747
+    },
+    "AUD/nab business confidence": {
+      "n": 2,
+      "mean": 3.5,
+      "std": 4.949747
     },
     "CAD/manufacturing sales mom": {
       "n": 4,
@@ -1475,42 +1470,6 @@
     }
   },
   "events": [
-    {
-      "currency": "JPY",
-      "event": "Current Account",
-      "dateISO": "2025-09-07",
-      "actual": "¥2684B",
-      "forecast": "3366.0",
-      "previous": "1348.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "23:50"
-    },
-    {
-      "currency": "JPY",
-      "event": "GDP Growth Rate QoQ",
-      "dateISO": "2025-09-07",
-      "actual": "0.5%",
-      "forecast": "0.3",
-      "previous": "0.1",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "23:50"
-    },
-    {
-      "currency": "JPY",
-      "event": "GDP Growth Annualized",
-      "dateISO": "2025-09-07",
-      "actual": "2.2%",
-      "forecast": "1.0",
-      "previous": "0.3",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "23:50"
-    },
     {
       "currency": "EUR",
       "event": "Balance of Trade",
