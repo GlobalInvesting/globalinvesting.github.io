@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-08T11:47:06Z",
+  "generated_at": "2026-09-08T15:24:22Z",
   "signals": [
     {
-      "time": "11:45",
+      "time": "15:23",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + JPY Carry Unwind",
-      "text": "The G10 Currency Strength Scorecard registers a dominant bilateral spread of 1.865%, with JPY leading G10 peers at +1.081% across 7 pairs and NZD lagging at -0.784% across 4 pairs. Escalating Middle East geopolitical tensions and Houthi strikes on Saudi energy facilities drive a broad unwind of JPY short positioning. This surge occurs despite a severe carry deficit, with RBNZ at 2.75% vs BoJ at 1.0% yielding a +175bp nominal and +275bp NZD/CHF equivalent cross differential favoring NZD. JPY speculative positioning sits stretched at net short -111,297 contracts (52w pctl 2, z -2.18), exposing the currency to aggressive squeeze dynamics when global risk appetite falters. Concurrently, NZD suffers from domestic data underperformance, marked by an ESI reading of -3.3. Technicals reflect heavy distribution, with NZD/USD holding below its SMA20 of 0.5910 while USD/JPY breaks below its SMA20/50/200 cluster at 158.44-160.33 to trade at 154.25. Trade bias: Bearish NZD/JPY, cross-underperformance driven by JPY short covering. Catalyst: BoJ meeting 18 Sep. Risk: Easing Middle East geopolitical friction revives high-beta carry demand.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Geopolitical Shock",
+      "text": "NZD/JPY sits under acute selling pressure as JPY dominates G10 performance while NZD lags across the board. Middle East maritime escalation following the IRGC capture of a US submersible at the Strait of Hormuz has triggered a broad risk-off impulse, driving JPY 1W average performance to +0.925% (n=7) while NZD falls to -0.649% (n=4). The resulting 1.574% G10 spread establishes NZD/JPY as the primary bilateral trend in the G10 space. Technicals confirm the breakdown, with spot trading below its model fair value while Japanese data outperformance (ESI +28.7) provides fundamental support for JPY gains despite . Trade bias: Bearish NZD/JPY; severe risk-off flow and cross-G10 divergence override carry considerations. Catalyst: ECB President Lagarde speaks at 17:00 UTC and US PPI data on 10 Sep. Risk: De-escalation headlines in the Middle East cause a rapid unwinding of safe-haven JPY demand.",
       "evidence": [
-        "JPY 1W avg: +1.081% (n=7)",
-        "NZD 1W avg: -0.784% (n=4)",
-        "G10 spread: 1.865%"
+        "JPY 1W avg: +0.925% (n=7)",
+        "NZD 1W avg: -0.649% (n=4)",
+        "G10 spread: 1.574%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:42",
+      "time": "15:20",
       "priority": "critical",
-      "title": "USD/JPY — Short Squeeze + Options Skew Extreme",
-      "text": "USD/JPY trades down at 154.25, breaking sharply below its technical SMA cluster with SMA20 at 158.72, SMA50 at 160.33, and SMA200 at 158.44. The options market signals aggressive hedging against further downside, with 1M 25d Risk Reversals printing an extreme put skew of -2.55 while implied volatility runs at 7.2% against realized HV30 of 11.1% (VRP -3.9%). CFTC data shows institutional leveraged funds heavily exposed at net short -111,297 contracts (52w pctl 2, z -2.18), with net positions expanding by -29,678 WoW into the selloff. Retail sentiment stands at 85% long, establishing an acute retail-institutional divergence that increases capitulation vulnerability as spot trends lower. Although the Fed 3.75% vs BoJ 1.0% policy spread (+275bp carry premium; SOFR vs TONA +268bp) structurally supports USD, Middle East war escalation and crude supply disruption trigger swift carry liquidations. Trade bias: Bearish USD/JPY, positioning squeeze dominating fundamental carry. Catalyst: BoJ meeting 18 Sep — hike bias active. Risk: USD/JPY reclaims the SMA200 at 158.44, halting short-covering momentum.",
+      "title": "USD/JPY — Options Skew + Positioning Squeeze",
+      "text": "USD/JPY trades at 154.215, holding well below its SMA20/50/200 cluster at 158.44–160.33 following recent safe-haven inflows and BOJ tightening pricing. CFTC data shows JPY Leveraged Funds net short at -111,297 contracts (pctl 2, z -2.18), indicating an extreme crowded short positioning setup that remains vulnerable to violent unwinds. Options markets actively price downside protection, with the 1M 25-delta Risk Reversal exhibiting a severe put skew at -2.46 alongside a negative Vol Risk Premium (IV 7.2% vs HV30 11.1%). Meanwhile, retail sentiment is 85% long, directly opposing institutional futures positioning and heightening capitulation risk if spot moves lower. Trade bias: Bearish USD/JPY; severe short positioning and negative options skew favor further downside expansion. Catalyst: US PPI and Unemployment Claims on 10 Sep. Risk: Fed-BoJ 268bp OIS carry advantage reasserts dominance if broad market risk appetite stabilizes.",
       "evidence": [
-        "USD/JPY 25d RR: -2.55 (Saxo)",
         "JPY COT LF net: -111,297 (pctl 2)",
-        "Fed 3.75% vs BoJ 1.0% — +275bp"
+        "USD/JPY 25d RR: -2.46",
+        "Retail sentiment: 85% long"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:38",
+      "time": "15:18",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Spec Long + Retail Divergence",
-      "text": "AUD/USD trades at 0.7216, positioned comfortably above its moving-average cluster of SMA20 at 0.7144, SMA50 at 0.7048, and SMA200 at 0.6992. CFTC positioning shows speculative leveraged funds crowded long at +50,250 contracts (52w pctl 94, z +1.79), placing positioning in the upper decile of its 52-week historical range despite a weekly reduction of -3,328 contracts. Myfxbook retail sentiment reveals an extreme 90% short position against 10% long, generating a direct institutional-versus-retail divergence setup at cyclical highs. Fundamentals remain buoyed by an RBA at 4.35% vs Fed at 3.75%, providing a +60bp cash carry advantage (AONIA vs SOFR -69bp) alongside solid Australian macro beats reflected in an ESI of +16.3. However, with WTI crude jumping +2.69% to $93.90 on Middle East disruption and ATM IV running at 7.2% over HV30 6.0% (VRP +1.2%), upside momentum shows signs of stalling. Trade bias: Long AUD/USD; crowded speculative positioning caps near-term extension. Catalyst: BoC meeting 9 Sep — 100% hold priced. Risk: Broad equity risk aversion deepens, forcing an unwind of leveraged commodity longs below SMA20 at 0.7144.",
+      "title": "GBP/USD — Vol Risk Premium + Positioning Stretch",
+      "text": "GBP/USD trades at 1.3549, capped just below its SMA20 at 1.3556 while remaining above the SMA50/200 support zone at 1.3449–1.3461. Implied volatility trades at an extreme premium to realized (IV 11.0% vs HV30 4.5%, creating a +6.5% VRP) as options markets price heavy event-hedging demand following public policy splits between BoE members Greene and Ramsden. CFTC data shows Leveraged Funds net long at +47,504 contracts (pctl 93, z +1.27), indicating stretched bullish positioning near 52-week highs. With UK ESI disappointing at -12.1 and OIS carry neutral against SOFR (SONIA 3.73% vs SOFR 3.66%), upside momentum faces structural positioning resistance. Trade bias: Neutral/Bearish GBP/USD; stretched speculative positioning and high volatility premium limit near-term upside. Catalyst: BoE Monetary Policy Committee meeting on 17 Sep. Risk: BoE Governor Bailey adopts an explicitly hawkish stance on energy shock inflation risks.",
       "evidence": [
-        "AUD COT LF net: +50,250 (pctl 94)",
-        "Retail AUD/USD: 10% long / 90% short",
-        "RBA 4.35% vs Fed 3.75% — +60bp"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "11:34",
-      "priority": "warning",
-      "title": "GBP/USD — Elevated Vol Premium + Fiscal Gilt Stress",
-      "text": "GBP/USD trades at 1.3536, holding below its SMA20 of 1.3556 but above its SMA50 at 1.3461 and SMA200 at 1.3449. The options market displays sharp defensive pricing, with CBOE BPVIX implied volatility printing at 11.0% against realized HV30 of 4.5%, creating an outsized Vol Risk Premium of +6.5%. This demand for options protection coincides with UK 30-year gilt yields clearing 5.83% at auction, highlighting mounting pressure on UK public finances and wider government borrowing costs. Speculative positioning remains stretched at CFTC net long +47,504 contracts (52w pctl 93, z +1.27), though funds liquidated -9,335 contracts WoW as negative UK economic surprises accumulate to an ESI of -12.1. The Fed-BoE policy stance offers no carry buffer, with Fed at 3.75% vs BoE at 3.75% (+0bp spread; SONIA vs SOFR +7bp favoring GBP), leaving the pound vulnerable to fiscal-risk repricing. Trade bias: Neutral/range GBP/USD, downside hedging capping spot recovery. Catalyst: UK Monetary Policy Report Hearings today at 13:15 UTC. Risk: A daily close above the SMA20 at 1.3556 neutralizes immediate downside pressure.",
-      "evidence": [
-        "GBP/USD IV 11.0% vs HV30 4.5% — VRP +6.5%",
+        "GBP/USD VRP: +6.5% (IV 11.0% vs HV30 4.5%)",
         "GBP COT LF net: +47,504 (pctl 93)",
         "BoE 3.75% vs Fed 3.75% — 0bp"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "15:15",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning Extreme + Retail Divergence",
+      "text": "AUD/USD trades at 0.7225, maintaining a strong bullish posture above its SMA20/50/200 cluster (0.6991–0.7144). Institutional positioning is highly crowded, with CFTC Leveraged Funds net long at +50,250 contracts (pctl 94, z +1.79), supported by a solid domestic Economic Surprise Index of +16.3 and a 69bp OIS carry advantage over USD (AONIA 4.35% vs SOFR 3.66%). Retail traders have aggressively built a contrarian short stance at 90%, creating an extreme institutional-versus-retail divergence at multi-month highs. However, a negative correlation break against the ASX 200 (z = -1.98σ) cautions that equity market weakness is failing to drag spot lower, leaving the move heavily reliant on carry and commodity strength. Trade bias: Bullish AUD/USD; institutional positioning and carry advantage support the trend against retail fighting. Catalyst: RBA policy decision on 29 Sep. Risk: Broad commodity sell-off or sharp reduction in global risk appetite that forces an unwind of Leveraged Fund longs.",
+      "evidence": [
+        "AUD COT LF net: +50,250 (pctl 94)",
+        "Retail sentiment: 90% short",
+        "Fed 3.75% vs RBA 4.35% — -60bp"
       ],
       "_source": "engine-ai-primary"
     }
