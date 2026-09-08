@@ -8340,15 +8340,6 @@ async function fetchCarryRanking() {
       return b.diff - a.diff;
     });
 
-    // v8.430.0 — was allPairs.slice(0, 10): the sidebar only ever showed the
-    // top 10 of 45 G10 pairs by real carry, with no way to reach any pair
-    // ranked below that (e.g. AUD/CAD, NZD/CAD) short of it happening to sort
-    // into the top 10 on a given day. Every sibling sidebar list with more
-    // rows than fit on screen (Crosses) already solves this the same way —
-    // a scrollable container, not a fixed slice — so this now renders all
-    // 45 pairs and relies on #carry-rank-rows's own overflow-y:auto (see
-    // index.html) for the same scroll-to-find pattern, rather than a second,
-    // inconsistent UI convention for one panel only.
     const top = allPairs;
 
     const topDisplay = top.map(p => Math.max(p.realCarry ?? p.diff, 0));

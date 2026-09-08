@@ -811,15 +811,9 @@
     return `${y}-${m}-${day}`;
   }
 
-  // Returns the ISO date of the Monday that starts the real calendar week
-  // (Monday-Sunday, matching the ForexFactory/Investing.com convention this
-  // panel's "This week"/"Week +N" label implies) containing "today + offsetDays".
-  // Built from local Y/M/D components only (never .toISOString(), which
-  // converts to UTC and can silently shift the date by one day for a GMT-3
-  // browser late in the local evening).
   function _calWeekStartISO(offsetDays) {
     const now = new Date();
-    const day = now.getDay(); // 0=Sun..6=Sat
+    const day = now.getDay();
     const toMonday = (day === 0) ? -6 : (1 - day);
     const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + toMonday + offsetDays);
     return _isoFromLocalDate(monday);
@@ -940,11 +934,6 @@
 
     const _now       = new Date();
     const nowMs      = _now.getTime();
-    // A real Monday-Sunday calendar week, matching what "This week"/"Week +N"
-    // actually promises — not a 17-day rolling lookback+lookahead window.
-    // See CHANGELOG.md for the incident this replaced (the old window let
-    // "This week" silently show up to 2 weeks of future events, and let a
-    // "Week +N" view show events far outside week N).
     const _yISO = _calWeekStartISO(_calWeekOffsetDays);
     const _mISO = _calWeekEndISO(_yISO);
 
@@ -982,11 +971,6 @@
     const holidayByDate = {};
     holidays.forEach(h => {
       if (!h.dateISO) return;
-      // Scope holidays to the currently selected week window, exactly like
-      // events are scoped a few lines above — without this, a holiday's
-      // dateISO bypassed the window filter entirely (it was only ever added
-      // to `allDates` unconditionally), so every holiday in the feed kept
-      // reappearing regardless of which week was being viewed.
       if (h.dateISO < _yISO || h.dateISO > _mISO) return;
       if (!holidayByDate[h.dateISO]) holidayByDate[h.dateISO] = [];
       holidayByDate[h.dateISO].push(h);
@@ -1402,16 +1386,6 @@
       let source   = ffJson?.source || calJson?.source || 'ForexFactory';
       let holidays = Array.isArray(ffJson?.holidays) ? ffJson.holidays : [];
 
-      // Always fill in any calendar.json event not already present in
-      // ff_calendar.json (keyed on currency+dateISO+time+title), regardless
-      // of ff_calendar.json's own health. This used to be gated behind
-      // `ffPastDates.size < 2` (only merge when ff_calendar.json itself
-      // looked degraded/stale) — that gate meant a healthy Myfxbook feed
-      // silently hid every secondary-source event (the calendar-completeness
-      // backfill's new AUD/JPY/etc. events, or any future genuine gap-fill),
-      // even though calendar.json is already merge-only / never overwrites
-      // an existing ff_calendar.json value, so there was no real conflict
-      // risk it was ever protecting against. See CHANGELOG.md v8.421.0.
       if (calEvents.length) {
         const seen = new Set(ffEvents.map(e => `${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
         const fill = calEvents.filter(e => !seen.has(`${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
