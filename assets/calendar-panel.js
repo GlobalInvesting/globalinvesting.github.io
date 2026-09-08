@@ -804,6 +804,41 @@
     return `${y}-${m}-${d}`;
   }
 
+  function _isoFromLocalDate(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  // Returns the ISO date of the Monday that starts the real calendar week
+  // (Monday-Sunday, matching the ForexFactory/Investing.com convention this
+  // panel's "This week"/"Week +N" label implies) containing "today + offsetDays".
+  // Built from local Y/M/D components only (never .toISOString(), which
+  // converts to UTC and can silently shift the date by one day for a GMT-3
+  // browser late in the local evening).
+  function _calWeekStartISO(offsetDays) {
+    const now = new Date();
+    const day = now.getDay(); // 0=Sun..6=Sat
+    const toMonday = (day === 0) ? -6 : (1 - day);
+    const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + toMonday + offsetDays);
+    return _isoFromLocalDate(monday);
+  }
+
+  function _calWeekEndISO(startISO) {
+    const [y, m, d] = startISO.split('-').map(Number);
+    const end = new Date(y, m - 1, d + 6);
+    return _isoFromLocalDate(end);
+  }
+
+  function _formatWeekRange(startISO, endISO) {
+    const [sy, sm, sd] = startISO.split('-').map(Number);
+    const [, em, ed] = endISO.split('-').map(Number);
+    const sMonth = new Date(sy, sm - 1, sd).toLocaleDateString('en-US', { month: 'short' });
+    const eMonth = new Date(sy, em - 1, ed).toLocaleDateString('en-US', { month: 'short' });
+    return sMonth === eMonth ? `${sMonth} ${sd}\u2013${ed}` : `${sMonth} ${sd}\u2013${eMonth} ${ed}`;
+  }
+
   function scrollCalTo(container, target) {
     if (!target) { container.scrollTop = 0; return; }
     const offset = target.offsetTop - container.offsetTop;
@@ -904,11 +939,14 @@
     _calRenderIndex = [];        
 
     const _now       = new Date();
-    const nowMs      = _now.getTime(); 
-    const _lookback  = new Date(_now); _lookback.setDate(_now.getDate() - 3 + _calWeekOffsetDays);
-    const _maxAhead  = new Date(_now); _maxAhead.setDate(_now.getDate() + 14 + _calWeekOffsetDays);
-    const _yISO = _lookback.toISOString().slice(0, 10);
-    const _mISO = _maxAhead.toISOString().slice(0, 10);
+    const nowMs      = _now.getTime();
+    // A real Monday-Sunday calendar week, matching what "This week"/"Week +N"
+    // actually promises — not a 17-day rolling lookback+lookahead window.
+    // See CHANGELOG.md for the incident this replaced (the old window let
+    // "This week" silently show up to 2 weeks of future events, and let a
+    // "Week +N" view show events far outside week N).
+    const _yISO = _calWeekStartISO(_calWeekOffsetDays);
+    const _mISO = _calWeekEndISO(_yISO);
 
     let filtered = events.filter(ev =>
       G10_CURRENCIES.has(ev.currency) && passesImpactFilter(ev) &&      
@@ -944,6 +982,12 @@
     const holidayByDate = {};
     holidays.forEach(h => {
       if (!h.dateISO) return;
+      // Scope holidays to the currently selected week window, exactly like
+      // events are scoped a few lines above — without this, a holiday's
+      // dateISO bypassed the window filter entirely (it was only ever added
+      // to `allDates` unconditionally), so every holiday in the feed kept
+      // reappearing regardless of which week was being viewed.
+      if (h.dateISO < _yISO || h.dateISO > _mISO) return;
       if (!holidayByDate[h.dateISO]) holidayByDate[h.dateISO] = [];
       holidayByDate[h.dateISO].push(h);
     });
@@ -1331,7 +1375,10 @@
     label.textContent = weekNavLabel();
     const atCurrent = _calWeekOffsetDays === 0;
     label.style.color  = atCurrent ? 'var(--text3)' : '#fff';
-    label.title         = atCurrent ? '' : 'Back to current window';
+    const startISO = _calWeekStartISO(_calWeekOffsetDays);
+    const endISO   = _calWeekEndISO(startISO);
+    const range    = _formatWeekRange(startISO, endISO);
+    label.title = atCurrent ? range : `${range} — click to return to the current week`;
   }
 
   async function fetchEconomicCalendar() {
