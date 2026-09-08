@@ -1,0 +1,112 @@
+name: Update Calendar Completeness (secondary source)
+
+# Weekly full-calendar refresh from a secondary calendar source (see the
+# private scripts repo for source details) — this workflow's job is
+# calendar COMPLETENESS (new events, real per-event impact tags) rather
+# than minute-level actuals speed. The existing minute-level pipeline
+# (update-ff-calendar.yml) stays on its own tight schedule and now acts
+# as the fast-actuals fallback layer between this workflow's weekly
+# passes. Merge-only writer discipline (never overwrites an existing
+# non-null actual/previous/forecast/impact) means running this alongside
+# the existing calendar pipeline is safe by construction — see the
+# private script's merge_full_events_into_calendar().
+
+on:
+  schedule:
+    - cron: '0 3 * * 1'   # every Monday, 03:00 UTC
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: update-calendar-completeness
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-calendar-completeness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v6
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v6
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4 lxml --break-system-packages
+
+      - name: Fetch full calendar from secondary source
+        run: python3 private-scripts/fetch_te_calendar.py
+
+      - name: Display summary
+        run: |
+          echo ""
+          echo "========================================"
+          echo "    CALENDAR COMPLETENESS FETCH SUMMARY"
+          echo "========================================"
+          python3 -c "
+          import json
+          with open('calendar-data/calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])
+          sec_events = [e for e in events if e.get('source') == 'secondary-calendar']
+          print(f'  Total events in calendar.json: {len(events)}')
+          print(f'  Secondary-source events: {len(sec_events)}')
+          by_impact = {}
+          for e in sec_events:
+              by_impact[e.get('impact')] = by_impact.get(e.get('impact'), 0) + 1
+          print(f'  Secondary-source events by impact: {by_impact}')
+          "
+
+      - name: Commit and push (with retry on race)
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- calendar-data/calendar.json && git diff --staged --quiet -- calendar-data/calendar.json; then
+            echo "No changes to calendar-data/calendar.json — skipping commit."
+            exit 0
+          fi
+
+          cp calendar-data/calendar.json /tmp/calendar_fresh.json
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            cp /tmp/calendar_fresh.json calendar-data/calendar.json
+            git add calendar-data/calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
+              exit 0
+            fi
+            git commit -m "Calendar completeness refresh ${TIMESTAMP}"
+            if git push origin main; then
+              echo "Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "All push attempts exhausted — data refreshes on next scheduled run."
+          exit 0
+
+      - name: Trigger Pages deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
