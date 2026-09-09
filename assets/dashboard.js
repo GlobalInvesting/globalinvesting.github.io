@@ -10754,7 +10754,7 @@ function alertsRender(intra) {
 
   container.innerHTML = arr.map(a => {
     const cls      = a.fired ? 'alert-row alert-row-active' : 'alert-row';
-    const firedTxt = a.fired ? ` <span class="alert-fired">⚡ FIRED ${a.firedAt || ''}</span>` : '';
+    const firedTxt = a.fired ? ` <span class="alert-fired">FIRED ${a.firedAt || ''}</span>` : '';
     const cur      = alertsCurrentValue(a, intra);
     const curFmt   = alertFormatValue(a, cur);
     const curTxt   = curFmt != null ? ` · now ${curFmt}` : '';
