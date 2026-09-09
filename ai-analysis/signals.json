@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-09T07:01:32Z",
+  "generated_at": "2026-09-09T11:58:40Z",
   "signals": [
     {
-      "time": "06:58",
+      "time": "11:57",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + Geopolitical Tension",
-      "text": "The G10 scorecard records JPY as the week's strongest performer with a 1W average of +1.488% across 7 pairs, while NZD lags at -0.810% across 4 pairs, creating an extreme 2.298% bilateral spread. Escalating US-Iran military strikes and surging crude oil (WTI at $94.50) drive cross-asset defensiveness, accelerating an unwind of high-carry funding pairs despite normal broader equity volatility with VIX at 15.7. A large nominal policy divergence remains in place with RBNZ at 2.75% versus BoJ at 1.0% providing a +175bp carry buffer, yet JPY momentum dominates as BEER fair value tracks NZD/JPY stretched at z=-3.29σ below model equilibrium. Spot trades under heavy distribution alongside NZD speculative net short positioning of -23,004 contracts (pctl 4). Sustained risk aversion keeps downside momentum intact toward key psychological thresholds. Trade bias: Bearish NZD/JPY, thematic cross-asset unwind dominating nominal carry. Catalyst: BoJ rate decision on 18 Sep. Risk: De-escalation headlines in the Middle East reverse the broad yen bid.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Geopolitical Shock",
+      "text": "The G10 scorecard shows JPY outperforming all peers with a 1W average of +1.526% across 7 pairs, while NZD lags the complex at -1.027% across 4 pairs. This generates an extreme leader-to-laggard bilateral spread of 2.553%. Geopolitical disruption in the Strait of Hormuz and Brent crude testing $100 reinforce defensive flows into JPY crosses. Meanwhile, the RBNZ cash rate of 2.75% provides only a 175bp nominal buffer against the BoJ rate of 1.0%, leaving NZD vulnerable as high-beta sentiment deteriorates. NZD/JPY trades at a sharp BEER-model discount of z=-3.29σ, reflecting intense short-term divergence. Trade bias: Bearish NZD/JPY, driven by broad JPY outperformance and high-beta commodity currency liquidation. Catalyst: RBNZ policy meeting on 28 Oct — hold bias priced. Risk: Strait of Hormuz tensions de-escalate, prompting a sharp rebound in risk appetite and compression of the bilateral gap below 0.80%.",
       "evidence": [
-        "JPY 1W avg: +1.488% (n=7)",
-        "NZD 1W avg: -0.810% (n=4)",
-        "G10 spread: 2.298%"
+        "JPY 1W avg: +1.526% (n=7)",
+        "NZD 1W avg: -1.027% (n=4)",
+        "G10 spread: 2.553%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:55",
-      "priority": "warning",
-      "title": "USD/JPY — Options Skew + Positioning Unwind",
-      "text": "USD/JPY prints at 153.26, sitting well below its SMA20 (158.45) and SMA200 (158.43) cluster after extending weekly losses to -1.54%. CFTC data shows leveraged funds holding an extreme net short JPY position of -111,297 contracts (pctl 2, z -2.18), creating severe short-covering pressure on spot. Derivatives markets aggressively position for deeper downside, with 1M 25d risk reversals displaying a strong put skew of -2.46 alongside an ATM implied volatility of 10.6% versus 30-day realized volatility of 11.3% (VRP -0.7%). Retail sentiment reflects extreme asymmetry with 86% long positioning, directly contradicting the persistent institutional short unwind. Although the Fed-BoJ policy differential of +275bp (Fed 3.75% vs BoJ 1.0%) structurally favors the dollar, spot remains trapped in a liquidation cycle while holding beneath moving average resistance. Trade bias: Bearish USD/JPY, crowded spec short covering superseding carry. Catalyst: US Core PPI release today at 12:30 UTC. Risk: Rebound and daily close above the 158.45 SMA20 level.",
+      "time": "11:54",
+      "priority": "critical",
+      "title": "USD/JPY — Options Downside Skew + Positioning Squeeze",
+      "text": "USD/JPY trades at 153.28, holding below its technical SMA20/50/200 cluster at 158.45/160.16/158.43. CFTC data shows Leveraged Funds net short JPY at -111,297 contracts (pctl 2, z -2.18), marking an extreme positioning deficit that faces rapid liquidation. The 1M 25d risk reversal sits at -2.46, indicating heavy institutional demand for downside puts. Although the Fed rate of 3.75% versus BoJ 1.0% yields a 275bp policy rate advantage for USD, spot is divorcing from carry amid hawkish BoJ rate hike expectations and safe-haven rotation. USD/JPY 1M ATM implied volatility sits at 10.6% against 30-day realized volatility of 11.3%, leaving the volatility risk premium at -0.7%. Trade bias: Bearish USD/JPY; crowded speculative shorts face ongoing squeeze pressure toward 150.00. Catalyst: BoJ policy meeting on 18 Sep — hike bias active. Risk: Leveraged Funds rebuild JPY short exposure alongside a sustained daily close back above the 200-day SMA at 158.43.",
       "evidence": [
         "JPY COT LF net: -111,297 (pctl 2, z -2.18)",
         "USD/JPY 25d RR: -2.46 put skew",
-        "USD/JPY: 153.26 (below SMA20 158.45)"
+        "USD/JPY: 153.28 (below SMA20/50/200)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:52",
+      "time": "11:51",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long + Retail Divergence",
-      "text": "AUD/USD trades at 0.7234, maintaining an upward trajectory above its SMA20 of 0.7151 and SMA50 of 0.7054. Leveraged funds hold a stretched net long position of +50,250 contracts (pctl 94, z +1.79), representing the upper decile of 52-week positioning even as WoW delta stalled at -3,328 contracts. Retail positioning shows a mirror extreme at 91% short, establishing a stark retail versus institutional positioning divergence. The underlying yield structure remains constructive with RBA at 4.35% versus Fed at 3.75%, providing a +60bp cash rate advantage reinforced by an Australian Economic Surprise Index reading of +17.3. However, with BEER fair value indicating spot is rich at z=+1.78σ and options market 25d RR showing a -0.46 put skew, upside velocity is increasingly constrained by positioning saturation. Trade bias: Long AUD/USD, supported by carry advantage but constrained by crowded longs. Catalyst: US Core PPI today at 12:30 UTC. Risk: A break below technical support at the 0.7151 SMA20.",
+      "title": "AUD/USD — Crowded Speculative Long vs Retail Short",
+      "text": "AUD/USD trades at 0.7224, holding above its SMA20/50/200 cluster at 0.7151/0.7054/0.6995. Leveraged Funds positioning reflects an overextended profile with net longs at +50,250 contracts (pctl 94, z +1.79), in the 94th percentile of its 52-week range. Conversely, retail sentiment sits at an extreme 91% short, establishing a stark institutional-versus-retail divergence. The RBA rate of 4.35% versus Fed 3.75% secures a 60bp cash carry premium for AUD, reinforced by an Australian Economic Surprise Index of +17.3. However, Saxo Bank 1M ATM implied volatility of 7.2% against 5.9% realized generates a +1.2% vol risk premium, showing that options markets are pricing upside exhaustion. Trade bias: Long AUD/USD, but crowded institutional positioning warns of late-trend stalling near 0.7300. Catalyst: RBA policy decision on 29 Sep — hike bias priced. Risk: Leveraged Funds weekly net delta contracts sharply, triggering long liquidation toward the 20-day SMA at 0.7151.",
       "evidence": [
         "AUD COT LF net: +50,250 (pctl 94, z +1.79)",
-        "AUD/USD Retail: 91% short",
-        "RBA 4.35% vs Fed 3.75% — +60bp carry"
+        "Retail sentiment: 91% short",
+        "RBA 4.35% vs Fed 3.75% — 60bp AUD carry"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:48",
-      "priority": "info",
-      "title": "EUR/USD — CB Spread + Pre-ECB Compression",
-      "text": "EUR/USD trades at 1.1643, consolidating slightly above its SMA20 (1.1619) and SMA200 (1.1638) support cluster ahead of immediate policy risk. The structural macro backdrop remains weighed down by central bank policy divergence, where Fed at 3.75% versus ECB at 2.40% generates a 135bp nominal yield spread favoring USD. Leveraged funds hold net short euro exposure of -52,784 contracts (pctl 31, z -0.39), while asset managers sit on +291,129 contracts of net longs, reflecting balanced multi-week institutional positioning. Options markets show contained premium with 1M ATM implied volatility at 5.1% against 4.6% HV30 (VRP +0.5%) and a neutral 25d risk reversal at -0.21. A daily close above the 200-day moving average is required to open technical targets toward 1.1700, but rate differentials restrict aggressive top-side expansion. Trade bias: Neutral EUR/USD, policy spread limiting upside momentum. Catalyst: ECB Refinancing Rate decision today at 12:15 UTC. Risk: An unexpected 50bp ECB rate hike that forces a rapid compression of the transatlantic yield gap.",
+      "time": "11:47",
+      "priority": "warning",
+      "title": "EUR/USD — CB Carry Advantage Ahead of ECB",
+      "text": "EUR/USD trades at 1.1647, hovering between its 20-day SMA at 1.1619 and 200-day SMA at 1.1638. The Fed rate of 3.75% against the ECB rate of 2.4% maintains a 135bp nominal yield advantage in favor of USD, while €STR at 2.19% versus SOFR at 3.65% reflects a 146bp OIS carry discount on holding EUR. CFTC Leveraged Funds maintain a net short EUR position of -52,784 contracts (pctl 31, z -0.39). ECB holds at 2.4%. With 1M 25d risk reversals flat at -0.21, the options market exhibits little appetite to chase euro upside. Trade bias: Bearish EUR/USD; persistent 146bp OIS carry penalty caps sustainable advances above 1.1700. Catalyst: ECB interest rate announcement and monetary policy statement today at 12:15 UTC. Risk: ECB delivers an unexpectedly hawkish forward policy path that forces a decisive move through the 200-day SMA at 1.1638.",
       "evidence": [
-        "Fed 3.75% vs ECB 2.40% — 135bp",
-        "EUR COT LF net: -52,784 (pctl 31)",
-        "EUR/USD: 1.1643 (SMA200 1.1638)"
+        "Fed 3.75% vs ECB 2.4% — 135bp USD carry",
+        "EUR/USD OIS carry: SOFR 3.65% vs ESTR 2.19% (146bp)",
+        "EUR COT LF net: -52,784 (pctl 31)"
       ],
       "_source": "engine-ai-primary"
     }
