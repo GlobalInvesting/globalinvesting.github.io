@@ -1,10 +1,10 @@
 {
-  "updated_at": "2026-09-09T22:08:19Z",
+  "updated_at": "2026-09-09T23:13:24Z",
   "source": "Daily-close OHLC pipeline \u00b7 SMA20/50/200",
   "levels": {
     "USD": {
       "pair": "DXY",
-      "close": 98.77,
+      "close": 98.78,
       "sma20": 99.24,
       "sma50": 100.08,
       "sma200": 99.13,
@@ -13,7 +13,7 @@
     },
     "EUR": {
       "pair": "EUR/USD",
-      "close": 1.1636,
+      "close": 1.1632,
       "sma20": 1.1625,
       "sma50": 1.1525,
       "sma200": 1.1638,
@@ -22,8 +22,8 @@
     },
     "GBP": {
       "pair": "GBP/USD",
-      "close": 1.3549,
-      "sma20": 1.3561,
+      "close": 1.3543,
+      "sma20": 1.356,
       "sma50": 1.3472,
       "sma200": 1.3451,
       "position": "below_sma20_above_sma50_above_sma200",
@@ -31,7 +31,7 @@
     },
     "JPY": {
       "pair": "USD/JPY",
-      "close": 153.55,
+      "close": 153.63,
       "sma20": 158.16,
       "sma50": 159.98,
       "sma200": 158.42,
@@ -40,7 +40,7 @@
     },
     "AUD": {
       "pair": "AUD/USD",
-      "close": 0.722,
+      "close": 0.7219,
       "sma20": 0.7159,
       "sma50": 0.706,
       "sma200": 0.6998,
@@ -49,7 +49,7 @@
     },
     "CAD": {
       "pair": "USD/CAD",
-      "close": 1.3803,
+      "close": 1.3809,
       "sma20": 1.3841,
       "sma50": 1.398,
       "sma200": 1.383,
@@ -58,7 +58,7 @@
     },
     "CHF": {
       "pair": "USD/CHF",
-      "close": 0.81,
+      "close": 0.8105,
       "sma20": 0.8073,
       "sma50": 0.8088,
       "sma200": 0.7933,
@@ -76,20 +76,20 @@
     },
     "NOK": {
       "pair": "USD/NOK",
-      "close": 9.186,
-      "sma20": 9.33,
-      "sma50": 9.512,
+      "close": 9.203,
+      "sma20": 9.331,
+      "sma50": 9.513,
       "sma200": 9.614,
       "position": "below_sma20_below_sma50_below_sma200",
       "asof": "2026-09-09"
     },
     "SEK": {
       "pair": "USD/SEK",
-      "close": 9.585,
+      "close": 9.599,
       "sma20": 9.538,
       "sma50": 9.587,
       "sma200": 9.344,
-      "position": "above_sma20_below_sma50_above_sma200",
+      "position": "above_sma20_above_sma50_above_sma200",
       "asof": "2026-09-09"
     }
   }
