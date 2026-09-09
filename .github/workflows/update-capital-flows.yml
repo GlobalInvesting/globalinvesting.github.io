@@ -37,7 +37,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install dependencies
-        run: pip install beautifulsoup4 lxml --break-system-packages
+        run: pip install xlrd --break-system-packages
 
       - name: Fetch capital flows (TIC + ICI)
         run: python3 private-scripts/fetch_capital_flows.py
