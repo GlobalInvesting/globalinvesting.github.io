@@ -465,7 +465,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.360.2">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.432.0">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -520,7 +520,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <a class="site-menu-btn" href="guide-mt5-ea.html" title="MetaTrader 5 Expert Advisor — companion product">MT5 EA</a>
     <span id="session-label">DETECTING...</span>
     <span><span class="live-dot"></span><span id="clock">--:--:-- UTC</span></span>
-    
+
+    <div class="gi-alertbell" id="gi-alertbell">
+      <button id="gi-alertbell-btn" aria-haspopup="true" aria-expanded="false" aria-controls="gi-alertbell-tray" aria-label="Alert history" title="Alert history">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M12 3a5 5 0 0 0-5 5v3.2c0 .8-.28 1.58-.79 2.2L5 15h14l-1.21-1.6a3.6 3.6 0 0 1-.79-2.2V8a5 5 0 0 0-5-5z" stroke="currentColor" stroke-width="1.6" fill="none"/>
+          <path d="M9.5 18a2.5 2.5 0 0 0 5 0" stroke="currentColor" stroke-width="1.6" fill="none"/>
+        </svg>
+        <span id="gi-alertbell-count" class="gi-alertbell-count" hidden>0</span>
+      </button>
+      <button id="gi-alertsound-btn" aria-pressed="true" aria-label="Alert sound on" title="Alert sound — click to mute">
+        <svg id="gi-alertsound-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M4 9v6h4l5 4V5L8 9H4z" stroke="currentColor" stroke-width="1.6" fill="none"/>
+          <path id="gi-alertsound-wave" d="M16.5 8.5a5 5 0 0 1 0 7" stroke="currentColor" stroke-width="1.6" fill="none"/>
+        </svg>
+      </button>
+      <div id="gi-alertbell-tray" class="gi-alertbell-tray" role="menu" aria-label="Recent alerts" hidden>
+        <div class="gi-alertbell-tray-head">
+          <span>Alerts</span>
+          <button id="gi-alertbell-clear" title="Clear all">Clear</button>
+        </div>
+        <div id="gi-alertbell-tray-list" class="gi-alertbell-tray-list"></div>
+      </div>
+    </div>
+
     <div class="site-menu">
       <button class="site-menu-btn" aria-label="Site menu" aria-expanded="false" aria-controls="site-menu-dropdown">
         <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1898,6 +1921,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
             <option value="ivrank">IV Rank</option>
             <option value="corr">Correlation Z-score</option>
             <option value="var">VaR 95% (1d)</option>
+            <option value="rr">25d Risk Reversal</option>
+            <option value="cot">COT Positioning Rank</option>
+            <option value="fairvalue">FX Fair Value Z-score</option>
             <option value="regime">Regime change</option>
           </select>
           
@@ -1960,7 +1986,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           
           <div id="alp-eco-row" style="display:none;gap:4px;flex-wrap:wrap;align-items:center;">
             <select id="alert-eco-ccy" class="alert-select" aria-label="Currency filter" style="flex:1;min-width:100px;">
-              <option value="">All G8 currencies</option>
+              <option value="">All G10 currencies</option>
               <option value="USD">USD only</option>
               <option value="EUR">EUR only</option>
               <option value="GBP">GBP only</option>
@@ -1969,6 +1995,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
               <option value="CAD">CAD only</option>
               <option value="NZD">NZD only</option>
               <option value="CHF">CHF only</option>
+              <option value="NOK">NOK only</option>
+              <option value="SEK">SEK only</option>
               <option value="USD,EUR">USD + EUR</option>
               <option value="USD,GBP">USD + GBP</option>
               <option value="USD,JPY">USD + JPY</option>
@@ -1998,7 +2026,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.430.2" defer></script>
+<script src="assets/dashboard.js?v=8.432.0" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 
 <script src="assets/fx-websocket.js?v=1.0.1" defer></script>
