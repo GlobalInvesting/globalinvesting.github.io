@@ -11325,6 +11325,15 @@ function initAlerts() {
       if (btn) btn.setAttribute('aria-expanded', 'false');
     }
   });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    const pop = document.getElementById('alerts-popover');
+    if (!pop || pop.style.display === 'none') return;
+    pop.style.display = 'none';
+    const btn = document.getElementById('alerts-bell-btn');
+    if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.focus(); }
+  });
 }
 
 function toggleAlertsPopover() {
