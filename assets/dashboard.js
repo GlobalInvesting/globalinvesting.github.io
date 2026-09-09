@@ -10568,6 +10568,128 @@ const ADV_ALERT_TYPES = {
     getValue(intra) { return intra?.var_cvar?.spx?.var_pct ?? null; },
     formatValue: v => `${v.toFixed(3)}%`,
   },
+
+  'rr_eurusd': {
+    label: 'EUR/USD 25d RR (1M)', category: 'rr',
+    description: '1-month 25-delta risk reversal for EUR/USD. Positive = call skew (market pays up for upside); negative = put skew (downside hedging demand).',
+    getValue(ctx) { return ctx?.rr?.EURUSD?.rr25d ?? null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`,
+  },
+  'rr_gbpusd': {
+    label: 'GBP/USD 25d RR (1M)', category: 'rr',
+    description: '1-month 25-delta risk reversal for GBP/USD.',
+    getValue(ctx) { return ctx?.rr?.GBPUSD?.rr25d ?? null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`,
+  },
+  'rr_usdjpy': {
+    label: 'USD/JPY 25d RR (1M)', category: 'rr',
+    description: '1-month 25-delta risk reversal for USD/JPY.',
+    getValue(ctx) { return ctx?.rr?.USDJPY?.rr25d ?? null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`,
+  },
+  'rr_audusd': {
+    label: 'AUD/USD 25d RR (1M)', category: 'rr',
+    description: '1-month 25-delta risk reversal for AUD/USD.',
+    getValue(ctx) { return ctx?.rr?.AUDUSD?.rr25d ?? null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`,
+  },
+  'rr_usdchf': {
+    label: 'USD/CHF 25d RR (1M)', category: 'rr',
+    description: '1-month 25-delta risk reversal for USD/CHF.',
+    getValue(ctx) { return ctx?.rr?.USDCHF?.rr25d ?? null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`,
+  },
+  'rr_usdcad': {
+    label: 'USD/CAD 25d RR (1M)', category: 'rr',
+    description: '1-month 25-delta risk reversal for USD/CAD.',
+    getValue(ctx) { return ctx?.rr?.USDCAD?.rr25d ?? null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}`,
+  },
+  'cot_eur': {
+    label: 'EUR COT Positioning Rank', category: 'cot',
+    description: 'Leveraged Funds net position vs its own trailing 52-week range, 0–100. Same methodology as the COT Full Breakdown panel\u2019s Net Exposure % Rank chart. Above 80 / below 20 = crowded positioning relative to this currency\u2019s own recent history — not a fixed contract-count threshold.',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.EUR)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'cot_gbp': {
+    label: 'GBP COT Positioning Rank', category: 'cot',
+    description: 'GBP Leveraged Funds net position 52-week rank (0\u2013100).',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.GBP)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'cot_jpy': {
+    label: 'JPY COT Positioning Rank', category: 'cot',
+    description: 'JPY Leveraged Funds net position 52-week rank (0\u2013100).',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.JPY)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'cot_aud': {
+    label: 'AUD COT Positioning Rank', category: 'cot',
+    description: 'AUD Leveraged Funds net position 52-week rank (0\u2013100).',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.AUD)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'cot_cad': {
+    label: 'CAD COT Positioning Rank', category: 'cot',
+    description: 'CAD Leveraged Funds net position 52-week rank (0\u2013100).',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.CAD)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'cot_chf': {
+    label: 'CHF COT Positioning Rank', category: 'cot',
+    description: 'CHF Leveraged Funds net position 52-week rank (0\u2013100).',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.CHF)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+  'cot_nzd': {
+    label: 'NZD COT Positioning Rank', category: 'cot',
+    description: 'NZD Leveraged Funds net position 52-week rank (0\u2013100).',
+    getValue(ctx) { return _cotNetExposureRankDetail(ctx?.cot?.NZD)?.currentRank ?? null; },
+    formatValue: v => `${v.toFixed(0)} rnk`,
+  },
+
+  'fv_eurusd': {
+    label: 'EUR/USD Fair Value Z', category: 'fairvalue',
+    description: 'FX Fair Value model Z-score (rate differential + risk sentiment, 60-business-day rolling regression). |Z| > 1 = spot trading away from the model\u2019s fair value estimate.',
+    getValue(ctx) { const d = ctx?.fairValue?.eurusd; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
+  'fv_gbpusd': {
+    label: 'GBP/USD Fair Value Z', category: 'fairvalue',
+    description: 'GBP/USD Fair Value model Z-score.',
+    getValue(ctx) { const d = ctx?.fairValue?.gbpusd; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
+  'fv_usdjpy': {
+    label: 'USD/JPY Fair Value Z', category: 'fairvalue',
+    description: 'USD/JPY Fair Value model Z-score.',
+    getValue(ctx) { const d = ctx?.fairValue?.usdjpy; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
+  'fv_audusd': {
+    label: 'AUD/USD Fair Value Z', category: 'fairvalue',
+    description: 'AUD/USD Fair Value model Z-score.',
+    getValue(ctx) { const d = ctx?.fairValue?.audusd; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
+  'fv_usdchf': {
+    label: 'USD/CHF Fair Value Z', category: 'fairvalue',
+    description: 'USD/CHF Fair Value model Z-score.',
+    getValue(ctx) { const d = ctx?.fairValue?.usdchf; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
+  'fv_usdcad': {
+    label: 'USD/CAD Fair Value Z', category: 'fairvalue',
+    description: 'USD/CAD Fair Value model Z-score.',
+    getValue(ctx) { const d = ctx?.fairValue?.usdcad; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
+  'fv_nzdusd': {
+    label: 'NZD/USD Fair Value Z', category: 'fairvalue',
+    description: 'NZD/USD Fair Value model Z-score.',
+    getValue(ctx) { const d = ctx?.fairValue?.nzdusd; return (d && !d.accumulating) ? d.z ?? null : null; },
+    formatValue: v => `${v >= 0 ? '+' : ''}${v.toFixed(2)}\u03c3`,
+  },
 };
 
 function _liveRegime() {
@@ -10674,6 +10796,7 @@ function maybeNotifyNewSignals(signals) {
   const body = parts.length
     ? `${signals.length} signals — ${parts.join(', ')}`
     : `${signals.length} market signals updated`;
+  giFireAlert('New Signals', body, critCount ? 'critical' : warnCount ? 'warning' : 'info');
   try {
     new Notification('GI Terminal — New Signals', {
       body,
@@ -10726,7 +10849,7 @@ function alertFormatValue(a, v) {
 function alertDescribeCondition(a) {
   if (a.type === 'regime') return `Regime = ${a.target}`;
   if (a.type === 'eco_actual') {
-    const ccyLabel = a.currencies?.length ? a.currencies.join('/') : 'All G8';
+    const ccyLabel = a.currencies?.length ? a.currencies.join('/') : 'All G10';
     return `Eco actual released — ${ccyLabel}`;
   }
   const label = ADV_ALERT_TYPES[a.sym]?.label ?? ALERTS_LABELS[a.sym] ?? a.sym;
@@ -10760,7 +10883,7 @@ function alertsRender(intra) {
     const curTxt   = curFmt != null ? ` · now ${curFmt}` : '';
     const condTxt  = alertDescribeCondition(a);
     const cat = a.type === 'regime' ? 'regime' : a.type === 'eco_actual' ? 'eco' : (ADV_ALERT_TYPES[a.sym]?.category ?? 'price');
-    const catColors = { price:'var(--text2)', spread:'#1D9E75', ivrank:'#185FA5', corr:'#854F0B', var:'#A32D2D', regime:'#533AB7', eco:'#B87A0A' };
+    const catColors = { price:'var(--text2)', spread:'#1D9E75', ivrank:'#185FA5', corr:'#854F0B', var:'#A32D2D', rr:'#0E7490', cot:'#9333EA', fairvalue:'#C2410C', regime:'#533AB7', eco:'#B87A0A' };
     const catStyle  = `color:${catColors[cat]||'var(--text2)'};font-size:9px;margin-right:4px;`;
     return `<div class="${cls}" data-id="${a.id}">
       <span class="alert-lbl"><span style="${catStyle}">[${cat.toUpperCase()}]</span>${condTxt}${curTxt}${firedTxt}</span>
@@ -10851,12 +10974,15 @@ async function alertsCheckEco() {
     a.lastActuals = matching.slice(0, 3);
     changed       = true;
 
+    const ccyLabel = a.currencies.length ? a.currencies.join('/') : 'G10';
+    const preview  = matching.slice(0, 2).map(n => `${n.ccy} ${n.title}: ${n.actual}`).join(' · ');
+    const ecoBody  = preview || `${matching.length} new actual(s)`;
+    giFireAlert(`${ccyLabel} Economic Release`, ecoBody, 'info');
+
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      const ccyLabel = a.currencies.length ? a.currencies.join('/') : 'G8';
-      const preview  = matching.slice(0, 2).map(n => `${n.ccy} ${n.title}: ${n.actual}`).join(' · ');
       try {
         new Notification(`GI Terminal — ${ccyLabel} Economic Release`, {
-          body : preview || `${matching.length} new actual(s)`,
+          body : ecoBody,
           icon : '/favicon-192x192.png',
           tag  : 'gi-eco-' + a.id,
         });
@@ -10867,15 +10993,74 @@ async function alertsCheckEco() {
   if (changed) { alertsSave(arr); alertsRender(null); }
 }
 
+let _alertsFVCache = null, _alertsFVCacheTime = 0;
+async function _alertsLoadFairValue() {
+  const now = Date.now();
+  if (_alertsFVCache && (now - _alertsFVCacheTime) < 600_000) return _alertsFVCache;
+  try {
+    const res = await fetch('./fair-value-data/summary.json', { cache: 'no-store' }).catch(() => null);
+    if (res?.ok) {
+      const j = await res.json();
+      if (j?.pairs) { _alertsFVCache = j.pairs; _alertsFVCacheTime = now; }
+    }
+  } catch {}
+  return _alertsFVCache;
+}
+
+async function _alertsLoadRR() {
+  if (window.RR_DATA_CACHE && Object.keys(window.RR_DATA_CACHE).length) return window.RR_DATA_CACHE;
+  try {
+    const res = await fetch('./rr-data/rr.json').catch(() => null);
+    if (res?.ok) {
+      const j = await res.json();
+      if (j?.pairs) {
+        if (!window.RR_DATA_CACHE) window.RR_DATA_CACHE = {};
+        Object.assign(window.RR_DATA_CACHE, j.pairs);
+      }
+    }
+  } catch {}
+  return window.RR_DATA_CACHE || {};
+}
+
+async function _alertsLoadCot() {
+  if (window.COT_DATA_STORE && Object.keys(window.COT_DATA_STORE).length >= COT_CURRENCIES.length) {
+    return window.COT_DATA_STORE;
+  }
+  const store = { ...(window.COT_DATA_STORE || {}) };
+  try {
+    const results = await Promise.all(COT_CURRENCIES.map(async ccy => {
+      try {
+        const r = await fetch('./cot-data/' + ccy + '.json');
+        if (!r.ok) return null;
+        const data = await r.json();
+        return { ccy, ...data };
+      } catch { return null; }
+    }));
+    results.filter(Boolean).forEach(d => { store[d.ccy] = d; });
+  } catch {}
+  return store;
+}
+
 async function alertsCheck() {
   const arr = alertsLoad();
   if (!arr.length) return;
 
-  let intra = null;
-  const needsIntra = arr.some(a => a.type && a.type !== 'price' && a.type !== 'regime' && a.type !== 'eco_actual');
-  if (needsIntra) {
-    intra = await loadIntradayQuotes().catch(() => null);
-  }
+  const activeCats = new Set(
+    arr.filter(a => !a.fired && a.type && a.type !== 'price' && a.type !== 'regime' && a.type !== 'eco_actual')
+       .map(a => ADV_ALERT_TYPES[a.sym]?.category)
+       .filter(Boolean)
+  );
+  const needsIntra = activeCats.has('spread') || activeCats.has('ivrank') || activeCats.has('corr') || activeCats.has('var');
+
+  let intra = null, rr = null, cot = null, fairValue = null;
+  const loaders = [];
+  if (needsIntra)                loaders.push(loadIntradayQuotes().catch(() => null).then(v => { intra = v; }));
+  if (activeCats.has('rr'))        loaders.push(_alertsLoadRR().catch(() => null).then(v => { rr = v; }));
+  if (activeCats.has('cot'))       loaders.push(_alertsLoadCot().catch(() => null).then(v => { cot = v; }));
+  if (activeCats.has('fairvalue')) loaders.push(_alertsLoadFairValue().catch(() => null).then(v => { fairValue = v; }));
+  if (loaders.length) await Promise.all(loaders);
+
+  const ctx = { ...(intra || {}), rr, cot, fairValue };
 
   let changed = false;
 
@@ -10883,7 +11068,7 @@ async function alertsCheck() {
   arr.forEach(a => {
     if (a.fired) return;
     if (a.type === 'eco_actual') return;
-    const cur = alertsCurrentValue(a, intra);
+    const cur = alertsCurrentValue(a, ctx);
     if (cur == null) return;
 
     let triggered = false;
@@ -10901,13 +11086,15 @@ async function alertsCheck() {
     a.firedAt = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     changed   = true;
 
+    const curFmt   = alertFormatValue(a, cur);
+    const condTxt  = alertDescribeCondition(a);
+    const alertBody = curFmt ? `${condTxt}  ·  Now: ${curFmt}` : condTxt;
+    giFireAlert('Terminal Alert', alertBody, 'warning');
+
     if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      const curFmt  = alertFormatValue(a, cur);
-      const condTxt = alertDescribeCondition(a);
-      const body    = curFmt ? `${condTxt}  ·  Now: ${curFmt}` : condTxt;
       try {
         new Notification('GI Terminal Alert', {
-          body,
+          body: alertBody,
           icon: '/favicon-192x192.png',
           tag : 'gi-alert-' + a.id,
         });
@@ -10915,10 +11102,199 @@ async function alertsCheck() {
     }
   });
 
-  if (changed) { alertsSave(arr); alertsRender(intra); }
+  if (changed) { alertsSave(arr); alertsRender(ctx); }
 }
 
+const GI_ALERT_HISTORY_KEY     = 'gi_alert_history_v1';
+const GI_ALERT_SOUND_KEY       = 'gi_alert_sound_v1';
+const GI_ALERT_MAX_HISTORY     = 50;
+const GI_TOAST_AUTO_DISMISS_MS = 8000;
+
+let _giAudioCtx = null;
+
+function giAlertSoundEnabled() {
+  const v = localStorage.getItem(GI_ALERT_SOUND_KEY);
+  return v === null ? true : v === 'on';
+}
+
+function giSetAlertSoundEnabled(on) {
+  try { localStorage.setItem(GI_ALERT_SOUND_KEY, on ? 'on' : 'off'); } catch {}
+  const btn = document.getElementById('gi-alertsound-btn');
+  if (btn) {
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.setAttribute('aria-label', on ? 'Alert sound on' : 'Alert sound off');
+    btn.title = on ? 'Alert sound — click to mute' : 'Alert sound muted — click to enable';
+  }
+}
+
+function giPlayAlertChime(severity) {
+  if (!giAlertSoundEnabled()) return;
+  try {
+    if (!_giAudioCtx) _giAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (_giAudioCtx.state === 'suspended') _giAudioCtx.resume();
+    const ctx  = _giAudioCtx;
+    const freq = severity === 'critical' ? 660 : severity === 'warning' ? 587 : 523;
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.35);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.36);
+  } catch {}
+}
+
+function giAlertHistoryLoad() {
+  try { return JSON.parse(localStorage.getItem(GI_ALERT_HISTORY_KEY) || '[]'); } catch { return []; }
+}
+function giAlertHistorySave(arr) {
+  try { localStorage.setItem(GI_ALERT_HISTORY_KEY, JSON.stringify(arr.slice(0, GI_ALERT_MAX_HISTORY))); } catch {}
+}
+
+function giEscHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+
+function giUpdateBellBadge() {
+  const countEl = document.getElementById('gi-alertbell-count');
+  if (!countEl) return;
+  const unread = giAlertHistoryLoad().filter(a => !a.read).length;
+  if (unread > 0) {
+    countEl.textContent = unread > 99 ? '99+' : String(unread);
+    countEl.hidden = false;
+  } else {
+    countEl.hidden = true;
+  }
+}
+
+function giRenderAlertTray() {
+  const list = document.getElementById('gi-alertbell-tray-list');
+  if (!list) return;
+  const items = giAlertHistoryLoad();
+  if (!items.length) {
+    list.innerHTML = '<div class="gi-alertbell-empty">No alerts yet</div>';
+    return;
+  }
+  list.innerHTML = items.map(a => `
+    <div class="gi-alertbell-item${a.read ? '' : ' unread'}">
+      <div class="gi-alertbell-item-title">${giEscHtml(a.title)}</div>
+      <div class="gi-alertbell-item-body">${giEscHtml(a.body)}</div>
+      <div class="gi-alertbell-item-time">${giEscHtml(a.time)}</div>
+    </div>
+  `).join('');
+}
+
+function giEnsureToastStack() {
+  let stack = document.getElementById('gi-toast-stack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.id = 'gi-toast-stack';
+    stack.setAttribute('role', 'status');
+    stack.setAttribute('aria-live', 'polite');
+    document.body.appendChild(stack);
+  }
+  return stack;
+}
+
+function giShowToast(title, body, severity) {
+  const stack = giEnsureToastStack();
+  const el = document.createElement('div');
+  el.className = 'gi-toast' +
+    (severity === 'warning' ? ' gi-toast-warning' : severity === 'critical' ? ' gi-toast-critical' : '');
+  el.innerHTML = `
+    <div class="gi-toast-row">
+      <span class="gi-toast-title">${giEscHtml(title)}</span>
+      <span class="gi-toast-close" aria-hidden="true">&times;</span>
+    </div>
+    <div class="gi-toast-body">${giEscHtml(body)}</div>
+  `;
+  stack.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('gi-toast-in'));
+  const dismiss = () => {
+    el.classList.remove('gi-toast-in');
+    el.classList.add('gi-toast-out');
+    setTimeout(() => el.remove(), 220);
+  };
+  const timer = setTimeout(dismiss, GI_TOAST_AUTO_DISMISS_MS);
+  el.addEventListener('click', () => { clearTimeout(timer); dismiss(); });
+}
+
+function giFireAlert(title, body, severity) {
+  severity = severity || 'info';
+  const arr = giAlertHistoryLoad();
+  arr.unshift({
+    title, body, severity,
+    time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    read: false,
+  });
+  giAlertHistorySave(arr);
+  giUpdateBellBadge();
+  giRenderAlertTray();
+  giShowToast(title, body, severity);
+  giPlayAlertChime(severity);
+}
+
+function giInitAlertSystem() {
+  giEnsureToastStack();
+  giUpdateBellBadge();
+  giRenderAlertTray();
+  giSetAlertSoundEnabled(giAlertSoundEnabled());
+
+  const bellBtn  = document.getElementById('gi-alertbell-btn');
+  const tray     = document.getElementById('gi-alertbell-tray');
+  const soundBtn = document.getElementById('gi-alertsound-btn');
+  const clearBtn = document.getElementById('gi-alertbell-clear');
+
+  if (bellBtn && tray) {
+    bellBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = !tray.hidden;
+      tray.hidden = isOpen;
+      bellBtn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+      if (!isOpen) {
+        const arr = giAlertHistoryLoad().map(a => ({ ...a, read: true }));
+        giAlertHistorySave(arr);
+        giUpdateBellBadge();
+        giRenderAlertTray();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!tray.hidden && !tray.contains(e.target) && e.target !== bellBtn) {
+        tray.hidden = true;
+        bellBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  if (soundBtn) {
+    soundBtn.addEventListener('click', () => {
+      if (!_giAudioCtx) {
+        try { _giAudioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch {}
+      } else if (_giAudioCtx.state === 'suspended') {
+        _giAudioCtx.resume();
+      }
+      giSetAlertSoundEnabled(!giAlertSoundEnabled());
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      giAlertHistorySave([]);
+      giUpdateBellBadge();
+      giRenderAlertTray();
+    });
+  }
+}
+
+window.giFireAlert = giFireAlert;
+
 function initAlerts() {
+  giInitAlertSystem();
   alertsRender(null);
   setTimeout(alertsCheck, 8000);
 
