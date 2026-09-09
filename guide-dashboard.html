@@ -870,7 +870,7 @@ a { color: inherit; text-decoration: none; }
         <p class="scr-meta"><strong>The Alerts &amp; Signals panel.</strong> Priority dot, pair/badge, body, and the Trade bias/Catalyst/Risk footer per entry, matching the live signals feed.</p>
       </div>
       <h3>Price &amp; Advanced Alerts</h3>
-      <p>Configurable alerts are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. An alert type selector lets you choose from six categories:</p>
+      <p>Configurable alerts are available via the <strong>alerts</strong> button in the status bar at the bottom of the screen. An alert type selector lets you choose from ten categories:</p>
       <div style="overflow-x:auto;margin:12px 0 16px;">
         <table aria-label="Alert types" class="data-table">
           <thead><tr>
@@ -879,16 +879,20 @@ a { color: inherit; text-decoration: none; }
             <th scope="col">Instruments</th>
           </tr></thead>
           <tbody>
-            <tr><td>Price / Level</td><td>Fires when a price or index crosses a threshold (above or below)</td><td>VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, NZD/USD, Gold, WTI, DXY, SPX, BTC, US 10Y, MOVE</td></tr>
+            <tr><td>Price / Level</td><td>Fires when a price or index crosses a threshold (above or below)</td><td>VIX, EUR/USD, USD/JPY, GBP/USD, AUD/USD, USD/CHF, USD/CAD, NZD/USD, Gold, WTI, DXY, SPX, BTC, US 10Y, MOVE</td></tr>
+            <tr><td>Economic actual released</td><td>Fires as soon as a new economic-calendar actual is published for the selected currency filter, same-day</td><td>All 10 G10 currencies, individually or in common pairs (e.g. USD + EUR)</td></tr>
             <tr><td>HV30 vs IV spread</td><td>Fires when the gap between realised (HV30) and implied (IV) volatility crosses a threshold — useful for identifying options mispricing</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD</td></tr>
-            <tr><td>IV Rank</td><td>Fires when the current implied volatility percentile rank crosses a threshold (0–100 scale) — helps identify historically cheap or expensive options</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD</td></tr>
+            <tr><td>IV Rank</td><td>Fires when the current implied volatility percentile rank crosses a threshold (0–100 scale) — helps identify historically cheap or expensive options. The same IV Rank value also colors the ATM IV metric on price-detail cards and its own column in the Volatility Leaderboard</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD</td></tr>
             <tr><td>Correlation Z-score</td><td>Fires when a correlation deviates from its 252-day norm beyond a z-score threshold — signals potential regime breaks</td><td>All 12 correlation pairs (EUR/USD vs DXY, AUD/USD vs Gold, etc.)</td></tr>
             <tr><td>VaR 95% (1d)</td><td>Fires when the 1-day historical VaR at 95% confidence for an instrument exceeds a threshold — signals elevated tail risk</td><td>EUR/USD, USD/JPY, GBP/USD, AUD/USD, Gold, WTI, SPX, BTC</td></tr>
+            <tr><td>25d Risk Reversal</td><td>Fires when the 1-month 25-delta risk reversal crosses a threshold — positive = call skew (market pays up for upside), negative = put skew (downside hedging demand)</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD</td></tr>
+            <tr><td>COT Positioning Rank</td><td>Fires when Leveraged Funds' net position, ranked against its own trailing 52-week range (0–100), crosses a threshold — same methodology as the COT Full Breakdown panel's Net Exposure % Rank chart</td><td>EUR, GBP, JPY, AUD, CAD, CHF, NZD</td></tr>
+            <tr><td>FX Fair Value Z-score</td><td>Fires when the FX Fair Value model's Z-score crosses a threshold — |Z| &gt; 1 signals spot trading away from the model's estimate</td><td>EUR/USD, GBP/USD, USD/JPY, AUD/USD, USD/CHF, USD/CAD, NZD/USD</td></tr>
             <tr><td>Regime change</td><td>Fires when the live stress score triggers a transition to a specific regime label</td><td>RISK-OFF, CAUTION, MIXED, RISK-ON</td></tr>
           </tbody>
         </table>
       </div>
-      <p>All alerts check every 5 minutes, fire a browser notification on trigger, and persist across sessions in local storage. Click the alert row in the popover to delete it. If your browser has blocked notifications, the alerts button shows a red state — re-enable from your browser's site settings.</p>
+      <p>All alerts check every 5 minutes and persist across sessions in local storage. On trigger, an alert fires three layers at once: an in-terminal toast in the corner of the screen, an entry in the bell icon's history tray (with an optional short chime, toggled via the speaker icon next to the bell), and — if you've granted permission — a browser notification. Click the alert row in the popover to delete it. If your browser has blocked notifications, the alerts button shows a red state — re-enable from your browser's site settings; the in-terminal toast/tray layer works regardless of that permission.</p>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
           <img src="assets/screenshot-alerts-widget.png" alt="Alerts popover showing a fired notification, the alert type selector (Price / Level), instrument dropdown, condition and value fields, and an Add button" width="492" height="288" loading="lazy">
