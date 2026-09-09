@@ -1,0 +1,116 @@
+name: Update Capital Flows (TIC + ICI)
+
+on:
+  schedule:
+    - cron: '0 12 * * 5'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: update-capital-flows
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  update-capital-flows:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v6
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v6
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install beautifulsoup4 lxml --break-system-packages
+
+      - name: Fetch capital flows (TIC + ICI)
+        run: python3 private-scripts/fetch_capital_flows.py
+
+      - name: Display summary
+        run: |
+          echo ""
+          echo "========================================"
+          echo "    CAPITAL FLOWS FETCH SUMMARY"
+          echo "========================================"
+          python3 -c "
+          import json
+          with open('capital-flows-data/capital_flows.json') as f:
+              doc = json.load(f)
+          tic = doc.get('tic')
+          ici = doc.get('ici')
+          if tic:
+              g = tic['gate']
+              print(f'  TIC as_of: {tic[\"as_of\"]}  gate: {g[\"have\"]}/{g[\"need\"]}  ready: {g[\"ready\"]}')
+              print(f'  TIC top 3: ' + ', '.join(f'{c[\"country\"]} ({c[\"signal\"]})' for c in tic['top10'][:3]))
+          else:
+              print('  TIC: FAILED — see [ERROR] line above')
+          if ici:
+              g = ici['gate']
+              print(f'  ICI as_of: {ici[\"as_of\"]}  gate: {g[\"have\"]}/{g[\"need\"]}  ready: {g[\"ready\"]}')
+              print(f'  ICI latest signal: {ici[\"latest_signal\"][\"signal\"]}')
+          else:
+              print('  ICI: FAILED — see [ERROR] line above')
+          "
+
+      - name: Commit and push (with retry on race)
+        id: push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --quiet -- capital-flows-data/ && git diff --staged --quiet -- capital-flows-data/ && [ -z "$(git status --porcelain capital-flows-data/)" ]; then
+            echo "No changes to capital-flows-data/ — skipping commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          mkdir -p /tmp/capital-flows-fresh
+          cp -r capital-flows-data/. /tmp/capital-flows-fresh/
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+
+          for i in 1 2 3 4 5; do
+            echo "--- Attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p capital-flows-data
+            cp -r /tmp/capital-flows-fresh/. capital-flows-data/
+            git add capital-flows-data/
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
+              echo "pushed=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            git commit -m "Capital Flows (TIC + ICI) refresh ${TIMESTAMP}"
+            if git push origin main; then
+              echo "Push succeeded on attempt $i."
+              echo "pushed=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "All push attempts exhausted — data refreshes on next scheduled run."
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Trigger Pages deploy
+        if: steps.push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy-pages.yml --ref main
