@@ -1431,19 +1431,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
       <div id="capflows-tic-wrap" style="display:none;">
         <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;">Foreign holders of US Treasuries · TIC · top 10</div>
-        <div style="max-height:260px;overflow-y:auto;min-width:0;">
+        <div id="capflows-tic-scroll" style="max-height:112px;overflow-y:auto;min-width:0;">
           <table id="capflows-tic-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="Top 10 foreign holders of US Treasury securities — holdings, month-over-month change, and accumulation/reduction signal">
             <thead>
               <tr>
-                <th scope="col" style="text-align:left;padding-left:16px;">Country</th>
-                <th scope="col">Holdings $bn</th>
-                <th scope="col" title="Change vs prior month's TIC release">MoM Δ</th>
-                <th scope="col" style="padding-right:16px;" title="Rolling z-score of MoM Δ vs trailing 12mo — a statistical deviation measure, not a trade signal">Signal</th>
+                <th scope="col" style="text-align:left;padding:4px 8px 4px 16px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;">Country</th>
+                <th scope="col" style="padding:4px 8px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;">Holdings $bn</th>
+                <th scope="col" style="padding:4px 8px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;" title="Change vs prior month's TIC release">MoM Δ</th>
+                <th scope="col" style="padding:4px 16px 4px 8px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;" title="Rolling z-score of MoM Δ vs trailing 12mo — a statistical deviation measure, not a trade signal">Signal</th>
               </tr>
             </thead>
             <tbody id="capflows-tic-tbody"></tbody>
           </table>
         </div>
+        <div style="padding:2px 16px 0;font-size:9px;color:var(--text3);">Scroll for the remaining 7 holders</div>
         <div id="capflows-tic-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
       </div>
 
