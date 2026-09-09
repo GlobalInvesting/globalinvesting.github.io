@@ -11298,7 +11298,7 @@ function initAlerts() {
   alertsRender(null);
   setTimeout(alertsCheck, 8000);
 
-  setInterval(alertsCheckEco, 2 * 60 * 1000);
+  setInterval(alertsCheckEco, 30 * 1000);
   setInterval(alertsCheck,    5 * 60 * 1000);
 
   let _lastVisCheck = 0;
