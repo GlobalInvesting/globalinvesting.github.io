@@ -1,7 +1,18 @@
 {
-  "generated_at": "2026-09-09T07:59:19Z",
+  "generated_at": "2026-09-09T15:00:27Z",
   "source": "Myfxbook · ForexFactory",
-  "holidays": [],
+  "holidays": [
+    {
+      "title": "Bank Holiday",
+      "currency": "CAD",
+      "dateISO": "2026-09-07"
+    },
+    {
+      "title": "Bank Holiday",
+      "currency": "USD",
+      "dateISO": "2026-09-07"
+    }
+  ],
   "events": [
     {
       "title": "Australia Wage Price Index YoY",
@@ -3914,6 +3925,18 @@
       "currency": "EUR",
       "dateISO": "2026-09-09",
       "timeUTC": "17:00",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false,
+      "vendor": "forexfactory"
+    },
+    {
+      "title": "President Trump Speaks",
+      "currency": "USD",
+      "dateISO": "2026-09-10",
+      "timeUTC": "01:15",
       "impact": "medium",
       "forecast": null,
       "previous": null,
