@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-10T00:01:19Z",
+  "generated_at": "2026-09-10T03:03:53Z",
   "signals": [
     {
-      "time": "23:58",
+      "time": "03:03",
       "priority": "critical",
-      "title": "NZD/JPY — G10 Bilateral Theme + BoJ Repricing",
-      "text": "NZD/JPY displays the widest G10 divergence this week, anchored by JPY 1W average gains of +1.433% across 7 pairs against NZD 1W losses of -0.941% across 4 pairs, creating an active 2.374% leader-to-laggard spread. The structural carry spread favors NZD via a +175bp policy differential with RBNZ at 2.75% against BoJ at 1.0%, yet aggressive BoJ rate-hike repricing completely overrides the yield gap. Institutional consensus now places a 97% probability on a BoJ hike to 1.25% at the September 18 meeting, bolstered by comments from US Treasury officials reducing political hurdles for tighter Japanese policy. Meanwhile, NZD speculative positioning sits heavily short at leveraged funds net -23,004 contracts, residing in the 4th percentile of its 52-week range with z at -1.81. The pair trades below its technical benchmarks, with NZD/USD holding below its SMA20 at 0.5907, SMA50 at 0.5850, and SMA200 at 0.5857. Trade bias: Bearish NZD/JPY; policy convergence and aggressive JPY momentum dominate nominal carry. Catalyst: BoJ interest rate decision 18 Sep — hike to 1.25% priced at 97%. Risk: BoJ holds rates unchanged at 1.0%, triggering an immediate unwinding of aggressive JPY longs.",
+      "title": "NZD/JPY — G10 Bilateral Theme + Hawkish BoJ Repricing",
+      "text": "NZD/JPY trades under acute downside pressure as JPY dominates the G10 space following explicit hawkish guidance from BoJ's Masu. Masu stated the central bank must raise rates further to estimated neutral levels promptly, driving massive repricing across JPY crosses ahead of the 18 Sep BoJ decision. The 1W G10 scorecard flags a critical bilateral divergence: JPY leads G10 (+1.487% avg, n=7) while NZD lags as the bottom G10 performer (-0.906% avg, n=4), yielding a 2.393% spread. NZD/JPY spot sits cheap at fair value z=-3.11σ, while CFTC data shows JPY leveraged short positioning stretched at pctl 2 (lev net -111,297), leaving massive short-squeeze fuel for JPY as monetary normalization accelerates. Trade bias: Bearish NZD/JPY, driven by hawkish BoJ repricing against a weak NZD backdrop. Catalyst: BoJ Rate Decision on 18 Sep. Risk: BoJ holds policy rate unchanged without hawkish guidance, sparking a sharp unwind of recent JPY gains.",
       "evidence": [
-        "JPY 1W avg: +1.433% (n=7)",
-        "NZD 1W avg: -0.941% (n=4)",
-        "G10 spread: 2.374%"
+        "JPY 1W avg: +1.487% (n=7)",
+        "NZD 1W avg: -0.906% (n=4)",
+        "G10 spread: 2.393%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:55",
-      "priority": "critical",
-      "title": "USD/JPY — Options Skew + Policy Repricing",
-      "text": "USD/JPY trades at 153.57, positioned below its SMA20 at 158.16, SMA50 at 159.98, and SMA200 at 158.42. The 1M 25-delta risk reversal prints at an extreme -2.31 put skew, showing heavy institutional demand for downside protection against USD weakness. Leveraged funds hold an extreme net short JPY position of -111,297 contracts (2nd percentile, z -2.18), expanding by -29,678 contracts on the week, which clashes directly with the options market's protective positioning and the 97% economist consensus pricing a BoJ rate hike to 1.25%. While Fed at 3.75% versus BoJ at 1.0% maintains a +275bp policy rate advantage for the dollar (and +266bp via SOFR-TONA carry), VRP trades negative at -0.6% (IV 10.8% versus HV30 11.3%), reflecting market complacency relative to realized volatility. With VIX at 16.5 representing normal volatility, the downside pressure reflects direct monetary policy repricing rather than broader safe-haven demand. Trade bias: Bearish USD/JPY; crowded speculative shorts face severe squeeze risk into tightening Japanese policy. Catalyst: US CPI release 10 Sep at 12:30 UTC. Risk: US Core CPI prints above the 0.2% monthly forecast, reigniting broad dollar yield demand.",
-      "evidence": [
-        "USD/JPY 25d RR: -2.31 (1M indicative mid)",
-        "JPY COT LF net: -111,297 (pctl 2, z -2.18)",
-        "Fed 3.75% vs BoJ 1.0% — 275bp"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "23:51",
+      "time": "03:00",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long + Retail Divergence",
-      "text": "AUD/USD trades at 0.7224, holding above its SMA20 at 0.7159, SMA50 at 0.7060, and SMA200 at 0.6998. CFTC data shows institutional leveraged funds heavily net long AUD at +50,250 contracts, situated in the 94th percentile of its 52-week range (z +1.79), even as net exposure trimmed by -3,328 contracts WoW. In stark contrast, retail sentiment registers an extreme 91% short positioning, setting up an active institutional versus retail divergence at historical extremes. The currency pair is underpinned by the Reserve Bank of Australia at 4.35% versus the Federal Reserve at 3.75%, delivering a 60bp carry advantage to AUD (+71bp via AONIA-SOFR). Implied volatility sits at 7.1% against 30-day realized volatility of 5.9%, reflecting a modest 1.2% vol risk premium that supports carry stability under normal volatility conditions with VIX at 16.5. Trade bias: Bullish AUD/USD; institutional long positioning and positive carry maintain upward trend structure against trapped retail shorts. Catalyst: US CPI release 10 Sep at 12:30 UTC. Risk: Leveraged funds accelerate weekly net long liquidation, triggering broader profit-taking toward the SMA20 at 0.7159.",
+      "title": "USD/JPY — Hawkish BoJ Repricing + Volatility Compression",
+      "text": "USD/JPY trades at 153.390, remaining below its SMA20/50/200 cluster (158.16/159.98/158.42) as hawkish rhetoric from BoJ Board Member Masu drives JPY buying across the board. The 266bp OIS carry advantage (SOFR 3.64% vs TONA 0.98%) continues to favor USD, but a -2.31 25d Risk Reversal highlights significant institutional demand for USD/JPY downside protection. Options market pricing displays unusual complacency with IV at 10.8% trading below HV30 at 11.3% (VRP -0.6%), suggesting potential for a volatility expansion if downside momentum accelerates. Positioning remains extreme with JPY COT net short at -111,297 (pctl 2, z -2.18) while retail stands 86% long USD/JPY, setting up a severe contrarian unwinding setup. Trade bias: Bearish USD/JPY, driven by hawkish BoJ rhetoric overriding carry support. Catalyst: US CPI release today at 12:30 UTC. Risk: US CPI significantly exceeds expectations, reigniting USD yield support.",
       "evidence": [
-        "AUD COT LF net: +50,250 (pctl 94, z +1.79)",
-        "Retail sentiment: 91% short (Myfxbook)",
-        "RBA 4.35% vs Fed 3.75% — 60bp AUD carry premium"
+        "USD/JPY 25d RR: -2.31",
+        "USD/JPY IV: 10.8% vs HV30: 11.3%",
+        "SOFR 3.64% vs TONA 0.98% — +266bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:46",
-      "priority": "info",
-      "title": "EUR/USD — ECB Policy Decision + Real Rate Compression",
-      "text": "EUR/USD trades at 1.1637, positioned above its SMA20 at 1.1625 and SMA50 at 1.1525, while remaining capped just below its SMA200 at 1.1638. The Federal Reserve at 3.75% holds a 135bp nominal policy rate spread over the European Central Bank at 2.4% (+145bp via SOFR-ESTR basis), yet the real policy rate differential sits narrower at 129bp (USD real rate +1.35% versus EUR +0.06%). Options markets indicate balanced near-term sentiment with 25-delta risk reversals near neutral at -0.11 and 1M ATM implied volatility at 5.0% against HV30 of 4.2%, yielding a modest 0.8% volatility premium. Leveraged funds hold net short exposure of -52,784 contracts, though net positioning has rebuilt by +20,265 contracts over the trailing 4 weeks to the 31st percentile. The impending ECB refinancing rate decision presents direct policy event risk ahead of US inflation figures. Trade bias: Neutral EUR/USD; nominal dollar carry advantage balanced by tightening real yield spreads and moving average resistance. Catalyst: ECB Main Refinancing Rate decision 10 Sep at 12:15 UTC. Risk: ECB delivers an unexpected 25bp rate hike, forcing immediate short-covering through the SMA200 barrier at 1.1638.",
+      "time": "02:57",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning Extreme + Carry Support",
+      "text": "AUD/USD trades at 0.72250, holding above its SMA20/50/200 cluster (0.7159/0.7060/0.6998) backed by strong fundamental and carry tailwinds. The 71bp OIS carry premium (AONIA 4.35% vs SOFR 3.64%) favors AUD, supported by a positive ESI reading of +17.3 reflecting steady domestic data beats. However, CFTC positioning shows Leveraged Funds crowded long at +50,250 net contracts (pctl 94, z +1.79) with WoW flow stalling (-3,328 contracts), while retail sentiment sits at an extreme 91% short, creating institutional-versus-retail divergence near multi-month highs. Options pricing shows 1M IV at 7.1% against HV30 of 5.9% (VRP +1.2%), pointing to moderate demand for downside hedging against upside trend exhaustion. Trade bias: Long AUD/USD, carry-supported trend with late-stage positioning caution. Catalyst: US CPI release today at 12:30 UTC. Risk: Sharp risk-off sentiment spike forcing liquidation of crowded speculative longs.",
       "evidence": [
-        "Fed 3.75% vs ECB 2.4% — 135bp",
-        "EUR/USD 25d RR: -0.11 (1M indicative mid)",
-        "EUR/USD SMA cluster: SMA20 1.1625 / SMA200 1.1638"
+        "AUD COT LF net: +50,250 (pctl 94)",
+        "SOFR 3.64% vs AONIA 4.35% — -71bp",
+        "Retail: 91% short"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "02:50",
+      "priority": "info",
+      "title": "EUR/USD — CB Policy Divergence + Low Volatility",
+      "text": "EUR/USD trades quietly at 1.16430, hovering above its SMA20 (1.1625) and SMA50 (1.1525) but below its SMA200 (1.1637). Carry continues to favor USD via a +145bp OIS spread (SOFR 3.64% vs €STR 2.19%), though market pricing anticipates a potential ECB hike at today's decision while the Fed remains on hold at 3.75%. CFTC Leveraged Funds hold a net short EUR position of -52,784 contracts (pctl 31), showing balanced structural positioning, while options vol remains subdued with 1M IV at 5.0% vs HV30 at 4.2% (VRP +0.8%) and a neutral 25d RR (-0.11). Trade bias: Neutral EUR/USD, awaiting central bank catalysts to establish directional momentum. Catalyst: ECB Policy Decision and Press Conference today at 12:15/12:45 UTC. Risk: ECB delivers a dovish hold, triggering a sharp re-pricing lower toward SMA50 support.",
+      "evidence": [
+        "SOFR 3.64% vs €STR 2.19% — +145bp",
+        "EUR/USD 25d RR: -0.11",
+        "EUR COT LF net: -52,784 (pctl 31)"
       ],
       "_source": "engine-ai-primary"
     }
