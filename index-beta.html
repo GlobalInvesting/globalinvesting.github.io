@@ -1418,7 +1418,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="section-capflows" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
       <div class="panel-head">
         <span class="panel-title">Capital Flows</span>
-        <span class="panel-sub" id="capflows-sub" title="Cross-border demand for dollar assets: monthly Treasury holdings by country (TIC), weekly long-term fund flows (ICI), and monthly money market fund flows (SEC). Slower-moving structural context, not a live quote.">TIC + ICI + SEC MMF · monthly / weekly</span>
+        <span class="panel-sub" id="capflows-sub" title="Cross-border demand for dollar assets: monthly Treasury holdings by country (TIC), monthly registered-fund net flows by asset class (SEC, Form N-PORT), and monthly money market fund flows (SEC, Form N-MFP). Slower-moving structural context, not a live quote.">TIC + SEC Fund Flows + SEC MMF · monthly</span>
       </div>
 
       <div id="capflows-tic-gate" style="padding:14px 16px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
@@ -1449,32 +1449,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="capflows-tic-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
       </div>
 
-      <div id="capflows-ici-gate" style="padding:8px 16px 14px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
-        Accumulating weekly history — <span id="capflows-ici-progress-text">0/12wk</span>
+      <div id="capflows-rf-gate" style="padding:8px 16px 14px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
+        Accumulating monthly history — <span id="capflows-rf-progress-text">0/12mo</span>
         <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;">
-          <div id="capflows-ici-progress-bar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;"></div>
+          <div id="capflows-rf-progress-bar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;"></div>
         </div>
       </div>
 
-      <div id="capflows-ici-unavailable" style="display:none;padding:8px 16px 14px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">ICI weekly fund flows currently unavailable.</div>
+      <div id="capflows-rf-unavailable" style="display:none;padding:8px 16px 14px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">SEC Registered Funds Flows currently unavailable.</div>
 
-      <div id="capflows-ici-wrap" style="display:none;padding-bottom:6px;">
-        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;">ICI weekly long-term fund flows · $bn</div>
-        <div style="overflow-x:auto;">
-          <table id="capflows-ici-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="ICI weekly estimated long-term fund flows — equity, bond, and total, last 8 weeks, with a rolling z-score signal on the total">
+      <div id="capflows-rf-wrap" style="display:none;padding-bottom:6px;">
+        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="Combines every SEC-registered ETF and mutual fund's Form N-PORT flow reporting, by asset class. Money market funds excluded here — covered separately below by a different report (Form N-MFP).">Registered fund net flows by asset class · SEC (Form N-PORT) · monthly · $bn</div>
+        <div id="capflows-rf-scroll" style="max-height:157px;overflow-y:auto;min-width:0;">
+          <table id="capflows-rf-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="SEC Registered Funds Flows — net flow by asset class, ETF and mutual fund combined, with month-over-month change and a rolling z-score signal">
             <thead>
               <tr>
-                <th scope="col" style="text-align:left;padding-left:16px;">Week ending</th>
-                <th scope="col">Equity</th>
-                <th scope="col">Bond</th>
-                <th scope="col">Total</th>
-                <th scope="col" style="padding-right:16px;" title="Rolling z-score of the Total column's WoW change vs trailing 12wk">Signal</th>
+                <th scope="col" style="text-align:left;padding:4px 8px 4px 16px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;">Asset class</th>
+                <th scope="col" style="padding:4px 8px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;">Net flow $bn</th>
+                <th scope="col" style="padding:4px 8px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;" title="Change vs prior month's report">MoM Δ</th>
+                <th scope="col" style="padding:4px 16px 4px 8px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;" title="Rolling z-score of the net flow vs trailing 12mo — a statistical deviation measure, not a trade signal">Signal</th>
               </tr>
             </thead>
-            <tbody id="capflows-ici-tbody"></tbody>
+            <tbody id="capflows-rf-tbody"></tbody>
           </table>
         </div>
-        <div id="capflows-ici-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
+        <div id="capflows-rf-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
       </div>
 
       <div id="capflows-mmf-gate" style="padding:8px 16px 14px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
@@ -1487,7 +1486,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="capflows-mmf-unavailable" style="display:none;padding:8px 16px 14px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">SEC Money Market Fund Statistics currently unavailable.</div>
 
       <div id="capflows-mmf-wrap" style="display:none;padding-bottom:6px;">
-        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="Money market fund flows are not part of ICI's release above — ICI's long-term-fund series excludes MMFs by definition, so this is genuinely separate coverage, not an ICI substitute.">Money market fund flows · SEC (Form N-MFP) · monthly, ~2mo lag · $bn</div>
+        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="Money market fund flows are not part of the Registered Funds Flows table above — that table's source (Form N-PORT) excludes money market funds by definition, so this is genuinely separate coverage from a different report (Form N-MFP), not overlapping data.">Money market fund flows · SEC (Form N-MFP) · monthly, ~2mo lag · $bn</div>
         <div style="overflow-x:auto;">
           <table id="capflows-mmf-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="SEC Money Market Fund Statistics — monthly net flows by fund category, last 8 months, with a rolling z-score signal per category">
             <thead>
@@ -1506,7 +1505,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="capflows-mmf-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
       </div>
 
-      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="TIC: US Treasury Major Foreign Holders table, monthly, roughly 6-week publication lag. ICI: weekly estimate covering long-term mutual funds and ETFs only — excludes money market funds. SEC MMF: Form N-MFP aggregate subscriptions/redemptions by fund category, monthly, ~2mo lag — genuinely separate coverage from ICI, not a substitute for it. Signal = rolling z-score vs a gated trailing window — a statistical deviation measure, not investment advice.">Source: US Treasury TIC (Table 5, MFH) · ICI weekly combined flows · SEC Money Market Fund Statistics (Form N-MFP) · z-score signal, same convention as FX Fair Value's Z-score column</div>
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="TIC: US Treasury Major Foreign Holders table, monthly, roughly 6-week publication lag. SEC Registered Funds Flows: Form N-PORT aggregate across every SEC-registered ETF and mutual fund, by asset class, essentially real-time for the prior month — excludes money market funds by construction. SEC MMF: Form N-MFP aggregate subscriptions/redemptions by fund category, monthly, ~2mo lag — genuinely separate coverage, not overlapping with the Registered Funds table above. Signal = rolling z-score vs a gated trailing window — a statistical deviation measure, not investment advice.">Source: US Treasury TIC (Table 5, MFH) · SEC Registered Funds Flows (Form N-PORT) · SEC Money Market Fund Statistics (Form N-MFP) · z-score signal, same convention as FX Fair Value's Z-score column</div>
     </div>
 
     <div id="section-fair-value" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
