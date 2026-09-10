@@ -1,5 +1,5 @@
 {
-  "runTimestamp": "2026-09-10T19:21:50.069919Z",
+  "runTimestamp": "2026-09-10T22:20:07.047687Z",
   "runDate": "2026-09-10",
   "frankfurterOk": true,
   "currencies": {
@@ -11,10 +11,10 @@
       "issues": []
     },
     "EUR": {
-      "status": "cached",
-      "rate": "2.65",
-      "source": "cached-file",
-      "date": "2026-09-16",
+      "status": "ok",
+      "rate": "2.5",
+      "source": "ff-calendar-actual",
+      "date": "2026-09-10",
       "issues": []
     },
     "GBP": {
@@ -75,8 +75,6 @@
     }
   },
   "issues": [],
-  "warnings": [
-    "EUR: kept cached 2026-09-16 value over older ff-calendar-actual candidate (2026-09-10) \u2014 likely a laggy fallback source"
-  ],
-  "overallStatus": "degraded_cached"
+  "warnings": [],
+  "overallStatus": "ok"
 }
