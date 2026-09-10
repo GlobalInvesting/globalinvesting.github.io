@@ -117,10 +117,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        if: steps.gate.outputs.run == 'true'
-        run: pip install requests --break-system-packages
-
       - name: Fetch economic calendar (biquote, single source — actuals + forward)
         if: steps.gate.outputs.run == 'true'
         run: python3 private-scripts/fetch_biquote_calendar.py
