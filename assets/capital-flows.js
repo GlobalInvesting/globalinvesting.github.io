@@ -1,5 +1,5 @@
 /*
-capital-flows.js  v2.1-beta — Capital Flows panel (TIC top holders +
+capital-flows.js  v2.2-beta — Capital Flows panel (TIC top holders +
 combined SEC Registered Funds Flows + SEC Money Market Fund Statistics)
 
 Reads capital-flows-data/capital_flows.json (written by
@@ -7,21 +7,35 @@ fetch_capital_flows.py). Gates each sub-panel on its own history-length
 threshold — same UX pattern as the FX Fair Value "Accumulating business-day
 history" progress bar — rather than showing a signal fit on too few points.
 
+v2.2-beta: fund-flows table flattened to a single plain list, matching how
+ICI's own weekly "Combined Estimated Long-Term Flows" release (the
+industry reference this project targets) lists categories — Domestic
+Equity, World Equity, Hybrid, Taxable Bond, Municipal Bond, Money Market —
+as one undifferentiated row list, with Money Market as one line among the
+others rather than its own sub-table. The v2.1-beta muted section-header
+rows are removed; Registered Funds' rows (registered_funds.rows) render
+first, then a single "Money Market" row (mmf.rows' own "total" category,
+relabeled) is appended last — a fixed position rather than interleaved,
+since it already aggregates three sub-categories (Government/Prime/
+Tax-exempt) into one figure and reads better as a summary line than mixed
+in with individual asset classes. The Government/Prime/Tax-exempt
+breakdown itself is dropped from the visible table (drill-down detail, not
+a top-level "flows by category" row) but stays in the underlying JSON
+(mmf.rows, unchanged) for a future per-category view.
+Vintage disclosure — the actual reason v2.1-beta had section headers in
+the first place (Registered Funds ≈ real-time for the prior month; MMF
+runs ~2mo behind, so the two groups sit on different "as of" dates) — is
+kept, just moved to the existing single-line footer beneath the table
+("Registered Funds as of ... · MMF as of ..."), which already disclosed
+both dates before this change; nothing about that honesty guarantee is
+lost by removing the in-table headers. A source-specific gate/unavailable
+row (fundFlowGateRow()/fundFlowUnavailableRow()) still names which source
+it refers to, since there's no longer a header above it to say so.
+
 v2.1-beta: renderRegisteredFunds() + renderMmf() merged into one
 renderFundFlows(), writing registered_funds.rows and mmf.rows (mmf.rows
 added in fetch_capital_flows.py v3.1) into a SINGLE table, one row per
-asset class/category, matching renderTic()'s row layout throughout. A
-muted section-header row is injected between the two groups because the
-two sources have genuinely different publication vintages (Registered
-Funds ≈ real-time for the prior month; MMF runs ~2mo behind) — combining
-the tables' LAYOUT is a real fix (both are "one row per category" data,
-they just used to render differently), but combining them into one
-undifferentiated series would hide that vintage difference, so each
-section still discloses its own "as of" date. Each group also gates
-independently: if one source's gate isn't ready, that group's row is a
-single "Accumulating history — n/12mo" line instead of hiding the whole
-table (see showUnavailable()'s doc for why a null/not-ready source must
-never look identical to "still loading").
+asset class/category, matching renderTic()'s row layout throughout.
 
 v2.0-beta: ICI removed (renderIci() deleted) — replaced with
 renderRegisteredFunds(), which renders SEC's Form N-PORT-derived net-flow-
@@ -136,37 +150,36 @@ review flow — see CHANGELOG.md.
       .join("");
   }
 
-  // Muted divider row between the Registered Funds and MMF groups within
-  // the one combined table — this is where each source's own "as of"
-  // vintage is disclosed, since the two reports are genuinely not on the
-  // same publication schedule (see capital-flows.js's top-of-file note).
-  function fundFlowSectionRow(label) {
-    return `<tr><td colspan="4" style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;">${label}</td></tr>`;
-  }
-
   // In-table equivalent of renderGate()'s progress bar, used when a group
-  // (Registered Funds or MMF) isn't past its own history gate yet — a
-  // single spanning row instead of hiding the whole combined table, since
-  // the other group may already be ready.
-  function fundFlowGateRow(gate) {
+  // (Registered Funds or Money Market) isn't past its own history gate
+  // yet — a single spanning row instead of hiding the whole flat list,
+  // since the other group may already be ready. Names the source
+  // explicitly since v2.2-beta removed the section header that used to
+  // say so.
+  function fundFlowGateRow(gate, label) {
     const have = gate ? gate.have : 0;
     const need = gate ? gate.need : 12;
     const pct = Math.min(100, (have / need) * 100);
     return `<tr><td colspan="4" style="padding:6px 16px 12px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
-      Accumulating monthly history — ${have}/${need}mo
+      Accumulating ${label} history — ${have}/${need}mo
       <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;">
         <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:2px;"></div>
       </div>
     </td></tr>`;
   }
 
-  function fundFlowUnavailableRow() {
-    return `<tr><td colspan="4" style="padding:6px 16px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Currently unavailable.</td></tr>`;
+  function fundFlowUnavailableRow(label) {
+    return `<tr><td colspan="4" style="padding:6px 16px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">${label} currently unavailable.</td></tr>`;
   }
 
-  // Combined Registered Funds + MMF table — see the v2.1-beta note at the
-  // top of this file for why these two are one table now (same row shape)
-  // but still two clearly-labeled sections (different vintages).
+  // Flat fund-flows list — Registered Funds' own rows first, then a single
+  // "Money Market" summary row appended last (mmf.rows' "total" category,
+  // relabeled), matching how ICI's own weekly release lists categories:
+  // one plain list, no sub-table. See the v2.2-beta note at the top of
+  // this file for why Money Market is a fixed trailing row rather than
+  // interleaved, and why the Government/Prime/Tax-exempt breakdown isn't
+  // shown here. Each source's own "as of" vintage is disclosed in the
+  // footer line below the table (asofParts), not in the row list itself.
   function renderFundFlows(rf, mmf) {
     const tbody = document.getElementById("capflows-flows-tbody");
     const wrap = document.getElementById("capflows-flows-wrap");
@@ -186,24 +199,22 @@ review flow — see CHANGELOG.md.
     let html = "";
 
     if (rf) {
-      html += fundFlowSectionRow(`Registered fund net flows by asset class · SEC (Form N-PORT) · as of ${rf.as_of}`);
-      html += rf.gate && rf.gate.ready ? fundFlowRows(rf.rows) : fundFlowGateRow(rf.gate);
+      html += rf.gate && rf.gate.ready ? fundFlowRows(rf.rows) : fundFlowGateRow(rf.gate, "registered fund flows");
       asofParts.push(`Registered Funds as of ${rf.as_of}`);
     } else {
-      html += fundFlowSectionRow("Registered fund net flows by asset class · SEC (Form N-PORT)");
-      html += fundFlowUnavailableRow();
+      html += fundFlowUnavailableRow("Registered fund flows");
     }
 
-    html += fundFlowSectionRow(
-      mmf
-        ? `Money market fund flows · SEC (Form N-MFP) · as of ${mmf.as_of} · ~2mo lag`
-        : "Money market fund flows · SEC (Form N-MFP)"
-    );
     if (mmf) {
-      html += mmf.gate && mmf.gate.ready ? fundFlowRows(mmf.rows) : fundFlowGateRow(mmf.gate);
+      if (mmf.gate && mmf.gate.ready) {
+        const total = mmf.rows.find((row) => row.category === "Money Market — Total");
+        html += total ? fundFlowRows([{ ...total, category: "Money Market" }]) : fundFlowUnavailableRow("Money market flows");
+      } else {
+        html += fundFlowGateRow(mmf.gate, "money market");
+      }
       asofParts.push(`MMF as of ${mmf.as_of}`);
     } else {
-      html += fundFlowUnavailableRow();
+      html += fundFlowUnavailableRow("Money market flows");
     }
 
     tbody.innerHTML = html;
