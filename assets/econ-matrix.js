@@ -24,10 +24,24 @@
     USD: 'united states ', GBP: 'united kingdom ', JPY: 'japan ', AUD: 'australia ',
     CAD: 'canada ', CHF: 'switzerland ', NZD: 'new zealand ', NOK: 'norway ', SEK: 'sweden ',
   };
+  // biquote (the calendar source since 2026-09-10) titles cadence notation
+  // as lowercase slash form ("CPI m/m", "GDP q/q") where every CATS/CATS_EUR
+  // prefix below was written against the previous vendor's concatenated form
+  // ("CPI MoM", "GDP QoQ"). Word-boundary-anchored so it never touches a
+  // genuinely different field like GBP's "GDP 3m/3m" (no boundary between
+  // the leading digit and "m"). Must stay in sync with the equivalent
+  // notation step in fetch_current_account_gdp.py's _cal_canon().
+  function normNotation(title) {
+    return title
+      .replace(/\bm\/m\b/g, 'MoM')
+      .replace(/\by\/y\b/g, 'YoY')
+      .replace(/\bq\/q\b/g, 'QoQ');
+  }
+
   function canon(ccy, title) {
     const pfx = CCY_PFXS[ccy];
-    if (pfx && title.toLowerCase().indexOf(pfx) === 0) return title.slice(pfx.length);
-    return title;
+    const stripped = (pfx && title.toLowerCase().indexOf(pfx) === 0) ? title.slice(pfx.length) : title;
+    return normNotation(stripped);
   }
 
   function strictMatch(title, prefix) {
@@ -38,52 +52,56 @@
 
   const CATS = {
     USD: {
-      gdp:   ['GDP Growth Rate QoQ'],
-      cpi:   ['Inflation Rate YoY'],
-      cpimom:['Inflation Rate MoM'],
-      core:  ['Core Inflation Rate YoY'],
-      ppi:   ['PPI MoM'], 
-      emp:   ['Non Farm Payrolls'],
+      gdp:   ['GDP Growth Rate QoQ', 'GDP QoQ'],
+      cpi:   ['Inflation Rate YoY', 'CPI YoY'],
+      cpimom:['Inflation Rate MoM', 'CPI MoM'],
+      core:  ['Core Inflation Rate YoY', 'Core CPI YoY'],
+      ppi:   ['PPI MoM'],
+      emp:   ['Non Farm Payrolls', 'Nonfarm Payrolls'],
       unemp: ['Unemployment Rate'],
-      prod:  ['Industrial Production MoM'],
+      prod:  ['Industrial Production MoM', 'Fed Industrial Production MoM'],
       conf:  ['ISM Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade', 'Goods Trade Balance'],
+      trade: ['Balance of Trade', 'Goods Trade Balance', 'Trade Balance'],
       pce:   ['PCE Price Index YoY'],
     },
     GBP: {
       gdp:   ['GDP Growth Rate QoQ', 'GDP MoM'],
-      cpi:   ['Inflation Rate YoY'],
-      cpimom:['Inflation Rate MoM'],
+      cpi:   ['Inflation Rate YoY', 'CPI YoY'],
+      cpimom:['Inflation Rate MoM', 'CPI MoM'],
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['PPI Output YoY', 'PPI Output MoM'],
-      emp:   ['Employment Change'],
+      emp:   ['Employment Change', 'Employment Change 3-months'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM'],
-      conf:  ['Flash Manufacturing PMI', 'CBI Industrial Trends Orders'],
+      conf:  ['Flash Manufacturing PMI', 'CBI Industrial Trends Orders', 'S&P Global/CIPS Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
-      trade: ['Goods Trade Balance', 'Balance of Trade'],
+      trade: ['Goods Trade Balance', 'Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
     JPY: {
-      gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP Growth Rate QoQ'],
+      gdp:   ['GDP Growth Rate QoQ Final', 'GDP Growth Rate QoQ Prel', 'GDP Growth Rate QoQ', 'GDP QoQ'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
-      core:  ['Core Inflation Rate YoY'],
+      core:  ['Core Inflation Rate YoY', 'Core CPI YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'],
       emp:   ['Employment Change MoM'],
       unemp: ['Unemployment Rate'],
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
-      ca:    ['Current Account'],
-      trade: ['Balance of Trade'],
+      // biquote publishes JPY's Current Account as n.s.a. (non-seasonally-
+      // adjusted, the BoJ's own headline release) rather than a plain
+      // "Current Account" title — verified live 2026-09-10, see
+      // fetch_current_account_gdp.py's matching _EVENT_KIND_ALIAS entry.
+      ca:    ['Current Account', 'Current Account n.s.a.'],
+      trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
     AUD: {
-      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
+      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY', 'GDP QoQ', 'GDP YoY'],
       cpi:   ['Inflation Rate YoY'],
       cpimom:['Inflation Rate MoM'],
       core:  ['RBA Trimmed Mean CPI YoY', 'Quarterly RBA Trimmed Mean CPI YoY'],
@@ -94,14 +112,14 @@
       conf:  ['NAB Business Confidence'],
       rtl:   ['Retail Sales MoM'],
       ca:    ['Current Account'], 
-      trade: ['Balance of Trade'],
+      trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
     CAD: {
-      gdp:   ['GDP MoM', 'GDP Growth Rate Annualized'],
+      gdp:   ['GDP MoM', 'GDP Growth Rate Annualized', 'GDP Annualized QoQ'],
       cpi:   ['Inflation Rate YoY'],
-      cpimom:['Inflation Rate MoM'],
-      core:  ['Core Inflation Rate YoY'],
+      cpimom:['Inflation Rate MoM', 'CPI MoM'],
+      core:  ['Core Inflation Rate YoY', 'Core CPI YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'],
       emp:   ['Employment Change'],
       unemp: ['Unemployment Rate'],
@@ -109,13 +127,13 @@
       conf:  ['Ivey PMI s.a', 'S&P Global Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Retail Sales MoM Final', 'Retail Sales Ex Autos MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade'],
+      trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
     CHF: {
-      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
+      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY', 'GDP QoQ', 'GDP YoY'],
       cpi:   ['Inflation Rate YoY'],
-      cpimom:['Inflation Rate MoM'],
+      cpimom:['Inflation Rate MoM', 'CPI MoM'],
       core:  ['Core Inflation Rate YoY'],
       ppi:   ['Producer & Import Prices YoY', 'Producer & Import Prices MoM'],
       emp:   ['Employment Change QoQ'],
@@ -124,11 +142,11 @@
       conf:  ['procure.ch Manufacturing PMI'],
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade'],
+      trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
     NZD: {
-      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY'],
+      gdp:   ['GDP Growth Rate QoQ', 'GDP Growth Rate YoY', 'GDP QoQ', 'GDP Annual Change'],
       cpi:   ['Inflation Rate YoY', 'Inflation Rate QoQ'],
       cpimom:[], 
       core:  ['Core Inflation Rate YoY'],
@@ -138,15 +156,20 @@
       prod:  ['Industrial Production YoY'],
       conf:  ['Business NZ PMI'],
       rtl:   ['Retail Sales QoQ', 'Retail Sales YoY'],
-      ca:    ['Current Account'],
-      trade: ['Balance of Trade'],
+      // biquote publishes NZD's Current Account/Trade Balance as trailing
+      // 12-month totals (Stats NZ's own headline convention), not a plain
+      // single-period title — verified live 2026-09-10.
+      ca:    ['Current Account', 'Current Account 12-Months'],
+      trade: ['Balance of Trade', 'Trade Balance 12-Months'],
       pce:   [],
     },
     SEK: {
-      gdp:   ['GDP Growth Rate QoQ'],
+      gdp:   ['GDP Growth Rate QoQ', 'GDP QoQ'],
       cpi:   ['CPIF YoY'],
       cpimom:['CPIF MoM'],
-      core:  ['Inflation Rate YoY'],
+      // core shows Sweden's HEADLINE CPI YoY by design, not an ex-food/
+      // ex-energy measure — see SEK_CORE_IS_HEADLINE_NOTE below.
+      core:  ['Inflation Rate YoY', 'CPI YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], 
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
       emp:   ['Employment Change QoQ'],
@@ -154,9 +177,15 @@
       prod:  ['Industrial Production MoM', 'Industrial Production YoY'],
       conf:  ['Swedbank Manufacturing PMI'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade'],
+      trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
+    // NOK: zero live events observed for this currency in the biquote
+    // window checked 2026-09-10 (economic-events.json had no NOK entries
+    // at all) — title conventions below could not be re-verified against
+    // biquote and are left at their pre-migration (TE/Myfxbook-era)
+    // values. Flagged for re-check the next time a NOK release actually
+    // appears in the calendar; do not assume these are still correct.
     NOK: {
       gdp:   ['GDP Growth Mainland QoQ', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
@@ -169,16 +198,16 @@
       conf:  ['Industrial Confidence'],
       rtl:   ['Retail Sales MoM'],
       ca:    ['Current Account'],
-      trade: ['Balance of Trade'],
+      trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
   };
 
   const CATS_EUR = {
-    gdp:   ['Euro Area GDP Growth Rate QoQ'],
-    cpi:   ['Euro Area Inflation Rate YoY'],
-    cpimom:['Euro Area Inflation Rate MoM'],
-    core:  ['Euro Area Core Inflation Rate YoY'],
+    gdp:   ['Euro Area GDP Growth Rate QoQ', 'Euro Area GDP QoQ'],
+    cpi:   ['Euro Area Inflation Rate YoY', 'Euro Area CPI YoY'],
+    cpimom:['Euro Area Inflation Rate MoM', 'Euro Area CPI MoM'],
+    core:  ['Euro Area Core Inflation Rate YoY', 'Euro Area Core CPI YoY'],
     ppi:   ['Germany PPI YoY', 'PPI YoY'],
     emp:   ['Euro Area Employment Change QoQ', 'Euro Area Employment Change YoY'],
     unemp: ['Euro Area Unemployment Rate'],
@@ -186,7 +215,7 @@
     conf:  ['Germany Ifo Business Climate', 'Ifo Business Climate'],
     rtl:   ['Euro Area Retail Sales MoM', 'Euro Area Retail Sales YoY'],
     ca:    ['Euro Area Current Account'],
-    trade: ['Euro Area Balance of Trade'],
+    trade: ['Euro Area Balance of Trade', 'Euro Area Trade Balance'],
     pce:   [],
   };
 
@@ -301,8 +330,9 @@
     let bestDate = null;
     for (let i = 0; i < list.length; i++) {
       if (list[i].actual == null || list[i].actual === '') continue;
+      const c = normNotation(list[i].event);
       for (let j = 0; j < prefixes.length; j++) {
-        if (strictMatch(list[i].event, prefixes[j])) {
+        if (strictMatch(c, prefixes[j])) {
           if (bestDate === null || list[i].dateISO > bestDate) bestDate = list[i].dateISO;
           break;
         }
@@ -312,7 +342,7 @@
     for (let j = 0; j < prefixes.length; j++) {
       for (let i = 0; i < list.length; i++) {
         if (list[i].dateISO === bestDate && list[i].actual != null && list[i].actual !== '' &&
-            strictMatch(list[i].event, prefixes[j])) {
+            strictMatch(normNotation(list[i].event), prefixes[j])) {
           return list[i];
         }
       }

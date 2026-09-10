@@ -12364,6 +12364,21 @@ const _ESI_VENDOR_ALIASES = {
   'revised uom consumer sentiment': 'michigan consumer sentiment',
   'revised uom inflation expectations': 'michigan inflation expectations',
   'prelim gdp price index qoq': 'gdp price index qoq',
+  // v8.445.0 (2026-09-10) — biquote vendor migration. All entries below
+  // chain-verified (same actual/previous across the vendor boundary) in
+  // fetch_economic_calendar.py's VENDOR_ALIASES v3.12 -- see that file's
+  // changelog for the full per-pair verification detail, including the two
+  // candidates (CHF GDP q/q+y/y, SEK GDP q/q) checked and deliberately left
+  // unaliased. 'gdp qoq' and 'ivey pmi' were already present in
+  // calendar-panel.js's _CAL_VENDOR_ALIASES but missing here — a
+  // pre-existing three-way sync gap, not new to this migration.
+  'gdp qoq': 'gdp growth rate qoq',
+  'ivey pmi': 'ivey pmi s.a',
+  'nonfarm payrolls': 'non farm payrolls',
+  'trade balance': 'balance of trade',
+  'core cpi yoy': 'core inflation rate yoy',
+  'nationwide hpi mom': 'nationwide housing prices mom',
+  'nationwide hpi yoy': 'nationwide housing prices yoy',
 };
 const _canonEsi = t => {
   let s = t.replace(/\s*\([^)]*\)/g,'').trim();

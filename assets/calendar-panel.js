@@ -98,6 +98,16 @@
     'adp non-farm employment change': 'adp employment change',
     'non-farm employment change': 'non farm payrolls',
     'official cash rate': 'rbnz interest rate decision',
+    // v8.445.0 (2026-09-10) — biquote vendor migration. Chain-verified in
+    // fetch_economic_calendar.py's VENDOR_ALIASES v3.12 (same
+    // actual/previous across the vendor boundary) — see that file's
+    // changelog for full per-pair detail, including CHF GDP q/q+y/y and
+    // SEK GDP q/q, which were checked and deliberately left unaliased.
+    'nonfarm payrolls': 'non farm payrolls',
+    'trade balance': 'balance of trade',
+    'core cpi yoy': 'core inflation rate yoy',
+    'nationwide hpi mom': 'nationwide housing prices mom',
+    'nationwide hpi yoy': 'nationwide housing prices yoy',
   };
   function _calCanonTitle(t) {
     let s = (t || '').toLowerCase().replace(/\s*\([^)]*\)/g, '').trim();
