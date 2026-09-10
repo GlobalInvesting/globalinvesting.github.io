@@ -1418,7 +1418,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div id="section-capflows" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
       <div class="panel-head">
         <span class="panel-title">Capital Flows</span>
-        <span class="panel-sub" id="capflows-sub" title="Cross-border demand for dollar assets: monthly Treasury holdings by country (TIC) and weekly long-term fund flows (ICI). Slower-moving structural context, not a live quote.">TIC + ICI · monthly / weekly</span>
+        <span class="panel-sub" id="capflows-sub" title="Cross-border demand for dollar assets: monthly Treasury holdings by country (TIC), weekly long-term fund flows (ICI), and monthly money market fund flows (SEC). Slower-moving structural context, not a live quote.">TIC + ICI + SEC MMF · monthly / weekly</span>
       </div>
 
       <div id="capflows-tic-gate" style="padding:14px 16px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
@@ -1473,7 +1473,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div id="capflows-ici-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
       </div>
 
-      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="TIC: US Treasury Major Foreign Holders table, monthly, roughly 6-week publication lag. ICI: weekly estimate covering long-term mutual funds and ETFs only — excludes money market funds, which ICI reports on a separate release not yet wired here. Signal = rolling z-score of period-over-period change vs a gated trailing window — a statistical deviation measure, not investment advice.">Source: US Treasury TIC (Table 5, MFH) · ICI weekly combined flows · z-score signal, same convention as FX Fair Value's Z-score column</div>
+      <div id="capflows-mmf-gate" style="padding:8px 16px 14px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
+        Accumulating monthly history — <span id="capflows-mmf-progress-text">0/12mo</span>
+        <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;">
+          <div id="capflows-mmf-progress-bar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;"></div>
+        </div>
+      </div>
+
+      <div id="capflows-mmf-wrap" style="display:none;padding-bottom:6px;">
+        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="Money market fund flows are not part of ICI's release above — ICI's long-term-fund series excludes MMFs by definition, so this is genuinely separate coverage, not an ICI substitute.">Money market fund flows · SEC (Form N-MFP) · monthly, ~2mo lag · $bn</div>
+        <div style="overflow-x:auto;">
+          <table id="capflows-mmf-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="SEC Money Market Fund Statistics — monthly net flows by fund category, last 8 months, with a rolling z-score signal per category">
+            <thead>
+              <tr>
+                <th scope="col" style="text-align:left;padding-left:16px;">Month</th>
+                <th scope="col">Govt</th>
+                <th scope="col">Prime</th>
+                <th scope="col">Tax-exempt</th>
+                <th scope="col">Total</th>
+                <th scope="col" style="padding-right:16px;" title="Rolling z-score of the Total column's level vs trailing 12mo">Signal</th>
+              </tr>
+            </thead>
+            <tbody id="capflows-mmf-tbody"></tbody>
+          </table>
+        </div>
+        <div id="capflows-mmf-asof" style="padding:4px 16px 0;font-size:9px;color:var(--text3);"></div>
+      </div>
+
+      <div style="padding:2px 16px 8px;font-size:9px;color:var(--text3);font-family:var(--font-ui);" title="TIC: US Treasury Major Foreign Holders table, monthly, roughly 6-week publication lag. ICI: weekly estimate covering long-term mutual funds and ETFs only — excludes money market funds. SEC MMF: Form N-MFP aggregate subscriptions/redemptions by fund category, monthly, ~2mo lag — genuinely separate coverage from ICI, not a substitute for it. Signal = rolling z-score vs a gated trailing window — a statistical deviation measure, not investment advice.">Source: US Treasury TIC (Table 5, MFH) · ICI weekly combined flows · SEC Money Market Fund Statistics (Form N-MFP) · z-score signal, same convention as FX Fair Value's Z-score column</div>
     </div>
 
     <div id="section-fair-value" style="display:flex;flex-direction:column;border-bottom:1px solid var(--border);">
