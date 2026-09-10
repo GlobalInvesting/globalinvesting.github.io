@@ -1,98 +1,33 @@
 {
-  "lastUpdate": "2026-09-09T22:39:19Z",
-  "generatedAt": "2026-09-09T22:39:19Z",
+  "lastUpdate": "2026-09-10T09:55:59Z",
+  "generatedAt": "2026-09-10T09:55:59Z",
   "fetchMode": "Primary + backfill calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Primary + backfill calendar feed",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-09-09",
+  "rangeFrom": "2025-09-10",
   "rangeTo": "2026-09-12",
-  "totalEvents": 3945,
+  "totalEvents": 3936,
   "currencyCounts": {
-    "AUD": 278,
-    "EUR": 923,
-    "USD": 1276,
+    "EUR": 921,
+    "USD": 1273,
     "GBP": 445,
     "NZD": 98,
     "CAD": 271,
     "JPY": 235,
+    "AUD": 274,
     "CHF": 132,
     "SEK": 183,
     "NOK": 104
   },
   "impactCounts": {
-    "high": 1695,
-    "medium": 1967,
+    "medium": 1962,
+    "high": 1691,
     "low": 283
   },
   "surpriseStats": {
-    "AUD/consumer inflation expectations": {
-      "n": 3,
-      "mean": -0.433333,
-      "std": 0.814453
-    },
-    "SEK/inflation rate yoy": {
-      "n": 2,
-      "mean": -0.15,
-      "std": 0.212132
-    },
-    "SEK/inflation rate mom": {
-      "n": 2,
-      "mean": -0.1,
-      "std": 0.141421
-    },
-    "SEK/cpif yoy": {
-      "n": 4,
-      "mean": 0.025,
-      "std": 0.095743
-    },
-    "SEK/cpif mom": {
-      "n": 4,
-      "mean": 0.0,
-      "std": 0.163299
-    },
-    "EUR/ecb interest rate decision": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "EUR/deposit facility rate": {
-      "n": 3,
-      "mean": 0.0,
-      "std": 0.0
-    },
-    "USD/jobless claims 4-week average": {
-      "n": 16,
-      "mean": 0.046875,
-      "std": 3.058075
-    },
-    "USD/ppi mom": {
-      "n": 4,
-      "mean": 0.075,
-      "std": 0.377492
-    },
-    "USD/core ppi mom": {
-      "n": 4,
-      "mean": -0.125,
-      "std": 0.05
-    },
-    "USD/initial jobless claims": {
-      "n": 16,
-      "mean": 2.9375,
-      "std": 8.6137
-    },
-    "USD/continuing jobless claims": {
-      "n": 16,
-      "mean": 0.5,
-      "std": 17.401149
-    },
-    "NZD/business nz pmi": {
-      "n": 4,
-      "mean": 1.6,
-      "std": 6.352952
-    },
     "GBP/gdp 3-month avg": {
       "n": 4,
       "mean": 0.05,
@@ -427,6 +362,21 @@
       "n": 4,
       "mean": 12.85,
       "std": 14.697052
+    },
+    "USD/jobless claims 4-week average": {
+      "n": 14,
+      "mean": 0.410714,
+      "std": 3.106456
+    },
+    "USD/continuing jobless claims": {
+      "n": 14,
+      "mean": 2.714286,
+      "std": 17.525492
+    },
+    "USD/initial jobless claims": {
+      "n": 14,
+      "mean": 4.785714,
+      "std": 7.49542
     },
     "USD/net long-term tic flows": {
       "n": 4,
@@ -1193,10 +1143,25 @@
       "mean": 0.0,
       "std": 0.0
     },
+    "SEK/cpif mom": {
+      "n": 3,
+      "mean": 0.0,
+      "std": 0.2
+    },
+    "SEK/cpif yoy": {
+      "n": 3,
+      "mean": 0.033333,
+      "std": 0.11547
+    },
     "EUR/france current account": {
       "n": 2,
       "mean": 1.35,
       "std": 0.494975
+    },
+    "NZD/business nz pmi": {
+      "n": 2,
+      "mean": 3.3,
+      "std": 10.46518
     },
     "GBP/rics house price balance": {
       "n": 2,
@@ -1348,10 +1313,25 @@
       "mean": -0.15,
       "std": 0.635085
     },
+    "USD/core ppi mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.070711
+    },
+    "USD/ppi mom": {
+      "n": 2,
+      "mean": -0.25,
+      "std": 0.070711
+    },
     "CAD/boc interest rate decision": {
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "AUD/consumer inflation expectations": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.919239
     },
     "EUR/current account s.a": {
       "n": 2,
@@ -1485,78 +1465,6 @@
     }
   },
   "events": [
-    {
-      "currency": "AUD",
-      "event": "Westpac Consumer Confidence Change",
-      "dateISO": "2025-09-09",
-      "actual": "-3.1%",
-      "forecast": "1.0",
-      "previous": "5.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "00:30"
-    },
-    {
-      "currency": "AUD",
-      "event": "Westpac Consumer Confidence Index",
-      "dateISO": "2025-09-09",
-      "actual": "95.4",
-      "forecast": "99.4",
-      "previous": "98.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "00:30"
-    },
-    {
-      "currency": "AUD",
-      "event": "NAB Business Confidence",
-      "dateISO": "2025-09-09",
-      "actual": "4",
-      "forecast": "8.0",
-      "previous": "8.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "01:30"
-    },
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-09-09",
-      "actual": "-1.1%",
-      "forecast": "-1.8",
-      "previous": "3.7",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:45"
-    },
-    {
-      "currency": "USD",
-      "event": "Non Farm Payrolls Annual Revision",
-      "dateISO": "2025-09-09",
-      "actual": "-911K",
-      "forecast": "",
-      "previous": "-818.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "14:00"
-    },
-    {
-      "currency": "USD",
-      "event": "API Crude Oil Stock Change",
-      "dateISO": "2025-09-09",
-      "actual": "1.25M",
-      "forecast": "",
-      "previous": "0.622",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "20:30"
-    },
     {
       "currency": "EUR",
       "event": "Industrial Production MoM",
@@ -44843,19 +44751,6 @@
     {
       "date": "19 Aug",
       "dateISO": "2026-08-19",
-      "timeUTC": "02:45",
-      "country": "AUD",
-      "currency": "AUD",
-      "flag": "🇦🇺",
-      "event": "Australia RBA Hauser Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "19 Aug",
-      "dateISO": "2026-08-19",
       "timeUTC": "06:00",
       "country": "GBP",
       "currency": "GBP",
@@ -45025,19 +44920,6 @@
     {
       "date": "19 Aug",
       "dateISO": "2026-08-19",
-      "timeUTC": "07:10",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "Euro Area ECB President Lagarde Speech",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "19 Aug",
-      "dateISO": "2026-08-19",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
@@ -45151,19 +45033,6 @@
       "actual": "4.405M",
       "forecast": "-0.6M",
       "previous": "17.422M"
-    },
-    {
-      "date": "19 Aug",
-      "dateISO": "2026-08-19",
-      "timeUTC": "18:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States FOMC Minutes",
-      "impact": "high",
-      "actual": null,
-      "forecast": null,
-      "previous": null
     },
     {
       "date": "19 Aug",
