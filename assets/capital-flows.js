@@ -41,7 +41,7 @@ review flow — see CHANGELOG.md.
     const progressText = document.getElementById(`capflows-${prefix}-progress-text`);
     const progressBar = document.getElementById(`capflows-${prefix}-progress-bar`);
     if (!gate) return;
-    const unit = prefix === "tic" ? "mo" : "wk";
+    const unit = prefix === "ici" ? "wk" : "mo";
     if (progressText) progressText.textContent = `${gate.have}/${gate.need}${unit}`;
     if (progressBar) progressBar.style.width = `${Math.min(100, (gate.have / gate.need) * 100)}%`;
     if (gate.ready) {
@@ -98,6 +98,35 @@ review flow — see CHANGELOG.md.
     if (asof) asof.textContent = `Week ending ${ici.as_of} · ICI, excludes money market funds`;
   }
 
+  function fmtBn(usd) {
+    if (usd === null || usd === undefined) return "—";
+    return (usd / 1e9).toFixed(1);
+  }
+
+  function renderMmf(mmf) {
+    if (!mmf) return;
+    renderGate("mmf", mmf.gate);
+    const tbody = document.getElementById("capflows-mmf-tbody");
+    const asof = document.getElementById("capflows-mmf-asof");
+    if (!tbody) return;
+    const rows = mmf.monthly.slice().reverse();
+    tbody.innerHTML = rows
+      .map((row, i) => {
+        const isLatest = i === 0;
+        const sig = isLatest ? mmf.signals.total : null;
+        return `<tr>
+          <td style="padding:4px 8px 4px 16px;white-space:nowrap;">${row.month}</td>
+          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.government)}</td>
+          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.prime)}</td>
+          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.tax_exempt)}</td>
+          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.total)}</td>
+          <td style="text-align:right;padding:4px 16px 4px 8px;">${sig ? signalBadge(sig.signal) : ""}</td>
+        </tr>`;
+      })
+      .join("");
+    if (asof) asof.textContent = `As of ${mmf.as_of} · SEC Money Market Fund Statistics (Form N-MFP)`;
+  }
+
   async function loadCapitalFlows() {
     try {
       const resp = await fetch(DATA_URL, { cache: "no-store" });
@@ -105,6 +134,7 @@ review flow — see CHANGELOG.md.
       const doc = await resp.json();
       renderTic(doc.tic);
       renderIci(doc.ici);
+      renderMmf(doc.mmf);
     } catch (err) {
       const ticBody = document.getElementById("capflows-tic-tbody");
       if (ticBody) {
