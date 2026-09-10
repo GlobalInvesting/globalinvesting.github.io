@@ -1452,9 +1452,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div id="capflows-flows-unavailable" style="display:none;padding:8px 16px 14px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Fund flow data currently unavailable.</div>
 
       <div id="capflows-flows-wrap" style="display:none;padding-bottom:6px;">
-        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="One combined table, one row per category — Registered Funds (Form N-PORT, every SEC-registered ETF and mutual fund) and Money Market (Form N-MFP) are shown as two labeled sections rather than two differently-shaped tables, since they're genuinely the same kind of data (net flow by category). The section headers disclose each report's own vintage: Registered Funds is essentially real-time for the prior month, MMF runs about 2 months behind — they are not the same reporting period.">Fund flows by category · SEC (Form N-PORT + N-MFP) · monthly · $bn</div>
-        <div id="capflows-flows-scroll" style="max-height:220px;overflow-y:auto;min-width:0;">
-          <table id="capflows-flows-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="Combined fund flows table — Registered Funds net flow by asset class and Money Market net flow by category, each with month-over-month change and a rolling z-score signal, grouped under labeled sections disclosing each source's own vintage">
+        <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="One plain list, one row per category — Registered Funds (Form N-PORT, every SEC-registered ETF and mutual fund) asset classes plus a single Money Market (Form N-MFP) summary row, the same flat layout convention as ICI's own weekly combined-flows release. Registered Funds and Money Market are on different publication vintages (Registered Funds is essentially real-time for the prior month, MMF runs about 2 months behind) — see the as-of line below the table for each source's own date.">Fund flows by category · SEC (Form N-PORT + N-MFP) · monthly · $bn</div>
+        <div id="capflows-flows-scroll" style="max-height:157px;overflow-y:auto;min-width:0;">
+          <table id="capflows-flows-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="Combined fund flows table — Registered Funds net flow by asset class plus a single Money Market summary row, each with month-over-month change and a rolling z-score signal">
             <thead>
               <tr>
                 <th scope="col" style="text-align:left;padding:4px 8px 4px 16px;position:sticky;top:0;background:var(--bg);color:var(--text3);font-weight:400;z-index:1;">Category</th>
@@ -2125,7 +2125,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 <script src="assets/calendar-panel.js?v=1.19.29" defer></script>
 <script src="assets/econ-matrix.js?v=2.6.6" defer></script>
-<script src="assets/capital-flows.js?v=2.1.0-beta" defer></script>
+<script src="assets/capital-flows.js?v=2.2.0-beta" defer></script>
   
   <div id="lw-fullscreen-overlay" role="dialog" aria-modal="true" aria-label="Fullscreen chart">
     <div class="lw-fs-toolbar">
