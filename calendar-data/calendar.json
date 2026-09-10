@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-10T22:41:10Z",
-  "generatedAt": "2026-09-10T22:41:10Z",
+  "lastUpdate": "2026-09-10T22:53:46Z",
+  "generatedAt": "2026-09-10T22:53:46Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,22 +9,22 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-10",
   "rangeTo": "2026-09-24",
-  "totalEvents": 4294,
+  "totalEvents": 4290,
   "currencyCounts": {
     "EUR": 1011,
     "USD": 1398,
-    "GBP": 491,
+    "GBP": 490,
     "NZD": 108,
     "CAD": 294,
-    "JPY": 273,
+    "JPY": 270,
     "AUD": 288,
     "CHF": 140,
     "SEK": 187,
     "NOK": 104
   },
   "impactCounts": {
-    "medium": 2284,
-    "high": 1727,
+    "medium": 2281,
+    "high": 1726,
     "low": 283
   },
   "surpriseStats": {
@@ -1134,9 +1134,9 @@
       "std": 0.494975
     },
     "JPY/current account": {
-      "n": 3,
-      "mean": -1529.144,
-      "std": 2269.210974
+      "n": 2,
+      "mean": -2353.166,
+      "std": 2494.907483
     },
     "NZD/rbnz interest rate decision": {
       "n": 3,
@@ -1259,9 +1259,9 @@
       "std": 69.86215
     },
     "GBP/brc retail sales monitor yoy": {
-      "n": 3,
-      "mean": -0.8,
-      "std": 0.360555
+      "n": 2,
+      "mean": -0.85,
+      "std": 0.494975
     },
     "AUD/westpac consumer confidence index": {
       "n": 4,
@@ -1443,15 +1443,10 @@
       "mean": -0.05,
       "std": 0.353553
     },
-    "JPY/gdp growth annualized": {
-      "n": 2,
-      "mean": -0.3,
-      "std": 0.848528
-    },
     "JPY/gdp growth rate qoq": {
-      "n": 3,
-      "mean": -0.033333,
-      "std": 0.152753
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.212132
     },
     "EUR/austria inflation rate mom": {
       "n": 2,
@@ -51665,19 +51660,6 @@
       "source": "secondary-calendar"
     },
     {
-      "date": "7 Sep",
-      "dateISO": "2026-09-07",
-      "timeUTC": "23:01",
-      "country": "GBP",
-      "currency": "GBP",
-      "flag": "🇬🇧",
-      "event": "United Kingdom BRC Retail Sales Monitor YoY",
-      "impact": "high",
-      "actual": "0.5",
-      "forecast": "1.2%",
-      "previous": "1.0%"
-    },
-    {
       "date": "2026-09-07",
       "dateISO": "2026-09-07",
       "timeUTC": "23:30",
@@ -51782,45 +51764,6 @@
       "actual": "2523.1B",
       "forecast": "2981.2B",
       "previous": "1396.9B"
-    },
-    {
-      "date": "7 Sep",
-      "dateISO": "2026-09-07",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan Current Account",
-      "impact": "medium",
-      "actual": "2988.9",
-      "forecast": "¥2870.0B",
-      "previous": "¥-92.3B"
-    },
-    {
-      "date": "7 Sep",
-      "dateISO": "2026-09-07",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan GDP Growth Rate QoQ",
-      "impact": "medium",
-      "actual": "0.4",
-      "forecast": "0.4%",
-      "previous": "0.5%"
-    },
-    {
-      "date": "7 Sep",
-      "dateISO": "2026-09-07",
-      "timeUTC": "23:50",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan GDP Growth Annualized",
-      "impact": "medium",
-      "actual": "1.4",
-      "forecast": "1.1%",
-      "previous": "1.8%"
     },
     {
       "date": "2026-09-07",
