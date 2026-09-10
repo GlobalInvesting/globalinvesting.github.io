@@ -1,4 +1,4 @@
-name: Update Capital Flows (TIC + ICI)
+name: Update Capital Flows (TIC + SEC)
 
 on:
   schedule:
@@ -36,10 +36,7 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: pip install xlrd --break-system-packages
-
-      - name: Fetch capital flows (TIC + ICI)
+      - name: Fetch capital flows (TIC + SEC)
         run: python3 private-scripts/fetch_capital_flows.py
 
       - name: Display summary
@@ -53,19 +50,26 @@ jobs:
           with open('capital-flows-data/capital_flows.json') as f:
               doc = json.load(f)
           tic = doc.get('tic')
-          ici = doc.get('ici')
+          rf = doc.get('registered_funds')
+          mmf = doc.get('mmf')
           if tic:
               g = tic['gate']
               print(f'  TIC as_of: {tic[\"as_of\"]}  gate: {g[\"have\"]}/{g[\"need\"]}  ready: {g[\"ready\"]}')
               print(f'  TIC top 3: ' + ', '.join(f'{c[\"country\"]} ({c[\"signal\"]})' for c in tic['top10'][:3]))
           else:
               print('  TIC: FAILED — see [ERROR] line above')
-          if ici:
-              g = ici['gate']
-              print(f'  ICI as_of: {ici[\"as_of\"]}  gate: {g[\"have\"]}/{g[\"need\"]}  ready: {g[\"ready\"]}')
-              print(f'  ICI latest signal: {ici[\"latest_signal\"][\"signal\"]}')
+          if rf:
+              g = rf['gate']
+              print(f'  Registered Funds as_of: {rf[\"as_of\"]}  gate: {g[\"have\"]}/{g[\"need\"]}  ready: {g[\"ready\"]}')
+              print(f'  Registered Funds top row: ' + ', '.join(f'{r[\"category\"]} ({r[\"signal\"]})' for r in rf['rows'][:3]))
           else:
-              print('  ICI: FAILED — see [ERROR] line above')
+              print('  Registered Funds: FAILED — see [ERROR] line above')
+          if mmf:
+              g = mmf['gate']
+              print(f'  MMF as_of: {mmf[\"as_of\"]}  gate: {g[\"have\"]}/{g[\"need\"]}  ready: {g[\"ready\"]}')
+              print(f'  MMF total signal: ' + mmf['signals']['total']['signal'])
+          else:
+              print('  MMF: FAILED — see [ERROR] line above')
           "
 
       - name: Commit and push (with retry on race)
@@ -96,7 +100,7 @@ jobs:
               echo "pushed=false" >> "$GITHUB_OUTPUT"
               exit 0
             fi
-            git commit -m "Capital Flows (TIC + ICI) refresh ${TIMESTAMP}"
+            git commit -m "Capital Flows (TIC + SEC) refresh ${TIMESTAMP}"
             if git push origin main; then
               echo "Push succeeded on attempt $i."
               echo "pushed=true" >> "$GITHUB_OUTPUT"
