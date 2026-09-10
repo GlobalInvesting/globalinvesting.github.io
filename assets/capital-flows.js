@@ -35,12 +35,33 @@ review flow — see CHANGELOG.md.
     return v > 0 ? "+" + s : s;
   }
 
+  // A source that never clears its own gate (e.g. ICI, permanently blocked
+  // at the domain level — see CHANGELOG.md v8.436.0/v8.437.0) still renders
+  // `doc.ici === null` on every run. Before this helper existed, a null
+  // source's early-return in renderTic()/renderIci()/renderMmf() meant
+  // renderGate() was never called at all, leaving the pre-JS default HTML
+  // (the "Accumulating ... 0/12" gate div, visible by default) on screen
+  // forever — indistinguishable from a source that's genuinely still
+  // accumulating its first 12 points, when it's actually a disclosed,
+  // permanent failure. This makes the null case an explicit third state,
+  // not a silent fallthrough of the "still accumulating" one.
+  function showUnavailable(prefix) {
+    const gateEl = document.getElementById(`capflows-${prefix}-gate`);
+    const wrap = document.getElementById(`capflows-${prefix}-wrap`);
+    const unavailEl = document.getElementById(`capflows-${prefix}-unavailable`);
+    if (gateEl) gateEl.style.display = "none";
+    if (wrap) wrap.style.display = "none";
+    if (unavailEl) unavailEl.style.display = "block";
+  }
+
   function renderGate(prefix, gate) {
     const wrap = document.getElementById(`capflows-${prefix}-wrap`);
     const gateEl = document.getElementById(`capflows-${prefix}-gate`);
+    const unavailEl = document.getElementById(`capflows-${prefix}-unavailable`);
     const progressText = document.getElementById(`capflows-${prefix}-progress-text`);
     const progressBar = document.getElementById(`capflows-${prefix}-progress-bar`);
     if (!gate) return;
+    if (unavailEl) unavailEl.style.display = "none";
     const unit = prefix === "ici" ? "wk" : "mo";
     if (progressText) progressText.textContent = `${gate.have}/${gate.need}${unit}`;
     if (progressBar) progressBar.style.width = `${Math.min(100, (gate.have / gate.need) * 100)}%`;
@@ -54,7 +75,7 @@ review flow — see CHANGELOG.md.
   }
 
   function renderTic(tic) {
-    if (!tic) return;
+    if (!tic) { showUnavailable("tic"); return; }
     renderGate("tic", tic.gate);
     const tbody = document.getElementById("capflows-tic-tbody");
     const asof = document.getElementById("capflows-tic-asof");
@@ -76,7 +97,7 @@ review flow — see CHANGELOG.md.
   }
 
   function renderIci(ici) {
-    if (!ici) return;
+    if (!ici) { showUnavailable("ici"); return; }
     renderGate("ici", ici.gate);
     const tbody = document.getElementById("capflows-ici-tbody");
     const asof = document.getElementById("capflows-ici-asof");
@@ -104,7 +125,7 @@ review flow — see CHANGELOG.md.
   }
 
   function renderMmf(mmf) {
-    if (!mmf) return;
+    if (!mmf) { showUnavailable("mmf"); return; }
     renderGate("mmf", mmf.gate);
     const tbody = document.getElementById("capflows-mmf-tbody");
     const asof = document.getElementById("capflows-mmf-asof");
