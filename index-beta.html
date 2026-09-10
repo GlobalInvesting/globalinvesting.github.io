@@ -1429,9 +1429,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div style="margin-top:8px;color:var(--text3);">Each run appends that month's TIC snapshot; the z-score signal appears once there's enough trailing history to fit a stable window against.</div>
       </div>
 
+      <div id="capflows-tic-unavailable" style="display:none;padding:14px 16px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">US Treasury TIC data currently unavailable.</div>
+
       <div id="capflows-tic-wrap" style="display:none;">
         <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;">Foreign holders of US Treasuries · TIC · top 10</div>
-        <div id="capflows-tic-scroll" style="max-height:135px;overflow-y:auto;min-width:0;">
+        <div id="capflows-tic-scroll" style="max-height:157px;overflow-y:auto;min-width:0;">
           <table id="capflows-tic-table" style="width:100%;border-collapse:collapse;font-size:11px;font-family:var(--font-mono);" aria-label="Top 10 foreign holders of US Treasury securities — holdings, month-over-month change, and accumulation/reduction signal">
             <thead>
               <tr>
@@ -1453,6 +1455,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div id="capflows-ici-progress-bar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;"></div>
         </div>
       </div>
+
+      <div id="capflows-ici-unavailable" style="display:none;padding:8px 16px 14px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">ICI weekly fund flows currently unavailable.</div>
 
       <div id="capflows-ici-wrap" style="display:none;padding-bottom:6px;">
         <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;">ICI weekly long-term fund flows · $bn</div>
@@ -1479,6 +1483,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div id="capflows-mmf-progress-bar" style="height:100%;width:0%;background:var(--accent);border-radius:2px;"></div>
         </div>
       </div>
+
+      <div id="capflows-mmf-unavailable" style="display:none;padding:8px 16px 14px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">SEC Money Market Fund Statistics currently unavailable.</div>
 
       <div id="capflows-mmf-wrap" style="display:none;padding-bottom:6px;">
         <div style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;" title="Money market fund flows are not part of ICI's release above — ICI's long-term-fund series excludes MMFs by definition, so this is genuinely separate coverage, not an ICI substitute.">Money market fund flows · SEC (Form N-MFP) · monthly, ~2mo lag · $bn</div>
