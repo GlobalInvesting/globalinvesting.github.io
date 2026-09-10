@@ -121,11 +121,9 @@ jobs:
         if: steps.gate.outputs.run == 'true'
         run: pip install requests --break-system-packages
 
-      - name: Fetch economic calendar (Myfxbook actuals + ForexFactory forward, v3.40)
+      - name: Fetch economic calendar (biquote, single source — actuals + forward)
         if: steps.gate.outputs.run == 'true'
-        env:
-          CF_PAYLOAD_TOKEN: ${{ secrets.CF_PAYLOAD_TOKEN }}
-        run: python3 private-scripts/fetch_ff_calendar.py
+        run: python3 private-scripts/fetch_biquote_calendar.py
 
       - name: Display summary
         if: steps.gate.outputs.run == 'true'
@@ -151,13 +149,8 @@ jobs:
           print(f'  Source: {cal.get(\"source\",\"?\")}')
           print(f'  Total events: {len(events)} | with actuals: {len(released_all)}')
           print(f'  Today ({today}): {len(today_evs)} events | {len(released_today)} released')
-          mfb_evs = [e for e in events if e.get('vendor', 'myfxbook') == 'myfxbook']
-          ff_evs = [e for e in events if e.get('vendor') == 'forexfactory']
           forward_evs = [e for e in events if e['dateISO'] > today]
-          print(f'  By vendor: myfxbook={len(mfb_evs)} forexfactory={len(ff_evs)}')
-          print(f'  Forward-looking (dateISO > today): {len(forward_evs)} events '
-                f'({len([e for e in forward_evs if e.get(\"vendor\")==\"forexfactory\"])} forexfactory, '
-                f'{len([e for e in forward_evs if e.get(\"vendor\",\"myfxbook\")==\"myfxbook\"])} myfxbook carry-over)')
+          print(f'  Forward-looking (dateISO > today): {len(forward_evs)} events')
           for e in high_today:
               status = e.get('actual') or 'pending'
               print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"title\"]} | actual={status} est={e.get(\"forecast\",\"—\")}')
