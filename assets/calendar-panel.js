@@ -916,9 +916,9 @@
   }
 
   function cleanSourceLabel(raw) {
-    if (!raw) return 'Myfxbook · ForexFactory';
+    if (!raw) return 'biquote';
     const stripped = String(raw).replace(/\s*\([^)]*\)\s*$/, '').trim();
-    return stripped || 'Myfxbook · ForexFactory';
+    return stripped || 'biquote';
   }
 
   function buildPanel(events, source, holidays) {
@@ -1379,21 +1379,24 @@
       const ffEvents  = (ffJson?.events  || []).map(normalize);
       const calEvents = (calJson?.events || []).map(normalize);
 
+      // calendar.json (secondary/backfill feed) is kept ONLY as a deep-history source for the
+      // per-event historical trend index (buildSeriesIndex, used by the detail modal's mini-series).
+      // It is deliberately never merged into the main displayed event list below: its `event`
+      // field ("GDP m/m") and biquote's own `title` field ("United Kingdom GDP m/m") use different
+      // naming conventions for the identical release, so a same-event dedup keyed on exact title
+      // text silently fails to match and both copies render as separate rows — one from biquote
+      // (usually still pending, dashes) and one from calendar.json (its own forecast/previous,
+      // never an `actual` since this feed doesn't track releases live). Confirmed live for GBP
+      // 2026-09-11: calendar.json's `{event:"GDP m/m", forecast:"0.0%", previous:"0.3%"}` vs.
+      // biquote's `{title:"United Kingdom GDP m/m", forecast:null, previous:null}` — same release,
+      // two rows. Per the single-source-of-truth decision made when biquote replaced Myfxbook/
+      // ForexFactory (v8.443.0), the displayed calendar shows biquote's own events exclusively.
       _lastFullHistory = calEvents;
       _seriesIndex     = buildSeriesIndex(calEvents);
 
-      let events   = ffEvents;
-      let source   = ffJson?.source || calJson?.source || 'ForexFactory';
+      let events   = ffEvents.filter(ev => !((ev.title || ev.event || '').toLowerCase().includes('myfxbook')));
+      let source   = ffJson?.source || 'biquote';
       let holidays = Array.isArray(ffJson?.holidays) ? ffJson.holidays : [];
-
-      if (calEvents.length) {
-        const seen = new Set(ffEvents.map(e => `${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
-        const fill = calEvents.filter(e => !seen.has(`${e.currency}|${e.dateISO}|${e.timeUTC || e.hourUTC || ''}|${e.title}`));
-        events = ffEvents.concat(fill);
-        if (!ffEvents.length) source = calJson?.source || source;
-      }
-
-      events = events.filter(ev => !((ev.title || ev.event || '').toLowerCase().includes('myfxbook')));
 
       const _relIdx = {};
       for (const ev of events) {

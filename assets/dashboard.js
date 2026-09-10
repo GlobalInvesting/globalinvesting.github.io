@@ -12454,7 +12454,7 @@ async function renderEconSurprises() {
           const t = new Date(ev.dateISO).getTime();
           return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
         });
-        if (hasReleased) { calEvents = evts; calSource = ffj.source || 'ForexFactory'; }
+        if (hasReleased) { calEvents = evts; calSource = ffj.source || 'biquote'; }
       }
     } catch {  }
   }
