@@ -1,53 +1,60 @@
 /*
-capital-flows.js  v2.2-beta — Capital Flows panel (TIC top holders +
-combined SEC Registered Funds Flows + SEC Money Market Fund Statistics)
+capital-flows.js  v2.2 — Capital Flows panel (TIC top holders + combined
+SEC Registered Funds Flows + SEC Money Market Fund Statistics)
 
 Reads capital-flows-data/capital_flows.json (written by
 fetch_capital_flows.py). Gates each sub-panel on its own history-length
 threshold — same UX pattern as the FX Fair Value "Accumulating business-day
 history" progress bar — rather than showing a signal fit on too few points.
 
-v2.2-beta: fund-flows table flattened to a single plain list, matching how
+Promoted from beta to production this session: all three gates (TIC, RF,
+MMF) confirmed cleared with real accumulated data (13/12, 84/12, 117/12
+months respectively, per the live capital_flows.json at promotion time) and
+the panel visually confirmed across several beta-stage review sessions.
+Ported verbatim — no logic changes — into index.html between
+#section-econmap and #section-fair-value (see v2.2's own note below for why
+that position), with the matching <script> tag's cache-buster dropped from
+2.2.0-beta to 2.2.0. The corresponding block in index-beta.html was removed
+in the same change per this project's standing beta→production convention:
+this file is a single shared module referenced by one production entry
+point now, not duplicated staging markup two pages could independently
+drift out of sync with. No dashboard.js/dashboard.css changes were needed —
+loadCapitalFlows() self-registers on DOMContentLoaded and every CSS
+variable/class the panel uses (--text2/--text3/--accent/--font-ui/
+--font-mono/--bg2/--border, .panel-head/.panel-title/.panel-sub) already
+exists in the production stylesheet, since the whole panel was styled to
+match sibling production panels' conventions from the start.
+
+v2.2: fund-flows table flattened to a single plain list, matching how
 ICI's own weekly "Combined Estimated Long-Term Flows" release (the
 industry reference this project targets) lists categories — Domestic
 Equity, World Equity, Hybrid, Taxable Bond, Municipal Bond, Money Market —
 as one undifferentiated row list, with Money Market as one line among the
-others rather than its own sub-table. The v2.1-beta muted section-header
-rows are removed; Registered Funds' rows (registered_funds.rows) render
-first, then a single "Money Market" row (mmf.rows' own "total" category,
-relabeled) is appended last — a fixed position rather than interleaved,
-since it already aggregates three sub-categories (Government/Prime/
-Tax-exempt) into one figure and reads better as a summary line than mixed
-in with individual asset classes. The Government/Prime/Tax-exempt
-breakdown itself is dropped from the visible table (drill-down detail, not
-a top-level "flows by category" row) but stays in the underlying JSON
-(mmf.rows, unchanged) for a future per-category view.
-Vintage disclosure — the actual reason v2.1-beta had section headers in
-the first place (Registered Funds ≈ real-time for the prior month; MMF
-runs ~2mo behind, so the two groups sit on different "as of" dates) — is
-kept, just moved to the existing single-line footer beneath the table
+others rather than its own sub-table. The muted section-header rows are
+removed; Registered Funds' rows (registered_funds.rows) render first, then
+a single "Money Market" row (mmf.rows' own "total" category, relabeled) is
+appended last — a fixed position rather than interleaved, since it already
+aggregates three sub-categories (Government/Prime/Tax-exempt) into one
+figure and reads better as a summary line than mixed in with individual
+asset classes. The Government/Prime/Tax-exempt breakdown itself is dropped
+from the visible table (drill-down detail, not a top-level "flows by
+category" row) but stays in the underlying JSON (mmf.rows, unchanged) for
+a future per-category view.
+Vintage disclosure — the actual reason section headers existed in the
+first place (Registered Funds ≈ real-time for the prior month; MMF runs
+~2mo behind, so the two groups sit on different "as of" dates) — is kept,
+just moved to the existing single-line footer beneath the table
 ("Registered Funds as of ... · MMF as of ..."), which already disclosed
 both dates before this change; nothing about that honesty guarantee is
 lost by removing the in-table headers. A source-specific gate/unavailable
 row (fundFlowGateRow()/fundFlowUnavailableRow()) still names which source
 it refers to, since there's no longer a header above it to say so.
 
-v2.1-beta: renderRegisteredFunds() + renderMmf() merged into one
-renderFundFlows(), writing registered_funds.rows and mmf.rows (mmf.rows
-added in fetch_capital_flows.py v3.1) into a SINGLE table, one row per
-asset class/category, matching renderTic()'s row layout throughout.
-
-v2.0-beta: ICI removed (renderIci() deleted) — replaced with
+v2.0: ICI removed (renderIci() deleted) — replaced with
 renderRegisteredFunds(), which renders SEC's Form N-PORT-derived net-flow-
 by-asset-class table using the same row layout/sticky-header/badge
 conventions as renderTic(), not the older plainer table style ICI/MMF used.
 See fetch_capital_flows.py v3.0's docstring for the full sourcing history.
-
-Beta-stage note: this file is wired into index-beta.html only. Once the
-panel is confirmed visually and the data pipeline has run long enough to
-clear both gates with real data, this section (HTML + this script + the
-JSON path) gets promoted into index.html / dashboard.css per the usual
-review flow — see CHANGELOG.md.
 */
 
 (function () {
