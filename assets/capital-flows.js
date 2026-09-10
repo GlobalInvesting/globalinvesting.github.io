@@ -1,11 +1,27 @@
 /*
-capital-flows.js  v2.0-beta — Capital Flows panel (TIC top holders + SEC
-Registered Funds Flows by asset class + SEC Money Market Fund Statistics)
+capital-flows.js  v2.1-beta — Capital Flows panel (TIC top holders +
+combined SEC Registered Funds Flows + SEC Money Market Fund Statistics)
 
 Reads capital-flows-data/capital_flows.json (written by
 fetch_capital_flows.py). Gates each sub-panel on its own history-length
 threshold — same UX pattern as the FX Fair Value "Accumulating business-day
 history" progress bar — rather than showing a signal fit on too few points.
+
+v2.1-beta: renderRegisteredFunds() + renderMmf() merged into one
+renderFundFlows(), writing registered_funds.rows and mmf.rows (mmf.rows
+added in fetch_capital_flows.py v3.1) into a SINGLE table, one row per
+asset class/category, matching renderTic()'s row layout throughout. A
+muted section-header row is injected between the two groups because the
+two sources have genuinely different publication vintages (Registered
+Funds ≈ real-time for the prior month; MMF runs ~2mo behind) — combining
+the tables' LAYOUT is a real fix (both are "one row per category" data,
+they just used to render differently), but combining them into one
+undifferentiated series would hide that vintage difference, so each
+section still discloses its own "as of" date. Each group also gates
+independently: if one source's gate isn't ready, that group's row is a
+single "Accumulating history — n/12mo" line instead of hiding the whole
+table (see showUnavailable()'s doc for why a null/not-ready source must
+never look identical to "still loading").
 
 v2.0-beta: ICI removed (renderIci() deleted) — replaced with
 renderRegisteredFunds(), which renders SEC's Form N-PORT-derived net-flow-
@@ -102,13 +118,12 @@ review flow — see CHANGELOG.md.
     if (asof) asof.textContent = `As of ${tic.as_of} · US Treasury TIC`;
   }
 
-  function renderRegisteredFunds(rf) {
-    if (!rf) { showUnavailable("rf"); return; }
-    renderGate("rf", rf.gate);
-    const tbody = document.getElementById("capflows-rf-tbody");
-    const asof = document.getElementById("capflows-rf-asof");
-    if (!tbody) return;
-    tbody.innerHTML = rf.rows
+  // Shared row renderer for both Registered Funds and MMF sections — both
+  // now emit the identical {category, net_flow_bn, mom_change_bn, z,
+  // signal} row shape (see fetch_capital_flows.py v3.1), so one renderer
+  // covers both instead of duplicating the markup per source.
+  function fundFlowRows(rows) {
+    return rows
       .map((row) => {
         const momColor = row.mom_change_bn > 0 ? "var(--up)" : row.mom_change_bn < 0 ? "var(--down)" : "var(--text3)";
         return `<tr>
@@ -119,36 +134,80 @@ review flow — see CHANGELOG.md.
         </tr>`;
       })
       .join("");
-    if (asof) asof.textContent = `As of ${rf.as_of} · SEC Registered Funds Flows (Form N-PORT, ETF + Mutual Fund combined)`;
   }
 
-  function fmtBn(usd) {
-    if (usd === null || usd === undefined) return "—";
-    return (usd / 1e9).toFixed(1);
+  // Muted divider row between the Registered Funds and MMF groups within
+  // the one combined table — this is where each source's own "as of"
+  // vintage is disclosed, since the two reports are genuinely not on the
+  // same publication schedule (see capital-flows.js's top-of-file note).
+  function fundFlowSectionRow(label) {
+    return `<tr><td colspan="4" style="padding:10px 16px 4px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;">${label}</td></tr>`;
   }
 
-  function renderMmf(mmf) {
-    if (!mmf) { showUnavailable("mmf"); return; }
-    renderGate("mmf", mmf.gate);
-    const tbody = document.getElementById("capflows-mmf-tbody");
-    const asof = document.getElementById("capflows-mmf-asof");
+  // In-table equivalent of renderGate()'s progress bar, used when a group
+  // (Registered Funds or MMF) isn't past its own history gate yet — a
+  // single spanning row instead of hiding the whole combined table, since
+  // the other group may already be ready.
+  function fundFlowGateRow(gate) {
+    const have = gate ? gate.have : 0;
+    const need = gate ? gate.need : 12;
+    const pct = Math.min(100, (have / need) * 100);
+    return `<tr><td colspan="4" style="padding:6px 16px 12px;font-size:11px;color:var(--text2);font-family:var(--font-ui);">
+      Accumulating monthly history — ${have}/${need}mo
+      <div style="height:4px;background:var(--bg2);border-radius:2px;margin-top:6px;overflow:hidden;">
+        <div style="height:100%;width:${pct}%;background:var(--accent);border-radius:2px;"></div>
+      </div>
+    </td></tr>`;
+  }
+
+  function fundFlowUnavailableRow() {
+    return `<tr><td colspan="4" style="padding:6px 16px 12px;font-size:11px;color:var(--text3);font-family:var(--font-ui);">Currently unavailable.</td></tr>`;
+  }
+
+  // Combined Registered Funds + MMF table — see the v2.1-beta note at the
+  // top of this file for why these two are one table now (same row shape)
+  // but still two clearly-labeled sections (different vintages).
+  function renderFundFlows(rf, mmf) {
+    const tbody = document.getElementById("capflows-flows-tbody");
+    const wrap = document.getElementById("capflows-flows-wrap");
+    const unavailEl = document.getElementById("capflows-flows-unavailable");
+    const asof = document.getElementById("capflows-flows-asof");
     if (!tbody) return;
-    const rows = mmf.monthly.slice().reverse();
-    tbody.innerHTML = rows
-      .map((row, i) => {
-        const isLatest = i === 0;
-        const sig = isLatest ? mmf.signals.total : null;
-        return `<tr>
-          <td style="padding:4px 8px 4px 16px;white-space:nowrap;">${row.month}</td>
-          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.government)}</td>
-          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.prime)}</td>
-          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.tax_exempt)}</td>
-          <td style="text-align:right;padding:4px 8px;">${fmtBn(row.total)}</td>
-          <td style="text-align:right;padding:4px 16px 4px 8px;">${sig ? signalBadge(sig.signal) : ""}</td>
-        </tr>`;
-      })
-      .join("");
-    if (asof) asof.textContent = `As of ${mmf.as_of} · SEC Money Market Fund Statistics (Form N-MFP)`;
+
+    if (!rf && !mmf) {
+      if (wrap) wrap.style.display = "none";
+      if (unavailEl) unavailEl.style.display = "block";
+      return;
+    }
+    if (unavailEl) unavailEl.style.display = "none";
+    if (wrap) wrap.style.display = "block";
+
+    const asofParts = [];
+    let html = "";
+
+    if (rf) {
+      html += fundFlowSectionRow(`Registered fund net flows by asset class · SEC (Form N-PORT) · as of ${rf.as_of}`);
+      html += rf.gate && rf.gate.ready ? fundFlowRows(rf.rows) : fundFlowGateRow(rf.gate);
+      asofParts.push(`Registered Funds as of ${rf.as_of}`);
+    } else {
+      html += fundFlowSectionRow("Registered fund net flows by asset class · SEC (Form N-PORT)");
+      html += fundFlowUnavailableRow();
+    }
+
+    html += fundFlowSectionRow(
+      mmf
+        ? `Money market fund flows · SEC (Form N-MFP) · as of ${mmf.as_of} · ~2mo lag`
+        : "Money market fund flows · SEC (Form N-MFP)"
+    );
+    if (mmf) {
+      html += mmf.gate && mmf.gate.ready ? fundFlowRows(mmf.rows) : fundFlowGateRow(mmf.gate);
+      asofParts.push(`MMF as of ${mmf.as_of}`);
+    } else {
+      html += fundFlowUnavailableRow();
+    }
+
+    tbody.innerHTML = html;
+    if (asof) asof.textContent = asofParts.join(" · ");
   }
 
   async function loadCapitalFlows() {
@@ -157,8 +216,7 @@ review flow — see CHANGELOG.md.
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const doc = await resp.json();
       renderTic(doc.tic);
-      renderRegisteredFunds(doc.registered_funds);
-      renderMmf(doc.mmf);
+      renderFundFlows(doc.registered_funds, doc.mmf);
     } catch (err) {
       const ticBody = document.getElementById("capflows-tic-tbody");
       if (ticBody) {
