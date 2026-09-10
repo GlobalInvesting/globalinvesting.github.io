@@ -1,11 +1,17 @@
 /*
-capital-flows.js  v1.0-beta — Capital Flows panel (TIC top holders + ICI
-weekly fund flows)
+capital-flows.js  v2.0-beta — Capital Flows panel (TIC top holders + SEC
+Registered Funds Flows by asset class + SEC Money Market Fund Statistics)
 
 Reads capital-flows-data/capital_flows.json (written by
 fetch_capital_flows.py). Gates each sub-panel on its own history-length
 threshold — same UX pattern as the FX Fair Value "Accumulating business-day
 history" progress bar — rather than showing a signal fit on too few points.
+
+v2.0-beta: ICI removed (renderIci() deleted) — replaced with
+renderRegisteredFunds(), which renders SEC's Form N-PORT-derived net-flow-
+by-asset-class table using the same row layout/sticky-header/badge
+conventions as renderTic(), not the older plainer table style ICI/MMF used.
+See fetch_capital_flows.py v3.0's docstring for the full sourcing history.
 
 Beta-stage note: this file is wired into index-beta.html only. Once the
 panel is confirmed visually and the data pipeline has run long enough to
@@ -35,15 +41,15 @@ review flow — see CHANGELOG.md.
     return v > 0 ? "+" + s : s;
   }
 
-  // A source that never clears its own gate (e.g. ICI, permanently blocked
-  // at the domain level — see CHANGELOG.md v8.436.0/v8.437.0) still renders
-  // `doc.ici === null` on every run. Before this helper existed, a null
-  // source's early-return in renderTic()/renderIci()/renderMmf() meant
-  // renderGate() was never called at all, leaving the pre-JS default HTML
-  // (the "Accumulating ... 0/12" gate div, visible by default) on screen
-  // forever — indistinguishable from a source that's genuinely still
-  // accumulating its first 12 points, when it's actually a disclosed,
-  // permanent failure. This makes the null case an explicit third state,
+  // A source that fails on a given run (network error, layout change, a
+  // permanent block like ICI's — see CHANGELOG.md v8.436.0/v8.437.0, since
+  // removed in v3.0) renders as `null` in the JSON. Before this helper
+  // existed, a null source's early-return in renderTic()/renderRegistered
+  // Funds()/renderMmf() meant renderGate() was never called at all, leaving
+  // the pre-JS default HTML (the "Accumulating ... 0/12" gate div, visible
+  // by default) on screen forever — indistinguishable from a source that's
+  // genuinely still accumulating its first 12 points, when it's actually a
+  // disclosed failure. This makes the null case an explicit third state,
   // not a silent fallthrough of the "still accumulating" one.
   function showUnavailable(prefix) {
     const gateEl = document.getElementById(`capflows-${prefix}-gate`);
@@ -62,7 +68,7 @@ review flow — see CHANGELOG.md.
     const progressBar = document.getElementById(`capflows-${prefix}-progress-bar`);
     if (!gate) return;
     if (unavailEl) unavailEl.style.display = "none";
-    const unit = prefix === "ici" ? "wk" : "mo";
+    const unit = "mo";
     if (progressText) progressText.textContent = `${gate.have}/${gate.need}${unit}`;
     if (progressBar) progressBar.style.width = `${Math.min(100, (gate.have / gate.need) * 100)}%`;
     if (gate.ready) {
@@ -96,27 +102,24 @@ review flow — see CHANGELOG.md.
     if (asof) asof.textContent = `As of ${tic.as_of} · US Treasury TIC`;
   }
 
-  function renderIci(ici) {
-    if (!ici) { showUnavailable("ici"); return; }
-    renderGate("ici", ici.gate);
-    const tbody = document.getElementById("capflows-ici-tbody");
-    const asof = document.getElementById("capflows-ici-asof");
+  function renderRegisteredFunds(rf) {
+    if (!rf) { showUnavailable("rf"); return; }
+    renderGate("rf", rf.gate);
+    const tbody = document.getElementById("capflows-rf-tbody");
+    const asof = document.getElementById("capflows-rf-asof");
     if (!tbody) return;
-    const rows = ici.weekly.slice().reverse();
-    tbody.innerHTML = rows
-      .map((row, i) => {
-        const isLatest = i === 0;
-        const sig = isLatest ? ici.latest_signal : null;
+    tbody.innerHTML = rf.rows
+      .map((row) => {
+        const momColor = row.mom_change_bn > 0 ? "var(--up)" : row.mom_change_bn < 0 ? "var(--down)" : "var(--text3)";
         return `<tr>
-          <td style="padding:4px 8px 4px 16px;white-space:nowrap;">${row.week_ending}</td>
-          <td style="text-align:right;padding:4px 8px;">${row.equity !== null ? (row.equity / 1000).toFixed(2) : "—"}</td>
-          <td style="text-align:right;padding:4px 8px;">${row.bond !== null ? (row.bond / 1000).toFixed(2) : "—"}</td>
-          <td style="text-align:right;padding:4px 8px;">${row.total !== null ? (row.total / 1000).toFixed(2) : "—"}</td>
-          <td style="text-align:right;padding:4px 16px 4px 8px;">${sig ? signalBadge(sig.signal) : ""}</td>
+          <td style="padding:4px 8px 4px 16px;white-space:nowrap;">${row.category}</td>
+          <td style="text-align:right;padding:4px 8px;color:${row.net_flow_bn > 0 ? "var(--up)" : row.net_flow_bn < 0 ? "var(--down)" : "var(--text3)"};">${fmtSigned(row.net_flow_bn, 1)}</td>
+          <td style="text-align:right;padding:4px 8px;color:${momColor};">${fmtSigned(row.mom_change_bn, 1)}</td>
+          <td style="text-align:right;padding:4px 16px 4px 8px;">${signalBadge(row.signal)}</td>
         </tr>`;
       })
       .join("");
-    if (asof) asof.textContent = `Week ending ${ici.as_of} · ICI, excludes money market funds`;
+    if (asof) asof.textContent = `As of ${rf.as_of} · SEC Registered Funds Flows (Form N-PORT, ETF + Mutual Fund combined)`;
   }
 
   function fmtBn(usd) {
@@ -154,7 +157,7 @@ review flow — see CHANGELOG.md.
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const doc = await resp.json();
       renderTic(doc.tic);
-      renderIci(doc.ici);
+      renderRegisteredFunds(doc.registered_funds);
       renderMmf(doc.mmf);
     } catch (err) {
       const ticBody = document.getElementById("capflows-tic-tbody");
