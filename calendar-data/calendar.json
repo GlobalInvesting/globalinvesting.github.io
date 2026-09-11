@@ -1,68 +1,33 @@
 {
-  "lastUpdate": "2026-09-10T23:57:08Z",
-  "generatedAt": "2026-09-10T23:57:08Z",
+  "lastUpdate": "2026-09-11T00:27:03Z",
+  "generatedAt": "2026-09-11T00:27:03Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Calendar feed",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-09-10",
-  "rangeTo": "2026-09-24",
-  "totalEvents": 4290,
+  "rangeFrom": "2025-09-11",
+  "rangeTo": "2026-09-25",
+  "totalEvents": 4302,
   "currencyCounts": {
-    "EUR": 1011,
-    "USD": 1398,
-    "GBP": 490,
+    "EUR": 1014,
+    "USD": 1405,
     "NZD": 108,
+    "GBP": 490,
     "CAD": 294,
-    "JPY": 270,
-    "AUD": 288,
+    "JPY": 271,
+    "AUD": 289,
     "CHF": 140,
     "SEK": 187,
     "NOK": 104
   },
   "impactCounts": {
-    "medium": 2281,
     "high": 1726,
+    "medium": 2293,
     "low": 283
   },
   "surpriseStats": {
-    "GBP/gdp 3-month avg": {
-      "n": 4,
-      "mean": 0.05,
-      "std": 0.1
-    },
-    "GBP/goods trade balance": {
-      "n": 4,
-      "mean": -1.1675,
-      "std": 4.101076
-    },
-    "GBP/industrial production mom": {
-      "n": 4,
-      "mean": -0.225,
-      "std": 0.15
-    },
-    "GBP/manufacturing production mom": {
-      "n": 4,
-      "mean": 0.3,
-      "std": 0.424264
-    },
-    "GBP/goods trade balance non-eu": {
-      "n": 4,
-      "mean": -1.2975,
-      "std": 2.693515
-    },
-    "GBP/gdp mom": {
-      "n": 4,
-      "mean": 0.075,
-      "std": 0.15
-    },
-    "USD/michigan consumer sentiment": {
-      "n": 8,
-      "mean": 0.825,
-      "std": 2.318097
-    },
     "NOK/balance of trade": {
       "n": 3,
       "mean": 1.433333,
@@ -697,6 +662,11 @@
       "n": 4,
       "mean": 0.2,
       "std": 0.503322
+    },
+    "USD/michigan consumer sentiment": {
+      "n": 6,
+      "mean": 0.133333,
+      "std": 2.28619
     },
     "JPY/retail sales yoy": {
       "n": 3,
@@ -1333,6 +1303,36 @@
       "mean": -0.15,
       "std": 0.919239
     },
+    "GBP/gdp 3-month avg": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
+    },
+    "GBP/industrial production mom": {
+      "n": 2,
+      "mean": -0.35,
+      "std": 0.070711
+    },
+    "GBP/goods trade balance": {
+      "n": 2,
+      "mean": 1.215,
+      "std": 5.267946
+    },
+    "GBP/goods trade balance non-eu": {
+      "n": 2,
+      "mean": 0.655,
+      "std": 2.552655
+    },
+    "GBP/manufacturing production mom": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.424264
+    },
+    "GBP/gdp mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
     "EUR/current account s.a": {
       "n": 2,
       "mean": 10.0,
@@ -1560,90 +1560,6 @@
     }
   },
   "events": [
-    {
-      "currency": "EUR",
-      "event": "Industrial Production MoM",
-      "dateISO": "2025-09-10",
-      "actual": "0.4%",
-      "forecast": "-0.1",
-      "previous": "0.2",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "08:00"
-    },
-    {
-      "currency": "USD",
-      "event": "MBA 30-Year Mortgage Rate",
-      "dateISO": "2025-09-10",
-      "actual": "6.49%",
-      "forecast": "",
-      "previous": "6.64",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "11:00"
-    },
-    {
-      "currency": "USD",
-      "event": "PPI MoM",
-      "dateISO": "2025-09-10",
-      "actual": "-0.1%",
-      "forecast": "0.3",
-      "previous": "0.7",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "Core PPI MoM",
-      "dateISO": "2025-09-10",
-      "actual": "-0.1%",
-      "forecast": "0.3",
-      "previous": "0.7",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Gasoline Stocks Change",
-      "dateISO": "2025-09-10",
-      "actual": "1.458M",
-      "forecast": "-0.1",
-      "previous": "-3.795",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
-    {
-      "currency": "USD",
-      "event": "EIA Crude Oil Stocks Change",
-      "dateISO": "2025-09-10",
-      "actual": "3.939M",
-      "forecast": "-1.1",
-      "previous": "2.415",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "14:30"
-    },
-    {
-      "currency": "GBP",
-      "event": "RICS House Price Balance",
-      "dateISO": "2025-09-10",
-      "actual": "-19%",
-      "forecast": "-10.0",
-      "previous": "-13.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "23:01"
-    },
     {
       "currency": "EUR",
       "event": "Deposit Facility Rate",
@@ -54527,6 +54443,253 @@
       "currency": "USD",
       "flag": "🇺🇸",
       "event": "United States 7-Year Note Auction",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany GfK Consumer Climate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-28.4",
+      "previous": "-26.6"
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "07:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain GDP q/q",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.7%",
+      "previous": "0.7%"
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "ECB Households Loans y/y",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.0%",
+      "previous": "3.1%"
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Durable Goods Orders m/m",
+      "impact": "high",
+      "actual": null,
+      "forecast": "-3.4%",
+      "previous": "1.1%"
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Core Durable Goods Orders m/m",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.9%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Michigan Consumer Sentiment",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Michigan Consumer Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Michigan Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "14:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Michigan 5-Year Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Baker Hughes US Oil Rig Count",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "17:00",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Baker Hughes US Total Rig Count",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia CFTC AUD Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CFTC EUR Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom CFTC GBP Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan CFTC JPY Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CFTC Gold Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CFTC Crude Oil Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CFTC S&P 500 Non-Commercial Net Positions",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "25 Sep",
+      "dateISO": "2026-09-25",
+      "timeUTC": "19:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States CFTC Nasdaq 100 Non-Commercial Net Positions",
       "impact": "medium",
       "actual": null,
       "forecast": null,
