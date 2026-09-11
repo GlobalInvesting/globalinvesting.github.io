@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-11T15:18:36Z",
+  "generated_at": "2026-09-11T21:01:27Z",
   "signals": [
     {
-      "time": "15:15",
+      "time": "20:50",
       "priority": "critical",
-      "title": "JPY/SEK — G10 Bilateral Theme + BoJ Tightening Repricing",
-      "text": "The G10 currency strength scorecard registers an extreme leader-laggard gap of 3.371% over the one-week window. JPY leads the G10 complex with a 1W average gain of +1.821% across 7 pairs, while SEK anchors the laggard board at -1.550% across 2 pairs. BoJ holds at 1.0%. JPY continues its systemic bid despite running a negative carry deficit against the G10 board, reflecting acute rate-hike repricing. Trade bias: Bullish JPY/SEK, theme outperformance driven by policy repricing. Catalyst: BoJ meeting 18 Sep — rate hike decision. Risk: BoJ holds rate at 1.0% and defers the hike, precipitating a fast unwind of the weekly JPY gain.",
+      "title": "JPY/SEK — G10 Bilateral Theme + Monetary Divergence",
+      "text": "JPY 1W avg outperformance of +1.916% across 7 pairs against SEK laggard status of -1.624% creates a 3.540% bilateral spread favoring JPY upside. BoJ holds at 1.0%. The Tokyo open and the upcoming BoJ meeting on 18 Sep resolve this divergent divergence. Trade bias: Bullish JPY/SEK into the open; SEK underperformance accelerates the trend. Catalyst: Sydney/Tokyo open followed by the BoJ meeting on 18 Sep. Risk: BoJ leaves the policy rate unchanged at 1.0% with dovish forward guidance.",
       "evidence": [
-        "JPY 1W avg: +1.821% (n=7)",
-        "SEK 1W avg: -1.550% (n=2)",
-        "G10 spread: 3.371%"
+        "JPY 1W avg: +1.916% (n=7)",
+        "SEK 1W avg: -1.624% (n=2)",
+        "G10 spread: 3.540%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:12",
+      "time": "18:46",
       "priority": "critical",
-      "title": "USD/JPY — Positioning Squeeze + Vol Skew + BoJ Repricing",
-      "text": "USD/JPY trades at 153.59, holding well below its daily SMA20 at 157.91, SMA50 at 159.85, and SMA200 at 158.42. The pair faces severe asymmetric squeeze conditions as CFTC Leveraged Funds sit heavily short JPY at -111,297 contracts (2nd percentile, z -2.18), with net short exposure surging WoW by -29,678 contracts. Options markets show intense demand for downside protection, with 1M 25d risk reversals at -2.09 reflecting extreme put skew while 1M IV at 9.5% trades below HV30 at 10.1% for a -0.6% vol risk premium. BoJ holds at 1.0%. Retail positioning is trapped long at 86%, further compounding capitulation downside risk. Trade bias: Bearish USD/JPY, crowded spec short covering dominates carry advantage. Catalyst: BoJ meeting 18 Sep — rate hike decision. Risk: BoJ leaves policy rate unchanged at 1.0%, prompting an aggressive bounce back toward the 157.91 SMA20.",
+      "title": "USD/CAD — Strait of Hormuz Drone Strike + Trendline Resistance",
+      "text": "CAD COT leveraged funds net short -70.1k (pctl 10%, z=-1.44) faces geopolitical headline pressure after Iran launched drones toward ships in the Strait of Hormuz, testing WTI crude at $100.30/bbl. USD/CAD closed Friday at 1.3872 after stalling against major technical trendline resistance, while Canada's strong ESI at +25.6 buffers CAD against broader USD strength. Geopolitical escalation into the Asian open determines whether crude supply disruptions force a CAD rebound and squeeze stretched spec shorts. Trade bias: Bearish USD/CAD into the open; crude spike threatens technical resistance. Catalyst: Sydney open crude oil reopening following Strait of Hormuz conflict headlines. Risk: De-escalation headlines emerge over the weekend and WTI breaks below $98.00/bbl.",
       "evidence": [
-        "JPY COT LF net: -111,297 (pctl 2, z -2.18)",
-        "USD/JPY 25d RR: -2.09 (indicative mid)",
-        "Fed-BoJ OIS spread: +266bp"
+        "CAD COT LF net: -70,142 (pctl 10%, z=-1.44)",
+        "WTI Oil: $100.3/bbl following Middle East drone attacks",
+        "USD/CAD Friday close: 1.3872 stalling at trendline resistance"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:08",
+      "time": "19:30",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Spec Long vs Retail Sentiment Divergence",
-      "text": "AUD/USD trades at 0.7173, testing the immediate resistance of its SMA20 at 0.7164 while holding above the SMA50 at 0.7065 and SMA200 at 0.7001. CFTC Leveraged Funds hold an extended net long position of +50,250 contracts, sitting in the 94th percentile of its 52-week historical distribution with a z-score of +1.79. In contrast, retail positioning from Myfxbook displays an extreme 91% short skew, setting up an acute institutional versus retail divergence at a key technical boundary. While the RBA at 4.35% maintains a -71bp OIS carry advantage over the Fed at 3.75%, leveraged fund net length stalled WoW with a 3,328-contract trim, signaling late-trend momentum exhaustion. Trade bias: Neutral/range AUD/USD; stretched institutional length caps upside near current levels. Catalyst: Fed meeting 16 Sep — policy rate decision. Risk: Sustained daily close above 0.7200 triggers retail short capitulation and forces another trend extension.",
+      "title": "AUD/USD — Crowded Speculative Long Unwind Risk",
+      "text": "AUD COT leveraged funds net long +50.3k (73.5% long, pctl 94%, z=+1.79) creates crowded-long liquidation risk after AUD/USD closed Friday at 0.7173. The RBA hold at 4.35% and positive AONIA-over-SOFR carry of +71bp provide support, but elevated positioning leaves the currency fragile to US Dollar rebound dynamics ahead of the FOMC. The Sydney open is the catalyst that tests leveraged fund conviction around the 0.7164 20-day SMA. Trade bias: Bearish AUD/USD on rallies; stretched spec long overhang limits upside. Catalyst: Sydney market open and liquidity resumption. Risk: Australian economic outperformance drives AUD/USD clear above the 0.7220 resistance zone.",
       "evidence": [
-        "AUD COT LF net: +50,250 (pctl 94, z +1.79)",
-        "AUD/USD Retail: 91% short",
-        "RBA 4.35% vs Fed 3.75% — 71bp OIS AUD carry advantage"
+        "AUD COT LF net: +50,250 (long% 73.5%, pctl 94%, z=+1.79)",
+        "AUD/USD Friday close: 0.7173 vs 20-day SMA 0.7164",
+        "OIS carry: AONIA 4.35% vs SOFR 3.64% (+71bp favors AUD)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:03",
+      "time": "19:30",
       "priority": "warning",
-      "title": "EUR/USD — Transatlantic Inflation Divergence + Policy Spread",
-      "text": "EUR/USD trades flat at 1.1613, compressed directly beneath its daily SMA20 at 1.1629 and SMA200 at 1.1637 while holding above the SMA50 at 1.1529. Headline US August CPI printed at 0.4% month-on-month against a 0.0% consensus, lifting year-on-year CPI to 3.4% and putting upward pressure on front-end US rates where the 2Y yield pushed to 4.43%. ECB holds at 2.5%. The 25-delta risk reversal sits neutral at -0.11 with 1M IV at 5.1% versus HV30 at 4.0%, indicating an options market that is comfortable hedging near-term range-bound conditions rather than pricing a directional breakout. Trade bias: Bearish EUR/USD, policy yield differential and upside US inflation surprise constrain spot upside. Catalyst: Fed meeting 16 Sep — policy rate decision. Risk: Dovish Fed rhetoric or a decisive break above the 1.1637 SMA200 resistance cluster.",
+      "title": "GBP/USD — Heavy Leveraged Long Overhang Ahead of BoE",
+      "text": "GBP COT leveraged funds net long +47.5k (71.6% long, pctl 93%, z=+1.27) exposes GBP/USD to long-liquidation pressure following Friday's close at 1.3527. The Bank of England meeting on 17 Sep approaches with policy on hold at 3.75% while the SONIA-SOFR carry premium sits flat at just +9bp. The BoE rate decision on 17 Sep is the catalyst that determines if crowded long positions can withstand FOMC tightening risks. Trade bias: Bearish GBP/USD into early-week sessions; crowded positioning caps continuation. Catalyst: BoE meeting on 17 Sep. Risk: BoE delivers a hawkish rate vote split indicating additional tightening requirements.",
       "evidence": [
-        "US August CPI: 0.4% m/m vs 0.0% forecast",
-        "Fed 3.75% vs ECB 2.50% — +145bp OIS carry favors USD",
-        "EUR/USD: 1.1613 (SMA20 1.1629, SMA200 1.1637)"
+        "GBP COT LF net: +47,504 (long% 71.6%, pctl 93%, z=+1.27)",
+        "GBP/USD Friday close: 1.3527 vs 20-day SMA 1.3562",
+        "OIS carry: SONIA 3.73% vs SOFR 3.64% (+9bp favors GBP)"
       ],
       "_source": "engine-ai-primary"
     }
