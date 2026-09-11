@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-11T02:59:00Z",
+  "generated_at": "2026-09-11T07:01:44Z",
   "signals": [
     {
-      "time": "02:58",
+      "time": "06:58",
       "priority": "critical",
-      "title": "JPY/SEK — G10 Bilateral Theme + Geopolitical Shock",
-      "text": "G10 scorecard prints JPY as top leader at +1.286% (n=7 pairs) against SEK as laggard at -1.634% (n=2 pairs), yielding an extreme bilateral spread of 2.920%. Strait of Hormuz transit disruptions and surging crude oil past $102/bbl drive flight away from European energy importers toward the yen despite JPY's policy rate carrying an accommodative real stance of -1.70%. BoJ policy rate sits at 1.0% against Riksbank at 1.75%, leaving a 75bp nominal deficit that JPY momentum completely overpowers in this risk-sensitive backdrop. The pair reflects systemic energy-shock vulnerability, with SEK weighed down by negative economic surprises at ESI -6.7 while JPY prints strong data momentum at ESI +23.8. Trade bias: Short SEK/JPY; geopolitical energy disruption continues to crush energy-importing beta. Catalyst: US CPI at 12:30 UTC today. Risk: De-escalation headlines in the Middle East compress the bilateral spread back below 1.20%.",
+      "title": "JPY/SEK — G10 Bilateral Theme + BoJ Hike Speculation",
+      "text": "The G10 scorecard shows JPY leading with an average weekly gain of +1.310% across 7 pairs while SEK lags at -1.378% across 2 pairs, generating a wide bilateral spread of 2.688%. BoJ holds at 1.0%. JPY strength dominates despite its nominal carry deficit, reinforced by strong positive Japanese economic surprises at an ESI index of +23.8 versus Sweden at -6.7. This policy convergence theme and broad cross-asset re-pricing fuel sustained JPY outperformance against low-yielding European peers. Technical positioning remains firmly bearish for JPY crosses as risk sentiment wavers. Trade bias: Bullish JPY/SEK; persistent outperformance spread favors continuation. Catalyst: BoJ meeting 18 Sep — rate hike decision. Risk: BoJ holds rates at 1.00% without hawkish guidance, sharply compressing the bilateral spread.",
       "evidence": [
-        "JPY 1W avg: +1.286% (n=7)",
-        "SEK 1W avg: -1.634% (n=2)",
-        "G10 spread: 2.920%"
+        "JPY 1W avg: +1.310% (n=7)",
+        "SEK 1W avg: -1.378% (n=2)",
+        "G10 spread: 2.688%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "02:54",
+      "time": "06:55",
       "priority": "critical",
-      "title": "USD/JPY — Crowded Carry Unwind + Options Skew",
-      "text": "USD/JPY prints at 154.40, pinned below its SMA20 (157.91), SMA50 (159.85), and SMA200 (158.42) moving-average cluster. CFTC positioning shows JPY leveraged funds net short -111,297 contracts, sitting at the 2nd percentile of its 52-week range with a z-score of -2.18σ, after shedding another 29,678 contracts WoW. The options desk confirms aggressive downside positioning with 1-month 25-delta risk reversals at -2.04, reflecting massive put demand despite 1-month IV sitting at 9.7% versus HV30 of 10.3% (VRP -0.6%). A positive OIS carry buffer of SOFR 3.64% versus TONA 0.98% (+266bp) provides insufficient structural defense as crowded spec shorts unwind amidst rising energy risks. The BEER model tags USD/JPY as severely cheap at z=-2.69σ against fair value 158.52, but technical breakdown and extreme options skew dominate spot action. Trade bias: Short USD/JPY; speculative short-covering forces spot lower through technical resistance. Catalyst: US CPI print at 12:30 UTC today. Risk: Spot closes back above the SMA20 at 157.91, aborting the downside momentum.",
+      "title": "USD/JPY — Options Downside Hedging + Unwind Risk",
+      "text": "USD/JPY trades at 154.17, breaking cleanly below its SMA20 at 157.91, SMA50 at 159.85, and SMA200 at 158.42. The 1M 25-delta Risk Reversal prints a sharp put skew of -2.04 with options implied volatility at 9.7% against HV30 at 10.2% yielding a negative volatility risk premium of -0.6%. BoJ holds at 1.0%. While Fed SOFR at 3.64% vs BoJ TONA at 0.98% maintains a +266bp carry advantage for USD, institutional options demand aggressively buys downside insurance against a crowded carry trade. Trade bias: Bearish USD/JPY; crowded speculative short unwinds threaten deeper pullbacks. Catalyst: US CPI release today at 12:30 UTC. Risk: US Core CPI prints well above the 0.2% monthly forecast, reviving broad USD yields.",
       "evidence": [
+        "USD/JPY 25d RR: -2.04 (Saxo Bank, 1M tenor, indicative mid)",
         "JPY COT LF net: -111,297 (pctl 2, z -2.18)",
-        "USD/JPY 25d RR: -2.04 (Saxo 1M mid)",
-        "USD/JPY: 154.40"
+        "Fed SOFR 3.64% vs BoJ TONA 0.98% — +266bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "02:49",
+      "time": "06:51",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long + Retail Divergence",
-      "text": "AUD/USD trades at 0.7158, consolidating just beneath its SMA20 at 0.7164 while holding above the SMA50 at 0.7065. Leveraged funds hold an extended net long of +50,250 contracts, ranking at the 94th percentile of its 52-week distribution (z=+1.79σ), though net additions stalled with a WoW delta of -3,328 contracts. Retail sentiment stands in direct contrarian divergence at 91% short, reflecting heavy retail fading of the prevailing uptrend. The 71bp OIS carry advantage (AONIA 4.35% vs SOFR 3.64%) supports Australian dollar resilience, but options show a mild put skew of -0.55 on IV of 7.0% against HV30 of 6.0%. Late-trend institutional exhaustion meets retail capitulation risk as price tests immediate moving-average resistance. Trade bias: Neutral/long AUD/USD; institutional positioning limits breakout room despite retail short squeeze setup. Catalyst: US CPI release at 12:30 UTC today. Risk: Leveraged funds net positioning drops for a second consecutive week, invalidating the upside momentum thesis.",
+      "title": "GBP/USD — Macro GDP Beat + Overextended Longs",
+      "text": "GBP/USD trades at 1.3526, holding above its SMA50 at 1.3475 and SMA200 at 1.3452, but remaining capped below the declining SMA20 at 1.3562. Fresh macro data shows UK July GDP accelerated to +0.4% MoM against 0.0% expected, driven by broad-based services and manufacturing activity. However, CFTC speculative positioning reveals leveraged funds are stretched long at +47,504 contracts, residing in the 93rd percentile of the 52-week range (z = +1.27) with a weekly contraction of -9,335 contracts. The policy carry differential offers zero support, with BoE 3.75% vs Fed 3.75% showing a 0bp carry premium and SONIA vs SOFR showing an insignificant -9bp gap. Strong growth prints are being absorbed into an already crowded speculative long, limiting topside momentum toward 1.3600. Trade bias: Neutral/range GBP/USD; crowded spec longs limit topside expansion. Catalyst: US CPI release today at 12:30 UTC. Risk: Persistent US disinflation triggers a broad USD selloff that forces fresh momentum buying.",
+      "evidence": [
+        "UK July GDP: +0.4% MoM vs 0.0% expected",
+        "GBP COT LF net: +47,504 (pctl 93, z +1.27)",
+        "BoE 3.75% vs Fed 3.75% — 0bp"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "06:46",
+      "priority": "warning",
+      "title": "AUD/USD — Positioning + Vol + Retail Divergence",
+      "text": "AUD/USD trades at 0.7175, testing its SMA20 at 0.7164 while holding above the SMA50 at 0.7065 and SMA200 at 0.7001. CFTC leveraged fund positioning shows a crowded net long of +50,250 contracts in the 94th percentile of the 52-week range (z = +1.79), contrasting sharply with retail positioning showing an extreme 91% short skew. Options implied volatility sits at 7.0% against HV30 of 5.7% (VRP +1.3%), while the 25-delta risk reversal reflects a mild put skew of -0.55. Although the RBA at 4.35% provides a 60bp carry advantage over the Fed at 3.75% (AONIA vs SOFR differential at -71bp), stalling institutional accumulation indicates upside momentum is tiring. The extreme institutional-retail divergence signals elevated squeeze vulnerability in both directions. Trade bias: Bullish AUD/USD; retail short capitulation risk supports the trend despite crowded spec longs. Catalyst: US CPI release today at 12:30 UTC. Risk: US headline inflation accelerates sharply, driving a bear steepener across the US curve.",
       "evidence": [
         "AUD COT LF net: +50,250 (pctl 94, z +1.79)",
-        "Retail sentiment: 91% short",
-        "AUD/USD: 0.7158"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "02:44",
-      "priority": "warning",
-      "title": "EUR/USD — Macro Tightening + Bear Steepener Pressure",
-      "text": "EUR/USD trades at 1.1612, hovering below its SMA20 at 1.1629 and SMA200 at 1.1637 while anchored above the SMA50 at 1.1529. ECB holds at 2.5%. Cross-asset dynamics show US Treasury yields bear-steepening with the 2s10s curve at +51.4bp and 10Y yields up to 4.944%, strengthening dollar rate insulation against surging oil costs. CFTC data reflects EUR leveraged funds net short -52,784 contracts (31st percentile, z=-0.39σ), indicating neutral institutional positioning. Options 25-delta risk reversals sit flat at -0.06 with modest IV of 5.0% over HV30 of 4.0% (VRP +1.0%), signaling lack of directional options participation as US rate dominance limits upside follow-through. Trade bias: Bearish EUR/USD; US yield-curve steepening and carry deficit cap upward progress. Catalyst: ECB President Lagarde speech at 08:00 UTC today. Risk: Spot prints a daily close above the SMA200 at 1.1637, dismantling the yield-driven ceiling.",
-      "evidence": [
-        "EUR/USD OIS carry: SOFR 3.64% vs €STR 2.19% (+145bp)",
-        "US 2s10s spread: +51.4bp (Bear Steepener)",
-        "EUR/USD: 1.1612"
+        "Retail sentiment: 91% short (Myfxbook)",
+        "RBA 4.35% vs Fed 3.75% — 60bp AUD carry premium"
       ],
       "_source": "engine-ai-primary"
     }
