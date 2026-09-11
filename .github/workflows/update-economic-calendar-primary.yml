@@ -117,9 +117,9 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Fetch economic calendar (biquote, single source — actuals + forward)
+      - name: Fetch economic calendar (primary source, single source — actuals + forward)
         if: steps.gate.outputs.run == 'true'
-        run: python3 private-scripts/fetch_biquote_calendar.py
+        run: python3 private-scripts/fetch_economic_calendar_primary.py
 
       - name: Display summary
         if: steps.gate.outputs.run == 'true'
