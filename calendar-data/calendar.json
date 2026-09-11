@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-11T13:49:27Z",
-  "generatedAt": "2026-09-11T13:49:27Z",
+  "lastUpdate": "2026-09-11T14:12:43Z",
+  "generatedAt": "2026-09-11T14:12:43Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -664,9 +664,9 @@
       "std": 0.503322
     },
     "USD/michigan consumer sentiment": {
-      "n": 6,
-      "mean": 0.133333,
-      "std": 2.28619
+      "n": 7,
+      "mean": -0.171429,
+      "std": 2.237345
     },
     "JPY/retail sales yoy": {
       "n": 3,
@@ -1439,9 +1439,9 @@
       "std": 0.070711
     },
     "USD/michigan inflation expectations": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 0.353553
+      "n": 3,
+      "mean": 0.133333,
+      "std": 0.404145
     },
     "JPY/gdp growth rate qoq": {
       "n": 2,
@@ -1527,6 +1527,16 @@
       "n": 2,
       "mean": 0.4,
       "std": 0.565685
+    },
+    "USD/michigan consumer expectations": {
+      "n": 2,
+      "mean": -2.25,
+      "std": 4.454773
+    },
+    "USD/michigan 5-year inflation expectations": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 0.141421
     },
     "JPY/retail sales mom": {
       "n": 2,
@@ -52416,7 +52426,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Consumer Sentiment",
       "impact": "medium",
-      "actual": null,
+      "actual": "47.8",
       "forecast": "49.8",
       "previous": "51.7"
     },
@@ -52429,7 +52439,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Consumer Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "45.8",
       "forecast": "51.2",
       "previous": "51.5"
     },
@@ -52442,7 +52452,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "4.6%",
       "forecast": "4.1%",
       "previous": "4.0%"
     },
@@ -52455,7 +52465,7 @@
       "flag": "🇺🇸",
       "event": "United States Michigan 5-Year Inflation Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "3.4%",
       "forecast": "3.2%",
       "previous": "3.3%"
     },
