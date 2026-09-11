@@ -7,18 +7,12 @@ fetch_capital_flows.py). Gates each sub-panel on its own history-length
 threshold — same UX pattern as the FX Fair Value "Accumulating business-day
 history" progress bar — rather than showing a signal fit on too few points.
 
-Promoted from beta to production this session: all three gates (TIC, RF,
-MMF) confirmed cleared with real accumulated data (13/12, 84/12, 117/12
-months respectively, per the live capital_flows.json at promotion time) and
-the panel visually confirmed across several beta-stage review sessions.
-Ported verbatim — no logic changes — into index.html between
-#section-econmap and #section-fair-value (see v2.2's own note below for why
-that position), with the matching <script> tag's cache-buster dropped from
-2.2.0-beta to 2.2.0. The corresponding block in index-beta.html was removed
-in the same change per this project's standing beta→production convention:
-this file is a single shared module referenced by one production entry
-point now, not duplicated staging markup two pages could independently
-drift out of sync with. No dashboard.js/dashboard.css changes were needed —
+Production panel: all three gates (TIC, RF, MMF) clear with real
+accumulated data (13/12, 84/12, 117/12 months respectively). Lives in
+index.html between #section-econmap and #section-fair-value; this file is
+a single shared module referenced by one production entry point, not
+duplicated staging markup two pages could independently drift out of sync
+with. No dashboard.js/dashboard.css changes were needed —
 loadCapitalFlows() self-registers on DOMContentLoaded and every CSS
 variable/class the panel uses (--text2/--text3/--accent/--font-ui/
 --font-mono/--bg2/--border, .panel-head/.panel-title/.panel-sub) already

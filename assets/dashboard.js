@@ -12364,8 +12364,8 @@ const _ESI_VENDOR_ALIASES = {
   'revised uom consumer sentiment': 'michigan consumer sentiment',
   'revised uom inflation expectations': 'michigan inflation expectations',
   'prelim gdp price index qoq': 'gdp price index qoq',
-  // v8.445.0 (2026-09-10) — biquote vendor migration. All entries below
-  // chain-verified (same actual/previous across the vendor boundary) in
+  // v8.445.0 (2026-09-10) — calendar source migration. All entries below
+  // chain-verified (same actual/previous across the source boundary) in
   // fetch_economic_calendar.py's VENDOR_ALIASES v3.12 -- see that file's
   // changelog for the full per-pair verification detail, including the two
   // candidates (CHF GDP q/q+y/y, SEK GDP q/q) checked and deliberately left
@@ -12469,7 +12469,7 @@ async function renderEconSurprises() {
           const t = new Date(ev.dateISO).getTime();
           return !isNaN(t) && nowMs - t <= win21 && ev.released && ev.actual != null;
         });
-        if (hasReleased) { calEvents = evts; calSource = ffj.source || 'biquote'; }
+        if (hasReleased) { calEvents = evts; calSource = ffj.source || 'calendar-primary'; }
       }
     } catch {  }
   }

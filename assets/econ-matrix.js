@@ -24,13 +24,6 @@
     USD: 'united states ', GBP: 'united kingdom ', JPY: 'japan ', AUD: 'australia ',
     CAD: 'canada ', CHF: 'switzerland ', NZD: 'new zealand ', NOK: 'norway ', SEK: 'sweden ',
   };
-  // biquote (the calendar source since 2026-09-10) titles cadence notation
-  // as lowercase slash form ("CPI m/m", "GDP q/q") where every CATS/CATS_EUR
-  // prefix below was written against the previous vendor's concatenated form
-  // ("CPI MoM", "GDP QoQ"). Word-boundary-anchored so it never touches a
-  // genuinely different field like GBP's "GDP 3m/3m" (no boundary between
-  // the leading digit and "m"). Must stay in sync with the equivalent
-  // notation step in fetch_current_account_gdp.py's _cal_canon().
   function normNotation(title) {
     return title
       .replace(/\bm\/m\b/g, 'MoM')
@@ -92,10 +85,6 @@
       prod:  ['Industrial Production MoM Prel', 'Industrial Production MoM'],
       conf:  ['Jibun Bank Manufacturing PMI', 'Tankan Large Manufacturers Index'],
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
-      // biquote publishes JPY's Current Account as n.s.a. (non-seasonally-
-      // adjusted, the BoJ's own headline release) rather than a plain
-      // "Current Account" title — verified live 2026-09-10, see
-      // fetch_current_account_gdp.py's matching _EVENT_KIND_ALIAS entry.
       ca:    ['Current Account', 'Current Account n.s.a.'],
       trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
@@ -156,9 +145,9 @@
       prod:  ['Industrial Production YoY'],
       conf:  ['Business NZ PMI'],
       rtl:   ['Retail Sales QoQ', 'Retail Sales YoY'],
-      // biquote publishes NZD's Current Account/Trade Balance as trailing
-      // 12-month totals (Stats NZ's own headline convention), not a plain
-      // single-period title — verified live 2026-09-10.
+      // The calendar feed publishes NZD's Current Account/Trade Balance as
+      // trailing 12-month totals (Stats NZ's own headline convention), not
+      // a plain single-period title — verified live 2026-09-10.
       ca:    ['Current Account', 'Current Account 12-Months'],
       trade: ['Balance of Trade', 'Trade Balance 12-Months'],
       pce:   [],
@@ -180,10 +169,10 @@
       trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
-    // NOK: zero live events observed for this currency in the biquote
-    // window checked 2026-09-10 (economic-events.json had no NOK entries
-    // at all) — title conventions below could not be re-verified against
-    // biquote and are left at their pre-migration (TE/Myfxbook-era)
+    // NOK: zero live events observed for this currency in the calendar
+    // feed's window checked 2026-09-10 (economic-events.json had no NOK
+    // entries at all) — title conventions below could not be re-verified
+    // against the current feed and are left at their pre-migration
     // values. Flagged for re-check the next time a NOK release actually
     // appears in the calendar; do not assume these are still correct.
     NOK: {
@@ -238,8 +227,8 @@
     'USD/AUD/CAD/GBP/NZD/EUR\u2019s own headline Employment Change.';
   const EMP_PROXY_CCY = new Set([...EMP_COMPUTED_CCY, ...EMP_EUROSTAT_CCY]);
 
-  const SEK_CORE_IS_HEADLINE_NOTE = 'This is Sweden\u2019s headline CPI YoY (Myfxbook), not an ' +
-    'ex-food/ex-energy core measure \u2014 shown here instead of the more volatile TE-sourced CPIF ' +
+  const SEK_CORE_IS_HEADLINE_NOTE = 'This is Sweden\u2019s headline CPI YoY, not an ' +
+    'ex-food/ex-energy core measure \u2014 shown here instead of the more volatile CPIF ' +
     'excl. Energy series, for reliability. See CPI YoY column for CPIF, ' +
     'the Riksbank\u2019s actual target measure.';
 

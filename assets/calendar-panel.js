@@ -98,9 +98,9 @@
     'adp non-farm employment change': 'adp employment change',
     'non-farm employment change': 'non farm payrolls',
     'official cash rate': 'rbnz interest rate decision',
-    // v8.445.0 (2026-09-10) — biquote vendor migration. Chain-verified in
+    // v8.445.0 (2026-09-10) — calendar source migration. Chain-verified in
     // fetch_economic_calendar.py's VENDOR_ALIASES v3.12 (same
-    // actual/previous across the vendor boundary) — see that file's
+    // actual/previous across the source boundary) — see that file's
     // changelog for full per-pair detail, including CHF GDP q/q+y/y and
     // SEK GDP q/q, which were checked and deliberately left unaliased.
     'nonfarm payrolls': 'non farm payrolls',
@@ -926,9 +926,9 @@
   }
 
   function cleanSourceLabel(raw) {
-    if (!raw) return 'biquote';
+    if (!raw) return 'calendar-primary';
     const stripped = String(raw).replace(/\s*\([^)]*\)\s*$/, '').trim();
-    return stripped || 'biquote';
+    return stripped || 'calendar-primary';
   }
 
   function buildPanel(events, source, holidays) {
@@ -1392,20 +1392,21 @@
       // calendar.json (secondary/backfill feed) is kept ONLY as a deep-history source for the
       // per-event historical trend index (buildSeriesIndex, used by the detail modal's mini-series).
       // It is deliberately never merged into the main displayed event list below: its `event`
-      // field ("GDP m/m") and biquote's own `title` field ("United Kingdom GDP m/m") use different
-      // naming conventions for the identical release, so a same-event dedup keyed on exact title
-      // text silently fails to match and both copies render as separate rows — one from biquote
-      // (usually still pending, dashes) and one from calendar.json (its own forecast/previous,
-      // never an `actual` since this feed doesn't track releases live). Confirmed live for GBP
-      // 2026-09-11: calendar.json's `{event:"GDP m/m", forecast:"0.0%", previous:"0.3%"}` vs.
-      // biquote's `{title:"United Kingdom GDP m/m", forecast:null, previous:null}` — same release,
-      // two rows. Per the single-source-of-truth decision made when biquote replaced Myfxbook/
-      // ForexFactory (v8.443.0), the displayed calendar shows biquote's own events exclusively.
+      // field ("GDP m/m") and the primary feed's own `title` field ("United Kingdom GDP m/m") use
+      // different naming conventions for the identical release, so a same-event dedup keyed on
+      // exact title text silently fails to match and both copies render as separate rows — one
+      // from the primary feed (usually still pending, dashes) and one from calendar.json (its own
+      // forecast/previous, never an `actual` since this feed doesn't track releases live).
+      // Confirmed live for GBP 2026-09-11: calendar.json's `{event:"GDP m/m", forecast:"0.0%",
+      // previous:"0.3%"}` vs. the primary feed's `{title:"United Kingdom GDP m/m", forecast:null,
+      // previous:null}` — same release, two rows. Per the single-source-of-truth decision made
+      // when the primary feed replaced its predecessors (v8.443.0), the displayed calendar shows
+      // the primary feed's own events exclusively.
       _lastFullHistory = calEvents;
       _seriesIndex     = buildSeriesIndex(calEvents);
 
       let events   = ffEvents.filter(ev => !((ev.title || ev.event || '').toLowerCase().includes('myfxbook')));
-      let source   = ffJson?.source || 'biquote';
+      let source   = ffJson?.source || 'calendar-primary';
       let holidays = Array.isArray(ffJson?.holidays) ? ffJson.holidays : [];
 
       const _relIdx = {};
