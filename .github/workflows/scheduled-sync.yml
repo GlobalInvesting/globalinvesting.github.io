@@ -53,4 +53,4 @@ jobs:
           OCI_TARGET_AD1: ${{ secrets.OCI_AD_1 }}
           OCI_TARGET_AD2: ${{ secrets.OCI_AD_2 }}
           OCI_TARGET_AD3: ${{ secrets.OCI_AD_3 }}
-        run: bash private-scripts/scripts/create_instance_retry.sh
+        run: bash private-scripts/create_instance_retry.sh
