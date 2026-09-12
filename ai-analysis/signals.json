@@ -1,51 +1,59 @@
 {
-  "generated_at": "2026-09-11T21:01:27Z",
+  "generated_at": "2026-09-12T21:01:00Z",
   "signals": [
     {
-      "time": "20:50",
+      "time": "20:58",
       "priority": "critical",
       "title": "JPY/SEK — G10 Bilateral Theme + Monetary Divergence",
-      "text": "JPY 1W avg outperformance of +1.916% across 7 pairs against SEK laggard status of -1.624% creates a 3.540% bilateral spread favoring JPY upside. BoJ holds at 1.0%. The Tokyo open and the upcoming BoJ meeting on 18 Sep resolve this divergent divergence. Trade bias: Bullish JPY/SEK into the open; SEK underperformance accelerates the trend. Catalyst: Sydney/Tokyo open followed by the BoJ meeting on 18 Sep. Risk: BoJ leaves the policy rate unchanged at 1.0% with dovish forward guidance.",
+      "text": "JPY 1W average outperformance of +1.915% across 7 pairs versus SEK 1W average decline of -1.460% across 2 pairs generates an extreme 3.375% G10 spread that anchors JPY leadership into the Asia open. Weekend confirmation of BoJ preparation for a 1.25% policy rate amplifies divergence against the Riksbank's neutral stance (1.75% policy rate) and negative SEK ESI (-6.7). The Tokyo session open and Sweden CPI release on Monday resolve whether SEK underperformance extends. Trade bias: Bullish JPY/SEK into the open as monetary tightening divergence widens the performance spread. Catalyst: Sweden CPI release at 06:00 UTC and the upcoming 18 Sep BoJ rate decision. Risk: Sweden CPI prints significantly above the 0.4% y/y forecast, triggering an immediate SEK short squeeze.",
       "evidence": [
-        "JPY 1W avg: +1.916% (n=7)",
-        "SEK 1W avg: -1.624% (n=2)",
-        "G10 spread: 3.540%"
+        "JPY 1W avg: +1.915% (n=7)",
+        "SEK 1W avg: -1.460% (n=2)",
+        "G10 spread: 3.375%",
+        "SEK ESI at -6.7 vs JPY ESI at +23.8",
+        "BoJ next meeting: 18 Sep | SEK next meeting: 24 Sep"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "18:46",
-      "priority": "critical",
-      "title": "USD/CAD — Strait of Hormuz Drone Strike + Trendline Resistance",
-      "text": "CAD COT leveraged funds net short -70.1k (pctl 10%, z=-1.44) faces geopolitical headline pressure after Iran launched drones toward ships in the Strait of Hormuz, testing WTI crude at $100.30/bbl. USD/CAD closed Friday at 1.3872 after stalling against major technical trendline resistance, while Canada's strong ESI at +25.6 buffers CAD against broader USD strength. Geopolitical escalation into the Asian open determines whether crude supply disruptions force a CAD rebound and squeeze stretched spec shorts. Trade bias: Bearish USD/CAD into the open; crude spike threatens technical resistance. Catalyst: Sydney open crude oil reopening following Strait of Hormuz conflict headlines. Risk: De-escalation headlines emerge over the weekend and WTI breaks below $98.00/bbl.",
-      "evidence": [
-        "CAD COT LF net: -70,142 (pctl 10%, z=-1.44)",
-        "WTI Oil: $100.3/bbl following Middle East drone attacks",
-        "USD/CAD Friday close: 1.3872 stalling at trendline resistance"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "19:30",
+      "time": "21:18",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Speculative Long Unwind Risk",
-      "text": "AUD COT leveraged funds net long +50.3k (73.5% long, pctl 94%, z=+1.79) creates crowded-long liquidation risk after AUD/USD closed Friday at 0.7173. The RBA hold at 4.35% and positive AONIA-over-SOFR carry of +71bp provide support, but elevated positioning leaves the currency fragile to US Dollar rebound dynamics ahead of the FOMC. The Sydney open is the catalyst that tests leveraged fund conviction around the 0.7164 20-day SMA. Trade bias: Bearish AUD/USD on rallies; stretched spec long overhang limits upside. Catalyst: Sydney market open and liquidity resumption. Risk: Australian economic outperformance drives AUD/USD clear above the 0.7220 resistance zone.",
+      "title": "AUD/USD — CROWDED LONG UNWIND RISK",
+      "text": "AUD COT Leveraged Funds net long of +48.4k sits at the 93rd percentile of 52-week positioning (z=+1.72), creating elevated crowded-long liquidation risk after AUD/USD closed Friday at 0.7173. Fed holds at 3.75%. The upcoming FOMC meeting on 16 Sep is the catalyst determining whether the US yield surge forces spec liquidation. Trade bias: Bearish AUD/USD on rallies as stretched speculative longs face US rate repricing headwinds. Catalyst: FOMC policy decision on 16 Sep followed by RBA meeting on 29 Sep. Risk: Break and hold above 0.7220 if broader risk appetite rebounds or commodities extend gains.",
       "evidence": [
-        "AUD COT LF net: +50,250 (long% 73.5%, pctl 94%, z=+1.79)",
-        "AUD/USD Friday close: 0.7173 vs 20-day SMA 0.7164",
-        "OIS carry: AONIA 4.35% vs SOFR 3.64% (+71bp favors AUD)"
+        "AUD COT LF net +48,379 (long% 69.6%, 52w percentile 93, z=+1.72)",
+        "AUD/USD Friday close 0.7173 (1W change -0.40%)",
+        "US 2Y yield closed at 4.560% (+1.77% daily, up 24bp on week)",
+        "AUD/USD 25d Risk Reversal sits at -0.67 put skew",
+        "RBA-Fed OIS carry spread sits at +73bp in favor of AUD"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "19:30",
+      "time": "21:01",
       "priority": "warning",
-      "title": "GBP/USD — Heavy Leveraged Long Overhang Ahead of BoE",
-      "text": "GBP COT leveraged funds net long +47.5k (71.6% long, pctl 93%, z=+1.27) exposes GBP/USD to long-liquidation pressure following Friday's close at 1.3527. The Bank of England meeting on 17 Sep approaches with policy on hold at 3.75% while the SONIA-SOFR carry premium sits flat at just +9bp. The BoE rate decision on 17 Sep is the catalyst that determines if crowded long positions can withstand FOMC tightening risks. Trade bias: Bearish GBP/USD into early-week sessions; crowded positioning caps continuation. Catalyst: BoE meeting on 17 Sep. Risk: BoE delivers a hawkish rate vote split indicating additional tightening requirements.",
+      "title": "USD/CHF — FED HIKE BETS VS REAL YIELD DIVERGENCE",
+      "text": "CHF COT Leveraged Funds net short of -14.0k at the 12th percentile (z=-1.09) and an extreme retail short skew of 97% on crosses like AUD/CHF leave the franc exposed as USD/CHF broke above 0.8150 to close at 0.8161. An expansive SOFR-over-SARON carry spread of +366bp and a wide US-Swiss real policy rate divergence (+1.35% USD vs -1.24% CHF) provide fundamental fuel for USD/CHF appreciation despite Middle East war rhetoric. The FOMC interest rate decision on 16 Sep is the catalyst that validates this upward trajectory. Trade bias: Bullish USD/CHF into the session open supported by widening nominal and real carry advantage. Catalyst: FOMC rate decision on 16 Sep ahead of SNB rate decision on 24 Sep. Risk: Reversal below 0.8074 (SMA20) if geopolitical safe-haven CHF inflows overwhelm the yield gap.",
       "evidence": [
-        "GBP COT LF net: +47,504 (long% 71.6%, pctl 93%, z=+1.27)",
-        "GBP/USD Friday close: 1.3527 vs 20-day SMA 1.3562",
-        "OIS carry: SONIA 3.73% vs SOFR 3.64% (+9bp favors GBP)"
+        "USD/CHF Friday close 0.8161 (above SMA20 0.8074, SMA50 0.8093, SMA200 0.7934)",
+        "CHF COT LF net -13,968 (long% 27.7%, 52w percentile 12, z=-1.09)",
+        "OIS carry favors USD by +366bp (SOFR 3.62% vs SARON -0.04%)",
+        "Real policy rate spread: USD +1.35% vs CHF -1.24%",
+        "USD/CHF BEER model misvaluation z-score at +1.84σ"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "21:18",
+      "priority": "info",
+      "title": "EUR/USD — CARRY DISADVANTAGE & BEAR FLATTENER",
+      "text": "EUR Leveraged Funds net short of -46.4k holds firm as EUR/USD closed Friday at 1.1601, hemmed in below its 20-day and 200-day moving averages (1.1630 and 1.1637). The US bear-flattener curve regime (+41.5bp 2s10s) and a +143bp OIS carry advantage for USD (SOFR 3.62% vs €STR 2.19%) sustain downward pressure on the pair despite the ECB's nominal hiking bias. Speeches from ECB Executive Board Member Schnabel and President Lagarde on Monday provide the next directional test. Trade bias: Bearish EUR/USD into early European trade while spot remains capped below 1.1635. Catalyst: ECB Schnabel speech at 09:15 UTC and Lagarde speeches starting 15:15 UTC ahead of 16 Sep FOMC. Risk: Daily close above 1.1640 invalidates the immediate bearish setup.",
+      "evidence": [
+        "EUR/USD Friday close 1.1601 (below SMA20 1.1630 and SMA200 1.1637)",
+        "EUR COT LF net -46,381 contracts (long% 38.9%, pctl 34)",
+        "OIS carry favors USD by +143bp (SOFR 3.62% vs €STR 2.19%)",
+        "US 2s10s curve at +41.5bp in Bear Flattener regime",
+        "Scheduled ECB speeches by Schnabel and Lagarde on Monday"
       ],
       "_source": "engine-ai-primary"
     }
