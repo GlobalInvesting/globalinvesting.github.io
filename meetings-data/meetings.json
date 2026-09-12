@@ -153,13 +153,13 @@
         "8 Dec"
       ],
       "source": "rba.gov.au",
-      "bias": "hold",
+      "bias": "hike",
       "biasSource": "30-day Interbank Cash Rate futures",
-      "biasMethod": "spread",
+      "biasMethod": "ois",
       "biasUpdated": "2026-09-12",
       "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 4.35
+      "hikeProb": 100,
+      "fwdRate": 4.6
     },
     "CAD": {
       "nextMeeting": "28 Oct",
