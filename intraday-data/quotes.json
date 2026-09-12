@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-12T01:45:32Z",
+  "updated": "2026-09-12T01:50:47Z",
   "source": "mixed",
   "quotes": {
     "vix": {
@@ -35,12 +35,12 @@
       "pct1w_date": "2026-09-04"
     },
     "gold": {
-      "close": 4348.3324,
+      "close": 4348.3978,
       "prev_close": 4348.8692,
-      "chg": -0.5368,
-      "pct": -0.0123,
+      "chg": -0.4714,
+      "pct": -0.0108,
       "source": "twelve_data",
-      "high": 4444.8,
+      "high": 4444.9,
       "low": 4333.0,
       "open": 4359.4,
       "market_state": "REGULAR",
@@ -52,7 +52,7 @@
       "chg": -2.49,
       "pct": -2.4297,
       "high": 104.46,
-      "low": 98.53,
+      "low": 98.51,
       "open": 104.32,
       "bid": 99.99,
       "ask": 100.69,
@@ -200,40 +200,40 @@
       "pct1w_date": "2026-09-04"
     },
     "btc": {
-      "close": 77259.28,
+      "close": 77308.23,
       "prev_close": 77201.88,
-      "chg": 57.4,
-      "pct": 0.0744,
-      "high": 77366.49,
-      "low": 77201.88,
+      "chg": 106.35,
+      "pct": 0.1378,
+      "high": 65713.91,
+      "low": 64182.797,
       "open": 77201.88,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1789177531,
+      "market_time": 1789177845,
       "source": "quote-pipeline-primary",
-      "pct1w": -3.0283,
+      "pct1w": -2.9668,
       "pct1w_date": "2026-09-04",
-      "session_high": 79748.38,
-      "session_low": 76173.28
+      "session_high": 79812.11,
+      "session_low": 76088.52
     },
     "eth": {
-      "close": 2512.99,
+      "close": 2515.5,
       "prev_close": 2515.5227,
-      "chg": -2.5327,
-      "pct": -0.1007,
-      "high": 2516.4236,
-      "low": 2510.772,
+      "chg": -0.0227,
+      "pct": -0.0009,
+      "high": 1907.2332,
+      "low": 1858.5846,
       "open": 2515.5227,
       "bid": null,
       "ask": null,
       "market_state": "REGULAR",
-      "market_time": 1789177531,
+      "market_time": 1789177840,
       "source": "quote-pipeline-primary",
-      "pct1w": 2.3172,
+      "pct1w": 2.4194,
       "pct1w_date": "2026-09-04",
-      "session_high": 2663.1,
-      "session_low": 2433.32
+      "session_high": 2666.82,
+      "session_low": 2433.98
     },
     "nasdaq": {
       "close": 29368.44,
@@ -1252,7 +1252,7 @@
       "chg": -3.21,
       "pct": -2.9824,
       "high": 110.19,
-      "low": 103.49,
+      "low": 103.48,
       "open": 109.16,
       "bid": 104.01,
       "ask": 105.56,
@@ -4215,14 +4215,14 @@
     {
       "a": "AUD/USD",
       "b": "ASX 200",
-      "corr30": 0.041,
+      "corr30": 0.026,
       "n30": 30,
-      "corr": -0.018,
+      "corr": -0.034,
       "n": 60,
-      "corr90": -0.149,
+      "corr90": -0.142,
       "n90": 90,
       "norm": 0.079,
-      "z_score": -0.17,
+      "z_score": -0.24,
       "std": 0.2231,
       "n_indep": 8,
       "band15hi": 0.392,
@@ -4230,7 +4230,6 @@
       "band25hi": 0.563,
       "band25lo": -0.445,
       "history": [
-        0.071,
         0.112,
         0.064,
         0.036,
@@ -4452,10 +4451,10 @@
         -0.34,
         -0.28,
         -0.231,
-        0.041
+        0.041,
+        0.026
       ],
       "hist_dates": [
-        "2025-10-24",
         "2025-10-27",
         "2025-10-28",
         "2025-10-29",
@@ -4677,12 +4676,13 @@
         "2026-09-07",
         "2026-09-08",
         "2026-09-09",
-        "2026-09-10"
+        "2026-09-10",
+        "2026-09-11"
       ],
       "spread_z": null,
       "signal": null,
       "beta": null,
-      "coint_p": 0.8826,
+      "coint_p": 0.8768,
       "coint_n": 252
     },
     {
