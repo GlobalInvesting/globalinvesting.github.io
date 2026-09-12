@@ -10934,7 +10934,7 @@ function alertsAddFromUI() {
 
 async function alertsCheckEco() {
   const arr      = alertsLoad();
-  const ecoAlerts = arr.filter(a => a.type === 'eco_actual' && !a.fired);
+  const ecoAlerts = arr.filter(a => a.type === 'eco_actual');
   if (!ecoAlerts.length) return;
 
   const todayISO = new Date().toISOString().slice(0, 10);
