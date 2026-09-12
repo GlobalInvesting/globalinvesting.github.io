@@ -1,10 +1,10 @@
 
-const CACHE_VERSION = 'gi-v8.445.0';
+const CACHE_VERSION = 'gi-v8.457.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
 const STATIC_PRECACHE = [
-  '/assets/dashboard.css?v=8.434.0',
+  '/assets/dashboard.css?v=8.457.0',
   '/assets/dashboard.js?v=8.445.0',
   '/assets/gi-auth.js?v=1.7.8',
   '/assets/gi-overview.js?v=2.0.1',
