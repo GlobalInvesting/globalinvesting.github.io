@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = 'gi-v8.466.0';
+const CACHE_VERSION = 'gi-v8.468.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -21,7 +21,7 @@ const STATIC_PRECACHE = [
   '/assets/feed.js?v=1.0.0',
   '/assets/share.js?v=1.1.0',
   '/assets/inline-panel.js?v=1.4.2',
-  '/assets/calendar-panel.js?v=1.19.31',
+  '/assets/calendar-panel.js?v=1.19.32',
   '/assets/econ-matrix.js?v=2.6.7',
   '/assets/capital-flows.js?v=2.2.0',
   '/assets/gdpr.js',
