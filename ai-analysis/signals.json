@@ -1,39 +1,63 @@
 {
-  "generated_at": "2026-09-13T21:00:49Z",
+  "generated_at": "2026-09-13T22:41:43Z",
   "signals": [
     {
-      "time": "20:58",
+      "time": "22:41",
       "priority": "critical",
-      "title": "JPY/SEK — G10 Bilateral Theme + CB Divergence",
-      "text": "G10 scorecard metrics confirm broad JPY outperformance against persistent SEK weakness over the trailing week. JPY leads all G10 peers with a 1W average gain of +2.124% across 7 pairs, while SEK lags at -1.542% across 2 pairs, producing a critical 3.666% bilateral performance spread. This move defies the nominal policy carry deficit, where Riksbank at 1.75% maintains a 75bp premium over BoJ at 1.0%. The divergence reflects shifting monetary policy trajectories, as headlines signal the Bank of Japan is preparing to raise its policy rate to 1.25% at the 18 September meeting, whereas Sweden CPI prints are due at 06:00 UTC. In technical positioning, USD/SEK trades at 9.689, positioned above its SMA20 at 9.552 and SMA50 at 9.588, highlighting underlying SEK vulnerability. Trade bias: Long JPY/SEK; widening policy trajectory divergence favors continued bilateral outperformance. Catalyst: Sweden CPI release 14 Sep at 06:00 UTC. Risk: BoJ holds rate at 1.0% with dovish forward guidance on 18 Sep, triggering carry-trade re-engagement.",
+      "title": "JPY/SEK — G10 Bilateral Theme + BoJ Tightening Repricing",
+      "text": "The G10 scorecard highlights JPY as the weekly outperformer averaging +1.777% across 7 pairs, while SEK anchors the laggard end at −1.461% across 2 pairs, generating an extreme 3.238% bilateral spread. Headwinds for SEK mount following Sweden's subdued inflation profile alongside a negative ESI reading of −6.7, contrasting with Japan's ESI running at +23.8. JPY speculative positioning shows an unprecedented covering impulse of +58,042 contracts WoW to leave net short at −53,255, driven by market expectations that the Bank of Japan will hike its policy rate to 1.25% at its upcoming policy meeting. While the nominal BoJ rate of 1.0% vs Riksbank at 1.75% still represents a carry deficit, real policy rate differentials and massive short-covering flows drive the bilateral gap. Trade bias: Long JPY/SEK, theme-driven policy divergence and short covering. Catalyst: BoJ meeting 18 Sep — rate decision. Risk: BoJ holds rates at 1.0% with dovish forward guidance, unwinding yen gains.",
       "evidence": [
-        "JPY 1W avg: +2.124% (n=7)",
-        "SEK 1W avg: -1.542% (n=2)",
-        "G10 spread: 3.666%"
+        "JPY 1W avg: +1.777% (n=7)",
+        "SEK 1W avg: -1.461% (n=2)",
+        "G10 spread: 3.238%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:50",
+      "time": "22:38",
+      "priority": "critical",
+      "title": "USD/JPY — Options Skew + Retail Divergence",
+      "text": "USD/JPY trades at 153.78, holding well below its SMA20 at 157.62, SMA50 at 159.69, and SMA200 at 158.41. FX options pricing reflects acute downside demand with the 1-month 25-delta Risk Reversal printing at −2.09 (Saxo Bank, 1M tenor, indicative mid), marking a severe put skew even as VIX sits at 15.8 (normal volatility). In sharp contrast, Retail sentiment data retail sentiment is positioned 85% long against 15% short, establishing an extreme retail-long posture that diverges directly from institutional downside protection flows. Although Fed SOFR at 3.62% vs BoJ TONA at 0.98% maintains a +264bp carry advantage favoring the dollar, market repricing ahead of the BoJ decision forces aggressive downside hedging. Trade bias: Short USD/JPY, positioning squeeze against retail long. Catalyst: BoJ meeting 18 Sep — rate decision. Risk: Sustained close above the SMA200 at 158.41 invalidating the short structure.",
+      "evidence": [
+        "USD/JPY 25d RR: -2.09 (strong put skew)",
+        "Retail USD/JPY: 85% long",
+        "USD/JPY: SOFR 3.62% vs TONA 0.98% — +264bp"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "22:35",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Positioning",
-      "text": "AUD/USD trades at 0.7164, holding just below its immediate SMA20 level at 0.7168 but comfortably above its SMA50 at 0.7069 and SMA200 at 0.7003. CFTC leveraged funds positioning shows a net long stance of +48,379 contracts, sitting at the 93rd percentile of its 52-week historical range with a z-score of +1.72. The weekly change reveals an outflow of -1,871 contracts, indicating that institutional allocation growth is stalling near multi-month highs. Cash market carry remains supportive with RBA AONIA at 4.35% holding a 73bp carry advantage over Fed SOFR at 3.62%. However, 25-delta risk reversals display a mild put skew of -0.67, confirming that derivative markets are paying for downside protection rather than chasing the extended cash move. Trade bias: Neutral/range AUD/USD; upper-decile spec crowding constrains additional topside momentum. Catalyst: RBA policy meeting 29 Sep. Risk: Leveraged funds net longs break cleanly above +50k contracts alongside a daily close above the 0.7168 SMA20.",
+      "title": "AUD/USD — Crowded Long",
+      "text": "AUD/USD trades at 0.7162, holding above its SMA20 at 0.7168, SMA50 at 0.7069, and SMA200 at 0.7003. CFTC Leveraged Funds net positioning sits long at +48,379 contracts, placing positioning at the 93rd percentile and a z-score of +1.72 over its 52-week history, indicating upper-decile institutional crowding. Flow has begun to stall with Leveraged Funds shedding −1,871 contracts WoW while price consolidates just under recent highs. RBA cash rate at 4.35% vs Fed at 3.75% provides a +60bp nominal carry advantage (AONIA 4.35% vs SOFR 3.62% provides −73bp favoring AUD), yet the 25d Risk Reversal at −0.67 reflects a protective put skew that signals caution into the rally. Trade bias: Neutral/range AUD/USD; crowded positioning caps near-term upside. Catalyst: RBA meeting 29 Sep — rate decision. Risk: A daily close below the SMA20 at 0.7168 triggering speculative long liquidation.",
       "evidence": [
         "AUD COT LF net: +48,379 (pctl 93, z +1.72)",
-        "AONIA 4.35% vs SOFR 3.62% — 73bp",
-        "AUD/USD: 0.7164 (SMA20: 0.7168)"
+        "AUD/USD: AONIA 4.35% vs SOFR 3.62% — -73bp",
+        "AUD/USD 25d RR: -0.67 (put skew)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:46",
+      "time": "22:30",
       "priority": "warning",
-      "title": "EUR/USD — Sovereign Spread + Technical Resistance",
-      "text": "EUR/USD trades at 1.1601, pinned below both its 20-day moving average at 1.1630 and 200-day moving average at 1.1637, while holding above the 50-day moving average at 1.1532. Sovereign fixed income markets continue to penalize the single currency, with German 10-year Bund yields at 3.52% sitting at a 145bp discount to US 10-year Treasury yields at 4.97%. The benchmark OIS differential reflects this ongoing gap, with Fed SOFR at 3.62% maintaining a +143bp carry advantage over ECB €STR at 2.19%. Furthermore, the US yield curve operates in a bear flattener regime with 2s10s at +41.5bp, reinforcing broad dollar resilience. ECB holds at 2.65%. Trade bias: Bearish EUR/USD; ongoing sovereign yield discount and moving-average resistance cap recoveries. Catalyst: France and Spain CPI prints 14 Sep starting at 06:45 UTC. Risk: Sustained daily close above the SMA200 at 1.1637 accompanied by a compression of the DE-US 10-year spread inside 130bp.",
+      "title": "EUR/USD — ECB Inflation Shock + Technical Anchor",
+      "text": "EUR/USD trades at 1.1593, positioned below its SMA20 at 1.1630 and SMA200 at 1.1637 while holding above its SMA50 at 1.1532. Fed SOFR at 3.62% vs ECB €STR at 2.19% generates favoring USD (Fed 3.75% vs ECB 2.65% — 110bp nominal spread), structurally capping euro rallies. However, ECB President Lagarde's remarks indicating that the euro-area inflation shock will endure longer than anticipated reinforce policy sensitivity into upcoming meetings. Leveraged Funds positioning reflects this conflict, trimming net short exposure by +6,403 contracts WoW to −46,381 (pctl 34, z −0.25). Trade bias: Neutral/short EUR/USD; carry advantage favors USD into resistance. Catalyst: ECB President Lagarde Speech 15:15 UTC. Risk: A clean break and daily close above the SMA200 at 1.1637 negating dollar carry dominance.",
       "evidence": [
-        "DE 10Y 3.52% vs US 10Y 4.97% — spread -145bp",
-        "SOFR 3.62% vs ESTR 2.19% — 143bp",
-        "EUR/USD: 1.1601 (SMA20: 1.1630, SMA200: 1.1637)"
+        "EUR/USD: SOFR 3.62% vs €STR 2.19% — +143bp",
+        "EUR COT LF net: -46,381 (WoW +6,403)",
+        "EUR/USD SMA20/200: 1.1630 / 1.1637"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "22:25",
+      "priority": "info",
+      "title": "USD/CHF — Negative Vol Risk Premium",
+      "text": "USD/CHF trades at 0.8169, maintaining levels above its SMA20 at 0.8074, SMA50 at 0.8093, and SMA200 at 0.7934. Options volatility displays an atypical negative risk premium, with 1-month ATM implied volatility at 6.8% trading 0.6 percentage points below the 30-day realized volatility of 7.4% (VRP −0.6%). This pricing compression occurs despite Fed SOFR at 3.62% vs SNB SARON at −0.04% yielding a substantial +366bp carry advantage favoring the dollar (Fed 3.75% vs SNB 0.0% — +375bp nominal carry). Leveraged Funds remain net short CHF at −13,968 contracts (pctl 12, z −1.09), showing low market appetite for buying franc downside protection. Trade bias: Long USD/CHF; carry premium intact while options volatility remains compressed. Catalyst: SNB meeting 24 Sep — rate decision. Risk: Break below the SMA50 support at 0.8093 accompanied by a sharp spike in front-month implied volatility.",
+      "evidence": [
+        "USD/CHF: IV 6.8% vs HV30 7.4% — VRP -0.6%",
+        "Fed 3.75% vs SNB 0.0% — +375bp",
+        "CHF COT LF net: -13,968 (pctl 12, z -1.09)"
       ],
       "_source": "engine-ai-primary"
     }
