@@ -148,6 +148,31 @@ priority between the two mirrors:
       scoped to ICI specifically, rather than a firehose feed or a
       weak site-wide search.
 
+v1.5 UPDATE: this run's live evidence confirmed the FIRST candidate
+slug is real -- `https://www.prnewswire.com/news/investment-company-institute/`
+returned HTTP 200 and did mention "Investment Company Institute" in
+its body, so v1.4's guess was right. But its own link-extraction regex
+(absolute-href-only, `href="https://www.prnewswire.com/news-releases/...`)
+found ZERO links on this real page -- not even unrelated ones, which
+rules out "matched the wrong link" and points at "the page's raw HTML
+doesn't contain this kind of link at all" as the real cause. Two things
+added to actually test that, rather than guess at it:
+  - `_extract_news_release_links()` now also matches site-relative
+    hrefs (`href="/news-releases/...`), normalized to absolute -- a
+    real possibility this script had not yet tried.
+  - `_extract_next_data_links()` checks for a `__NEXT_DATA__` embedded
+    JSON blob (the standard Next.js client-hydration pattern) and, if
+    present, parses it as real JSON and walks it for release-link
+    strings -- since a client-side-rendered page's initial HTML often
+    doesn't carry its list content at all, only the JS bundle that
+    fetches it after load.
+  - If both come back empty, the script now checks the page's own body
+    for concrete client-side-rendering signals (`__NEXT_DATA__`,
+    `window.__INITIAL_STATE__`, `id="root"`, etc.) and reports whether
+    any were actually found -- rather than assuming CSR is the cause
+    without checking, or silently reporting "no links" with no
+    explanation of why.
+
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
     playwright-stealth, no fingerprint spoofing, no proxy rotation).
@@ -171,7 +196,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.4"
+SCRIPT_VERSION = "1.5"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -494,6 +519,65 @@ def discover_latest_mm_url_sitemap():
     return selected
 
 
+CSR_SIGNAL_MARKERS = [
+    "__next_data__", "window.__initial_state__", "window.__preloaded_state__",
+    "id=\"root\"", "id=\"__next\"", "data-reactroot",
+]
+
+
+def _extract_news_release_links(body):
+    """Real links only, never fabricated. Handles both absolute and
+    site-relative hrefs -- v1.4 only matched absolute
+    'https://www.prnewswire.com/news-releases/...' hrefs, which is why it
+    found zero links on the real (confirmed-reachable) v1.4 org-page run:
+    that page's raw HTML had no absolute-form links at all, relative or
+    otherwise, of the kind this check anticipated -- see the CSR-signal
+    check in the caller for what that run's evidence actually pointed to."""
+    absolute = re.findall(r'href="(https://www\.prnewswire\.com/news-releases/[^"]+\.html)"', body)
+    relative = re.findall(r'href="(/news-releases/[^"]+\.html)"', body)
+    normalized_relative = [f"https://www.prnewswire.com{u}" for u in relative]
+    return list(dict.fromkeys(absolute + normalized_relative))
+
+
+def _extract_next_data_links(body):
+    """PRNewswire's org pages may hydrate their release list from a
+    Next.js-style embedded JSON blob (a <script id="__NEXT_DATA__"> tag)
+    rather than plain server-rendered anchor tags. If present, parse it as
+    real JSON (never regex-guessed) and walk it for any string value that
+    looks like a /news-releases/...html path -- absolute or relative,
+    same normalization as _extract_news_release_links. Returns [] (not an
+    error) if the tag isn't present or doesn't parse, since this is a
+    secondary check, not an assumption that it will be there."""
+    m = re.search(r'<script[^>]+id="__NEXT_DATA__"[^>]*>(.*?)</script>', body, re.DOTALL)
+    if not m:
+        return []
+    try:
+        data = json.loads(m.group(1))
+    except Exception as e:
+        print(f"  __NEXT_DATA__ tag found but did not parse as JSON ({type(e).__name__}) -- "
+              f"skipping this check rather than guessing its shape.")
+        return []
+
+    found = []
+
+    def _walk(node):
+        if isinstance(node, str):
+            if "/news-releases/" in node and node.endswith(".html"):
+                if node.startswith("/"):
+                    found.append(f"https://www.prnewswire.com{node}")
+                elif node.startswith("http"):
+                    found.append(node)
+        elif isinstance(node, dict):
+            for v in node.values():
+                _walk(v)
+        elif isinstance(node, list):
+            for v in node:
+                _walk(v)
+
+    _walk(data)
+    return list(dict.fromkeys(found))
+
+
 def discover_via_prnewswire_org_page():
     _report("[PRNewswire discovery F] org-scoped newsroom page (UNVERIFIED candidate URLs)")
     for candidate in PN_ORG_PAGE_CANDIDATES:
@@ -518,11 +602,34 @@ def discover_via_prnewswire_org_page():
                   "not ICI's real newsroom. Not treating this as a match.")
             continue
 
-        # Extract real /news-releases/...html links from the page itself,
-        # never fabricated -- then filter for this release family.
-        links = re.findall(r'href="(https://www\.prnewswire\.com/news-releases/[^"]+\.html)"', body)
-        links = list(dict.fromkeys(links))  # de-dup, keep first-seen order (page's own order)
-        print(f"  Real /news-releases/ links found on this page: {len(links)}")
+        # v1.5: try both server-rendered anchor links (absolute or relative)
+        # and any release links embedded in a client-rendered page's own
+        # __NEXT_DATA__ JSON state, since v1.4's absolute-href-only regex
+        # found zero links on this exact (confirmed-reachable) page.
+        anchor_links = _extract_news_release_links(body)
+        next_data_links = _extract_next_data_links(body)
+        links = list(dict.fromkeys(anchor_links + next_data_links))
+        print(f"  Real /news-releases/ links found on this page: {len(links)} "
+              f"({len(anchor_links)} from anchor tags, {len(next_data_links)} from __NEXT_DATA__)")
+
+        if not links:
+            # Report real evidence about WHY, rather than guessing -- checked
+            # directly against this response body, not assumed.
+            csr_hits = _scan(body_lower, CSR_SIGNAL_MARKERS)
+            print(f"  Client-side-rendering signal check on this body: "
+                  f"{csr_hits if csr_hits else 'none of the checked markers found'}")
+            if csr_hits:
+                print("  This page's initial HTML likely does not carry the release list at "
+                      "all -- it is probably populated by a client-side JS fetch after load, "
+                      "which a plain requests.get() never executes. A real fix would need "
+                      "either PRNewswire's underlying data API (not yet found) or a headless "
+                      "browser -- neither attempted here; flagged for a future session, not "
+                      "guessed at.")
+            else:
+                print("  No CSR signal found either -- the absence of release links on this "
+                      "page is not yet explained; flagged for further investigation rather "
+                      "than assumed to be either cause.")
+
         matches = [u for u in links if "mutual-fund" in u.lower() and "flow" in u.lower()]
         print(f"  Links matching this release family (mutual fund flows): {len(matches)}")
         for u in matches[:5]:
