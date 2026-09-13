@@ -1,0 +1,27 @@
+name: Diagnose ICI PRNewswire Mirror (diagnose)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: python -m pip install requests --break-system-packages
+
+      - name: Run diagnose_ici_prnewswire_mirror.py
+        run: python diagnose_ici_prnewswire_mirror.py 2>&1 | tee ici_mirror_diagnose_output.txt
+
+      - name: Upload diagnose output as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ici-mirror-diagnose
+          path: ici_mirror_diagnose_output.txt
+          retention-days: 7
