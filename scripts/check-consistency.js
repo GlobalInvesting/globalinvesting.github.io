@@ -159,9 +159,24 @@ function checkFaqJsonLdSync() {
   if (ok) pass(`FAQ JSON-LD sync: ${checkedPairs} question/answer pairs match across ${checkedFiles} files, none invisible`);
 }
 
+function checkNoScriptsInWorkflowsDir() {
+  const workflowsDir = path.join(ROOT, '.github', 'workflows');
+  if (!fs.existsSync(workflowsDir)) {
+    pass('workflows dir hygiene: .github/workflows/ not present, nothing to check');
+    return;
+  }
+  const stray = fs.readdirSync(workflowsDir).filter((f) => f.endsWith('.py') || f.endsWith('.js'));
+  if (stray.length > 0) {
+    fail(`workflows dir hygiene: ${stray.length} script file(s) directly under .github/workflows/ (${stray.join(', ')}) — GitHub Actions never executes scripts from this location; this is always a stale orphaned copy left over from a prior session, not a working file. Delete it.`);
+  } else {
+    pass('workflows dir hygiene: no stray .py/.js files directly under .github/workflows/');
+  }
+}
+
 checkCacheBusterSync();
 checkDataPathCoverage();
 checkFaqJsonLdSync();
+checkNoScriptsInWorkflowsDir();
 
 console.log('');
 if (failures > 0) {
