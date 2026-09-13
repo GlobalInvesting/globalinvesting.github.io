@@ -165,7 +165,8 @@
       if (ev.impact !== 'high') return;
       const isReleased = !!(ev.actual && ev.actual !== '' && ev.actual !== '-');
       if (isReleased) return;
-      if (!ev.timeUTC) return; // tentative/unconfirmed time — never a live-countdown target
+      if (!ev.timeUTC) return; // no time at all — never a live-countdown target
+      if (ev.timeMode === 'tentative') return; // provisional estimate only — never a live-countdown target
       const [h, m] = ev.timeUTC.split(':').map(Number);
       const evMs = Date.UTC(+ev.dateISO.slice(0,4), +ev.dateISO.slice(5,7)-1, +ev.dateISO.slice(8,10), h, m);
       const delta = evMs - nowMs;
@@ -773,6 +774,10 @@
   }
 
   function toLocalTime(dateISO, timeUTC) {
+    // Bare-fallback path only — biquote's v1.3 schema populates timeUTC even
+    // for tentative events, so this branch fires only if the field is
+    // genuinely absent (e.g. an older cached file, or a future vendor
+    // response with no time at all).
     if (!timeUTC) return 'Tentative';
     const [h, m] = timeUTC.split(':').map(Number);
     const d = new Date(Date.UTC(
@@ -1087,12 +1092,22 @@
 
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
         const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
+        // v1.19.32: timeMode ("exact" vs "tentative") — not the mere
+        // presence of timeUTC — now decides the tentative styling, since
+        // biquote v1.3 populates a real (if provisional) timeUTC on
+        // tentative events too. A missing timeUTC (ev.timeUTC falsy) is
+        // the separate, rarer "no time at all" case and still renders the
+        // bare 'Tentative' text with no estimate to show.
+        const isTentative = ev.timeMode === 'tentative';
 
         const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
         let liveClass = '';
-        let timeCellHtml = ev.timeUTC
-          ? localTime
-          : `<span class="cal-time-tentative" title="Day confirmed by the data provider; exact release time not yet published">${localTime}</span>`;
+        let timeCellHtml = localTime;
+        if (!ev.timeUTC) {
+          timeCellHtml = `<span class="cal-time-tentative" title="Day confirmed by the data provider; exact release time not yet published">${localTime}</span>`;
+        } else if (isTentative) {
+          timeCellHtml = `<span class="cal-time-tentative" title="Estimated release time \u2014 provisional, not yet confirmed by the data provider">~${localTime}</span>`;
+        }
         if (isLiveTarget) {
           const delta = liveTarget.evMs - nowMs;
           liveClass = delta <= CAL_LIVE_IMMINENT_MS ? ' cal-live-imminent' : ' cal-live-soon';
