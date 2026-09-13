@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-diagnose_ici_prnewswire_mirror.py  v1.0
+diagnose_ici_prnewswire_mirror.py  v1.1
 =============================================================
 DIAGNOSTIC ONLY -- not wired into any production data path.
 
@@ -28,10 +28,28 @@ independent things:
      from one IP class is not evidence about a different IP class"
      discipline (GUIDELINES.md).
 
-Same secondary probe run against MarketsMedia's mirror of the same
-release, since the earlier manual test there was inconclusive (a plain
-curl without redirect-following only saw the 301 wrapper, never the
-real page).
+v1.1 UPDATE (this run's live evidence): StreetInsider is confirmed
+BLOCKED from the real GitHub Actions runner IP (HTTP 403, Cloudflare
+challenge-platform markers) -- the same failure class already
+documented for ici.org itself, just a different CDN (Cloudflare, not
+Akamai) applying the same datacenter-IP-reputation logic. MarketsMedia,
+by contrast, is CONFIRMED REACHABLE from the same runner IP (HTTP 200,
+zero block-signature hits, all three real-content markers present).
+Since the only article tested there was a known, hardcoded, old URL,
+this version adds THREE independent discovery probes -- MarketsMedia
+runs WordPress (confirmed via its own response headers: `X-Powered-By`,
+`X-Redirect-By: WordPress`) -- to find out whether the CURRENT week's
+release URL can be discovered automatically, without which this source
+cannot be wired into a real weekly fetcher regardless of how clean the
+reachability check is:
+  (a) the default WordPress REST API search endpoint
+      (`/wp-json/wp/v2/posts?search=...`), which most WordPress sites
+      expose without any auth;
+  (b) the default WordPress site-wide RSS feed (`/feed/`), filtered for
+      ICI-titled items;
+  (c) `sitemap.xml` (or a post-type sub-sitemap linked from it), as a
+      fallback if neither of the above is exposed.
+None of these is assumed to work -- each is checked independently.
 
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
@@ -56,7 +74,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.0"
+SCRIPT_VERSION = "1.1"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -156,6 +174,110 @@ def discover_latest_ici_url_from_si_rss():
     return None
 
 
+MM_BASE = "https://www.marketsmedia.com"
+MM_SEARCH_TERMS = ["ICI Reports Estimated Long-Term Mutual Fund Flows"]
+
+
+def discover_latest_mm_url_wpjson():
+    _report("[MarketsMedia discovery A] WordPress REST API search")
+    url = f"{MM_BASE}/wp-json/wp/v2/posts"
+    params = {"search": "ICI Estimated Long-Term Mutual Fund Flows", "per_page": 5, "orderby": "date", "order": "desc"}
+    try:
+        resp = requests.get(url, headers=HEADERS, params=params, timeout=TIMEOUT)
+    except Exception as e:
+        print(f"REQUEST FAILED: {type(e).__name__}: {e}")
+        return None
+
+    print(f"GET {resp.url}")
+    print(f"HTTP status : {resp.status_code}")
+    if resp.status_code != 200:
+        print("wp-json endpoint not reachable/enabled with this status.")
+        return None
+
+    try:
+        posts = resp.json()
+    except Exception as e:
+        print(f"Response was not valid JSON ({e}) -- wp-json likely disabled/rewritten.")
+        return None
+
+    if not isinstance(posts, list) or not posts:
+        print("wp-json reachable but returned no matching posts.")
+        return None
+
+    print(f"Posts returned: {len(posts)}")
+    for p in posts:
+        title = (p.get("title") or {}).get("rendered", "")
+        link = p.get("link")
+        date = p.get("date")
+        print(f"  - [{date}] {title!r} -> {link}")
+
+    top = posts[0]
+    link = top.get("link")
+    title = (top.get("title") or {}).get("rendered", "")
+    if link and "mutual fund flow" in title.lower():
+        print(f"SELECTED: {link}")
+        return link
+    print("Top result did not look like an ICI mutual-fund-flows release -- not selecting it.")
+    return None
+
+
+def discover_latest_mm_url_rss():
+    _report("[MarketsMedia discovery B] default WordPress /feed/")
+    url = f"{MM_BASE}/feed/"
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+    except Exception as e:
+        print(f"REQUEST FAILED: {type(e).__name__}: {e}")
+        return None
+
+    print(f"HTTP status : {resp.status_code}")
+    if resp.status_code != 200:
+        print("Site-wide feed not reachable with this status.")
+        return None
+
+    items = re.findall(r"<item>(.*?)</item>", resp.text, re.DOTALL | re.IGNORECASE)
+    print(f"RSS items found: {len(items)}")
+    for item in items:
+        title_m = re.search(r"<title>(.*?)</title>", item, re.DOTALL | re.IGNORECASE)
+        link_m = re.search(r"<link>(.*?)</link>", item, re.DOTALL | re.IGNORECASE)
+        if not title_m or not link_m:
+            continue
+        title = title_m.group(1).strip()
+        link = link_m.group(1).strip()
+        if "mutual fund flow" in title.lower() and "ici" in title.lower():
+            print(f"Matched RSS item -> title={title!r} link={link}")
+            return link
+
+    print("No ICI mutual-fund-flows item in the current site-wide feed window "
+          "(expected outside release weeks -- this feed is recency-windowed, "
+          "not a permanent archive, and may also simply be diluted by MarketsMedia's "
+          "other daily content).")
+    return None
+
+
+def discover_latest_mm_url_sitemap():
+    _report("[MarketsMedia discovery C] sitemap.xml")
+    url = f"{MM_BASE}/sitemap.xml"
+    try:
+        resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+    except Exception as e:
+        print(f"REQUEST FAILED: {type(e).__name__}: {e}")
+        return None
+
+    print(f"HTTP status : {resp.status_code}")
+    if resp.status_code != 200:
+        print("sitemap.xml not reachable with this status.")
+        return None
+
+    sub_sitemaps = re.findall(r"<loc>(.*?)</loc>", resp.text)
+    print(f"Top-level sitemap.xml entries: {len(sub_sitemaps)}")
+    for s in sub_sitemaps[:20]:
+        print(f"  - {s}")
+    print("(Not descending into sub-sitemaps this run -- reporting structure only. "
+          "If a post-sitemap is present here, a follow-up probe can search it directly.)")
+    return None
+
+
 def main():
     print(f"diagnose_ici_prnewswire_mirror.py v{SCRIPT_VERSION}")
     print(f"Run time (UTC): {datetime.now(timezone.utc).isoformat()}")
@@ -174,9 +296,22 @@ def main():
     if discovered_url and discovered_url != known_si_url:
         results.append(check_url(discovered_url, "StreetInsider (RSS-discovered, current)"))
 
-    # 3. MarketsMedia reachability (inconclusive in the manual test --
-    #    that test never followed the 301; this one does).
+    # 3. MarketsMedia reachability (confirmed clean in v1.0's run --
+    #    re-checked here for a fresh timestamped log alongside discovery).
     results.append(check_url(MM_FALLBACK_URL, "MarketsMedia (known article)"))
+
+    # 4. MarketsMedia auto-discovery of the CURRENT week's release --
+    #    the actual remaining blocker before this source can be wired
+    #    into a real weekly fetcher, since v1.0 only proved reachability
+    #    against a hardcoded old URL.
+    mm_wpjson_url = discover_latest_mm_url_wpjson()
+    mm_rss_url = discover_latest_mm_url_rss()
+    discover_latest_mm_url_sitemap()  # structure-only report, no URL returned
+
+    if mm_wpjson_url:
+        results.append(check_url(mm_wpjson_url, "MarketsMedia (wp-json discovered)"))
+    if mm_rss_url and mm_rss_url != mm_wpjson_url:
+        results.append(check_url(mm_rss_url, "MarketsMedia (RSS discovered)"))
 
     _report("SUMMARY")
     for r in results:
@@ -184,13 +319,21 @@ def main():
         print(f"- {r['label']}: {status} (status={r.get('status')}, "
               f"block_hits={r.get('block_hits')}, content_hits={r.get('content_hits')})")
 
-    print(f"\nRSS auto-discovery of the CURRENT week's release: "
+    print(f"\nStreetInsider RSS auto-discovery of the CURRENT week's release: "
           f"{'WORKED' if discovered_url else 'no match this run (see note above)'}")
+    print(f"MarketsMedia wp-json auto-discovery: "
+          f"{'WORKED -> ' + mm_wpjson_url if mm_wpjson_url else 'no match this run'}")
+    print(f"MarketsMedia RSS auto-discovery: "
+          f"{'WORKED -> ' + mm_rss_url if mm_rss_url else 'no match this run'}")
 
-    all_ok = any(r.get("ok") for r in results if "StreetInsider" in r["label"])
-    print(f"\nOVERALL: StreetInsider mirror path is "
-          f"{'VIABLE from this runner IP' if all_ok else 'NOT CONFIRMED from this runner IP'} "
-          f"-- this report is the evidence, not a guess.")
+    si_ok = any(r.get("ok") for r in results if "StreetInsider" in r["label"])
+    mm_ok = any(r.get("ok") for r in results if "MarketsMedia" in r["label"])
+    print(f"\nOVERALL — StreetInsider: "
+          f"{'VIABLE from this runner IP' if si_ok else 'NOT CONFIRMED from this runner IP'}")
+    print(f"OVERALL — MarketsMedia:  "
+          f"{'VIABLE from this runner IP' if mm_ok else 'NOT CONFIRMED from this runner IP'}"
+          f"{' -- but still needs a working CURRENT-week discovery method (see above) before it can be wired into production' if mm_ok and not (mm_wpjson_url or mm_rss_url) else ''}")
+    print("This report is the evidence, not a guess.")
 
     sys.exit(0)
 
