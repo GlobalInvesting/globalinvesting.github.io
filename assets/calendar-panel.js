@@ -792,8 +792,19 @@
     return dt.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
   }
 
-  function toLocalDateISO(dateISO, timeUTC) {
-    if (!timeUTC) return dateISO;
+  function toLocalDateISO(dateISO, timeUTC, timeMode) {
+    // v1.19.33: a tentative timeMode means the underlying time is an
+    // unconfirmed estimate, not a fact — shifting which CALENDAR DAY an
+    // event is grouped under based on that estimate is wrong, since a
+    // later real release time (a common BoJ outcome) could shift the
+    // local-timezone conversion across midnight again, disagreeing with
+    // itself run to run and with every other calendar source, which all
+    // anchor to the vendor's own confirmed day. Live-reported: BoJ Interest
+    // Rate Decision (dateISO 2026-09-18, biquote's estimated time 02:30
+    // UTC) was rendering under "Thursday, September 17" for a UTC-3
+    // viewer, while every other source lists it on the 18th. Only a
+    // confirmed exact time may shift the display day.
+    if (!timeUTC || timeMode === 'tentative') return dateISO;
     const [h, m] = timeUTC.split(':').map(Number);
     const d = new Date(Date.UTC(
       +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), h, m
@@ -993,7 +1004,7 @@
     });
 
     const allDates = new Set([
-      ...filtered.map(ev => toLocalDateISO(ev.dateISO, ev.timeUTC)),
+      ...filtered.map(ev => toLocalDateISO(ev.dateISO, ev.timeUTC, ev.timeMode)),
       ...Object.keys(holidayByDate),
     ]);
 
@@ -1007,7 +1018,7 @@
 
     const byDate = {};
     filtered.forEach(ev => {
-      const localDate = toLocalDateISO(ev.dateISO, ev.timeUTC);
+      const localDate = toLocalDateISO(ev.dateISO, ev.timeUTC, ev.timeMode);
       if (!byDate[localDate]) byDate[localDate] = [];
       byDate[localDate].push(ev);
     });
@@ -1092,13 +1103,24 @@
 
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
         const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
-        // v1.19.32: timeMode ("exact" vs "tentative") — not the mere
+        // v1.19.33: timeMode ("exact" vs "tentative") — not the mere
         // presence of timeUTC — now decides the tentative styling, since
         // biquote v1.3 populates a real (if provisional) timeUTC on
         // tentative events too. A missing timeUTC (ev.timeUTC falsy) is
         // the separate, rarer "no time at all" case and still renders the
         // bare 'Tentative' text with no estimate to show.
         const isTentative = ev.timeMode === 'tentative';
+        // Tentative time is shown in UTC, never localized: the row is
+        // grouped under the vendor's own confirmed calendar day (see
+        // toLocalDateISO), and converting an unconfirmed estimate to the
+        // viewer's local wall-clock time would print a time that reads as
+        // belonging to that day locally while actually landing on the
+        // adjacent day for viewers behind UTC — exactly the "shows the
+        // 17th's clock time under the 18th's header" confusion reported
+        // live. Showing "~HH:MM UTC" instead removes the ambiguity: it's
+        // explicitly not a local time, so no calendar-day inference is
+        // implied by it.
+        const tentativeTimeText = ev.timeUTC ? `~${ev.timeUTC} UTC` : 'Tentative';
 
         const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
         let liveClass = '';
@@ -1106,7 +1128,7 @@
         if (!ev.timeUTC) {
           timeCellHtml = `<span class="cal-time-tentative" title="Day confirmed by the data provider; exact release time not yet published">${localTime}</span>`;
         } else if (isTentative) {
-          timeCellHtml = `<span class="cal-time-tentative" title="Estimated release time \u2014 provisional, not yet confirmed by the data provider">~${localTime}</span>`;
+          timeCellHtml = `<span class="cal-time-tentative" title="Estimated release time \u2014 provisional, not yet confirmed by the data provider. Shown in UTC, not your local time, since the calendar day this event is grouped under is anchored to the data provider's confirmed date, not to this estimate.">${tentativeTimeText}</span>`;
         }
         if (isLiveTarget) {
           const delta = liveTarget.evMs - nowMs;
