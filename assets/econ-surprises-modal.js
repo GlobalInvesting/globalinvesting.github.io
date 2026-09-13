@@ -773,7 +773,7 @@ async function openEconSurprisesModal(initialCcy) {
   });
 
   try {
-    const res = await fetch('./calendar-data/calendar.json').catch(() => null);
+    const res = await fetch('./calendar-data/calendar.json', { cache: 'no-store' }).catch(() => null);
     if (res?.ok) {
       const calj = await res.json();
       _esmCalData = calj;

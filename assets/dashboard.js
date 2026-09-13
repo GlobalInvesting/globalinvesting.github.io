@@ -12430,7 +12430,7 @@ async function renderEconSurprises() {
   let calEvents = [];
   let calSource = '';
   try {
-    const res = await fetch('./calendar-data/calendar.json').catch(() => null);
+    const res = await fetch('./calendar-data/calendar.json', { cache: 'no-store' }).catch(() => null);
     if (res?.ok) {
       const calj = await res.json();
       const evts = (calj?.events || []).map(ev => ({
@@ -13617,7 +13617,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
       }
 
     } else if (cmpType === 'esi') {
-      const r = await fetch('./calendar-data/calendar.json', { signal: AbortSignal.timeout(8000) });
+      const r = await fetch('./calendar-data/calendar.json', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const calj = await r.json();
       const allEvents = calj.events || [];
