@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-diagnose_ici_prnewswire_mirror.py  v1.2
+diagnose_ici_prnewswire_mirror.py  v1.3
 =============================================================
 DIAGNOSTIC ONLY -- not wired into any production data path.
 
@@ -80,6 +80,37 @@ the wp-json search endpoint's own relevance ranking proved too weak in
 v1.1's live run (returned two multi-year-old, topically-unrelated
 articles instead of the current week's release).
 
+v1.3 UPDATE: fixes two bugs found in v1.2's own live run output, both
+caught by re-reading that run's evidence line-by-line rather than
+trusting its headline PASS/FAIL:
+  - `check_url()`'s verdict logic treated any hit against BLOCK_MARKERS
+    as a block, full stop -- but PRNewswire's own article page (probe
+    (d), added in v1.2) came back HTTP 200, ~216KB body, all four real
+    ICI content markers present, and STILL got judged "NOT CONFIRMED"
+    purely because the string "challenge-platform" also appears
+    somewhere on the page. That string is the literal URL path
+    (`cdn-cgi/challenge-platform/...`) of a Cloudflare bot-management
+    beacon script many Cloudflare-fronted sites embed on every page
+    load, blocked or not -- it is not itself proof of a block. Fixed:
+    a block-signature hit is now only trusted as a genuine block when
+    the real-content markers are ALSO absent (>=2 of 4 required to
+    count as "real content present"), verified against this script's
+    own StreetInsider baseline (a genuine 403 block: ~6KB body, zero
+    content markers) so the fix doesn't weaken detection of an actual
+    block page.
+  - `discover_latest_mm_url_sitemap()` (probe (c)) assumed the
+    highest-numbered `post-sitemapN.xml` in MarketsMedia's sitemap
+    index is the most recent one. A live run showed 728 URLs in
+    post-sitemap25.xml with ZERO matching "ici-reports", despite
+    MarketsMedia publishing this release weekly -- meaning filename
+    number order isn't chronological here. Fixed: each `<sitemap>`
+    entry's own `<lastmod>` tag (present per the standard sitemap
+    protocol) is now parsed and sorted on directly; only when no entry
+    carries a `<lastmod>` does the script fall back to the
+    highest-numbered guess, and that fallback path is now explicitly
+    flagged in its own output as unverified rather than presented with
+    the same confidence as a real-lastmod result.
+
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
     playwright-stealth, no fingerprint spoofing, no proxy rotation).
@@ -103,7 +134,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.2"
+SCRIPT_VERSION = "1.3"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -168,14 +199,41 @@ def check_url(url, label):
     print(f"Block-signature hits      : {hits_block or 'none'}")
     print(f"Real-content-marker hits  : {hits_content or 'none'}")
 
-    ok = resp.status_code == 200 and not hits_block and bool(hits_content)
-    verdict = "REACHABLE — real content, no block signature" if ok else "NOT CONFIRMED — see hits above"
+    # v1.3 fix: a genuine Cloudflare/Akamai challenge page NEVER carries the
+    # real content markers -- confirmed against this script's own live
+    # baseline (StreetInsider's actual 403 block: 6KB body, zero content
+    # markers). A live PRNewswire run (v1.2) showed the opposite shape --
+    # HTTP 200, a full ~216KB body, ALL FOUR real-content markers present --
+    # yet still matched the single generic string "challenge-platform",
+    # which many Cloudflare-fronted sites embed defensively as a
+    # bot-management/beacon script path (cdn-cgi/challenge-platform/...) on
+    # every page load regardless of whether the visitor is actually
+    # challenged. A block-signature keyword hit is therefore only trusted as
+    # a genuine block when the real content is ALSO absent; real content
+    # presence (>=2 of the 4 markers, on a substantial body) overrides a
+    # stray keyword match. This does not weaken the check against an actual
+    # block page, which by construction never has the content markers to
+    # begin with.
+    is_substantial_body = len(body) > 5000
+    has_real_content = len(hits_content) >= 2
+    ok = resp.status_code == 200 and is_substantial_body and has_real_content
+
+    if ok and hits_block:
+        verdict = (f"REACHABLE — real content present ({len(hits_content)}/4 markers, "
+                   f"{len(body)} bytes); block-signature hit {hits_block} judged incidental "
+                   f"(a genuine block page never carries real content, per this script's own "
+                   f"StreetInsider baseline) rather than an actual challenge")
+    elif ok:
+        verdict = "REACHABLE — real content, no block signature"
+    else:
+        verdict = "NOT CONFIRMED — see hits above"
     print(f"VERDICT: {verdict}")
 
     return {
         "label": label, "url": url, "final_url": resp.url,
         "status": resp.status_code, "body_len": len(body),
         "block_hits": hits_block, "content_hits": hits_content, "ok": ok,
+        "block_hit_judged_incidental": bool(ok and hits_block),
     }
 
 
@@ -295,7 +353,7 @@ def discover_latest_mm_url_rss():
 
 
 def discover_latest_mm_url_sitemap():
-    _report("[MarketsMedia discovery C] sitemap.xml -> highest-numbered post-sitemap")
+    _report("[MarketsMedia discovery C] sitemap.xml -> most-recent post-sitemap by real <lastmod>")
     try:
         resp = requests.get(MM_SITEMAP_INDEX_URL, headers=HEADERS, timeout=TIMEOUT)
     except Exception as e:
@@ -307,51 +365,78 @@ def discover_latest_mm_url_sitemap():
         print("sitemap.xml not reachable with this status.")
         return None
 
-    sub_sitemaps = re.findall(r"<loc>(.*?)</loc>", resp.text)
-    print(f"Top-level sitemap.xml entries: {len(sub_sitemaps)}")
+    # v1.3 fix: v1.2 assumed the highest-numbered post-sitemapN.xml is the
+    # most recent one. A live run showed 728 URLs in post-sitemap25.xml with
+    # ZERO matching "ici-reports", despite MarketsMedia clearly publishing
+    # this release weekly -- meaning that assumption was wrong, most likely
+    # because sitemap index numbering here isn't chronological-ascending.
+    # The standard sitemap protocol (and Yoast SEO, the plugin this
+    # wp-json-enabled WordPress site's earlier probe suggests it runs)
+    # includes a real <lastmod> per <sitemap> entry in the index -- use
+    # that instead of guessing from the filename's number.
+    sitemap_entries = re.findall(
+        r"<sitemap>\s*<loc>(.*?)</loc>\s*(?:<lastmod>(.*?)</lastmod>)?\s*</sitemap>",
+        resp.text, re.DOTALL | re.IGNORECASE,
+    )
+    print(f"Top-level <sitemap> entries with parsed loc/lastmod pairs: {len(sitemap_entries)}")
 
-    post_sitemaps = [s for s in sub_sitemaps if re.search(r"post-sitemap\d+\.xml", s)]
+    post_sitemaps = [(loc, lastmod) for loc, lastmod in sitemap_entries
+                      if re.search(r"post-sitemap\d+\.xml", loc)]
     if not post_sitemaps:
-        print("No post-sitemapN.xml entries found -- cannot descend. "
-              "Structure only:")
-        for s in sub_sitemaps[:20]:
-            print(f"  - {s}")
+        print("No post-sitemapN.xml entries found -- cannot descend.")
         return None
 
-    def _num(u):
-        m = re.search(r"post-sitemap(\d+)\.xml", u)
-        return int(m.group(1)) if m else -1
+    dated = [(loc, lastmod) for loc, lastmod in post_sitemaps if lastmod]
+    if dated:
+        dated.sort(key=lambda pair: pair[1], reverse=True)
+        latest_sitemap_url = dated[0][0]
+        print(f"{len(post_sitemaps)} post-sitemaps found, {len(dated)} carry a real "
+              f"<lastmod>. Selected by ACTUAL most-recent lastmod "
+              f"({dated[0][1]}): {latest_sitemap_url}")
+    else:
+        print("No post-sitemap entries carried a <lastmod> tag -- cannot determine "
+              "chronological order reliably. Falling back to the highest-numbered "
+              "entry, flagged as an UNVERIFIED guess (this was v1.2's sole method "
+              "and was already shown wrong once live).")
+        def _num(u):
+            m = re.search(r"post-sitemap(\d+)\.xml", u)
+            return int(m.group(1)) if m else -1
+        post_sitemaps.sort(key=lambda pair: _num(pair[0]), reverse=True)
+        latest_sitemap_url = post_sitemaps[0][0]
 
-    post_sitemaps.sort(key=_num, reverse=True)
-    latest_sitemap_url = post_sitemaps[0]
-    print(f"{len(post_sitemaps)} post-sitemaps found. Descending into the "
-          f"highest-numbered one (assumed most recent, per v1.1's observed "
-          f"ascending numbering): {latest_sitemap_url}")
+    candidates = [latest_sitemap_url]
+    if dated and len(dated) > 1:
+        candidates.append(dated[1][0])  # second-most-recent, as a fallback in case this week's release landed in the prior batch
 
-    try:
-        resp2 = requests.get(latest_sitemap_url, headers=HEADERS, timeout=TIMEOUT)
-    except Exception as e:
-        print(f"REQUEST FAILED fetching {latest_sitemap_url}: {type(e).__name__}: {e}")
-        return None
+    ici_urls = []
+    for candidate_url in candidates:
+        try:
+            resp2 = requests.get(candidate_url, headers=HEADERS, timeout=TIMEOUT)
+        except Exception as e:
+            print(f"REQUEST FAILED fetching {candidate_url}: {type(e).__name__}: {e}")
+            continue
 
-    print(f"HTTP status (post-sitemap) : {resp2.status_code}")
-    if resp2.status_code != 200:
-        print("Highest-numbered post-sitemap not reachable with this status.")
-        return None
+        print(f"HTTP status ({candidate_url}) : {resp2.status_code}")
+        if resp2.status_code != 200:
+            print("Not reachable with this status -- skipping.")
+            continue
 
-    urls = re.findall(r"<loc>(.*?)</loc>", resp2.text)
-    print(f"URLs in this post-sitemap: {len(urls)}")
+        urls = re.findall(r"<loc>(.*?)</loc>", resp2.text)
+        print(f"URLs in this post-sitemap: {len(urls)}")
 
-    ici_urls = [u for u in urls if "ici-reports" in u.lower()]
-    print(f"URLs matching 'ici-reports': {len(ici_urls)}")
-    for u in ici_urls:
-        print(f"  - {u}")
+        found = [u for u in urls if "ici-reports" in u.lower()]
+        print(f"URLs matching 'ici-reports' in {candidate_url}: {len(found)}")
+        for u in found:
+            print(f"  - {u}")
+        ici_urls.extend(found)
+        if found:
+            break  # most-recent candidate that actually has a match wins; don't keep searching further back
 
     if not ici_urls:
-        print("No 'ici-reports' slug found in the most recent post-sitemap "
-              "-- either MarketsMedia's slug convention differs from what "
-              "was assumed, or this sitemap's date range doesn't cover the "
-              "latest release yet (sitemaps can lag a live publish).")
+        print("No 'ici-reports' slug found in either of the 2 most-recent post-sitemaps "
+              "(by real <lastmod>) -- either MarketsMedia's slug convention differs from "
+              "what was assumed, or this release genuinely isn't in the sitemap's covered "
+              "date range yet (sitemaps can lag a live publish).")
         return None
 
     # Sitemaps list <loc> entries; without a reliable <lastmod> per URL in
