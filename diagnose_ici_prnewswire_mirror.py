@@ -111,6 +111,43 @@ trusting its headline PASS/FAIL:
     flagged in its own output as unverified rather than presented with
     the same confidence as a real-lastmod result.
 
+v1.4 UPDATE: this run's live evidence (2026-09-13) changed the working
+priority between the two mirrors:
+  - PRNewswire direct is now CONFIRMED REACHABLE with the v1.3 verdict
+    fix applied (both known article URLs: HTTP 200, real body size,
+    3-4 of 4 content markers, the "challenge-platform" hit correctly
+    judged incidental). This is the strongest candidate found so far --
+    the original wire source, not a third-party republish.
+  - MarketsMedia's sitemap probe, now correctly sorting by real
+    <lastmod>, still found ZERO "ici-reports" matches in the two most
+    recent post-sitemaps (2026-09-11 lastmod, 1,728 combined URLs).
+    Cross-checked against a live web search of MarketsMedia's own
+    archive: the only "ici-reports-estimated-long-term-mutual-fund-
+    flows-N" URLs findable are old (e.g. suffix "-10" from 2016,
+    suffix "-12" already known here) -- suggesting MarketsMedia
+    republishes this release sporadically, not on ICI's real weekly
+    cadence. The v1.1/v1.2 docstrings' assumption of a matching weekly
+    cadence on MarketsMedia was never independently verified and may
+    be wrong; flagged here rather than corrected outright, since this
+    script has no way to enumerate MarketsMedia's full ICI-tagged
+    history to confirm either way.
+  Given this, v1.4 adds a PRNewswire-side discovery probe rather than
+  further chasing MarketsMedia's uncertain cadence:
+  (f) PRNewswire publishes a per-organization "newsroom" page at a
+      `/news/<org-slug>/` URL pattern -- confirmed to exist for OTHER
+      organizations via live web search (e.g. `/news/investing.com/`,
+      `/news/investment-professionals-inc./`), listing that org's own
+      releases with real `/news-releases/...` links. No search result
+      confirmed the exact ICI page exists or what its slug is --
+      `investment-company-institute` is a plausible candidate built
+      from ICI's own display name, NOT a confirmed URL, and is tested
+      exactly like every other untested candidate in this script (no
+      assumption of success). If reachable and the page's own HTML
+      contains real `/news-releases/` links matching this release
+      family, this would be the first discovery method actually
+      scoped to ICI specifically, rather than a firehose feed or a
+      weak site-wide search.
+
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
     playwright-stealth, no fingerprint spoofing, no proxy rotation).
@@ -134,7 +171,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.3"
+SCRIPT_VERSION = "1.4"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -159,6 +196,16 @@ PN_KNOWN_URLS = [
 ]
 PN_ALL_RELEASES_RSS = "https://www.prnewswire.com/rss/news-releases-list.rss"  # PRNewswire's firehose feed -- every company's releases, NOT scoped to ICI; tested for domain reachability only, not discovery
 MM_SITEMAP_INDEX_URL = "https://www.marketsmedia.com/sitemap.xml"
+
+# UNVERIFIED candidates -- PRNewswire's real "/news/<org-slug>/" newsroom-page
+# pattern, confirmed to exist for other organizations via live web search, but
+# NOT confirmed to exist for ICI specifically under either slug guessed here.
+# Tried in order; first one that returns a real page (not a 404/redirect-to-
+# search) wins. This script does not assume either works.
+PN_ORG_PAGE_CANDIDATES = [
+    "https://www.prnewswire.com/news/investment-company-institute/",
+    "https://www.prnewswire.com/news/investment-company-institute-(ici)/",
+]
 
 BLOCK_MARKERS = [
     "just a moment", "checking your browser", "cf-mitigated", "captcha",
@@ -447,6 +494,52 @@ def discover_latest_mm_url_sitemap():
     return selected
 
 
+def discover_via_prnewswire_org_page():
+    _report("[PRNewswire discovery F] org-scoped newsroom page (UNVERIFIED candidate URLs)")
+    for candidate in PN_ORG_PAGE_CANDIDATES:
+        print(f"Trying candidate: {candidate}")
+        try:
+            resp = requests.get(candidate, headers=HEADERS, timeout=TIMEOUT, allow_redirects=True)
+        except Exception as e:
+            print(f"  REQUEST FAILED: {type(e).__name__}: {e}")
+            continue
+
+        print(f"  Final URL after redirects : {resp.url}")
+        print(f"  HTTP status               : {resp.status_code}")
+        if resp.status_code != 200:
+            print("  Not reachable with this status -- trying next candidate, if any.")
+            continue
+
+        body = resp.text or ""
+        body_lower = body.lower()
+        if "investment company institute" not in body_lower:
+            print("  Page reached but does not mention \"Investment Company Institute\" "
+                  "anywhere in its body -- likely a 404-as-200 / generic search page, "
+                  "not ICI's real newsroom. Not treating this as a match.")
+            continue
+
+        # Extract real /news-releases/...html links from the page itself,
+        # never fabricated -- then filter for this release family.
+        links = re.findall(r'href="(https://www\.prnewswire\.com/news-releases/[^"]+\.html)"', body)
+        links = list(dict.fromkeys(links))  # de-dup, keep first-seen order (page's own order)
+        print(f"  Real /news-releases/ links found on this page: {len(links)}")
+        matches = [u for u in links if "mutual-fund" in u.lower() and "flow" in u.lower()]
+        print(f"  Links matching this release family (mutual fund flows): {len(matches)}")
+        for u in matches[:5]:
+            print(f"    - {u}")
+
+        if matches:
+            print(f"  SELECTED (first match, page's own listing order): {matches[0]}")
+            return matches[0]
+        print("  Page confirmed as ICI's own newsroom, but no matching release link found "
+              "on it right now -- either this week's release hasn't posted here yet, or "
+              "the page paginates and the match is further back.")
+        return None  # confirmed real ICI page, just no current match -- don't try other candidates
+
+    print("No candidate org-page URL resolved to a confirmed ICI newsroom page.")
+    return None
+
+
 def check_prnewswire_direct():
     _report("[PRNewswire direct] known-article reachability probes")
     results = []
@@ -515,9 +608,15 @@ def main():
         results.append(check_url(mm_sitemap_url, "MarketsMedia (sitemap discovered)"))
 
     # 5. PRNewswire's own site -- the original syndication point, not an
-    #    aggregator/mirror. Never tested before this version.
+    #    aggregator/mirror. Never tested before v1.2.
     results.extend(check_prnewswire_direct())
     pn_rss_result = check_prnewswire_rss_domain_reachability()
+
+    # 6. PRNewswire org-scoped newsroom page -- new in v1.4, candidate URL
+    #    only, not confirmed to exist for ICI before this run.
+    pn_org_discovered_url = discover_via_prnewswire_org_page()
+    if pn_org_discovered_url and pn_org_discovered_url not in PN_KNOWN_URLS:
+        results.append(check_url(pn_org_discovered_url, "PRNewswire (org-page discovered)"))
 
     _report("SUMMARY")
     for r in results:
@@ -552,6 +651,8 @@ def main():
           f"(this feed cannot discover ICI's specific release -- it is not "
           f"organization-scoped; no ICI-specific PRNewswire feed was found "
           f"to exist)")
+    print(f"OVERALL — PRNewswire org-page discovery (v1.4, unverified candidate URL): "
+          f"{'WORKED -> ' + pn_org_discovered_url if pn_org_discovered_url else 'no match this run (see note above)'}")
     print("This report is the evidence, not a guess.")
 
     sys.exit(0)
