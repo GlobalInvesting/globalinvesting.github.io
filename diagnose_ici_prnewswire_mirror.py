@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-diagnose_ici_prnewswire_mirror.py  v1.6
+diagnose_ici_prnewswire_mirror.py  v1.7
 =============================================================
 DIAGNOSTIC ONLY -- not wired into any production data path.
 
@@ -198,6 +198,27 @@ here yet" indistinguishable from the log alone. Two things fixed:
     byte-for-byte, in the v1.5 run's own output. Removed the dead
     first call.
 
+v1.7 UPDATE: v1.6's own live run gave real evidence this was never a
+filter-wording bug. ICI's own site (ici.org, checked live via web
+search -- ici.org itself is confirmed permanently blocked from this
+runner's IP) confirms BOTH the standalone "Estimated Long-Term Mutual
+Fund Flows" release (real, Aug 19 2026) and the "Combined Estimated
+Long-Term Fund Flows and ETF Net Issuance" release (real, Sep 2 2026)
+are still issued weekly via genuine PRNewswire dateline -- yet NEITHER
+appeared among the confirmed real newsroom page's 25 most-recent
+links. A third-party PRNewswire-scraping vendor's own documentation
+was checked too: it confirms prnewswire.com's own search feature is
+JavaScript-powered and unreachable to a plain HTTP client, closing
+that as an avenue before spending a live run on it. The one untested
+explanation pagination could actually settle: maybe this page only
+shows its most recent N releases and older ones (including this
+family) sit further back. Added a real pagination check -- with a
+real safeguard, not blind trust: an unsupported pagination parameter
+can silently re-serve page 1 under a 200 status (a documented failure
+mode for at least one other newswire's own listing pages), so a page
+is only accepted as genuinely paginated if its extracted links
+actually differ from page 1's link set, never from status code alone.
+
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
     playwright-stealth, no fingerprint spoofing, no proxy rotation).
@@ -221,7 +242,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.6"
+SCRIPT_VERSION = "1.7"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -678,6 +699,60 @@ def discover_via_prnewswire_org_page():
               f"links found on this page ({len(links)}), for direct inspection:")
         for u in links:
             print(f"    - {u}")
+
+        # v1.7: v1.6's own live run gave real evidence that isn't a filter
+        # bug -- ICI's own site (ici.org, checked live via web search, not
+        # this script -- ici.org itself is confirmed permanently blocked
+        # from this runner) confirms BOTH the standalone "Estimated
+        # Long-Term Mutual Fund Flows" release (real, Aug 19 2026) and the
+        # "Combined Estimated Long-Term Fund Flows and ETF Net Issuance"
+        # release (real, Sep 2 2026) are still issued weekly via PRNewswire
+        # dateline, yet NEITHER appears among this page's 25 most-recent
+        # links. That means this newsroom page's own listing simply doesn't
+        # surface this release family at all (for whatever internal
+        # PRNewswire categorization reason -- not established, not
+        # guessed), not that this week's copy hasn't posted yet. The one
+        # untested explanation left that pagination could actually
+        # disprove: this page may show only its most recent N releases and
+        # paginate further back. Tested here, with a real check -- an
+        # unsupported pagination parameter can silently re-serve page 1
+        # under a 200 status (a documented failure mode for at least one
+        # other newswire's own listing pages), so a page is only accepted
+        # as genuinely paginated if its extracted links actually differ
+        # from page 1's, never from status code alone.
+        print("  Testing whether this page paginates further back "
+              "(UNVERIFIED guess at the query parameter, checked against "
+              "real evidence -- not trusted on status code alone):")
+        for page_num in (2, 3):
+            page_url = f"{resp.url.rstrip('/')}/?page={page_num}"
+            try:
+                page_resp = requests.get(page_url, headers=HEADERS, timeout=TIMEOUT, allow_redirects=True)
+            except Exception as e:
+                print(f"    page={page_num} REQUEST FAILED: {type(e).__name__}: {e}")
+                break
+            if page_resp.status_code != 200:
+                print(f"    page={page_num}: HTTP {page_resp.status_code} -- stopping pagination attempts.")
+                break
+            page_body = page_resp.text or ""
+            page_anchor_links = _extract_news_release_links(page_body)
+            page_next_data_links = _extract_next_data_links(page_body)
+            page_links = list(dict.fromkeys(page_anchor_links + page_next_data_links))
+            if set(page_links) == set(links):
+                print(f"    page={page_num}: HTTP 200 but returned the IDENTICAL link set as page 1 -- "
+                      f"this query parameter does not genuinely paginate this page (silently re-served "
+                      f"page 1, the same failure mode documented for other newswires' listing pages). "
+                      f"Stopping; this candidate parameter is not the real pagination mechanism.")
+                break
+            print(f"    page={page_num}: HTTP 200, {len(page_links)} links, genuinely DIFFERENT from "
+                  f"page 1 -- this parameter does paginate.")
+            page_matches = [u for u in page_links if "mutual-fund" in u.lower() and "flow" in u.lower()]
+            if page_matches:
+                print(f"    SELECTED (match found on page {page_num}): {page_matches[0]}")
+                return page_matches[0]
+            print(f"    No match on page {page_num} either. All links on this page, for inspection:")
+            for u in page_links:
+                print(f"      - {u}")
+
         return None  # confirmed real ICI page, just no current match -- don't try other candidates
 
     print("No candidate org-page URL resolved to a confirmed ICI newsroom page.")
