@@ -165,7 +165,8 @@
       if (ev.impact !== 'high') return;
       const isReleased = !!(ev.actual && ev.actual !== '' && ev.actual !== '-');
       if (isReleased) return;
-      const [h, m] = (ev.timeUTC || '23:59').split(':').map(Number);
+      if (!ev.timeUTC) return; // tentative/unconfirmed time — never a live-countdown target
+      const [h, m] = ev.timeUTC.split(':').map(Number);
       const evMs = Date.UTC(+ev.dateISO.slice(0,4), +ev.dateISO.slice(5,7)-1, +ev.dateISO.slice(8,10), h, m);
       const delta = evMs - nowMs;
       if (delta <= 0 || delta > CAL_LIVE_WINDOW_MS) return;
@@ -772,7 +773,7 @@
   }
 
   function toLocalTime(dateISO, timeUTC) {
-    if (!timeUTC) return 'All Day';
+    if (!timeUTC) return 'Tentative';
     const [h, m] = timeUTC.split(':').map(Number);
     const d = new Date(Date.UTC(
       +dateISO.slice(0,4), +dateISO.slice(5,7)-1, +dateISO.slice(8,10), h, m
@@ -1089,7 +1090,9 @@
 
         const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
         let liveClass = '';
-        let timeCellHtml = localTime;
+        let timeCellHtml = ev.timeUTC
+          ? localTime
+          : `<span class="cal-time-tentative" title="Day confirmed by the data provider; exact release time not yet published">${localTime}</span>`;
         if (isLiveTarget) {
           const delta = liveTarget.evMs - nowMs;
           liveClass = delta <= CAL_LIVE_IMMINENT_MS ? ' cal-live-imminent' : ' cal-live-soon';
