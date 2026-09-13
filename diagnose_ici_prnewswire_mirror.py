@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-diagnose_ici_prnewswire_mirror.py  v1.1
+diagnose_ici_prnewswire_mirror.py  v1.2
 =============================================================
 DIAGNOSTIC ONLY -- not wired into any production data path.
 
@@ -51,6 +51,35 @@ reachability check is:
       fallback if neither of the above is exposed.
 None of these is assumed to work -- each is checked independently.
 
+v1.2 UPDATE: adds a third, previously-untested distribution channel --
+PRNewswire's OWN site, not just the two aggregators that redistribute
+it. ICI's release is issued as a genuine PRNewswire wire release (the
+"/PRNewswire/" byline is on the release text itself), which means
+PRNewswire's own article pages are the original syndication point, not
+a third-party mirror -- worth testing independently since a block
+confirmed on an aggregator (StreetInsider, Cloudflare) says nothing
+about whether PRNewswire's own domain carries the same or a different
+WAF posture. Two probes added:
+  (d) direct reachability of a known PRNewswire article URL (same
+      block-signature / content-marker method as every other probe in
+      this script -- no assumption of success);
+  (e) PRNewswire's own all-releases RSS feed
+      (`/rss/news-releases-list.rss`) -- NOTE this is the firehose feed
+      (every release from every company PRNewswire distributes, not
+      scoped to ICI), so it is tested purely for domain-level
+      reachability from this runner's IP, not as a discovery mechanism;
+      no per-organization PRNewswire feed for ICI was found to exist,
+      so this script does not claim one and does not fabricate a URL
+      for it.
+Also extends the MarketsMedia sitemap probe (c) from v1.1: rather than
+reporting sitemap.xml's own top-level structure only, this version
+descends into the highest-numbered post-sitemap (empirically the most
+recent one, per v1.1's live run showing post-sitemap1.xml..20.xml in
+ascending order) and greps its entries for "ici-reports" slugs, since
+the wp-json search endpoint's own relevance ranking proved too weak in
+v1.1's live run (returned two multi-year-old, topically-unrelated
+articles instead of the current week's release).
+
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
     playwright-stealth, no fingerprint spoofing, no proxy rotation).
@@ -74,7 +103,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.1"
+SCRIPT_VERSION = "1.2"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -89,6 +118,16 @@ TIMEOUT = 20
 
 SI_RSS_URL = "https://www.streetinsider.com/freefeed.php?cid=81"  # PRNewswire category feed, advertised in the page's own <link rel="alternate"> -- not guessed
 MM_FALLBACK_URL = "https://www.marketsmedia.com/ici-reports-estimated-long-term-mutual-fund-flows-12"  # known-old article, used only as a reachability probe since MarketsMedia has no discovered feed yet
+
+# Known real PRNewswire article URLs for this exact release family, found via
+# web search of PRNewswire's own domain -- used only as reachability probes
+# (this script does not claim these specific old releases are current).
+PN_KNOWN_URLS = [
+    "https://www.prnewswire.com/news-releases/ici-reports-estimated-long-term-mutual-fund-flows-302661462.html",
+    "https://www.prnewswire.com/news-releases/ici-reports-estimated-etf-net-issuance-302654178.html",
+]
+PN_ALL_RELEASES_RSS = "https://www.prnewswire.com/rss/news-releases-list.rss"  # PRNewswire's firehose feed -- every company's releases, NOT scoped to ICI; tested for domain reachability only, not discovery
+MM_SITEMAP_INDEX_URL = "https://www.marketsmedia.com/sitemap.xml"
 
 BLOCK_MARKERS = [
     "just a moment", "checking your browser", "cf-mitigated", "captcha",
@@ -256,10 +295,9 @@ def discover_latest_mm_url_rss():
 
 
 def discover_latest_mm_url_sitemap():
-    _report("[MarketsMedia discovery C] sitemap.xml")
-    url = f"{MM_BASE}/sitemap.xml"
+    _report("[MarketsMedia discovery C] sitemap.xml -> highest-numbered post-sitemap")
     try:
-        resp = requests.get(url, headers=HEADERS, timeout=TIMEOUT)
+        resp = requests.get(MM_SITEMAP_INDEX_URL, headers=HEADERS, timeout=TIMEOUT)
     except Exception as e:
         print(f"REQUEST FAILED: {type(e).__name__}: {e}")
         return None
@@ -271,11 +309,85 @@ def discover_latest_mm_url_sitemap():
 
     sub_sitemaps = re.findall(r"<loc>(.*?)</loc>", resp.text)
     print(f"Top-level sitemap.xml entries: {len(sub_sitemaps)}")
-    for s in sub_sitemaps[:20]:
-        print(f"  - {s}")
-    print("(Not descending into sub-sitemaps this run -- reporting structure only. "
-          "If a post-sitemap is present here, a follow-up probe can search it directly.)")
-    return None
+
+    post_sitemaps = [s for s in sub_sitemaps if re.search(r"post-sitemap\d+\.xml", s)]
+    if not post_sitemaps:
+        print("No post-sitemapN.xml entries found -- cannot descend. "
+              "Structure only:")
+        for s in sub_sitemaps[:20]:
+            print(f"  - {s}")
+        return None
+
+    def _num(u):
+        m = re.search(r"post-sitemap(\d+)\.xml", u)
+        return int(m.group(1)) if m else -1
+
+    post_sitemaps.sort(key=_num, reverse=True)
+    latest_sitemap_url = post_sitemaps[0]
+    print(f"{len(post_sitemaps)} post-sitemaps found. Descending into the "
+          f"highest-numbered one (assumed most recent, per v1.1's observed "
+          f"ascending numbering): {latest_sitemap_url}")
+
+    try:
+        resp2 = requests.get(latest_sitemap_url, headers=HEADERS, timeout=TIMEOUT)
+    except Exception as e:
+        print(f"REQUEST FAILED fetching {latest_sitemap_url}: {type(e).__name__}: {e}")
+        return None
+
+    print(f"HTTP status (post-sitemap) : {resp2.status_code}")
+    if resp2.status_code != 200:
+        print("Highest-numbered post-sitemap not reachable with this status.")
+        return None
+
+    urls = re.findall(r"<loc>(.*?)</loc>", resp2.text)
+    print(f"URLs in this post-sitemap: {len(urls)}")
+
+    ici_urls = [u for u in urls if "ici-reports" in u.lower()]
+    print(f"URLs matching 'ici-reports': {len(ici_urls)}")
+    for u in ici_urls:
+        print(f"  - {u}")
+
+    if not ici_urls:
+        print("No 'ici-reports' slug found in the most recent post-sitemap "
+              "-- either MarketsMedia's slug convention differs from what "
+              "was assumed, or this sitemap's date range doesn't cover the "
+              "latest release yet (sitemaps can lag a live publish).")
+        return None
+
+    # Sitemaps list <loc> entries; without a reliable <lastmod> per URL in
+    # every case, take the last one in document order as the probable most
+    # recent (WordPress sitemap generators typically emit in publish order).
+    selected = ici_urls[-1]
+    print(f"SELECTED (last 'ici-reports' entry in document order): {selected}")
+    return selected
+
+
+def check_prnewswire_direct():
+    _report("[PRNewswire direct] known-article reachability probes")
+    results = []
+    for url in PN_KNOWN_URLS:
+        results.append(check_url(url, "PRNewswire (known article)"))
+    return results
+
+
+def check_prnewswire_rss_domain_reachability():
+    _report("[PRNewswire RSS] domain-reachability probe only (firehose feed, not ICI-scoped)")
+    try:
+        resp = requests.get(PN_ALL_RELEASES_RSS, headers=HEADERS, timeout=TIMEOUT)
+    except Exception as e:
+        print(f"REQUEST FAILED: {type(e).__name__}: {e}")
+        return {"label": "PRNewswire RSS (firehose)", "ok": False, "reason": f"exception:{type(e).__name__}"}
+
+    body_lower = (resp.text or "").lower()
+    hits_block = _scan(body_lower, BLOCK_MARKERS)
+    item_count = len(re.findall(r"<item>", resp.text, re.IGNORECASE))
+
+    print(f"HTTP status : {resp.status_code}")
+    print(f"Block-signature hits : {hits_block or 'none'}")
+    print(f"<item> entries found : {item_count}")
+    ok = resp.status_code == 200 and not hits_block and item_count > 0
+    print(f"VERDICT: {'REACHABLE (domain-level only -- this feed is NOT ICI-scoped)' if ok else 'NOT CONFIRMED'}")
+    return {"label": "PRNewswire RSS (firehose)", "ok": ok, "status": resp.status_code, "block_hits": hits_block}
 
 
 def main():
@@ -313,6 +425,15 @@ def main():
     if mm_rss_url and mm_rss_url != mm_wpjson_url:
         results.append(check_url(mm_rss_url, "MarketsMedia (RSS discovered)"))
 
+    mm_sitemap_url = discover_latest_mm_url_sitemap()
+    if mm_sitemap_url and mm_sitemap_url not in (mm_wpjson_url, mm_rss_url):
+        results.append(check_url(mm_sitemap_url, "MarketsMedia (sitemap discovered)"))
+
+    # 5. PRNewswire's own site -- the original syndication point, not an
+    #    aggregator/mirror. Never tested before this version.
+    results.extend(check_prnewswire_direct())
+    pn_rss_result = check_prnewswire_rss_domain_reachability()
+
     _report("SUMMARY")
     for r in results:
         status = "OK" if r.get("ok") else "NOT CONFIRMED"
@@ -325,14 +446,27 @@ def main():
           f"{'WORKED -> ' + mm_wpjson_url if mm_wpjson_url else 'no match this run'}")
     print(f"MarketsMedia RSS auto-discovery: "
           f"{'WORKED -> ' + mm_rss_url if mm_rss_url else 'no match this run'}")
+    print(f"MarketsMedia sitemap auto-discovery: "
+          f"{'WORKED -> ' + mm_sitemap_url if mm_sitemap_url else 'no match this run'}")
 
     si_ok = any(r.get("ok") for r in results if "StreetInsider" in r["label"])
     mm_ok = any(r.get("ok") for r in results if "MarketsMedia" in r["label"])
+    pn_direct_ok = any(r.get("ok") for r in results if "PRNewswire (known article)" in r["label"])
+    mm_discovery_worked = bool(mm_wpjson_url or mm_rss_url or mm_sitemap_url)
+
     print(f"\nOVERALL — StreetInsider: "
           f"{'VIABLE from this runner IP' if si_ok else 'NOT CONFIRMED from this runner IP'}")
     print(f"OVERALL — MarketsMedia:  "
           f"{'VIABLE from this runner IP' if mm_ok else 'NOT CONFIRMED from this runner IP'}"
-          f"{' -- but still needs a working CURRENT-week discovery method (see above) before it can be wired into production' if mm_ok and not (mm_wpjson_url or mm_rss_url) else ''}")
+          f"{' -- but still needs a working CURRENT-week discovery method before it can be wired into production' if mm_ok and not mm_discovery_worked else ''}"
+          f"{' -- AND a discovery method now confirmed working' if mm_ok and mm_discovery_worked else ''}")
+    print(f"OVERALL — PRNewswire direct: "
+          f"{'VIABLE from this runner IP (article pages)' if pn_direct_ok else 'NOT CONFIRMED from this runner IP'}"
+          f"; firehose RSS domain reachability: "
+          f"{'OK' if pn_rss_result.get('ok') else 'NOT CONFIRMED'} "
+          f"(this feed cannot discover ICI's specific release -- it is not "
+          f"organization-scoped; no ICI-specific PRNewswire feed was found "
+          f"to exist)")
     print("This report is the evidence, not a guess.")
 
     sys.exit(0)
