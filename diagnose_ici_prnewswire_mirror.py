@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-diagnose_ici_prnewswire_mirror.py  v1.3
+diagnose_ici_prnewswire_mirror.py  v1.6
 =============================================================
 DIAGNOSTIC ONLY -- not wired into any production data path.
 
@@ -173,6 +173,31 @@ added to actually test that, rather than guess at it:
     without checking, or silently reporting "no links" with no
     explanation of why.
 
+v1.6 UPDATE: this run's live evidence showed v1.5's own fix worked --
+the confirmed real ICI newsroom page DID have real /news-releases/
+links once relative hrefs were matched (25 found via plain anchor
+tags, 0 via __NEXT_DATA__), meaning v1.4's zero-link result was never
+a client-side-rendering problem at all, just the absolute-href-only
+regex missing a relative-href page. But none of the 25 matched this
+release family's slug filter ("mutual-fund" AND "flow"), and the
+prior version discarded all 25 without printing them -- making "the
+filter is wrong" and "this week's release genuinely isn't listed
+here yet" indistinguishable from the log alone. Two things fixed:
+  - `discover_via_prnewswire_org_page()` now prints every real link
+    found on the page when zero match the filter, not just the (empty)
+    matched subset -- so the next live run gives a human enough
+    evidence to tell those two cases apart directly, rather than
+    needing another guess-and-rerun cycle.
+  - `main()` was calling `discover_latest_mm_url_sitemap()` twice --
+    once for a "structure-only report" that stopped being true once
+    v1.3 made the function fully descend and return a URL, and once
+    for the real result. This silently doubled every live HTTP request
+    this probe makes against marketsmedia.com's sitemap.xml and its
+    two most-recent post-sitemaps on every run, and is the exact cause
+    of the duplicated "[MarketsMedia discovery C]" block seen twice,
+    byte-for-byte, in the v1.5 run's own output. Removed the dead
+    first call.
+
 What this script does NOT do:
   - It does not attempt any stealth/evasion technique (no
     playwright-stealth, no fingerprint spoofing, no proxy rotation).
@@ -196,7 +221,7 @@ from datetime import datetime, timezone
 
 import requests
 
-SCRIPT_VERSION = "1.5"
+SCRIPT_VERSION = "1.6"
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -638,9 +663,21 @@ def discover_via_prnewswire_org_page():
         if matches:
             print(f"  SELECTED (first match, page's own listing order): {matches[0]}")
             return matches[0]
-        print("  Page confirmed as ICI's own newsroom, but no matching release link found "
-              "on it right now -- either this week's release hasn't posted here yet, or "
-              "the page paginates and the match is further back.")
+
+        # v1.6: a zero-match result was previously reported with no visibility
+        # into what the 25 real links actually WERE -- discarding them here
+        # made "the filter is wrong" and "the release genuinely isn't listed
+        # yet" indistinguishable from the log alone. Print every real link
+        # found so this can be checked with evidence next run, instead of
+        # guessed at again.
+        print("  Page confirmed as ICI's own newsroom, but no link matched this release "
+              "family's filter -- either this week's release hasn't posted here yet, the "
+              "page paginates and it's further back, or ICI's real slug for this release "
+              "doesn't contain both 'mutual-fund' and 'flow' (unverified assumption, "
+              "carried over from the two PN_KNOWN_URLS reachability probes). All real "
+              f"links found on this page ({len(links)}), for direct inspection:")
+        for u in links:
+            print(f"    - {u}")
         return None  # confirmed real ICI page, just no current match -- don't try other candidates
 
     print("No candidate org-page URL resolved to a confirmed ICI newsroom page.")
@@ -703,7 +740,6 @@ def main():
     #    against a hardcoded old URL.
     mm_wpjson_url = discover_latest_mm_url_wpjson()
     mm_rss_url = discover_latest_mm_url_rss()
-    discover_latest_mm_url_sitemap()  # structure-only report, no URL returned
 
     if mm_wpjson_url:
         results.append(check_url(mm_wpjson_url, "MarketsMedia (wp-json discovered)"))
