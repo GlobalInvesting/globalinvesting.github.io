@@ -1,0 +1,129 @@
+{
+  "generatedAt": "2026-09-14T19:28:13Z",
+  "scriptVersion": "1.0",
+  "matchTolerance": 0.05,
+  "dateWindowDays": 1,
+  "aliasCount": 10,
+  "aliases": [
+    {
+      "currency": "EUR",
+      "primary_title": "Euro Area Core CPI y/y",
+      "secondary_title": "Euro Area Core Inflation Rate YoY Flash",
+      "evidence": {
+        "dateISO": "2026-09-01",
+        "forecast_primary": 2.4,
+        "forecast_secondary": 2.6,
+        "actual_primary": 2.4,
+        "actual_secondary": 2.4
+      }
+    },
+    {
+      "currency": "AUD",
+      "primary_title": "Australia GDP q/q",
+      "secondary_title": "Australia GDP Growth Rate QoQ",
+      "evidence": {
+        "dateISO": "2026-09-02",
+        "forecast_primary": 0.5,
+        "forecast_secondary": 0.2,
+        "actual_primary": 0.4,
+        "actual_secondary": 0.4
+      }
+    },
+    {
+      "currency": "AUD",
+      "primary_title": "Australia GDP y/y",
+      "secondary_title": "Australia GDP Growth Rate YoY",
+      "evidence": {
+        "dateISO": "2026-09-02",
+        "forecast_primary": -21.5,
+        "forecast_secondary": 1.6,
+        "actual_primary": 2.1,
+        "actual_secondary": 2.1
+      }
+    },
+    {
+      "currency": "NZD",
+      "primary_title": "RBNZ Interest Rate Decision",
+      "secondary_title": "New Zealand RBNZ Interest Rate Decision",
+      "evidence": {
+        "dateISO": "2026-09-02",
+        "forecast_primary": null,
+        "forecast_secondary": 2.75,
+        "actual_primary": 2.75,
+        "actual_secondary": 2.75
+      }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom S&P Global/CIPS Construction PMI",
+      "secondary_title": "United Kingdom S&P Global Construction PMI",
+      "evidence": {
+        "dateISO": "2026-09-04",
+        "forecast_primary": 39.2,
+        "forecast_secondary": 45.0,
+        "actual_primary": 44.3,
+        "actual_secondary": 44.3
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan GDP q/q",
+      "secondary_title": "Japan GDP Growth Rate QoQ Final",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 0.3,
+        "forecast_secondary": 0.3,
+        "actual_primary": 0.4,
+        "actual_secondary": 0.4
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan GDP Price Index y/y",
+      "secondary_title": "Japan GDP Price Index YoY Final",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 2.6,
+        "forecast_secondary": 2.6,
+        "actual_primary": 2.6,
+        "actual_secondary": 2.6
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan GDP y/y",
+      "secondary_title": "Japan GDP Growth Annualized Final",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 1.1,
+        "forecast_secondary": 1.1,
+        "actual_primary": 1.4,
+        "actual_secondary": 1.4
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Net Exports Contribution to GDP q/q",
+      "secondary_title": "Japan GDP External Demand QoQ Final",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 0.5,
+        "forecast_secondary": 0.5,
+        "actual_primary": 0.5,
+        "actual_secondary": 0.5
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Industrial Production m/m",
+      "secondary_title": "Japan Industrial Production MoM Final",
+      "evidence": {
+        "dateISO": "2026-09-14",
+        "forecast_primary": 0.1,
+        "forecast_secondary": 0.1,
+        "actual_primary": -0.2,
+        "actual_secondary": -0.2
+      }
+    }
+  ]
+}
