@@ -412,7 +412,7 @@ async function fetchFrankfurter() {
       if (updEl) updEl.textContent = 'ECB · updated ' + (data.today.date || '') + ' · daily rate';
     }
   } catch(e) {
-    console.warn('Frankfurter cache fetch failed:', e);
+    console.warn('FX rates cache fetch failed:', e);
   }
 }
 
@@ -9610,7 +9610,7 @@ async function fetchLiquidityData() {
 
   try {
     const r = await fetch('/fx-data/frankfurter.json');
-    if (!r.ok) throw new Error('frankfurter.json not available');
+    if (!r.ok) throw new Error('FX rates cache not available');
     const cacheData = await r.json();
     const rates = Object.values((cacheData.series && cacheData.series.rates) ? cacheData.series.rates : {});
     let volScalar = 1.0;
@@ -12079,7 +12079,7 @@ async function renderDerivativesSection() {
         });
 
         const footer = document.getElementById('ecb-fixings-footer');
-        if (footer && fxDate) footer.textContent = `ECB · official reference fixing · ${fxDate} · published ~16:00 CET · source: ECB via Frankfurter`;
+        if (footer && fxDate) footer.textContent = `ECB · official reference fixing · ${fxDate} · published ~16:00 CET · source: ECB official reference rates`;
       }
     } catch {  }
   }

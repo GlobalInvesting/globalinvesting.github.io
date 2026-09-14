@@ -63,7 +63,7 @@ function _connect() {
 function _scheduleReconnect() {
   if (!_active) return;
   if (_reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-    console.warn("[fx-ws] Max reconnect attempts reached — falling back to yfinance polling");
+    console.warn("[fx-ws] Max reconnect attempts reached — falling back to polling");
     _active = false;
     _updateSourceLabel(null);  
     return;
@@ -87,7 +87,7 @@ function _startStaleWatchdog() {
     const referenceMs = Math.max(_lastTickTs, _connectedAt);
     const staleMs = referenceMs ? Date.now() - referenceMs : Infinity;
     if (staleMs > TICK_STALE_MS) {
-      console.warn(`[fx-ws] No tick received in ${Math.round(staleMs / 1000)}s — reverting label; yfinance polling remains authoritative`);
+      console.warn(`[fx-ws] No tick received in ${Math.round(staleMs / 1000)}s — reverting label; polling remains authoritative`);
       _updateSourceLabel(null);
     }
   }, 30_000);
