@@ -82,11 +82,25 @@ jobs:
           MIN=$(date -u +%M)
           echo "Current UTC time: ${HOUR}:${MIN} (cron trigger)"
 
-          if [ $(( 10#$MIN % 5 )) -ne 0 ]; then
-            echo "Sparse off-peak cron — proceeding unconditionally."
-            echo "run=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
+          # Off-peak "colchón" cron slots declared in this workflow's own
+          # `on.schedule` block above, meant to cover gaps between the three
+          # release windows below. GitHub Actions never tells a running job
+          # which schedule entry fired it, so the only reliable way to
+          # recognize one of these slots is to match the current UTC clock
+          # against an explicit list of their declared times — NOT by
+          # checking MIN%5, which is broken: every slot below sits on :00 or
+          # :30, both multiples of 5, so it can never differ from the dense
+          # */5 cron and this branch never actually ran for any real
+          # trigger (see CHANGELOG.md / GUIDELINES.md).
+          OFFPEAK_SLOTS="02:30 03:00 03:30 04:00 04:30 05:00 10:00 10:30 11:00 11:30 15:30 16:00 16:30 17:00 17:30 18:00 18:30 19:00 19:30 20:00 20:30 21:00 21:30 22:00 22:30"
+          CURRENT="${HOUR}:${MIN}"
+          for slot in $OFFPEAK_SLOTS; do
+            if [ "$CURRENT" = "$slot" ]; then
+              echo "Off-peak colchón cron slot (${CURRENT}) — proceeding unconditionally."
+              echo "run=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+          done
 
           HOUR_INT=$(( 10#$HOUR ))
           if [ $HOUR_INT -ge 22 ] || [ $HOUR_INT -lt 2 ] || \
