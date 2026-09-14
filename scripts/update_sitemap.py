@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 update_sitemap.py — Regenerates sitemap.xml with accurate lastmod dates.
 
@@ -18,19 +17,6 @@ from xml.sax.saxutils import escape as xml_escape
 
 BASE_URL = "https://globalinvesting.github.io"
 
-# Pages with their priority, changefreq, and optional data dependencies.
-# Dependencies: if any listed file has a newer commit than the page itself,
-# that date is used as lastmod instead (keeps the sitemap honest for pages
-# with daily-updated data but infrequent HTML edits).
-#
-# "images": auto-derived at build time by scan_page_images() below — do not
-# hand-maintain a static list here. This was the root cause of the
-# guide-csi-indicator.html drift (page existed in the GUIDELINES.md sitemap
-# list and had real content screenshots, but was simply never added to this
-# PAGES array, so every automated run silently omitted it). Scanning the
-# actual HTML at build time means a page can never again have a screenshot
-# that isn't reflected in the sitemap, and a page's presence here is the
-# only thing that needs to be kept in sync with GUIDELINES.md.
 PAGES = [
     {
         "loc": "/",
@@ -203,7 +189,6 @@ def git_last_commit_date(filepath: str) -> datetime | None:
         iso = result.stdout.strip()
         if not iso:
             return None
-        # Parse ISO 8601 with timezone offset
         dt = datetime.fromisoformat(iso)
         return dt.astimezone(timezone.utc)
     except Exception:
@@ -221,7 +206,6 @@ def get_lastmod(page: dict) -> str:
                 dates.append(d)
     if dates:
         return max(dates).strftime("%Y-%m-%d")
-    # Fallback: today
     return datetime.now(timezone.utc).strftime("%Y-%m-%d")
 
 
@@ -256,7 +240,6 @@ if __name__ == "__main__":
     with open("sitemap.xml", "w") as f:
         f.write(sitemap)
     print("✅ sitemap.xml written")
-    # Print a summary
     for page in PAGES:
         lastmod = get_lastmod(page)
         print(f"  {lastmod}  {page['loc']}")
