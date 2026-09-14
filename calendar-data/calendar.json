@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-13T22:30:10Z",
-  "generatedAt": "2026-09-13T22:30:10Z",
+  "lastUpdate": "2026-09-14T08:02:41Z",
+  "generatedAt": "2026-09-14T08:02:41Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -8,12 +8,12 @@
   "errorMessage": null,
   "fetchErrors": [],
   "rangeFrom": "2025-09-15",
-  "rangeTo": "2026-09-27",
-  "totalEvents": 4290,
+  "rangeTo": "2026-09-28",
+  "totalEvents": 4293,
   "currencyCounts": {
-    "EUR": 1022,
+    "EUR": 1023,
     "USD": 1395,
-    "GBP": 480,
+    "GBP": 482,
     "CAD": 294,
     "NZD": 107,
     "JPY": 272,
@@ -23,71 +23,11 @@
     "NOK": 104
   },
   "impactCounts": {
-    "medium": 2292,
+    "medium": 2295,
     "high": 1715,
     "low": 283
   },
   "surpriseStats": {
-    "NOK/balance of trade": {
-      "n": 3,
-      "mean": 1.433333,
-      "std": 28.365002
-    },
-    "SEK/unemployment rate": {
-      "n": 3,
-      "mean": -0.166667,
-      "std": 1.628906
-    },
-    "EUR/germany wholesale prices yoy": {
-      "n": 3,
-      "mean": -1.033333,
-      "std": 0.832666
-    },
-    "EUR/germany wholesale prices mom": {
-      "n": 3,
-      "mean": -0.933333,
-      "std": 0.64291
-    },
-    "CHF/consumer confidence": {
-      "n": 4,
-      "mean": -0.5,
-      "std": 0.57735
-    },
-    "EUR/balance of trade": {
-      "n": 5,
-      "mean": -1.5594,
-      "std": 7.55738
-    },
-    "EUR/italy balance of trade": {
-      "n": 3,
-      "mean": -0.370667,
-      "std": 0.60677
-    },
-    "EUR/industrial production mom": {
-      "n": 4,
-      "mean": -0.175,
-      "std": 0.206155
-    },
-    "CAD/housing starts": {
-      "n": 4,
-      "mean": -6.325,
-      "std": 14.578151
-    },
-    "USD/ny empire state manufacturing index": {
-      "n": 4,
-      "mean": -0.05,
-      "std": 9.594617
-    },
-    "USD/industrial production mom": {
-      "n": 4,
-      "mean": -0.15,
-      "std": 0.057735
-    },
-    "USD/nahb housing market index": {
-      "n": 4,
-      "mean": -0.25,
-      "std": 1.5
-    },
     "JPY/boj interest rate decision": {
       "n": 3,
       "mean": 0.0,
@@ -472,6 +412,11 @@
       "n": 2,
       "mean": 3.6,
       "std": 0.0
+    },
+    "EUR/balance of trade": {
+      "n": 3,
+      "mean": 0.633333,
+      "std": 8.976822
     },
     "EUR/spain balance of trade": {
       "n": 3,
@@ -1178,6 +1123,11 @@
       "mean": 0.2,
       "std": 0.141421
     },
+    "CHF/consumer confidence": {
+      "n": 2,
+      "mean": -1.0,
+      "std": 0.0
+    },
     "EUR/italy industrial production mom": {
       "n": 2,
       "mean": -0.7,
@@ -1248,6 +1198,16 @@
       "mean": 2.333333,
       "std": 4.041452
     },
+    "EUR/germany wholesale prices yoy": {
+      "n": 2,
+      "mean": -0.7,
+      "std": 0.848528
+    },
+    "EUR/germany wholesale prices mom": {
+      "n": 2,
+      "mean": -0.7,
+      "std": 0.707107
+    },
     "USD/core inflation rate mom": {
       "n": 2,
       "mean": -0.1,
@@ -1278,6 +1238,16 @@
       "mean": -0.611,
       "std": 1.161069
     },
+    "NOK/balance of trade": {
+      "n": 2,
+      "mean": 16.6,
+      "std": 15.132085
+    },
+    "EUR/industrial production mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.353553
+    },
     "CAD/manufacturing sales mom": {
       "n": 4,
       "mean": -0.15,
@@ -1287,6 +1257,11 @@
       "n": 3,
       "mean": -0.233333,
       "std": 0.152753
+    },
+    "USD/ny empire state manufacturing index": {
+      "n": 2,
+      "mean": 8.2,
+      "std": 1.979899
     },
     "USD/ppi mom": {
       "n": 3,
@@ -1333,6 +1308,21 @@
       "mean": 0.233333,
       "std": 0.208167
     },
+    "EUR/italy balance of trade": {
+      "n": 2,
+      "mean": -0.1075,
+      "std": 0.566393
+    },
+    "CAD/housing starts": {
+      "n": 2,
+      "mean": -18.95,
+      "std": 0.070711
+    },
+    "USD/nahb housing market index": {
+      "n": 2,
+      "mean": 0.5,
+      "std": 2.12132
+    },
     "EUR/current account s.a": {
       "n": 2,
       "mean": 10.0,
@@ -1353,6 +1343,11 @@
       "mean": -445.62,
       "std": 216.091832
     },
+    "USD/industrial production mom": {
+      "n": 2,
+      "mean": -0.1,
+      "std": 0.0
+    },
     "EUR/greece current account": {
       "n": 2,
       "mean": -26.4815,
@@ -1372,6 +1367,11 @@
       "n": 2,
       "mean": 0.2,
       "std": 0.141421
+    },
+    "SEK/unemployment rate": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 2.12132
     },
     "SEK/gdp growth rate qoq": {
       "n": 3,
@@ -1566,6 +1566,16 @@
     "AUD/gdp growth rate yoy": {
       "n": 2,
       "mean": 0.4,
+      "std": 0.141421
+    },
+    "SEK/inflation rate mom": {
+      "n": 2,
+      "mean": -0.35,
+      "std": 0.212132
+    },
+    "SEK/inflation rate yoy": {
+      "n": 2,
+      "mean": -0.2,
       "std": 0.141421
     }
   },
@@ -52407,7 +52417,7 @@
       "flag": "🇸🇪",
       "event": "Sweden CPI m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.3%",
       "forecast": "0.2%",
       "previous": "-0.3%"
     },
@@ -52420,7 +52430,7 @@
       "flag": "🇸🇪",
       "event": "Sweden CPI y/y",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.4%",
       "previous": "0.2%"
     },
@@ -54564,6 +54574,45 @@
       "currency": "JPY",
       "flag": "🇯🇵",
       "event": "BoJ Monetary Policy Meeting Minutes",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "28 Sep",
+      "dateISO": "2026-09-28",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Nationwide HPI m/m",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": null
+    },
+    {
+      "date": "28 Sep",
+      "dateISO": "2026-09-28",
+      "timeUTC": "06:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom Nationwide HPI y/y",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "1.8%",
+      "previous": null
+    },
+    {
+      "date": "28 Sep",
+      "dateISO": "2026-09-28",
+      "timeUTC": "22:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Jobseekers Total",
       "impact": "medium",
       "actual": null,
       "forecast": null,
