@@ -72,7 +72,6 @@ const PAIRS = [
   { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
 
-
 async function renderFairValue() {
   const accWrap = document.getElementById('fv-accumulating');
   const tblWrap = document.getElementById('fv-wrap');
@@ -271,7 +270,6 @@ const CB_CONFIG = [
 ];
 
 const COT_CURRENCIES = ['EUR','GBP','JPY','AUD','CAD','CHF','NZD']; 
-
 
 function _themeColor(cssVar) {
   return getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
@@ -497,7 +495,6 @@ function populateQuoteBar() {
   }
 }
 
-
 function populateCrossRows() {
   const crossIds = ['eurgbp','eurjpy','eurchf','eurcad','euraud','gbpjpy','gbpchf','gbpcad','audjpy','audnzd','audchf','cadjpy','chfjpy','nzdjpy','eurnzd','gbpaud','gbpnzd','audcad','cadchf','nzdcad','nzdchf','eurnok','eursek'];
   crossIds.forEach(id => {
@@ -540,7 +537,6 @@ const TYPICAL_SPREADS = new Proxy({}, {
   }
 });
 const FX_PERF_CACHE = {};
-
 
 let _corrWindow = 60;  
 let _corrDataCache = []; 
@@ -857,7 +853,6 @@ async function _corrPairsLoadCloses(tf) {
   _corrPairsCloseCache[tf] = promise;
   return promise;
 }
-
 
 function _pairsCorrMap(ids, retsById, maxN) {
   const map = {};
@@ -1190,7 +1185,6 @@ function populateHeatmapThrottled() {
     populateHeatmap();
   }, _HM_THROTTLE_MS);
 }
-
 
 function computeCBTrend(obs) {
   if (!obs || obs.length < 2) return 'flat';
@@ -1563,7 +1557,6 @@ async function fetchCOTCommoditiesData() {
   if (subEl) subEl.innerHTML = _buildCOTUpdateLabel(results[0]);
   _renderCOTRows(results, {}, 'COT_DATA_STORE_COMMODITIES');
 }
-
 
 const COT_BREAKDOWN_CCYS    = ['USD', 'EUR', 'JPY', 'GBP', 'AUD', 'CAD', 'CHF', 'NZD'];
 const COT_BREAKDOWN_INDICES = ['SPX', 'NAS100', 'DJ30'];
@@ -2093,7 +2086,6 @@ function buildNewsTicker(items) {
   });
 }
 
-
 const QB_STOOQ_PAIRS = [
   { sym: 'eurusd',  id: 'eurusd',  dec: 5 },
   { sym: 'usdjpy',  id: 'usdjpy',  dec: 3 },
@@ -2239,8 +2231,6 @@ function _caClosedCcy(id) {
   return null;
 }
 
-
-
 async function fetchQuoteBarRT() {
   const intradayData = await loadIntradayQuotes();
   let updatedFromIntraday = 0;
@@ -2280,7 +2270,6 @@ async function fetchQuoteBarRT() {
     }
   }
 
-
   const totalUpdated = Object.keys(STOOQ_RT_CACHE).length;
   if (totalUpdated > 0) {
     updateFxPairsTableRT();
@@ -2298,7 +2287,6 @@ async function fetchQuoteBarRT() {
 function updateFxPairsTableRT() {
   const _rtDay2 = new Date().getUTCDay(), _rtH2 = new Date().getUTCHours();
   const _isWeekendRT = _rtDay2 === 6 || (_rtDay2 === 0 && _rtH2 < 21) || (_rtDay2 === 5 && _rtH2 >= 21);
-
 
   const tbody = document.getElementById('fx-pairs-tbody');
   if (tbody) {
@@ -2942,7 +2930,6 @@ function initSentimentAssetTabs() {
     _renderSentimentForActiveTab();
   });
 }
-
 
 function attachRiskTip(el, title, body, ex) {
   _fxTTAttach(el, title, body, ex);
@@ -3682,8 +3669,6 @@ function drawYieldCurve(points, priorPoints) {
 setTimeout(() => drawYieldCurveAndCache(null), 60);
 window.addEventListener('resize', () => drawYieldCurve(_lastDrawnYields, _lastDrawnPrior));
 
-
-
 const _OHLC_FULL_NAMES = {
   eurusd:'Euro / U.S. Dollar',   gbpusd:'British Pound / U.S. Dollar',
   usdjpy:'U.S. Dollar / Japanese Yen', audusd:'Australian Dollar / U.S. Dollar',
@@ -4093,7 +4078,6 @@ if (typeof window._lwCompareList === 'undefined') window._lwCompareList = _lsGet
 
 let _lwLastIntradayBarClose = null; 
 
-
 let _lwBlockHigh      = null; 
 let _lwBlockLow       = null; 
 let _lwBlockTs        = null; 
@@ -4500,7 +4484,6 @@ async function _renderLWChart(ohlcId, label) {
   _lwBlockHigh  = null;
   _lwBlockLow   = null;
   _lwBlockTs    = null;
-
 
   if (typeof window._lwShowVol === 'undefined') window._lwShowVol = false;
   let volumeSeries = null;
@@ -5404,7 +5387,6 @@ async function _renderLWChart(ohlcId, label) {
   };
   document.addEventListener('keydown', window._lwDrawEscHandler);
 
-
   let _drawDropdownOpen = false;
   function _closeDrawDropdown() {
     const p = document.getElementById('_lw-draw-dropdown');
@@ -5499,8 +5481,6 @@ async function _renderLWChart(ohlcId, label) {
     btn.parentNode.replaceChild(fresh, btn);
     fresh.addEventListener('click', e => { e.stopPropagation(); _openDrawDropdown(); });
   })();
-
-
 
   function _iSMA(src, n) {
     const out = [];
@@ -5775,7 +5755,6 @@ async function _renderLWChart(ohlcId, label) {
     const custom   = (window._lwIndParams[id] || {}).colors || [];
     return custom[i] || defaults[i] || _themeColor('--text3');
   }
-
 
   function _calcIndData(id, bars) {
     const closes = bars.map(b => b.close);
@@ -6138,7 +6117,6 @@ async function _renderLWChart(ohlcId, label) {
       default: return [];
     }
   }
-
 
   function _addPaneLegend(paneEl, id, html) {
     if (!paneEl) return;
@@ -7234,8 +7212,6 @@ document.getElementById('lw-cb-btn')?.addEventListener('click', function() {
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-
-
 document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
   const typeBtn = e.target.closest('[data-chart-type]');
   if (!typeBtn || typeBtn.disabled) return;
@@ -7249,7 +7225,6 @@ document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
   if (_ohlcWrap) _ohlcWrap.style.display = (_effType === 'candle' || _effType === 'bar') ? '' : 'none';
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
-
 
 function toggleInlineDetail(row) {
   const tvSym = row.dataset.sym;
@@ -8091,7 +8066,6 @@ async function updatePairDetail(tvSym) {
       ${cotWeek ? '<span class="pd-dim">COT ' + cotWeek + ' · Myfxbook' + (rrVal != null ? ' · Saxo RR' : '') + '</span>' : '<span class="pd-dim">Myfxbook' + (rrVal != null ? ' · Saxo RR' : '') + '</span>'}
     </div>`;
 
-
   if (window._fxTTPos) {
     panel.querySelectorAll('.fx-tip').forEach(cell => {
       const title = cell.dataset.tipTitle || '';
@@ -8545,7 +8519,6 @@ function renderVolRankList(container) {
   });
 }
 
-
 async function fetchCarryData() {
   const CURRENCIES = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD','NOK','SEK'];
   const LABELS = { USD:'USD Fed', EUR:'EUR ECB', GBP:'GBP BoE', JPY:'JPY BoJ',
@@ -8816,7 +8789,6 @@ async function fetchCrossAssetData() {
   _lwUpdateTodayBar();
 }
 
-
 async function fetchFedExpectations() {
   try {
     const tbody = document.getElementById('fed-exp-tbody');
@@ -8842,7 +8814,6 @@ async function fetchFedExpectations() {
       NOK: { flag:'no', short:'NB'     },
       SEK: { flag:'se', short:'Riksbank' },
     };
-
 
     const rows = [];
     currencies.forEach((ccy, i) => {
@@ -9474,11 +9445,8 @@ async function computeSessionVol() {
   } catch(e) { console.warn('[SessionVol] Failed:', e); }
 }
 
-
-
 async function boot() {
   fetchFrankfurter();                
-
 
   await loadIntradayQuotes();
 
@@ -9594,7 +9562,6 @@ setInterval(buildRichNarrative, 15 * 60 * 1000);
     });
   });
 })();
-
 
 const LIQ_BASE = [18,14,11,10,12,20,30,42,58,68,72,70,72,82,95,100,95,80,68,55,42,30,22,20];
 
@@ -9792,7 +9759,6 @@ function drawLiquidityChart() {
     const lbl = lm === 0 ? lh.toString().padStart(2, '0') : lh.toString().padStart(2, '0') + ':' + lm.toString().padStart(2, '0');
     ctx.fillText(lbl, PAD_L+(ci/47)*cW, H-4);
   });
-
 
   const now = new Date();
   const localH = now.getHours().toString().padStart(2,'0');
@@ -10424,7 +10390,6 @@ function exportPanel(type, format = 'csv') {
   });
 }
 
-
 const ALERTS_KEY = 'gi_alerts';
 
 const ALERTS_LABELS = {
@@ -10432,7 +10397,6 @@ const ALERTS_LABELS = {
   audusd:'AUD/USD', usdchf:'USD/CHF', xauusd:'Gold', us10y:'US 10Y', move:'MOVE',
   nzdusd:'NZD/USD', usdcad:'USD/CAD', dxy:'DXY', spx:'SPX', wti:'WTI', btc:'BTC',
 };
-
 
 const ADV_ALERT_TYPES = {
   'hv_iv_eurusd': {
@@ -10813,7 +10777,6 @@ function alertsSave(arr) {
   try { localStorage.setItem(ALERTS_KEY, JSON.stringify(arr)); } catch {}
 }
 
-
 function alertsCurrentValue(a, intra) {
   if (a.type === 'price' || !a.type) {
     const sym = a.sym;
@@ -10857,7 +10820,6 @@ function alertDescribeCondition(a) {
   return `${label} ${dirSym} ${a.threshold}`;
 }
 
-
 function alertsRender(intra) {
   const container = document.getElementById('alerts-rows');
   if (!container) return;
@@ -10897,7 +10859,6 @@ function alertsRemove(id) {
   alertsRender(null);
 }
 
-
 function alertsAddFromUI() {
   const typeEl  = document.getElementById('alert-type-sel');
   const symEl   = document.getElementById('alert-sym-sel');
@@ -10930,7 +10891,6 @@ function alertsAddFromUI() {
     Notification.requestPermission();
   }
 }
-
 
 async function alertsCheckEco() {
   const arr      = alertsLoad();
@@ -11063,7 +11023,6 @@ async function alertsCheck() {
   const ctx = { ...(intra || {}), rr, cot, fairValue };
 
   let changed = false;
-
 
   arr.forEach(a => {
     if (a.fired) return;
@@ -11549,7 +11508,6 @@ function toggleAlertsPopover() {
   }
 })();
 
-
 const GI_OB_KEY = 'gi_ob_done';
 
 function giOnboardShouldShow() {
@@ -11644,7 +11602,6 @@ if (document.readyState === 'loading') {
 } else {
   giOnboardInit();
 }
-
 
 window._CB_RATES_CACHE = window._CB_RATES_CACHE || {};
 
@@ -12199,7 +12156,6 @@ async function renderDerivativesSection() {
   }
 }
 
-
 function initG8RatesTabs() {
   const tabBar = document.getElementById('rates-country-tabs');
   if (!tabBar) return;
@@ -12351,7 +12307,6 @@ async function renderSovereignSpreads() {
   tbody.dataset.loaded = '2';
 }
 
-
 const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
   'australia ','canada ','switzerland ','new zealand ','norway ','sweden '];
 const _ESI_VENDOR_ALIASES = {
@@ -12364,14 +12319,6 @@ const _ESI_VENDOR_ALIASES = {
   'revised uom consumer sentiment': 'michigan consumer sentiment',
   'revised uom inflation expectations': 'michigan inflation expectations',
   'prelim gdp price index qoq': 'gdp price index qoq',
-  // v8.445.0 (2026-09-10) — calendar source migration. All entries below
-  // chain-verified (same actual/previous across the source boundary) in
-  // fetch_economic_calendar.py's VENDOR_ALIASES v3.12 -- see that file's
-  // changelog for the full per-pair verification detail, including the two
-  // candidates (CHF GDP q/q+y/y, SEK GDP q/q) checked and deliberately left
-  // unaliased. 'gdp qoq' and 'ivey pmi' were already present in
-  // calendar-panel.js's _CAL_VENDOR_ALIASES but missing here — a
-  // pre-existing three-way sync gap, not new to this migration.
   'gdp qoq': 'gdp growth rate qoq',
   'ivey pmi': 'ivey pmi s.a',
   'nonfarm payrolls': 'non farm payrolls',
@@ -12692,8 +12639,6 @@ async function loadOISRatesCache() {
   } catch {
   }
 }
-
-
 
 let _newsAllItems = [];
 let _newsMeta     = {};
@@ -13241,7 +13186,6 @@ function initExclusivePanelNav() {
   }
 })();
 
-
 (function initWatchlist() {
   'use strict';
 
@@ -13398,7 +13342,6 @@ function initExclusivePanelNav() {
   }
 })();
 
-
 const _TF_RANGE_SETS = {
   H1: [{days:1,label:'1D'},{days:5,label:'1W'},{days:14,label:'2W'},{days:30,label:'1M'}],
   H4: [{days:14,label:'2W'},{days:30,label:'1M'},{days:91,label:'3M'},{days:182,label:'6M'}],
@@ -13428,7 +13371,6 @@ document.getElementById('lw-range-bar')?.addEventListener('click', e => {
   _lwUpdateRangeBtns();
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
-
 
 (function _lwCmpDropdownToBody() {
   const dd = document.getElementById('lw-cmp-dropdown');
@@ -13804,7 +13746,6 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
   }
 }
 
-
 let _lwFsOriginalParent = null;
 let _lwFsOriginalNext   = null;
 let _lwFsOriginalHeight = null;
@@ -13958,7 +13899,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.getElementById('lw-fullscreen-overlay')?.classList.contains('lw-fs-active'))
     _lwCloseFullscreen();
 });
-
 
 let _researchAllItems  = [];
 let _researchMeta      = {};
@@ -14149,7 +14089,6 @@ async function loadBankResearch() {
     console.error('[Research] Load failed:', e);
   }
 }
-
 
 window.addEventListener('gi-theme-change', function() {
   if (typeof _lwChart !== 'undefined' && _lwChart) {

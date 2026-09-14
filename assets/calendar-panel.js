@@ -46,7 +46,6 @@
   let _lastFullHistory = [];
   let _seriesIndex     = {};
 
-
   const IMPACT_DOT = {
     high:   { color: 'var(--down)',   label: 'High'   },
     medium: { color: 'var(--orange)', label: 'Medium' },
@@ -98,11 +97,6 @@
     'adp non-farm employment change': 'adp employment change',
     'non-farm employment change': 'non farm payrolls',
     'official cash rate': 'rbnz interest rate decision',
-    // v8.445.0 (2026-09-10) — calendar source migration. Chain-verified in
-    // fetch_economic_calendar.py's VENDOR_ALIASES v3.12 (same
-    // actual/previous across the source boundary) — see that file's
-    // changelog for full per-pair detail, including CHF GDP q/q+y/y and
-    // SEK GDP q/q, which were checked and deliberately left unaliased.
     'nonfarm payrolls': 'non farm payrolls',
     'trade balance': 'balance of trade',
     'core cpi yoy': 'core inflation rate yoy',
@@ -165,8 +159,8 @@
       if (ev.impact !== 'high') return;
       const isReleased = !!(ev.actual && ev.actual !== '' && ev.actual !== '-');
       if (isReleased) return;
-      if (!ev.timeUTC) return; // no time at all — never a live-countdown target
-      if (ev.timeMode === 'tentative') return; // provisional estimate only — never a live-countdown target
+      if (!ev.timeUTC) return;
+      if (ev.timeMode === 'tentative') return;
       const [h, m] = ev.timeUTC.split(':').map(Number);
       const evMs = Date.UTC(+ev.dateISO.slice(0,4), +ev.dateISO.slice(5,7)-1, +ev.dateISO.slice(8,10), h, m);
       const delta = evMs - nowMs;
@@ -774,10 +768,6 @@
   }
 
   function toLocalTime(dateISO, timeUTC) {
-    // Bare-fallback path only — biquote's v1.3 schema populates timeUTC even
-    // for tentative events, so this branch fires only if the field is
-    // genuinely absent (e.g. an older cached file, or a future vendor
-    // response with no time at all).
     if (!timeUTC) return 'Tentative';
     const [h, m] = timeUTC.split(':').map(Number);
     const d = new Date(Date.UTC(
@@ -793,17 +783,6 @@
   }
 
   function toLocalDateISO(dateISO, timeUTC, timeMode) {
-    // v1.19.33: a tentative timeMode means the underlying time is an
-    // unconfirmed estimate, not a fact — shifting which CALENDAR DAY an
-    // event is grouped under based on that estimate is wrong, since a
-    // later real release time (a common BoJ outcome) could shift the
-    // local-timezone conversion across midnight again, disagreeing with
-    // itself run to run and with every other calendar source, which all
-    // anchor to the vendor's own confirmed day. Live-reported: BoJ Interest
-    // Rate Decision (dateISO 2026-09-18, biquote's estimated time 02:30
-    // UTC) was rendering under "Thursday, September 17" for a UTC-3
-    // viewer, while every other source lists it on the 18th. Only a
-    // confirmed exact time may shift the display day.
     if (!timeUTC || timeMode === 'tentative') return dateISO;
     const [h, m] = timeUTC.split(':').map(Number);
     const d = new Date(Date.UTC(
@@ -1103,23 +1082,7 @@
 
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
         const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
-        // v1.19.33: timeMode ("exact" vs "tentative") — not the mere
-        // presence of timeUTC — now decides the tentative styling, since
-        // biquote v1.3 populates a real (if provisional) timeUTC on
-        // tentative events too. A missing timeUTC (ev.timeUTC falsy) is
-        // the separate, rarer "no time at all" case and still renders the
-        // bare 'Tentative' text with no estimate to show.
         const isTentative = ev.timeMode === 'tentative';
-        // Tentative time is shown in UTC, never localized: the row is
-        // grouped under the vendor's own confirmed calendar day (see
-        // toLocalDateISO), and converting an unconfirmed estimate to the
-        // viewer's local wall-clock time would print a time that reads as
-        // belonging to that day locally while actually landing on the
-        // adjacent day for viewers behind UTC — exactly the "shows the
-        // 17th's clock time under the 18th's header" confusion reported
-        // live. Showing "~HH:MM UTC" instead removes the ambiguity: it's
-        // explicitly not a local time, so no calendar-day inference is
-        // implied by it.
         const tentativeTimeText = ev.timeUTC ? `~${ev.timeUTC} UTC` : 'Tentative';
 
         const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
@@ -1429,19 +1392,6 @@
       const ffEvents  = (ffJson?.events  || []).map(normalize);
       const calEvents = (calJson?.events || []).map(normalize);
 
-      // calendar.json (secondary/backfill feed) is kept ONLY as a deep-history source for the
-      // per-event historical trend index (buildSeriesIndex, used by the detail modal's mini-series).
-      // It is deliberately never merged into the main displayed event list below: its `event`
-      // field ("GDP m/m") and the primary feed's own `title` field ("United Kingdom GDP m/m") use
-      // different naming conventions for the identical release, so a same-event dedup keyed on
-      // exact title text silently fails to match and both copies render as separate rows — one
-      // from the primary feed (usually still pending, dashes) and one from calendar.json (its own
-      // forecast/previous, never an `actual` since this feed doesn't track releases live).
-      // Confirmed live for GBP 2026-09-11: calendar.json's `{event:"GDP m/m", forecast:"0.0%",
-      // previous:"0.3%"}` vs. the primary feed's `{title:"United Kingdom GDP m/m", forecast:null,
-      // previous:null}` — same release, two rows. Per the single-source-of-truth decision made
-      // when the primary feed replaced its predecessors (v8.443.0), the displayed calendar shows
-      // the primary feed's own events exclusively.
       _lastFullHistory = calEvents;
       _seriesIndex     = buildSeriesIndex(calEvents);
 

@@ -1174,11 +1174,11 @@
     const localStr = localHH + ':' + localMM;
 
     if (weekend) {
-      const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
+      const aiSessionNotes = _sessionCtxCache && _sessionCtxCache.sessions
         ? _sessionCtxCache.sessions[ccy]
         : null;
 
-      if (groqSessions && Object.keys(groqSessions).length >= 3) {
+      if (aiSessionNotes && Object.keys(aiSessionNotes).length >= 3) {
         const weekendLabels = {
           'Sydney':   'FRI CLOSE',
           'Tokyo':    'WEEKLY',
@@ -1187,7 +1187,7 @@
         };
         const sessOrder = ['Sydney', 'Tokyo', 'London', 'New York'];
         notes.innerHTML = sessOrder.map(sName => {
-          const note   = convertUtcTimesInNote(groqSessions[sName] || '—');
+          const note   = convertUtcTimesInNote(aiSessionNotes[sName] || '—');
           const wLabel = weekendLabels[sName] || sName.toUpperCase();
           return (
             '<div style="margin-bottom:5px">' +
@@ -1212,16 +1212,16 @@
       return;
     }
 
-    const groqSessions = _sessionCtxCache && _sessionCtxCache.sessions
+    const aiSessionNotes = _sessionCtxCache && _sessionCtxCache.sessions
       ? _sessionCtxCache.sessions[ccy]
       : null;
 
-    if (groqSessions && Object.keys(groqSessions).length >= 3) {
+    if (aiSessionNotes && Object.keys(aiSessionNotes).length >= 3) {
       const sessOrder = getOrderedSessions().map(s => s.name);
       notes.innerHTML = sessOrder.map(sName => {
         const sess  = SESSIONS.find(s => s.name === sName);
         const state = getBarSessionState(sess);
-        const aiNote = convertUtcTimesInNote(groqSessions[sName] || '\u2014');
+        const aiNote = convertUtcTimesInNote(aiSessionNotes[sName] || '\u2014');
 
         const labelColor = state === 'active'   ? 'var(--blue,#4f7fff)'
                          : state === 'past'      ? 'var(--text3,#6b7280)'

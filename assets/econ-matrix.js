@@ -145,9 +145,6 @@
       prod:  ['Industrial Production YoY'],
       conf:  ['Business NZ PMI'],
       rtl:   ['Retail Sales QoQ', 'Retail Sales YoY'],
-      // The calendar feed publishes NZD's Current Account/Trade Balance as
-      // trailing 12-month totals (Stats NZ's own headline convention), not
-      // a plain single-period title — verified live 2026-09-10.
       ca:    ['Current Account', 'Current Account 12-Months'],
       trade: ['Balance of Trade', 'Trade Balance 12-Months'],
       pce:   [],
@@ -156,8 +153,6 @@
       gdp:   ['GDP Growth Rate QoQ', 'GDP QoQ'],
       cpi:   ['CPIF YoY'],
       cpimom:['CPIF MoM'],
-      // core shows Sweden's HEADLINE CPI YoY by design, not an ex-food/
-      // ex-energy measure — see SEK_CORE_IS_HEADLINE_NOTE below.
       core:  ['Inflation Rate YoY', 'CPI YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], 
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
@@ -169,12 +164,6 @@
       trade: ['Balance of Trade', 'Trade Balance'],
       pce:   [],
     },
-    // NOK: zero live events observed for this currency in the calendar
-    // feed's window checked 2026-09-10 (economic-events.json had no NOK
-    // entries at all) — title conventions below could not be re-verified
-    // against the current feed and are left at their pre-migration
-    // values. Flagged for re-check the next time a NOK release actually
-    // appears in the calendar; do not assume these are still correct.
     NOK: {
       gdp:   ['GDP Growth Mainland QoQ', 'GDP Growth Rate QoQ'],
       cpi:   ['Inflation Rate YoY'],
