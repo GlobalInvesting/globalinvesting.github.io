@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-14T19:28:13Z",
-  "scriptVersion": "1.0",
+  "generatedAt": "2026-09-14T23:20:54Z",
+  "scriptVersion": "1.1",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 10,
+  "aliasCount": 17,
   "aliases": [
     {
       "currency": "EUR",
@@ -66,6 +66,66 @@
       }
     },
     {
+      "currency": "AUD",
+      "primary_title": "Australia ANZ Job Advertisements m/m",
+      "secondary_title": "Australia ANZ-Indeed Job Ads MoM",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": -0.7,
+        "forecast_secondary": 0.5,
+        "actual_primary": 2.5,
+        "actual_secondary": 2.5
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Coincident Index",
+      "secondary_title": "Japan Coincident Index Prel",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 116.2,
+        "forecast_secondary": 118.8,
+        "actual_primary": 120.6,
+        "actual_secondary": 120.6
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Leading Index",
+      "secondary_title": "Japan Leading Economic Index Prel",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 117.4,
+        "forecast_secondary": 116.8,
+        "actual_primary": 117.9,
+        "actual_secondary": 117.9
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Labor Cash Earnings y/y",
+      "secondary_title": "Japan Average Cash Earnings YoY",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 1.8,
+        "forecast_secondary": 3.5,
+        "actual_primary": 4.7,
+        "actual_secondary": 4.7
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Overtime Pay y/y",
+      "secondary_title": "Japan Overtime Pay YoY",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 2.1,
+        "forecast_secondary": 3.0,
+        "actual_primary": 3.1,
+        "actual_secondary": 3.1
+      }
+    },
+    {
       "currency": "JPY",
       "primary_title": "Japan GDP q/q",
       "secondary_title": "Japan GDP Growth Rate QoQ Final",
@@ -103,6 +163,18 @@
     },
     {
       "currency": "JPY",
+      "primary_title": "Japan Private Consumption q/q",
+      "secondary_title": "Japan GDP Private Consumption QoQ Final",
+      "evidence": {
+        "dateISO": "2026-09-07",
+        "forecast_primary": 0.0,
+        "forecast_secondary": 0.0,
+        "actual_primary": 0.0,
+        "actual_secondary": 0.0
+      }
+    },
+    {
+      "currency": "JPY",
       "primary_title": "Japan Net Exports Contribution to GDP q/q",
       "secondary_title": "Japan GDP External Demand QoQ Final",
       "evidence": {
@@ -123,6 +195,18 @@
         "forecast_secondary": 0.1,
         "actual_primary": -0.2,
         "actual_secondary": -0.2
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Industrial Production y/y",
+      "secondary_title": "Japan Industrial Production YoY Final",
+      "evidence": {
+        "dateISO": "2026-09-14",
+        "forecast_primary": 4.1,
+        "forecast_secondary": 4.1,
+        "actual_primary": null,
+        "actual_secondary": 3.9
       }
     }
   ]
