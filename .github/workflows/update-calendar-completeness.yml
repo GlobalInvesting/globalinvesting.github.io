@@ -42,6 +42,9 @@ jobs:
       - name: Fetch full calendar from secondary source
         run: python3 private-scripts/fetch_te_calendar.py
 
+      - name: Build cross-vendor event-title cross-reference
+        run: python3 private-scripts/build_calendar_title_aliases.py
+
       - name: Display summary
         run: |
           echo ""
@@ -60,6 +63,12 @@ jobs:
           for e in sec_events:
               by_impact[e.get('impact')] = by_impact.get(e.get('impact'), 0) + 1
           print(f'  Secondary-source events by impact: {by_impact}')
+          try:
+              with open('calendar-data/event-title-aliases.json') as af:
+                  aliases = json.load(af)
+              print(f'  Cross-vendor title aliases: {aliases.get(\"aliasCount\", 0)}')
+          except FileNotFoundError:
+              print('  Cross-vendor title aliases: (file not yet written)')
           "
 
       - name: Commit and push (with retry on race)
@@ -68,13 +77,15 @@ jobs:
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          if git diff --quiet -- calendar-data/calendar.json && git diff --staged --quiet -- calendar-data/calendar.json; then
-            echo "No changes to calendar-data/calendar.json — skipping commit."
+          if git diff --quiet -- calendar-data/calendar.json calendar-data/event-title-aliases.json \
+             && git diff --staged --quiet -- calendar-data/calendar.json calendar-data/event-title-aliases.json; then
+            echo "No changes to calendar-data/calendar.json or calendar-data/event-title-aliases.json — skipping commit."
             echo "pushed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           cp calendar-data/calendar.json /tmp/calendar_fresh.json
+          cp calendar-data/event-title-aliases.json /tmp/event_title_aliases_fresh.json
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
           for i in 1 2 3 4 5; do
@@ -82,7 +93,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             cp /tmp/calendar_fresh.json calendar-data/calendar.json
-            git add calendar-data/calendar.json
+            cp /tmp/event_title_aliases_fresh.json calendar-data/event-title-aliases.json
+            git add calendar-data/calendar.json calendar-data/event-title-aliases.json
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
               echo "pushed=false" >> "$GITHUB_OUTPUT"
