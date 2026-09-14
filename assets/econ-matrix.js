@@ -152,7 +152,7 @@
     SEK: {
       gdp:   ['GDP Growth Rate QoQ', 'GDP QoQ'],
       cpi:   ['CPIF YoY'],
-      cpimom:['CPIF MoM'],
+      cpimom:['CPIF MoM', 'Inflation Rate MoM', 'CPI MoM'],
       core:  ['Inflation Rate YoY', 'CPI YoY'],
       ppi:   ['PPI YoY', 'PPI MoM'], 
       rtl:   ['Retail Sales MoM', 'Retail Sales YoY'],
@@ -220,6 +220,9 @@
     'ex-food/ex-energy core measure \u2014 shown here instead of the more volatile CPIF ' +
     'excl. Energy series, for reliability. See CPI YoY column for CPIF, ' +
     'the Riksbank\u2019s actual target measure.';
+  const SEK_MOM_IS_HEADLINE_NOTE = 'This is Sweden\u2019s headline CPI MoM, not CPIF MoM ' +
+    '(the Riksbank\u2019s target measure, shown here whenever a fresher CPIF MoM print is ' +
+    'available) \u2014 shown as a fallback for the most recent period covered by the current source.';
 
   function periodLabel(title, ccy, colKey) {
     const t = title.toLowerCase();
@@ -458,11 +461,13 @@
     const sub = (period ? period + ' \u00b7 ' : '') + ref;
     const isEmpProxy = gapKey === 'emp' && EMP_PROXY_CCY.has(ccy);
     const isSekCoreHeadline = gapKey === 'core' && ccy === 'SEK';
+    const isSekMomHeadline = gapKey === 'cpimom' && ccy === 'SEK' && !/CPIF/i.test(ev.event);
     let title = ev.event + ' \u00b7 ' + refDateForTooltip(ev) + (ev.previous != null ? ' \u00b7 prev ' + ev.previous : '');
     if (gapKey === 'emp' && EMP_COMPUTED_CCY.has(ccy)) title += ' \u00b7 ' + EMP_COMPUTED_NOTE;
     else if (gapKey === 'emp' && EMP_EUROSTAT_CCY.has(ccy)) title += ' \u00b7 ' + EMP_EUROSTAT_NOTE;
     else if (isSekCoreHeadline) title += ' \u00b7 ' + SEK_CORE_IS_HEADLINE_NOTE;
-    const marker = (isEmpProxy || isSekCoreHeadline)
+    else if (isSekMomHeadline) title += ' \u00b7 ' + SEK_MOM_IS_HEADLINE_NOTE;
+    const marker = (isEmpProxy || isSekCoreHeadline || isSekMomHeadline)
       ? '<sup style="color:var(--text3);font-size:8px;margin-left:2px;">\u2020</sup>'
       : '';
     return '<td' + (cls ? ' class="' + cls + '"' : '') + ' title="' + _emxEscHtml(title) + '">' +

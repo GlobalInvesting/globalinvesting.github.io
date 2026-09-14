@@ -22,19 +22,26 @@
   }
   let _ccyFilter = loadCcyFilter(); 
 
+  const IMPACT_MODES = new Set(['default', 'all', 'high']);
   const CAL_IMPACT_FILTER_KEY = 'gi_cal_impact_filter';
   function loadImpactFilter() {
-    try { return localStorage.getItem(CAL_IMPACT_FILTER_KEY) === '1'; } catch { return false; }
+    try {
+      const raw = localStorage.getItem(CAL_IMPACT_FILTER_KEY);
+      if (raw === '1') return 'high';
+      return IMPACT_MODES.has(raw) ? raw : 'default';
+    } catch { return 'default'; }
   }
   function saveImpactFilter(v) {
     try {
-      if (v) localStorage.setItem(CAL_IMPACT_FILTER_KEY, '1');
-      else localStorage.removeItem(CAL_IMPACT_FILTER_KEY);
+      if (v === 'default') localStorage.removeItem(CAL_IMPACT_FILTER_KEY);
+      else localStorage.setItem(CAL_IMPACT_FILTER_KEY, v);
     } catch {}
   }
-  let _impactHighOnly = loadImpactFilter();
+  let _impactMode = loadImpactFilter();
   function passesImpactFilter(ev) {
-    return IMPACTS.has(ev.impact) && (!_impactHighOnly || ev.impact === 'high');
+    if (_impactMode === 'all') return true;
+    if (_impactMode === 'high') return ev.impact === 'high';
+    return IMPACTS.has(ev.impact);
   }
 
   let _calWeekOffsetDays = 0;
@@ -49,6 +56,7 @@
   const IMPACT_DOT = {
     high:   { color: 'var(--down)',   label: 'High'   },
     medium: { color: 'var(--orange)', label: 'Medium' },
+    low:    { color: 'var(--text3)',  label: 'Low'    },
   };
 
   const FLAG = { USD:'us', EUR:'eu', GBP:'gb', JPY:'jp', AUD:'au', CAD:'ca', CHF:'ch', NZD:'nz', NOK:'no', SEK:'se' };
@@ -950,7 +958,7 @@
     );
 
     let _hiddenByImpactCount = 0;
-    if (_impactHighOnly) {
+    if (_impactMode === 'high') {
       const _withoutImpactGate = events.filter(ev =>
         G10_CURRENCIES.has(ev.currency) && IMPACTS.has(ev.impact) &&
         (_ccyFilter == null || ev.currency === _ccyFilter) &&
@@ -988,8 +996,8 @@
     ]);
 
     if (!allDates.size) {
-      const emptyMsg = (_impactHighOnly && _hiddenByImpactCount > 0)
-        ? `No high-impact events in this window (${_hiddenByImpactCount} medium/low-impact event${_hiddenByImpactCount === 1 ? '' : 's'} hidden — toggle "High only" off to see them).`
+      const emptyMsg = (_impactMode === 'high' && _hiddenByImpactCount > 0)
+        ? `No high-impact events in this window (${_hiddenByImpactCount} medium-impact event${_hiddenByImpactCount === 1 ? '' : 's'} hidden — switch to "Med+High" or "All" to see them).`
         : 'No events available.';
       container.innerHTML = `<div style="padding:12px 10px;color:var(--text3);font-size:11px;">${emptyMsg}</div>`;
       return;
@@ -1191,10 +1199,10 @@
       ? []
       : (scrollRootsBefore.length ? Array.from(scrollRootsBefore).map(r => r.scrollTop) : [container.scrollTop]);
 
-    const impactNoteHtml = (_impactHighOnly && _hiddenByImpactCount > 0)
+    const impactNoteHtml = (_impactMode === 'high' && _hiddenByImpactCount > 0)
       ? `<div class="cal-impact-hidden-note" style="padding:5px 10px;font-size:10px;` +
         `color:var(--text3);background:var(--bg3);border-bottom:1px solid var(--border2);">` +
-        `Showing high-impact only — ${_hiddenByImpactCount} medium/low-impact event` +
+        `Showing high-impact only — ${_hiddenByImpactCount} medium-impact event` +
         `${_hiddenByImpactCount === 1 ? '' : 's'} hidden this window.</div>`
       : '';
     container.innerHTML = impactNoteHtml + html;
@@ -1240,7 +1248,10 @@
     }));
 
     if (sourceEl) {
-      sourceEl.textContent = `G10 currencies · medium & high impact`;
+      const _srcSuffix = _impactMode === 'all' ? 'all impact levels'
+        : _impactMode === 'high' ? 'high impact only'
+        : 'medium & high impact';
+      sourceEl.textContent = `G10 currencies · ${_srcSuffix}`;
     }
     const thTime = document.getElementById('cal-th-time');
     if (thTime) thTime.textContent = tzLabel();
@@ -1299,6 +1310,12 @@
     if (allBtn) allBtn.style.color = (_ccyFilter == null) ? '#fff' : 'var(--text3)';
   }
 
+  const IMPACT_MODE_BUTTONS = [
+    { mode: 'default', label: 'Med+High', title: 'Show medium and high impact events (default)' },
+    { mode: 'all',     label: 'All',      title: 'Show all events, including low impact' },
+    { mode: 'high',    label: 'High only', title: 'Show only high-impact events' },
+  ];
+
   function setupImpactFilterUI() {
     const box = document.getElementById('cal-impact-filter');
     if (!box) return;
@@ -1309,15 +1326,18 @@
 
     if (box.dataset.calImpactInit !== '1') {
       box.dataset.calImpactInit = '1';
-      box.innerHTML =
-        `<button type="button" id="cal-impact-high" style="${btnStyle(_impactHighOnly)}" ` +
-        `title="Show only high-impact events">High only</button>`;
+      box.innerHTML = IMPACT_MODE_BUTTONS.map(b =>
+        `<button type="button" data-impact-mode="${b.mode}" style="${btnStyle(_impactMode === b.mode)}" ` +
+        `title="${b.title}">${b.label}</button>`
+      ).join('');
 
       box.addEventListener('click', (e) => {
-        const btn = e.target.closest('button');
-        if (!btn || btn.id !== 'cal-impact-high') return;
-        _impactHighOnly = !_impactHighOnly;
-        saveImpactFilter(_impactHighOnly);
+        const btn = e.target.closest('button[data-impact-mode]');
+        if (!btn) return;
+        const mode = btn.dataset.impactMode;
+        if (mode === _impactMode) return;
+        _impactMode = mode;
+        saveImpactFilter(_impactMode);
         updateImpactFilterButtonStates();
         relayoutCalendar();
       });
@@ -1327,8 +1347,11 @@
   }
 
   function updateImpactFilterButtonStates() {
-    const btn = document.getElementById('cal-impact-high');
-    if (btn) btn.style.color = _impactHighOnly ? '#fff' : 'var(--text3)';
+    const box = document.getElementById('cal-impact-filter');
+    if (!box) return;
+    box.querySelectorAll('button[data-impact-mode]').forEach(btn => {
+      btn.style.color = (btn.dataset.impactMode === _impactMode) ? '#fff' : 'var(--text3)';
+    });
   }
 
   function setupWeekNavUI() {
