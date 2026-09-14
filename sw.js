@@ -1,14 +1,14 @@
 
-const CACHE_VERSION = 'gi-v8.484.0';
+const CACHE_VERSION = 'gi-v8.486.0';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
 const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.457.0',
-  '/assets/dashboard.js?v=8.484.0',
+  '/assets/dashboard.js?v=8.486.0',
   '/assets/gi-auth.js?v=1.7.8',
   '/assets/gi-overview.js?v=2.0.1',
-  '/assets/fx-websocket.js?v=1.0.1',
+  '/assets/fx-websocket.js?v=1.0.2',
   '/assets/cot-modal-chart.js?v=7.99.0',
   '/assets/cb-rates-modal.js?v=8.0.8',
   '/assets/real-carry-modal.js?v=2.7.10',
