@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-15T21:56:24Z",
+  "generatedAt": "2026-09-15T23:36:11Z",
   "scriptVersion": "1.3",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
@@ -1595,22 +1595,6 @@
     },
     {
       "currency": "AUD",
-      "primary_title": "Australia Ai Group Manufacturing Index",
-      "yahoo_title": "AIG Manufacturing Index*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-01",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": -16.6,
-          "actual_yahoo": -16.6,
-          "previous_primary": -19.6,
-          "previous_yahoo": -19.6
-        }
-      }
-    },
-    {
-      "currency": "AUD",
       "primary_title": "Australia Gross Fixed Capital Formation q/q",
       "yahoo_title": "Gross Fixed Capital Exp SA",
       "evidence": {
@@ -2674,10 +2658,26 @@
           "dateISO": "2026-09-15",
           "forecast_primary": 4.8,
           "forecast_yahoo": null,
-          "actual_primary": null,
+          "actual_primary": 4.9,
           "actual_yahoo": 4.9,
           "previous_primary": 4.9,
           "previous_yahoo": 4.9
+        }
+      }
+    },
+    {
+      "currency": "NZD",
+      "primary_title": "New Zealand Current Account - GDP Ratio",
+      "yahoo_title": "Current Account/GDP",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-15",
+          "forecast_primary": -3.5,
+          "forecast_yahoo": null,
+          "actual_primary": -3.2,
+          "actual_yahoo": -3.2,
+          "previous_primary": -3.6,
+          "previous_yahoo": -3.6
         }
       }
     }
