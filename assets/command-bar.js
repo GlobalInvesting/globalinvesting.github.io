@@ -69,7 +69,7 @@
     if (!row) return;
     closeOtherOpenDetails(row);
     row.click();
-    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    row.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function renderResults(query) {
