@@ -1,25 +1,21 @@
-name: Update Economic Calendar (private)
+name: Update Economic Calendar (calendar.json)
 #
-# v2 FIX (2026-08-16): The `workflow_run` trigger below listened for
-# "Update ForexFactory Calendar" completions, but that workflow lives in
-# GlobalInvesting/globalinvesting.github.io — a different repository than
-# this file. workflow_run only fires for workflows hosted in the SAME repo
-# as the listener; it silently never fired here. `workflow_call` was also
-# dead — nothing in either repo ever invoked this workflow via `uses:`. In
-# practice this workflow only ever ran on its raw 4x/day schedule below,
-# so any actual/forecast landing in ff_calendar.json just after a schedule
-# window closed could sit unreflected in calendar.json (and therefore in
-# the Economic Matrix / Economic Surprises Index, both of which read only
-# calendar.json, never ff_calendar.json) for up to ~9 hours — caught live
-# when two JPY GDP releases updated the Economic Calendar panel instantly
-# (it reads ff_calendar.json directly) but the Matrix/ESI stayed stale.
-# Fixed the same way v5.3 of update-ff-calendar.yml fixed the identical
-# cross-repo workflow_run mistake for cb-rate-decision: replaced with a
-# `repository_dispatch` listener, paired with a new dispatch step added to
-# update-ff-calendar.yml (event_type: calendar-actual-changed) that POSTs
-# to this repo's /dispatches endpoint using SCRIPTS_PAT whenever a fresh
-# actual is written. See update-ff-calendar.yml's matching step for the
-# full explanation and CHANGELOG.md v8.162.0.
+# This workflow builds calendar-data/calendar.json (the source for the
+# Economic Matrix and Economic Surprises Index) from economic-events.json.
+# It runs in this repo so it uses free public-repo Actions minutes; the
+# private-scripts checkout below only pulls in the fetch script itself.
+#
+# v8.494.0 FIX (2026-09-15): this workflow used to live in the private
+# globalinvesting-scripts repo and was moved here specifically to stop
+# consuming that repo's budgeted Actions minutes -- confirmed via GitHub's
+# own Actions usage report showing this workflow's runs (207 in the
+# current billing cycle, far above its own 4x/day schedule) as the
+# largest single consumer of the private repo's monthly allowance. The
+# repository_dispatch[calendar-actual-changed] listener below is fed by a
+# step in update-economic-calendar-primary.yml, in this same repo -- no
+# cross-repo PAT is needed on either side of that dispatch. See that
+# workflow's own dispatch step (same session's fix) and CHANGELOG.md
+# v8.494.0.
 on:
   workflow_call:
     secrets:
@@ -49,11 +45,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Checkout public repo
+      - name: Checkout repo
         uses: actions/checkout@v6
-        with:
-          repository: GlobalInvesting/globalinvesting.github.io
-          token: ${{ secrets.SCRIPTS_PAT }}
 
       - name: Checkout private scripts
         uses: actions/checkout@v6
