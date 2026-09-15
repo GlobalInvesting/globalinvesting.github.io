@@ -95,7 +95,6 @@ jobs:
             exit 0
           fi
 
-          cp calendar-data/calendar.json /tmp/calendar_fresh.json
           cp calendar-data/event-title-aliases.json /tmp/event_title_aliases_fresh.json
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
@@ -103,7 +102,18 @@ jobs:
             echo "--- Attempt $i ---"
             git fetch origin main
             git reset --hard origin/main
-            cp /tmp/calendar_fresh.json calendar-data/calendar.json
+            # v2.2 FIX (2026-09-15): calendar.json has other independent
+            # writers in this same window (update-economic-calendar.yml,
+            # calendar-watcher.js's own direct-commit fallback) — a blind cp
+            # of this run's once-computed file over the just-reset remote
+            # state discards whatever either of them committed between this
+            # run's checkout and this retry. Re-merge instead of overwrite,
+            # reusing this run's already-fetched TE data (never re-fetched
+            # here). See fetch_te_calendar.py v2.2 and CHANGELOG.md.
+            python3 private-scripts/fetch_te_calendar.py --remerge /tmp/te_full_events_fresh.json
+            # event-title-aliases.json has exactly one writer in this
+            # pipeline (this same step) — safe to restore this run's own
+            # computed copy directly, no race to protect against.
             cp /tmp/event_title_aliases_fresh.json calendar-data/event-title-aliases.json
             git add calendar-data/calendar.json calendar-data/event-title-aliases.json
             if git diff --quiet && git diff --staged --quiet; then

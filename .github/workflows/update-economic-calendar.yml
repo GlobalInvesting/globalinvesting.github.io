@@ -1,0 +1,158 @@
+name: Update Economic Calendar (private)
+#
+# v2 FIX (2026-08-16): The `workflow_run` trigger below listened for
+# "Update ForexFactory Calendar" completions, but that workflow lives in
+# GlobalInvesting/globalinvesting.github.io — a different repository than
+# this file. workflow_run only fires for workflows hosted in the SAME repo
+# as the listener; it silently never fired here. `workflow_call` was also
+# dead — nothing in either repo ever invoked this workflow via `uses:`. In
+# practice this workflow only ever ran on its raw 4x/day schedule below,
+# so any actual/forecast landing in ff_calendar.json just after a schedule
+# window closed could sit unreflected in calendar.json (and therefore in
+# the Economic Matrix / Economic Surprises Index, both of which read only
+# calendar.json, never ff_calendar.json) for up to ~9 hours — caught live
+# when two JPY GDP releases updated the Economic Calendar panel instantly
+# (it reads ff_calendar.json directly) but the Matrix/ESI stayed stale.
+# Fixed the same way v5.3 of update-ff-calendar.yml fixed the identical
+# cross-repo workflow_run mistake for cb-rate-decision: replaced with a
+# `repository_dispatch` listener, paired with a new dispatch step added to
+# update-ff-calendar.yml (event_type: calendar-actual-changed) that POSTs
+# to this repo's /dispatches endpoint using SCRIPTS_PAT whenever a fresh
+# actual is written. See update-ff-calendar.yml's matching step for the
+# full explanation and CHANGELOG.md v8.162.0.
+on:
+  workflow_call:
+    secrets:
+      SCRIPTS_PAT:
+        required: true
+  repository_dispatch:
+    types:
+    - calendar-actual-changed
+  schedule:
+  - cron: '30 5 * * *'
+  - cron: '30 9 * * *'
+  - cron: '30 13 * * *'
+  - cron: '30 20 * * *'
+  workflow_dispatch: null
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+concurrency:
+  group: update-economic-calendar
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update-economic-calendar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout public repo
+        uses: actions/checkout@v6
+        with:
+          repository: GlobalInvesting/globalinvesting.github.io
+          token: ${{ secrets.SCRIPTS_PAT }}
+
+      - name: Checkout private scripts
+        uses: actions/checkout@v6
+        with:
+          repository: GlobalInvesting/globalinvesting-scripts
+          token: ${{ secrets.SCRIPTS_PAT }}
+          path: private-scripts
+
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests --break-system-packages
+
+      - name: Create calendar-data directory
+        run: mkdir -p calendar-data
+
+      - name: Build calendar.json from economic-events.json
+        run: python private-scripts/fetch_economic_calendar.py
+
+      - name: Display summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "    ECONOMIC CALENDAR FETCH SUMMARY"
+          echo "========================================"
+          if [ -f "calendar-data/calendar.json" ]; then
+            python3 -c "
+          import json
+          from datetime import datetime, timezone, timedelta
+          with open('calendar-data/calendar.json') as f:
+              cal = json.load(f)
+          events = cal.get('events', [])
+          today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+          cutoff_90 = (datetime.now(timezone.utc) - timedelta(days=90)).strftime('%Y-%m-%d')
+          released_90  = [e for e in events if e.get('actual') and e.get('dateISO','') >= cutoff_90]
+          beat_miss_90 = [e for e in released_90 if e.get('forecast')]
+          high_today   = [e for e in events if e.get('impact') == 'high' and e.get('dateISO') == today]
+          print(f'  Source: {cal.get(\"source\",\"unknown\")}')
+          print(f'  Total events: {len(events)}')
+          print(f'  Released (90d): {len(released_90)} | with beat/miss data: {len(beat_miss_90)}')
+          print(f'  High-impact today ({today}): {len(high_today)}')
+          for e in high_today:
+              print(f'    {e[\"timeUTC\"]} [{e[\"currency\"]}] {e[\"event\"][:45]} | actual={e.get(\"actual\") or \"pending\"} forecast={e.get(\"forecast\") or \"—\"}')"
+          else
+            echo "  calendar.json not found"
+          fi
+
+      - name: Commit and push
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
+          for i in 1 2 3 4 5; do
+            echo "--- Push attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+            mkdir -p calendar-data
+            # v3.15 FIX (2026-09-15): same incident class as
+            # fetch_economic_calendar_primary.py v1.7 / fetch_te_calendar.py
+            # v2.2 — calendar.json has other independent writers in this
+            # same window (update-calendar-completeness.yml,
+            # calendar-watcher.js's own direct-commit fallback), so blindly
+            # cp-ing this run's once-computed output over the just-reset
+            # remote state discards whatever either of them committed
+            # between this run's checkout and this retry. Unlike those two
+            # fixes, no --remerge mode is needed here: this script's own
+            # main() already reads calendar-data/calendar.json fresh from
+            # disk on every call (load_previous_calendar(), Step 3) and
+            # merges it against economic-events.json (this script's other
+            # input, untouched within this job — never modified by any
+            # writer this workflow itself races against) — so simply
+            # re-running the script against the just-reset file re-derives
+            # correct output on every retry, at zero extra network cost.
+            # See fetch_economic_calendar.py's module header and
+            # CHANGELOG.md.
+            python private-scripts/fetch_economic_calendar.py
+            BEAT_MISS=$(python3 -c "
+          import json
+          from datetime import datetime, timezone, timedelta
+          c = json.load(open('calendar-data/calendar.json'))
+          cutoff = (datetime.now(timezone.utc) - timedelta(days=90)).strftime('%Y-%m-%d')
+          n = sum(1 for e in c['events'] if e.get('actual') and e.get('forecast') and e.get('dateISO','') >= cutoff)
+          print(f'{n} beat/miss events (90d)')
+          " 2>/dev/null || echo "updated")
+            git add calendar-data/calendar.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
+              exit 0
+            fi
+            git commit -m "Economic calendar ${TIMESTAMP} — ${BEAT_MISS}"
+            if git push origin main; then
+              echo "✅ Push succeeded on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          exit 0
