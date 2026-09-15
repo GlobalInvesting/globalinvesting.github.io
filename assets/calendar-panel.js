@@ -1207,19 +1207,44 @@
       : '';
     container.innerHTML = impactNoteHtml + html;
 
+    // v1.21.0 FIX (2026-09-15): restoring a periodic-refresh (or fullscreen-
+    // relayout) scroll position used to be deferred two requestAnimationFrame
+    // callbacks after container.innerHTML was replaced. That guarantees the
+    // browser paints at least once with scrollTop reset to 0 (the fresh
+    // innerHTML's default) BEFORE the restore runs on the next frame — a
+    // visible snap-to-top-then-back-down flash on every 90s poll, most
+    // noticeable in the large fullscreen overlay (openCalFullscreen()
+    // reparents this same #cal-events-body node and calls relayoutCalendar(),
+    // which is not a first render, so this is the branch that ran on every
+    // fullscreen relayout too). Setting scrollTop on a freshly-inserted
+    // element does not need to wait for a paint — reading/writing scrollTop
+    // forces the synchronous layout it needs on its own — so the restore for
+    // an already-initialized container now runs immediately, in the same
+    // task as the innerHTML swap, before the browser ever gets a chance to
+    // paint the intermediate reset-to-0 state. Only the isFirstRender branch
+    // (scrollCalTo of today's/next row) still needs the double-rAF: that one
+    // computes target offsets, which do benefit from a settled layout pass.
+    if (!isFirstRender) {
+      const roots = container.querySelectorAll('.cal-col-wrap');
+      if (roots.length) {
+        // Column count can legitimately change between renders (e.g.
+        // entering/leaving the fullscreen-only split-column layout) — only
+        // trust an index-for-index restore when the shape actually matches;
+        // otherwise fall back to each column's own top rather than mapping
+        // a stale index onto a differently-laid-out column.
+        const shapeMatches = roots.length === savedScrollTops.length;
+        roots.forEach((r, i) => { r.scrollTop = shapeMatches ? (savedScrollTops[i] || 0) : 0; });
+      } else {
+        container.scrollTop = savedScrollTops[0] || 0;
+      }
+    }
+
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const todayRow      = container.querySelector('[data-today="1"]');
       const firstUpcoming = container.querySelector('[data-upcoming="1"]');
       const scrollRootFor = el => (el && el.closest('.cal-col-wrap')) || container;
 
-      if (!isFirstRender) {
-        const roots = container.querySelectorAll('.cal-col-wrap');
-        if (roots.length) {
-          roots.forEach((r, i) => { r.scrollTop = savedScrollTops[i] || 0; });
-        } else {
-          container.scrollTop = savedScrollTops[0] || 0;
-        }
-      } else {
+      if (isFirstRender) {
         if (todayRow) {
           scrollCalTo(scrollRootFor(todayRow), todayRow);
         } else if (firstUpcoming) {
