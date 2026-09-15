@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-15T06:02:58Z",
-  "generatedAt": "2026-09-15T06:02:58Z",
+  "lastUpdate": "2026-09-15T06:46:51Z",
+  "generatedAt": "2026-09-15T06:46:51Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1612,6 +1612,26 @@
       "n": 2,
       "mean": -0.5,
       "std": 1.272792
+    },
+    "EUR/france cpi mom": {
+      "n": 2,
+      "mean": 0.2,
+      "std": 0.282843
+    },
+    "EUR/france cpi yoy": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.070711
+    },
+    "EUR/france hicp mom": {
+      "n": 2,
+      "mean": 0.25,
+      "std": 0.494975
+    },
+    "EUR/france hicp yoy": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.212132
     },
     "CAD/gdp growth rate qoq": {
       "n": 2,
@@ -59779,7 +59799,7 @@
       "flag": "🇪🇺",
       "event": "France CPI m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": "0.7%",
       "previous": "0.7%"
     },
@@ -59792,7 +59812,7 @@
       "flag": "🇪🇺",
       "event": "France CPI y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "2.4%",
       "forecast": "2.4%",
       "previous": "2.4%"
     },
@@ -59805,7 +59825,7 @@
       "flag": "🇪🇺",
       "event": "France HICP m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.7%",
       "forecast": "0.8%",
       "previous": "0.8%"
     },
@@ -59818,7 +59838,7 @@
       "flag": "🇪🇺",
       "event": "France HICP y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "2.6%",
       "forecast": "2.7%",
       "previous": "2.7%"
     },
