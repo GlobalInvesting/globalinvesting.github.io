@@ -64,12 +64,29 @@
 
   function goToPair(id) {
     var sym = 'FX_IDC:' + id.toUpperCase();
-    var row = document.querySelector('#fx-pairs-tbody tr[data-sym="' + sym + '"]') ||
-      document.querySelector('#sidebar .sb-row[data-sym="' + sym + '"]');
+    var majorRow = document.querySelector('#fx-pairs-tbody tr[data-sym="' + sym + '"]');
+    var crossRow = !majorRow && document.querySelector('#sidebar .sb-row[data-sym="' + sym + '"]');
+    var row = majorRow || crossRow;
     if (!row) return;
     closeOtherOpenDetails(row);
     row.click();
-    row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (majorRow) {
+      // Majors table has no scroll container of its own — scrolling the row
+      // into view legitimately scrolls the page, which is the only option.
+      row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      // Crosses live inside #sidebar, which has its own overflow-y:auto.
+      // row.scrollIntoView() would walk every scrollable ancestor — including
+      // the page itself — not just the nearest one, moving the whole layout
+      // instead of only the sidebar's internal scroll. Scroll #sidebar
+      // directly instead, aligning the row to its top (same intent as the
+      // majors' block:'start', scoped to the sidebar's own scrollbox).
+      var sidebar = document.getElementById('sidebar');
+      if (sidebar) {
+        var delta = row.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
+        sidebar.scrollTo({ top: sidebar.scrollTop + delta, behavior: 'smooth' });
+      }
+    }
   }
 
   function renderResults(query) {
