@@ -1,15 +1,12 @@
 (function () {
   'use strict';
 
-  var CMDBAR_PAIR_IDS = [
-    'eurusd', 'gbpusd', 'usdjpy', 'audusd', 'usdchf', 'usdcad', 'nzdusd', 'usdnok', 'usdsek',
-    'eurnok', 'eursek', 'eurgbp', 'eurjpy', 'eurchf', 'eurcad', 'euraud', 'gbpjpy', 'gbpchf',
-    'gbpcad', 'audjpy', 'audnzd', 'audchf', 'cadjpy', 'chfjpy', 'nzdjpy', 'eurnzd', 'gbpaud',
-    'gbpnzd', 'audcad', 'cadchf', 'nzdcad', 'nzdchf'
-  ];
-
   var overlay, input, resultsEl, lastFocused, activeIndex;
   activeIndex = -1;
+
+  function pairIds() {
+    return (Array.isArray(window.PAIRS) ? window.PAIRS : []).map(function (p) { return p.id; });
+  }
 
   function pairLabel(id) {
     return id.slice(0, 3).toUpperCase() + '/' + id.slice(3).toUpperCase();
@@ -31,7 +28,7 @@
     var q = normalize(query);
     var out = [];
     if (!q) return out;
-    CMDBAR_PAIR_IDS.forEach(function (id) {
+    pairIds().forEach(function (id) {
       if (normalize(id).indexOf(q) !== -1) {
         out.push({ type: 'pair', id: id, label: pairLabel(id) });
       }
@@ -54,23 +51,25 @@
     if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
+  function closeOtherOpenDetails(exceptRow) {
+    var openMajor = document.querySelector('#fx-pairs-tbody tr.pd-selected');
+    if (openMajor && openMajor !== exceptRow && typeof window.toggleInlineDetail === 'function') {
+      window.toggleInlineDetail(openMajor);
+    }
+    var openCross = document.querySelector('#sidebar .sb-row.sb-selected');
+    if (openCross && openCross !== exceptRow && typeof window.toggleSidebarDetail === 'function') {
+      window.toggleSidebarDetail(openCross);
+    }
+  }
+
   function goToPair(id) {
     var sym = 'FX_IDC:' + id.toUpperCase();
-
     var row = document.querySelector('#fx-pairs-tbody tr[data-sym="' + sym + '"]') ||
       document.querySelector('#sidebar .sb-row[data-sym="' + sym + '"]');
-
-    if (row) {
-      row.click();
-      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    if (typeof window.loadTVChart === 'function') {
-      window.loadTVChart(sym);
-    }
-    var section = document.getElementById('section-fxpairs');
-    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!row) return;
+    closeOtherOpenDetails(row);
+    row.click();
+    row.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function renderResults(query) {

@@ -71,6 +71,7 @@ const PAIRS = [
   { id:'nzdcad', base:'NZD', quote:'CAD', cross:['NZD','CAD'], dec:5 },
   { id:'nzdchf', base:'NZD', quote:'CHF', cross:['NZD','CHF'], dec:5 },
 ];
+window.PAIRS = PAIRS;
 
 async function renderFairValue() {
   const accWrap = document.getElementById('fv-accumulating');
