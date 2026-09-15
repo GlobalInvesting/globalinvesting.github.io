@@ -1,63 +1,51 @@
 {
-  "generated_at": "2026-09-14T13:28:35Z",
+  "generated_at": "2026-09-15T00:01:32Z",
   "signals": [
     {
-      "time": "13:24",
+      "time": "00:00",
       "priority": "critical",
-      "title": "USD/SEK — G10 Bilateral Theme + Policy Divergence",
-      "text": "The G10 scorecard flags a dominant bilateral theme with USD outperforming (+0.584% 1W avg across 9 pairs) and SEK lagging (−0.727% 1W avg across 2 pairs), creating a 1.311% spread. USD/SEK trades at 9.689, holding above its SMA20/50/200 cluster (SMA20 at 9.552), while the Economic Surprise Index underscores fundamental divergence with USD at +1.7 against SEK at a severe −22.6. Sweden's latest CPI print missed expectations at −0.3% m/m versus 0.2% forecast, reinforcing SEK weakness, while Fed 3.75% vs SEK 1.75% provides a +200bp carry advantage for the dollar. Trade bias: Long USD/SEK; broad dollar strength and Swedish disinflation drive trend continuation. Catalyst: US Retail Sales release today at 12:30 UTC. Risk: Scorecard spread compresses below 0.80%, signaling an abatement of the G10 bilateral divergence.",
+      "title": "USD/SEK — G10 Bilateral Theme + ESI Divergence",
+      "text": "USD/SEK trades at 9.747, holding above its SMA20/50/200 cluster (SMA20 at 9.564) in a clear bullish trend structure. The G10 currency scorecard shows USD outperforming as the top leader (+0.396% 1W avg across 9 pairs) while SEK sits as the weakest laggard (-0.521% 1W avg across 2 pairs), creating a notable 0.918% leader-to-laggard spread. Fundamental momentum reinforces this cross-asset divergence, as Sweden's Economic Surprise Index sits deeply negative at -29.2 while the US holds a neutral +0.4 read. COT positioning reflects this structural divergence, with SEK spec positioning at the 14th percentile of its 52-week range while USD net long positioning remains firm. Trade bias: Bullish USD/SEK; broad dollar strength and Swedish macroeconomic underperformance favor upside continuation. Catalyst: US Retail Sales release at 12:30 UTC. Risk: A downside break below the SMA20 level at 9.564 invalidates the immediate bullish structure.",
       "evidence": [
-        "USD 1W avg: +0.584% (n=9)",
-        "SEK 1W avg: -0.727% (n=2)",
-        "G10 spread: 1.311%"
+        "USD 1W avg: +0.396% (n=9)",
+        "SEK 1W avg: -0.521% (n=2)",
+        "G10 spread: 0.918%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "13:21",
-      "priority": "critical",
-      "title": "USD/JPY — Carry Differential + Options Put Skew",
-      "text": "USD/JPY trades at 154.82, positioned below its SMA20/50/200 cluster (SMA20 at 157.62). BoJ holds at 1.0%. Speculative positioning shows JPY COT Leveraged Funds net short at −53,255, though a massive WoW add of +58,042 reflects rapid short covering. The 25d Risk Reversals print at −1.95, indicating a strong options put skew as institutional players buy downside protection against intervention or BoJ hawkishness. Trade bias: Long USD/JPY; carry advantage dominates while spot holds below intervention-alert zones. Catalyst: BoJ Rate Decision on 18 Sep. Risk: A hawkish BoJ hike combined with VIX breaking above 25 forces an abrupt carry unwind.",
-      "evidence": [
-        "USD/JPY OIS carry: +264bp",
-        "USDJPY 25d RR: -1.95",
-        "JPY COT LF net: −53,255"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "13:19",
+      "time": "23:55",
       "priority": "warning",
-      "title": "EUR/USD — Rate Differential + Positioning Squeeze",
-      "text": "EUR/USD trades at 1.1539, maintaining a position above its SMA50 at 1.1532 but below the SMA20/200 level at 1.1630. Fed 3.75% vs ECB 2.65% establishes a 110bp rate differential favoring USD (+143bp on an OIS SOFR/€STR basis), keeping structural topside capped. COT Leveraged Funds remain net short EUR at −46,381 contracts (34th percentile), though WoW flows show +6,403 adds as specs cover shorts ahead of upcoming central bank decisions. One-month ATM implied volatility sits at 5.1% against 4.4% 30-day realized volatility, yielding a modest +0.7% vol risk premium. Trade bias: Bearish EUR/USD; monetary policy divergence limits upside recovery. Catalyst: ECB President Lagarde speech at 15:15 UTC today. Risk: A decisive close above the 1.1630 SMA cluster triggers a broader spec short-squeeze.",
+      "title": "NZD/USD — Positioning Squeeze vs Policy Bias",
+      "text": "NZD/USD trades at 0.5779, positioned beneath its SMA20/50/200 cluster (SMA20 at 0.5895, SMA50 at 0.5856). Leveraged funds maintain a net short positioning of -18,092 contracts, sitting at an extreme 8th percentile of its 52-week range (z-score -1.40). However, spec flows show early short-covering, with WoW additions of +4,912 contracts and 4W adds of +15,939 contracts. RBNZ policy rate sits at 2.75% with a hawkish bias, contrasting with the Fed on hold at 3.75%, while NZD inflation expectations of 2.34% yield a mildly restrictive real rate of +0.41%. Retail sentiment is heavily long at 79%, creating an institutional versus retail positioning split near technical support. Trade bias: Bullish NZD/USD; deeply depressed speculative positioning leaves the pair vulnerable to an asymmetric short squeeze on hawkish domestic data. Catalyst: New Zealand GDP release at 22:45 UTC. Risk: A breach of key support below 0.5750 invalidates the short-squeeze thesis.",
       "evidence": [
-        "Fed 3.75% vs ECB 2.65% — 110bp",
-        "EUR COT LF net: −46,381",
-        "EUR/USD IV vs HV30: 5.1% / 4.4%"
+        "NZD COT LF net: -18,092",
+        "NZD COT pctl(52w): 8",
+        "NZD/USD: 0.5779"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "13:16",
+      "time": "23:52",
       "priority": "warning",
-      "title": "AUD/USD — COT Extreme vs OIS Carry Advantage",
-      "text": "AUD/USD trades at 0.7116, holding above its SMA20/50/200 cluster (SMA20 at 0.7168). COT Leveraged Funds show AUD net long at +48,379 contracts, placing positioning at the 93rd percentile (z-score +1.72) of its 52-week range—a crowded speculative long setup. Conversely, retail sentiment sits at 73% short, presenting a sharp institutional versus retail divergence. AONIA at 4.35% vs SOFR at 3.62% yields a −73bp OIS carry differential favoring the Australian dollar, reinforced by RBA rate hike expectations. Trade bias: Long AUD/USD; carry advantage supports the pair despite late-trend positioning saturation. Catalyst: US Retail Sales release at 12:30 UTC. Risk: A sharp risk-off shift flattens carry demand and triggers an unwind of crowded spec longs.",
+      "title": "AUD/USD — Crowded Spec Long vs Volatility Premium",
+      "text": "AUD/USD trades at 0.7140, hovering between its SMA50 at 0.7073 and SMA20 at 0.7170. Leveraged fund positioning is highly crowded at net long +48,379 contracts, placing it at the 93rd percentile of its 52-week history (z-score +1.72). WoW net positioning stalled with a reduction of -1,871 contracts, pointing to late-trend fatigue as price advances stall. In options markets, 1M ATM implied volatility runs at 7.5% against 30-day realized volatility of 5.7%, generating an elevated Vol Risk Premium of +1.9% alongside a -0.78 risk reversal put skew. The RBA rate at 4.35% vs Fed at 3.75% delivers a -60bp rate differential (-73bp OIS basis), supporting AUD carry but offering limited further expansion. Trade bias: Bearish AUD/USD; overextended speculative long positioning and elevated options downside hedging signal late-trend vulnerability. Catalyst: US Retail Sales at 12:30 UTC ahead of the FOMC statement. Risk: A sustained breakout above the SMA20 level at 0.7170 confirms trend continuation and invalidates positioning exhaustion.",
       "evidence": [
-        "AUD COT LF net: +48,379 (pctl 93)",
-        "AUD/USD OIS carry: -73bp",
-        "AUD/USD Retail: 73% short"
+        "AUD COT pctl(52w): 93",
+        "AUD/USD VRP: +1.9%",
+        "AUD/USD 25d RR: -0.78"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "13:10",
+      "time": "23:48",
       "priority": "info",
-      "title": "USD/CHF — Volatility Complacency + Carry Support",
-      "text": "USD/CHF trades at 0.8178, operating above its SMA20/50/200 cluster (SMA20 at 0.8074). Fed 3.75% vs SNB 0.00% creates a +375bp carry differential favoring the dollar, providing steady structural support. Options markets exhibit notable complacency, with 1M implied volatility at 6.8% versus 30-day realized volatility at 7.5%, generating a negative vol risk premium of −0.7%. The 25d Risk Reversals print at −0.43, reflecting only a mild put skew despite the Swiss Franc's positive Economic Surprise Index (+22.8). Trade bias: Bullish USD/CHF; substantial carry buffer offsets mild option-market mispricing. Catalyst: SNB Interest Rate Decision on 24 Sep. Risk: A sudden surge in global market volatility triggers flight-to-safety flows into CHF.",
+      "title": "USD/CHF — Options Complacency at Range Highs",
+      "text": "USD/CHF trades at 0.8174, holding firm above its SMA20/50/200 cluster (SMA20 at 0.8077). Fed at 3.75% vs SNB at 0.00% maintains a massive +375bp policy rate advantage in favor of the dollar, driving structural carry interest. However, options pricing exhibits notable complacency: 1M ATM implied volatility sits at 6.8% vs 30-day realized volatility of 7.3%, yielding a negative Vol Risk Premium of -0.5%. Leveraged fund positioning remains net short CHF at -13,968 contracts (12th percentile of 52-week range), confirming institutional preference for using CHF as a funding currency. Meanwhile, Switzerland's Economic Surprise Index shows robust outperformance at +24.4, providing underlying macro support to the franc against non-USD crosses. Trade bias: Bullish USD/CHF; substantial carry spread dominates intraday flows despite option market volatility compression. Catalyst: SNB Interest Rate Decision on 24 Sep. Risk: Sudden risk-off equity liquidation driving sharp safe-haven demand into CHF.",
       "evidence": [
-        "USD/CHF carry: Fed 3.75% vs SNB 0.0% — +375bp",
-        "USD/CHF VRP: -0.7% (IV 6.8% vs HV30 7.5%)",
-        "USD/CHF 25d RR: -0.43"
+        "USD/CHF VRP: -0.5%",
+        "USD/CHF Carry Spread: +375bp",
+        "CHF COT pctl(52w): 12"
       ],
       "_source": "engine-ai-primary"
     }
