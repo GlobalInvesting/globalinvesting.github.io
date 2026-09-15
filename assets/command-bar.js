@@ -62,6 +62,18 @@
     }
   }
 
+  function _nearestScrollableAncestor(el) {
+    var node = el.parentElement;
+    while (node && node !== document.body) {
+      var style = window.getComputedStyle(node);
+      if ((style.overflowY === 'auto' || style.overflowY === 'scroll') && node.scrollHeight > node.clientHeight) {
+        return node;
+      }
+      node = node.parentElement;
+    }
+    return null;
+  }
+
   function goToPair(id) {
     var sym = 'FX_IDC:' + id.toUpperCase();
     var majorRow = document.querySelector('#fx-pairs-tbody tr[data-sym="' + sym + '"]');
@@ -75,16 +87,16 @@
       // into view legitimately scrolls the page, which is the only option.
       row.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-      // Crosses live inside #sidebar, which has its own overflow-y:auto.
-      // row.scrollIntoView() would walk every scrollable ancestor — including
-      // the page itself — not just the nearest one, moving the whole layout
-      // instead of only the sidebar's internal scroll. Scroll #sidebar
-      // directly instead, aligning the row to its top (same intent as the
-      // majors' block:'start', scoped to the sidebar's own scrollbox).
-      var sidebar = document.getElementById('sidebar');
-      if (sidebar) {
-        var delta = row.getBoundingClientRect().top - sidebar.getBoundingClientRect().top;
-        sidebar.scrollTo({ top: sidebar.scrollTop + delta, behavior: 'smooth' });
+      // A cross row's real scroll container isn't #sidebar (which stacks every
+      // panel — FX Liquidity, Crosses, Carry Trade Ranking, Watchlist — into
+      // one shared scroll) but the Crosses list's OWN inner overflow-y:auto
+      // box. Walk up from the row to find that nearest genuinely-scrollable
+      // ancestor and scroll only it, so opening a detail never drags the rest
+      // of the sidebar's panels along with it.
+      var container = _nearestScrollableAncestor(row);
+      if (container) {
+        var delta = row.getBoundingClientRect().top - container.getBoundingClientRect().top;
+        container.scrollTo({ top: container.scrollTop + delta, behavior: 'smooth' });
       }
     }
   }
