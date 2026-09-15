@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-15T11:59:33Z",
+  "generatedAt": "2026-09-15T15:10:01Z",
   "scriptVersion": "1.2",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 71,
+  "aliasCount": 75,
   "aliases": [
     {
       "currency": "EUR",
@@ -251,7 +251,7 @@
         "dateISO": "2026-09-15",
         "forecast_primary": 0.6,
         "forecast_secondary": 0.3,
-        "actual_primary": null,
+        "actual_primary": 0.4,
         "actual_secondary": 0.4,
         "previous_primary": -0.2,
         "previous_secondary": -0.2
@@ -279,8 +279,8 @@
         "dateISO": "2026-09-15",
         "forecast_primary": -0.6,
         "forecast_secondary": -0.6,
-        "actual_primary": null,
-        "actual_secondary": null,
+        "actual_primary": 0.3,
+        "actual_secondary": 0.3,
         "previous_primary": 2.8,
         "previous_secondary": 2.8
       }
@@ -293,8 +293,8 @@
         "dateISO": "2026-09-15",
         "forecast_primary": 13.5,
         "forecast_secondary": 14.0,
-        "actual_primary": null,
-        "actual_secondary": null,
+        "actual_primary": 7.6,
+        "actual_secondary": 7.6,
         "previous_primary": 20.6,
         "previous_secondary": 20.6
       }
@@ -586,7 +586,7 @@
       "evidence": {
         "dateISO": "2026-09-16",
         "forecast_primary": -0.5,
-        "forecast_secondary": 0.6,
+        "forecast_secondary": 0.4,
         "actual_primary": null,
         "actual_secondary": null,
         "previous_primary": 0.0,
@@ -997,6 +997,62 @@
         "actual_secondary": null,
         "previous_primary": 17.0,
         "previous_secondary": 17.0
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Durable Goods Orders m/m",
+      "secondary_title": "United States Durable Goods Orders MoM",
+      "evidence": {
+        "dateISO": "2026-09-25",
+        "forecast_primary": -3.4,
+        "forecast_secondary": null,
+        "actual_primary": null,
+        "actual_secondary": null,
+        "previous_primary": 1.1,
+        "previous_secondary": 1.1
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Core Durable Goods Orders m/m",
+      "secondary_title": "United States Durable Goods Orders Ex Transp MoM",
+      "evidence": {
+        "dateISO": "2026-09-25",
+        "forecast_primary": 0.9,
+        "forecast_secondary": null,
+        "actual_primary": null,
+        "actual_secondary": null,
+        "previous_primary": 0.4,
+        "previous_secondary": 0.4
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Durable Goods Orders excl. Defense m/m",
+      "secondary_title": "United States Durable Goods Orders ex Defense MoM",
+      "evidence": {
+        "dateISO": "2026-09-25",
+        "forecast_primary": 0.1,
+        "forecast_secondary": null,
+        "actual_primary": null,
+        "actual_secondary": null,
+        "previous_primary": 1.3,
+        "previous_secondary": 1.3
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Nondefense Capital Goods Orders excl. Aircraft m/m",
+      "secondary_title": "United States Non Defense Goods Orders Ex Air",
+      "evidence": {
+        "dateISO": "2026-09-25",
+        "forecast_primary": 1.3,
+        "forecast_secondary": null,
+        "actual_primary": null,
+        "actual_secondary": null,
+        "previous_primary": 0.2,
+        "previous_secondary": 0.2
       }
     }
   ]
