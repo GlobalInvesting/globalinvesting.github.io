@@ -56,14 +56,18 @@
 
   function goToPair(id) {
     var sym = 'FX_IDC:' + id.toUpperCase();
-    var qItem = document.querySelector('.q-item[data-sym="' + sym + '"]');
-    if (qItem) {
-      qItem.click();
+
+    var row = document.querySelector('#fx-pairs-tbody tr[data-sym="' + sym + '"]') ||
+      document.querySelector('#sidebar .sb-row[data-sym="' + sym + '"]');
+
+    if (row) {
+      row.click();
+      row.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
+
     if (typeof window.loadTVChart === 'function') {
       window.loadTVChart(sym);
-      return;
     }
     var section = document.getElementById('section-fxpairs');
     if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
