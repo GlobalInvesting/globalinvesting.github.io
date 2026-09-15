@@ -203,15 +203,27 @@
     });
   }
 
+  function isMac() {
+    var uaData = navigator.userAgentData;
+    if (uaData && uaData.platform) return /mac/i.test(uaData.platform);
+    return /mac/i.test(navigator.platform || navigator.userAgent || '');
+  }
+
+  var SEARCH_ICON_SVG = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" ' +
+    'stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' +
+    'aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>';
+
   function buildTrigger() {
     var right = document.querySelector('.topbar-right');
     if (!right) return;
     var btn = document.createElement('button');
     btn.id = 'cmdbar-trigger';
     btn.type = 'button';
+    var mac = isMac();
     btn.setAttribute('aria-label', 'Open command bar');
-    btn.title = 'Command bar (Ctrl+K)';
-    btn.textContent = '\u2318K';
+    btn.title = 'Command bar (' + (mac ? 'Cmd+K' : 'Ctrl+K') + ')';
+    btn.innerHTML = SEARCH_ICON_SVG +
+      '<span id="cmdbar-trigger-label">' + (mac ? '\u2318K' : 'Ctrl K') + '</span>';
     btn.addEventListener('click', openBar);
     right.insertBefore(btn, right.firstChild);
   }
