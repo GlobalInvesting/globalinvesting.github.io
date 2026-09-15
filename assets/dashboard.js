@@ -9493,7 +9493,7 @@ boot();
 setInterval(fetchQuoteBarRT, 60 * 1000);
 setInterval(fetchFrankfurter, 30 * 60 * 1000);
 setInterval(fetchNewsData, 2 * 60 * 1000);
-setInterval(buildRichNarrative, 15 * 60 * 1000);
+setInterval(buildRichNarrative, 3 * 60 * 1000);
 
 (function initCBRatesPoll() {
   let _lastRatesRun = null;  
