@@ -181,7 +181,16 @@ jobs:
             echo "--- Attempt $i ---"
             git fetch origin main
             git reset --hard origin/main
-            cp /tmp/ff_calendar_fresh.json calendar-data/economic-events.json
+            # v1.7 fix: re-merge against the state we just fetched, instead of
+            # blindly overwriting it with the pre-computed fresh file. Between
+            # this run's own checkout and this retry, calendar-watcher.js (or
+            # any other writer) may have committed a stale-actuals recovery
+            # straight to origin/main -- a blind cp here would silently
+            # discard it. --remerge re-runs _merge_preserve_actual() against
+            # the just-reset file so a mid-run recovery survives the retry.
+            # See fetch_economic_calendar_primary.py v1.7 and CHANGELOG.md.
+            python3 private-scripts/fetch_economic_calendar_primary.py --remerge \
+              /tmp/ff_calendar_fresh.json calendar-data/economic-events.json calendar-data/economic-events.json
             git add calendar-data/economic-events.json
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit (race condition resolved)."
