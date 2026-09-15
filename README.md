@@ -34,6 +34,7 @@ The EA runs natively inside MetaTrader 5 as a zero-flicker canvas overlay — li
 - Currency strength heatmap with per-currency pair breakdown, live carry, COT bias, realized vol, and correlations
 - FX liquidity profile with live session indicator (Sydney · Tokyo · London · New York)
 - Configurable alerts (price, HV/IV spread, IV Rank, correlation Z-score, VaR, 25d Risk Reversal, COT positioning rank, FX Fair Value Z-score, economic calendar actuals, regime change) with in-terminal toast/history-tray plus browser notifications
+- Command bar (Ctrl+K / ⌘K) — keyboard-first quick-jump to any of the 32 tracked pairs or any terminal section
 
 ### Central Bank Intelligence
 - Policy rates for all 10 G10 central banks with rate cycle direction
