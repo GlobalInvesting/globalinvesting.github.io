@@ -1,21 +1,5 @@
 name: Update Economic Calendar (calendar.json)
-#
-# This workflow builds calendar-data/calendar.json (the source for the
-# Economic Matrix and Economic Surprises Index) from economic-events.json.
-# It runs in this repo so it uses free public-repo Actions minutes; the
-# private-scripts checkout below only pulls in the fetch script itself.
-#
-# v8.494.0 FIX (2026-09-15): this workflow used to live in the private
-# globalinvesting-scripts repo and was moved here specifically to stop
-# consuming that repo's budgeted Actions minutes -- confirmed via GitHub's
-# own Actions usage report showing this workflow's runs (207 in the
-# current billing cycle, far above its own 4x/day schedule) as the
-# largest single consumer of the private repo's monthly allowance. The
-# repository_dispatch[calendar-actual-changed] listener below is fed by a
-# step in update-economic-calendar-primary.yml, in this same repo -- no
-# cross-repo PAT is needed on either side of that dispatch. See that
-# workflow's own dispatch step (same session's fix) and CHANGELOG.md
-# v8.494.0.
+
 on:
   workflow_call:
     secrets:
@@ -108,24 +92,7 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             mkdir -p calendar-data
-            # v3.15 FIX (2026-09-15): same incident class as
-            # fetch_economic_calendar_primary.py v1.7 / fetch_te_calendar.py
-            # v2.2 — calendar.json has other independent writers in this
-            # same window (update-calendar-completeness.yml,
-            # calendar-watcher.js's own direct-commit fallback), so blindly
-            # cp-ing this run's once-computed output over the just-reset
-            # remote state discards whatever either of them committed
-            # between this run's checkout and this retry. Unlike those two
-            # fixes, no --remerge mode is needed here: this script's own
-            # main() already reads calendar-data/calendar.json fresh from
-            # disk on every call (load_previous_calendar(), Step 3) and
-            # merges it against economic-events.json (this script's other
-            # input, untouched within this job — never modified by any
-            # writer this workflow itself races against) — so simply
-            # re-running the script against the just-reset file re-derives
-            # correct output on every retry, at zero extra network cost.
-            # See fetch_economic_calendar.py's module header and
-            # CHANGELOG.md.
+
             python private-scripts/fetch_economic_calendar.py
             BEAT_MISS=$(python3 -c "
           import json
