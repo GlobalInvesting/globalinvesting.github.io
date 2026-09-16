@@ -1228,7 +1228,7 @@ function computeCBTrend(obs) {
 async function fetchCBRates() {
   const promises = CB_CONFIG.map(async cfg => {
     try {
-      const r = await fetch('./rates/' + cfg.file + '.json');
+      const r = await fetch('./rates/' + cfg.file + '.json', { cache: 'no-store' });
       if (!r.ok) return null;
       const data = await r.json();
       const obs = data.observations;
@@ -8209,7 +8209,7 @@ async function fetchCarryRanking() {
       const cached = STATE.cbRates?.[ccy.toLowerCase()];
       if (cached?.rate != null) { cbRates[ccy] = cached.rate; return; }
       try {
-        const r = await fetch('./rates/' + ccy + '.json');
+        const r = await fetch('./rates/' + ccy + '.json', { cache: 'no-store' });
         if (!r.ok) return;
         const d = await r.json();
         if (d.observations?.[0]?.value) cbRates[ccy] = parseFloat(d.observations[0].value);
@@ -8226,7 +8226,7 @@ async function fetchCarryRanking() {
     let oisData = null;
     if (Object.keys(oisCache).length === 0) {
       try {
-        const or = await fetch('./ois-rates/rates.json');
+        const or = await fetch('./ois-rates/rates.json', { cache: 'no-store' });
         if (or.ok) oisData = await or.json();
       } catch {}
     }
@@ -8530,7 +8530,7 @@ async function fetchCarryData() {
     const rateData = {};
     await Promise.all(CURRENCIES.map(async ccy => {
       try {
-        const r = await fetch('./rates/' + ccy + '.json');
+        const r = await fetch('./rates/' + ccy + '.json', { cache: 'no-store' });
         if (!r.ok) return;
         const d = await r.json();
         if (d.observations && d.observations.length) {
@@ -8798,7 +8798,7 @@ async function fetchFedExpectations() {
     const [meetingsRes, ...rateResponses] = await Promise.all([
       fetch('./meetings-data/meetings.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
       ...['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].map(c =>
-        fetch(`./rates/${c}.json`).then(r => r.ok ? r.json() : null).catch(() => null)
+        fetch(`./rates/${c}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)
       )
     ]);
 
@@ -12604,7 +12604,7 @@ async function loadCBRatesCache() {
   };
   await Promise.all(Object.entries(ccyFiles).map(async ([ccy, path]) => {
     try {
-      const r = await fetch('./' + path);
+      const r = await fetch('./' + path, { cache: 'no-store' });
       if (!r.ok) return;
       const d = await r.json();
       const obs = d.observations;
@@ -12618,7 +12618,7 @@ async function loadCBRatesCache() {
 
 async function loadOISRatesCache() {
   try {
-    const r = await fetch('./ois-rates/rates.json');
+    const r = await fetch('./ois-rates/rates.json', { cache: 'no-store' });
     if (!r.ok) return;
     const d = await r.json();
     const rates   = d.rates   || {};
@@ -13529,7 +13529,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
       };
 
     } else if (cmpType === 'rate') {
-      const r = await fetch(`./rates/${cmpId}.json`, { signal: AbortSignal.timeout(6000) });
+      const r = await fetch(`./rates/${cmpId}.json`, { cache: 'no-store', signal: AbortSignal.timeout(6000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const d = await r.json();
       const obs = Array.isArray(d.observations) ? d.observations : [];

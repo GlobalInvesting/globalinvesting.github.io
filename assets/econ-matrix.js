@@ -436,7 +436,7 @@
       const trend = (typeof window.computeCBTrend === 'function') ? window.computeCBTrend(rec.obs) : simpleTrend(rec.obs);
       return { rate: rec.rate, date: meetingDate || rec.date, trend };
     }
-    const data = await fetch('./rates/' + ccy + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    const data = await fetch('./rates/' + ccy + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null);
     const obs = data && data.observations;
     if (!obs || !obs.length) return null;
     const rate = parseFloat(obs[0].value);
