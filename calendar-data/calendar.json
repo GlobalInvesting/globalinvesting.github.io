@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-16T07:32:59Z",
-  "generatedAt": "2026-09-16T07:32:59Z",
+  "lastUpdate": "2026-09-16T08:02:58Z",
+  "generatedAt": "2026-09-16T08:02:58Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1677,6 +1677,16 @@
       "n": 2,
       "mean": 1.0,
       "std": 0.565685
+    },
+    "EUR/italy cpi mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
+    "EUR/italy cpi yoy": {
+      "n": 2,
+      "mean": 0.45,
+      "std": 0.636396
     },
     "NZD/gdt price index": {
       "n": 2,
@@ -60763,7 +60773,7 @@
       "flag": "🇪🇺",
       "event": "Italy CPI m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.5%",
       "forecast": "0.5%",
       "previous": "0.5%"
     },
@@ -60776,7 +60786,7 @@
       "flag": "🇪🇺",
       "event": "Italy CPI y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.3%",
       "forecast": "3.3%",
       "previous": "3.3%"
     },
@@ -60815,7 +60825,7 @@
       "flag": "🇪🇺",
       "event": "Italy CPI FOI excl. Tobacco m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.6%",
       "forecast": "1.1%",
       "previous": "0.3%"
     },
@@ -60828,7 +60838,7 @@
       "flag": "🇪🇺",
       "event": "Italy CPI FOI excl. Tobacco y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.4%",
       "forecast": "3.3%",
       "previous": "2.8%"
     },
@@ -63650,8 +63660,8 @@
       "event": "Euro Area S&P Global Manufacturing PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "53.0",
+      "previous": "52.7"
     },
     {
       "date": "23 Sep",
@@ -63663,8 +63673,8 @@
       "event": "Euro Area S&P Global Services PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "51.1",
+      "previous": "51.6"
     },
     {
       "date": "23 Sep",
@@ -63676,8 +63686,8 @@
       "event": "Euro Area S&P Global Composite PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "51.1",
+      "previous": "52.0"
     },
     {
       "date": "23 Sep",
