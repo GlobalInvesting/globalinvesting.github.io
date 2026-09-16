@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-16T08:02:58Z",
-  "generatedAt": "2026-09-16T08:02:58Z",
+  "lastUpdate": "2026-09-16T08:05:00Z",
+  "generatedAt": "2026-09-16T08:05:00Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1687,6 +1687,16 @@
       "n": 2,
       "mean": 0.45,
       "std": 0.636396
+    },
+    "EUR/italy hicp mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
+    "EUR/italy hicp yoy": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
     },
     "NZD/gdt price index": {
       "n": 2,
@@ -60799,7 +60809,7 @@
       "flag": "🇪🇺",
       "event": "Italy HICP m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.1%",
       "forecast": "0.1%",
       "previous": "0.1%"
     },
@@ -60812,7 +60822,7 @@
       "flag": "🇪🇺",
       "event": "Italy HICP y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.2%",
       "forecast": "3.2%",
       "previous": "3.2%"
     },
