@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-16T18:16:13Z",
+  "generatedAt": "2026-09-16T23:45:25Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 168,
+  "aliasCount": 175,
   "aliases": [
     {
       "currency": "EUR",
@@ -830,8 +830,21 @@
           "actual_secondary_raw": "0.7%",
           "forecast_secondary_raw": "0.3%",
           "previous_secondary_raw": "-0.3%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": -0.5,
+          "forecast_yahoo": null,
+          "actual_primary": 0.7,
+          "actual_yahoo": 0.7,
+          "previous_primary": -0.4,
+          "previous_yahoo": -0.4,
+          "actual_yahoo_raw": "0.7",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-0.4"
         }
-      }
+      },
+      "yahoo_title": "Import Prices MM"
     },
     {
       "currency": "USD",
@@ -868,8 +881,21 @@
           "actual_secondary_raw": "0.6%",
           "forecast_secondary_raw": "0.4%",
           "previous_secondary_raw": "-1.4%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": -1.2,
+          "forecast_yahoo": null,
+          "actual_primary": 0.6,
+          "actual_yahoo": 0.6,
+          "previous_primary": -1.3,
+          "previous_yahoo": -1.3,
+          "actual_yahoo_raw": "0.6",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-1.3"
         }
-      }
+      },
+      "yahoo_title": "Export Prices MM"
     },
     {
       "currency": "USD",
@@ -906,8 +932,21 @@
           "actual_secondary_raw": "-17.3%",
           "forecast_secondary_raw": "-5.6%",
           "previous_secondary_raw": "18.3%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": 11.6,
+          "forecast_yahoo": null,
+          "actual_primary": -17.3,
+          "actual_yahoo": -17.3,
+          "previous_primary": 18.5,
+          "previous_yahoo": 18.5,
+          "actual_yahoo_raw": "-17.3",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "18.5"
         }
-      }
+      },
+      "yahoo_title": "Building Permits MM"
     },
     {
       "currency": "USD",
@@ -925,8 +964,21 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": "37",
           "previous_secondary_raw": "47.4"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": 37.0,
+          "forecast_yahoo": null,
+          "actual_primary": 32.0,
+          "actual_yahoo": 32.0,
+          "previous_primary": 35.0,
+          "previous_yahoo": 35.0,
+          "actual_yahoo_raw": "32",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "35"
         }
-      }
+      },
+      "yahoo_title": "NAHB Housing Market Indx"
     },
     {
       "currency": "GBP",
@@ -1127,7 +1179,7 @@
           "dateISO": "2026-09-17",
           "forecast_primary": null,
           "forecast_secondary": null,
-          "actual_primary": null,
+          "actual_primary": 4.03,
           "actual_secondary": 4.03,
           "previous_primary": 3.845,
           "previous_secondary": 3.895,
@@ -3338,6 +3390,139 @@
           "actual_yahoo_raw": "3.4",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "3.2"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Business Inventories m/m",
+      "yahoo_title": "Business Inventories MM",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": -0.5,
+          "forecast_yahoo": null,
+          "actual_primary": 0.8,
+          "actual_yahoo": 0.8,
+          "previous_primary": 0.0,
+          "previous_yahoo": 0.0,
+          "actual_yahoo_raw": "0.8",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Retail Inventories m/m",
+      "yahoo_title": "Business Inventories MM",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": 0.7,
+          "forecast_yahoo": null,
+          "actual_primary": 0.8,
+          "actual_yahoo": 0.8,
+          "previous_primary": 0.7,
+          "previous_yahoo": 0.0,
+          "actual_yahoo_raw": "0.8",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Retail Inventories excl. Autos m/m",
+      "yahoo_title": "Business Inventories MM",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": 0.8,
+          "actual_yahoo": 0.8,
+          "previous_primary": 0.7,
+          "previous_yahoo": 0.0,
+          "actual_yahoo_raw": "0.8",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States EIA Refinery Utilization Rate Change",
+      "yahoo_title": "EIA Wkly Refn Util*",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": -1.0,
+          "actual_yahoo": -1.0,
+          "previous_primary": -0.2,
+          "previous_yahoo": -0.2,
+          "actual_yahoo_raw": "-1",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-0.2"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Fed Interest Rate Decision",
+      "yahoo_title": "Fed Funds Tgt Rate",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": 4.0,
+          "actual_yahoo": 4.0,
+          "previous_primary": 3.75,
+          "previous_yahoo": 3.62,
+          "actual_yahoo_raw": "4",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "3.62"
+        }
+      }
+    },
+    {
+      "currency": "NZD",
+      "primary_title": "New Zealand GDP y/y",
+      "yahoo_title": "GDP Prod Based YY, SA",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": 1.4,
+          "forecast_yahoo": null,
+          "actual_primary": 2.6,
+          "actual_yahoo": 2.6,
+          "previous_primary": 1.5,
+          "previous_yahoo": 1.5,
+          "actual_yahoo_raw": "2.6",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "1.5"
+        }
+      }
+    },
+    {
+      "currency": "NZD",
+      "primary_title": "New Zealand GDP Expenditures q/q",
+      "yahoo_title": "GDP Exp Based QQ, SA",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-16",
+          "forecast_primary": 0.2,
+          "forecast_yahoo": null,
+          "actual_primary": 0.4,
+          "actual_yahoo": 0.4,
+          "previous_primary": 1.0,
+          "previous_yahoo": 1.0,
+          "actual_yahoo_raw": "0.4",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "1"
         }
       }
     },
