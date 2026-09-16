@@ -1,98 +1,277 @@
 {
-  "generated_at": "2026-09-15T10:50:42Z",
+  "generated_at": "2026-09-16T10:42:11Z",
   "drivers": {
     "EUR": {
-      "EUR/USD": "EUR/USD trades within a tight range following the European Central Bank's decision to deliver a 25-basis-point interest rate increase to 2.65%. Broad greenback resilience continues to dominate price action under Federal Reserve Chair Kevin Warsh, while precious metals headlines note that Silver’s $60 floor should hold unless gold breaks first. German ZEW sentiment edged up to 34.7, though Eurozone expectations fell to 25.8 alongside a collapsing year-to-date trade surplus cushion. The ECB has a rate hike fully priced in for October 29 while the Fed remains on hold ahead of its September 16 policy decision",
-      "EUR/GBP": "EUR/GBP remains constrained as the ECB's 25-basis-point rate hike to 2.65% is balanced against persistent UK"
+      "EUR/USD": "The European Central Bank executed a 25-basis-point rate hike today, September 16, bringing its deposit facility rate to 2.50% and main refinancing rate to 2.65%. ECB President Christine Lagarde characterized the decision as unanimous, reinforcing expectations of hawkish policy divergence as Nomura targets structural upside for the pair. Meanwhile, the U.S. Dollar Index tested 99.00 amid market focus on the FOMC decision, where a rate hike is priced in while traders await policy guidance from Fed Chair Jerome Powell. Broad macro pressures persist as Eurozone industrial production shrank for a second month, leaving the euro sensitive to Treasury yield spikes driven by oil price movements",
+      "EUR/GBP": "GBP COT LF long +40.4k. BoE hike priced in. The euro ticks slightly higher against the British Pound following the release of UK inflation data, which saw headline CPI accelerate to 3.1% year-on-year. Despite persistent sluggishness in Eurozone industrial momentum, the ECB's 25-basis-point rate hike to 2.65% effective September 16 offers near-term support against Sterling. Market participants are balancing the ECB's explicit tightening trajectory against the Bank of England's upcoming rate decision on September 17. Extreme speculative positioning in Sterling continues to cap aggressive topside expansion in the cross",
+      "EUR/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. EUR/JPY is driven by policy adjustments across both central banks as the ECB raised its deposit rate to 2.50% while the Bank of Japan prepares for its September 18 meeting with a 25-basis-point hike 78% priced in. Structural carry outflows continue to weigh on the yen due to TONA lagging global rates, though option markets exhibit heavy downside hedging demand via a -1.98 risk reversal in USD/JPY. Defense spending discussions in Japan totaling 3.5% of GDP have put additional pressure on JGBs, providing a tailwind for cross-rate demand",
+      "EUR/AUD": "AUD COT LF long +48.4k. RBA hike priced in. The euro finds a temporary floor following the ECB's unanimous decision to raise key interest rates by 25 basis points effective September 16. However, upside in EUR/AUD remains constrained by hawkish forward guidance from Reserve Bank of Australia Governor Michele Bullock and solid momentum in the Westpac Leading Index. Australian labor market data showed unemployment ticking up to 4.5% in September, though the RBA's rate hike bias keeps the Aussie well-supported. Heavy institutional positioning in AUD long contracts presents an ongoing hurdle for sustained euro outperformance",
+      "EUR/CAD": "CAD COT LF short -56.9k. BoC hike priced in. EUR/CAD edged higher as crude oil prices retreated amid rising U.S. crude inventories, undermining fundamental support for the Canadian dollar. The euro benefited from the ECB's rate increase to 2.65%, contrasting with soft Eurozone industrial production data that continues to signal underlying economic weakness. Meanwhile, Canadian inflation accelerated to 3.0% YoY in July, keeping the Bank of Canada on a hawkish footing ahead of its October meeting. Leveraged funds hold a substantial net short position in CAD, creating potential short-covering volatility on commodity shifts",
+      "EUR/CHF": "EUR/CHF trades near 0.9451 with a firm upside bias, underpinned by a +265-basis-point yield advantage as the ECB's deposit rate rose to 2.50% while the Swiss National Bank remains on hold at 0.00%. Retail sentiment exhibits an extreme reading of 90% short against 10% long, directly diverging from institutional flows that favor the euro's carry cushion. SNB intervention fears and balance sheet losses of CHF 8.2 billion in Q1 2026 continue to limit unhedged franc demand. Low global volatility (VIX at 17.0) suppresses safe-haven flows, allowing monetary policy divergence to dictate cross-rate price action",
+      "EUR/NZD": "The euro gains traction against the New Zealand dollar after the ECB holds at 2.65%. Broad Kiwi weakness is further amplified by news that RBNZ Assistant Governor Karen Silk will depart the central bank, adding leadership uncertainty to a dovish fundamental backdrop. Supply-chain disruptions near the Strait of Hormuz have disproportionately hit commodity exporters, weighing on NZD trade flows. The pair maintains an upward trajectory as EUR yield differentials widen against the sagging Kiwi"
     },
-    "GBP": {},
-    "JPY": {},
-    "AUD": {},
-    "CAD": {},
-    "CHF": {},
-    "NZD": {},
-    "USD": {}
+    "GBP": {
+      "GBP/USD": "GBP/USD trades near 1.3477 ahead of the Federal Reserve policy decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. Supporting Sterling, UK August CPI accelerated to 3.1% year-on-year, reinforcing expectations for the Bank of England's rate decision on September 17 where SONIA rates sit at 3.7307%. CFTC speculative positioning shows leveraged funds heavily crowded long in Sterling at +40.4k contracts, leaving the pair vulnerable to position-squaring. Despite rising energy-driven price pressures highlighted by Deutsche Bank, robust UK activity keeps the cable floor intact",
+      "GBP/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. Sterling remains supported against the yen ahead of back-to-back central bank meetings from the BoE and BoJ. Market pricing assigns a 78% probability to a 25-basis-point rate hike by Governor Kazuo Ueda on September 18, while SONIA cash rates at 3.7307% maintain a wide carry buffer over TONA. Japan's proposal to increase defense spending to 3.5% of GDP has weighed on JGBs, exacerbating yen softness. However, downside option skew in yen crosses indicates institutional demand for tail-risk protection",
+      "EUR/GBP": "EUR COT LF short -46.4k. ECB hike priced in. The euro ticked higher against the British pound following UK inflation data, which showed headline CPI rising to 3.1% YoY. The ECB's 25-basis-point rate hike effective September 16 provided immediate yield support to the single currency, offsetting soft Eurozone industrial production figures. Meanwhile, the Bank of England meets tomorrow with OIS markets pricing a 44% chance of a rate increase. Speculative short positioning in the euro provides underlying structural support against Sterling cross-advances",
+      "GBP/AUD": "AUD COT LF long +48.4k. RBA hike priced in. RBA holds at 4.35%. UK inflation accelerating to 3.1% YoY keeps pressure on the BoE, while RBA Governor Michele Bullock's persistent hawkish tone anchors Aussie yields. Australia's unemployment rate rising to 4.5% in September offers minor relief to Sterling bulls, though extreme long positioning in AUD limits topside cross-expansion. Traders remain focused on upcoming central bank guidance to break the stalemate",
+      "GBP/CAD": "CAD COT LF short -56.9k. BoC hike priced in. Sterling finds support against the Canadian dollar as elevated UK CPI data at 3.1% YoY reinforces Bank of England rate-hike expectations. Meanwhile, Statistics Canada reported July inflation rose to 3.0% YoY, maintaining hawkish expectations for the Bank of Canada ahead of its October 28 meeting. WTI crude oil fluctuations and rising U.S. crude inventories have sapped energy-related support for CAD. Leveraged funds hold a massive net short stance in the Canadian dollar, providing structural buoyancy to GBP/CAD",
+      "GBP/CHF": "GBP/CHF maintains a constructive tone, supported by SONIA rates offering a distinct carry advantage over the SNB's 0.00% policy benchmark. BoE holds at 3.75%. A statistically significant seasonal short window in GBP/CHF (active across 19 years of data with a 78.9% historical frequency) acts as a subtle counterweight to technical momentum. Low equity market volatility (VIX at 17.0) keeps safe-haven demand for the franc subdued",
+      "GBP/NZD": "GBP/NZD continues to push higher as monetary policy divergence favors Sterling following aggressive easing by the Reserve Bank of New Zealand. The Kiwi remains under broad distribution following the departure of RBNZ Assistant Governor Karen Silk and global trade headwinds tied to Strait of Hormuz shipping disruptions. Meanwhile, UK headline CPI matching expectations at 3.1% keeps BoE tightening risk alive for the September 17 meeting. The pair remains comfortably above key moving averages as capital flows prefer Sterling's superior yield structure"
+    },
+    "JPY": {
+      "USD/JPY": "USD/JPY trades near 155.06 ahead of today's FOMC decision, where a rate hike is priced in as markets await policy guidance from the Federal Reserve. The Bank of Japan's September 18 meeting looms with a 25-basis-point rate hike 78% priced in by money markets, shifting focus to Governor Kazuo Ueda's forward guidance. TONA at 0.98% keeps structural carry outflows active, though US Treasury Secretary Scott Bessent noted that a stronger yen benefits US exports. Options markets exhibit heavy downside hedging, with 1M 25-delta risk reversals displaying a -1.98 put skew as leveraged funds rebuild yen positions",
+      "EUR/JPY": "EUR COT LF short -46.4k. ECB hike priced in. EUR/JPY is elevated following the European Central Bank's 25-basis-point rate hike effective September 16, which raised the main refinancing rate to 2.65%. While Eurozone industrial output remains subdued, structural carry interest favors the euro over TONA's sub-1% rate. The Bank of Japan is widely expected to deliver its second rate hike of 2026 on September 18, putting traders on high alert for hawkish forward guidance from Governor Kazuo Ueda. Leveraged net shorts in JPY stand at -53.3k contracts, maintaining squeeze potential on hawkish policy surprises",
+      "GBP/JPY": "GBP COT LF long +40.4k. BoE hike priced in. GBP/JPY trades with a firm tone ahead of back-to-back central bank announcements, with UK inflation rising to 3.1% YoY keeping the BoE hawkish ahead of its September 17 decision. The BoJ is expected to hike rates to fight inflation at its September 18 meeting, though market participants fear the impact of rising yields on JGB debt sustainability. Japan's discussion of raising defense spending to 3.5% of GDP adds fiscal headwind to the yen. Leveraged funds maintain large long positions in GBP, amplifying cross-pair volatility",
+      "AUD/JPY": "AUD COT LF long +48.4k. RBA hike priced in. AUD/JPY treads water near multi-week highs as traders prepare for the Bank of Japan's rate decision, where a 25-basis-point hike is heavily anticipated. Hawkish comments from RBA Governor Michele Bullock and a stabilizing Westpac Leading Index provide fundamental backing to the Aussie, offsetting a uptick in domestic unemployment to 4.5%. CFTC data highlights extreme long positioning in AUD, which limits aggressive fresh buying despite favorable carry dynamics. Options markets reflect lingering tail-risk demand for yen calls ahead of Governor Ueda's press conference",
+      "CAD/JPY": "CAD COT LF short -56.9k. BoC hike priced in. CAD/JPY remains range-bound as firm Canadian inflation data of 3.0% YoY balances against upcoming Bank of Japan policy tightening. Oil price swings continue to drive short-term Canadian dollar valuation, with recent crude inventory builds capping momentum. The BoJ's upcoming September 18 meeting keeps yen traders cautious, as a 25-basis-point hike would narrow the interest rate differential. Heavily short CAD positioning among leveraged funds provides a structural floor against deep cross-rate pullbacks",
+      "CHF/JPY": "CHF/JPY remains anchored by ultra-low rate environments in both jurisdictions, with the SNB holding at 0.00% and TONA hovering near 0.98%. The Bank of Japan's impending rate decision on September 18 presents upside risk for JPY if Governor Kazuo Ueda signals aggressive terminal rate repricing. Safe-haven flows remain negligible with the VIX at 17.0, leaving price action driven by government bond yield differentials and fiscal concerns in Tokyo regarding defense spending. SNB balance sheet losses also curb enthusiasm for unhedged franc allocation",
+      "NZD/JPY": "NZD/JPY remains vulnerable near multi-month lows as the Reserve Bank of New Zealand's dovish policy stance contrasts sharply with the Bank of Japan's expected rate hike on September 18. The departure of RBNZ Assistant Governor Karen Silk and geopolitical friction in the Strait of Hormuz continue to suppress demand for commodity-linked currencies. Money markets fully expect the BoJ to deliver a 25-basis-point hike, boosting JPY yield appeal against the Kiwi. The cross stays capped below major moving averages as capital flows exit NZD"
+    },
+    "AUD": {
+      "AUD/USD": "AUD/USD trades around 0.7132 ahead of the FOMC announcement, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. RBA Governor Michele Bullock's hawkish stance and a firming Westpac Leading Index support the Aussie, despite Australian unemployment rising to 4.5% in September. CFTC data reveals heavily crowded long positioning in AUD at net +48,379 contracts (93rd percentile), signaling positioning risk if federal reserve guidance turns surprisingly hawkish. Geopolitical trade tensions and commodity price volatility remain key external catalysts for the pair",
+      "EUR/AUD": "EUR COT LF short -46.4k. ECB hike priced in. EUR/AUD remains under pressure despite the ECB raising rates by 25 basis points to 2.65% today, September 16. Hawkish forward guidance from RBA Governor Michele Bullock continues to support AUD, keeping the cross capped. Australia's labor market showed minor softening with unemployment rising to 4.5%, but the RBA's tight monetary stance limits euro recovery efforts. Speculative accounts remain net short EUR and heavily long AUD, maintaining a clear structural tilt in cross-rate dynamics",
+      "GBP/AUD": "GBP COT LF long +40.4k. BoE hike priced in. GBP/AUD is trapped in a tight consolidation range ahead of the Bank of England's rate decision on September 17. UK August CPI accelerated to 3.1% YoY, matching expectations and maintaining policy pressure on the BoE, while the RBA remains similarly committed to inflation control. CFTC data highlights extreme long positioning in both currencies, leaving the cross highly sensitive to micro-surprises in economic data. The Westpac Leading Index edging toward trend reinforces underlying Australian growth resilience",
+      "AUD/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. AUD/JPY hovers near multi-week highs, supported by RBA hawkishness and solid domestic sentiment indicators. Focus shifts to the Bank of Japan's September 18 meeting, where a 25-basis-point rate hike is 78% priced in by interest rate swaps. TONA at 0.98% keeps structural carry trades active, though heavy downside put skew in yen options cautions against unhedged long exposure. Defense budget expansion plans in Japan have pressured JGB yields, giving AUD/JPY additional intraday traction",
+      "AUD/CAD": "CAD COT LF short -56.9k. BoC hike priced in. AUD/CAD trades with a modest bullish bias, driven by RBA Governor Bullock's hawkish tone and a massive net short speculative position in the Canadian dollar. Statistics Canada reported July CPI at 3.0% YoY, keeping Bank of Canada rate hike expectations active for October. However, recent retreats in crude oil prices due to rising U.S. inventories have weakened CAD support. Extreme long AUD positioning poses the primary risk to further upside momentum in the cross",
+      "AUD/CHF": "AUD/CHF maintains a steady stance as the RBA's hawkish policy path contrasts with the Swiss National Bank's on-hold benchmark rate of 0.00%. Low global equity market volatility (VIX at 17.0) eliminates safe-haven demand for the franc, allowing Australian yield superiority to dominate price action. SNB intervention fears and Q1 balance sheet losses further reduce appeal for CHF. The cross remains supported near recent range highs as investors favor the Aussie's carry profile",
+      "AUD/NZD": "AUD/NZD continues to advance as monetary policy divergence widens between a hawkish Reserve Bank of Australia and a dovish Reserve Bank of New Zealand. The RBNZ's cash rate holds at 2.75% after policy cuts, while executive turnover with Assistant Governor Karen Silk's departure dampens sentiment. Furthermore, trade disruptions in the Strait of Hormuz disproportionately drag on New Zealand's export-reliant economy. Aussie strength persists despite a rise in domestic unemployment to 4.5%, keeping AUD/NZD firmly in an uptrend"
+    },
+    "CAD": {
+      "USD/CAD": "USD/CAD trades near three-month highs near 1.3950 ahead of the FOMC policy decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. The Canadian dollar remains weak across G10 majors despite Statistics Canada reporting July headline CPI accelerated to 3.0% YoY, beating expectations due to travel and energy costs. WTI crude oil price declines, driven by expanding U.S. crude inventories, have sapped support for the commodity-linked currency. CFTC data shows leveraged funds hold a large net short CAD position of -56,922 contracts, amplifying sensitivity to dollar movements",
+      "EUR/CAD": "EUR COT LF short -46.4k. ECB hike priced in. ECB holds at 2.65%. crude stockpiles. Despite Canadian inflation rising to 3.0% YoY in July, the Canadian dollar remains constrained by broader commodity weakness. Eurozone industrial production continues to shrink, but the ECB's rate hike offers near-term yield support against CAD. Leveraged fund net shorts in CAD provide a structural backdrop for potential short-squeezes",
+      "GBP/CAD": "GBP COT LF long +40.4k. BoE hike priced in. GBP/CAD continues to trend higher as UK headline inflation accelerating to 3.1% YoY reinforces Bank of England rate hike expectations ahead of its September 17 meeting. The Canadian dollar remains under pressure from falling crude oil prices and broader G10 weakness, despite strong domestic July CPI data at 3.0% YoY. CFTC positioning shows heavy long GBP exposure paired against extreme short CAD bets, creating persistent upward momentum in the cross rate",
+      "AUD/CAD": "AUD COT LF long +48.4k. RBA hike priced in. AUD/CAD trades with a positive tilt as hawkish rhetoric from RBA Governor Michele Bullock offsets minor weakness in Australian labor data. The Canadian dollar struggles to capitalize on its 3.0% July CPI print due to falling oil prices and inventory builds in the U.S. Heavy speculative short positioning in CAD continues to benefit the Aussie in cross trading. However, crowded long AUD positions signal potential pullbacks if commodity markets face broader liquidation",
+      "CAD/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. CAD/JPY remains range-bound as markets balance the Bank of Canada's hawkish rate outlook against the Bank of Japan's upcoming policy decision on September 18. A 25-basis-point hike by the BoJ is 78% priced in, threatening to narrow the carry advantage enjoyed by CAD. Canadian CPI accelerating to 3.0% YoY provides underlying support, but recent drops in crude oil limit topside potential. Options markets reflect persistent downside hedging in yen crosses, keeping traders cautious",
+      "CAD/CHF": "CAD/CHF is moving sideways as the Canadian dollar faces headwinds from soft crude oil prices while the Swiss National Bank remains firmly on hold at 0.00%. Statistics Canada's July CPI report showed inflation rising to 3.0% YoY, keeping BoC rate hike expectations alive for October. Low market volatility (VIX at 17.0) limits safe-haven flows into CHF, leaving yield differentials as the main driver. SNB holds at 0.00%.",
+      "NZD/CAD": "NZD/CAD remains depressed near multi-month lows as aggressive RBNZ rate cuts contrast with hawkish expectations for the Bank of Canada. News of RBNZ Assistant Governor Karen Silk's departure and geopolitical supply shocks in the Strait of Hormuz continue to weigh heavily on the Kiwi. Canadian July inflation at 3.0% YoY further favors CAD over NZD on yield differentials, despite recent pullbacks in crude oil prices. The cross stays firmly embedded in a downtrend across major technical moving averages"
+    },
+    "CHF": {
+      "USD/CHF": "USD/CHF trades near 0.8205 ahead of today's FOMC announcement, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. The Swiss National Bank remains on hold at 0.00%, with its foreign currency reserves incurring an CHF 8.2 billion loss in Q1 2026. SNB intervention threat limits unhedged franc appreciation, keeping the pair responsive to U.S. Treasury yield movements. Low global volatility (VIX at 17.0) prevents safe-haven flows from driving price action, leaving monetary policy divergence as the dominant macro force",
+      "EUR/CHF": "EUR COT LF short -46.4k. ECB hike priced in. EUR/CHF trades at 0.9451 with a firm upside stance, supported by the ECB's rate hike to 2.65% effective September 16, which yields a +265-basis-point carry advantage over the SNB's 0.00% rate. Retail sentiment data shows an extreme short position of 90% against 10% long, directly contradicting institutional positioning that favors euro carry. SNB balance sheet losses and persistent intervention risk limit franc gains. Low market volatility suppresses safe-haven demand, maintaining the cross's upward trajectory",
+      "GBP/CHF": "GBP COT LF long +40.4k. BoE hike priced in. GBP/CHF trades constructively as SONIA rates at 3.7307% provide a significant yield premium over the SNB's 0.00% target rate. UK August CPI accelerating to 3.1% YoY reinforces Bank of England rate hike expectations ahead of tomorrow's decision. A statistically significant seasonal short window (active across 19 years of data with a 78.9% win rate) presents a subtle historical counterweight, though current carry mechanics dominate. The SNB's active presence in FX markets keeps franc strength strictly contained",
+      "AUD/CHF": "AUD COT LF long +48.4k. RBA hike priced in. AUD/CHF remains elevated as RBA Governor Michele Bullock's hawkish policy stance maintains a strong yield differential over the SNB's 0.00% policy rate. Australia's Westpac Leading Index edging toward trend reinforces economic stability, offsetting an increase in domestic unemployment to 4.5%. Low global risk aversion (VIX at 17.0) neutralizes safe-haven demand for CHF. Speculative crowding in long AUD positions represents the primary source of cross-rate consolidation",
+      "CAD/CHF": "CAD COT LF short -56.9k. BoC hike priced in. CAD/CHF is hovering in a narrow range as Statistics Canada's July CPI print of 3.0% YoY supports Bank of Canada rate hike expectations, balancing against recent retreats in oil prices. The SNB stays on hold at 0.00%, offering no yield competition to CAD. SNB intervention risks continue to deter long franc exposure in low-volatility conditions. Leveraged accounts hold substantial net short positions in CAD, limiting severe downside in the pair",
+      "CHF/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. CHF/JPY trades with a muted tone as both the SNB and BoJ operate near the bottom of G10 yield tables. The BoJ's September 18 meeting is expected to deliver a 25-basis-point rate hike, which would elevate TONA relative to the SNB's 0.00% rate. Japanese fiscal concerns regarding a proposed defense spending expansion to 3.5% of GDP weigh on JGBs, offsetting yen strength. Without safe-haven flows active (VIX at 17.0), cross price action remains heavily constrained by central bank forward guidance",
+      "NZD/CHF": "NZD/CHF stays under pressure as the RBNZ's dovish policy trajectory contrasts with steady SNB rates. RBNZ Assistant Governor Karen Silk's resignation and trade disruptions stemming from the Strait of Hormuz add to the Kiwi's fundamental vulnerabilities. While the SNB offers zero interest rate carry, NZD yield erosion has diminished the cross's historical appeal. The pair continues to trade below key moving averages, reflecting broad distribution in NZD assets"
+    },
+    "NZD": {
+      "NZD/USD": "NZD/USD trades near multi-month lows around the mid-0.5700s ahead of the FOMC decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. RBNZ holds at 2.75%. Furthermore, critical shipping disruptions in the Strait of Hormuz have triggered intense USD demand while disproportionately harming New Zealand's commodity export model. The pair trades below its 20-day, 50-day, and 200-day moving average cluster, maintaining a highly vulnerable technical posture",
+      "EUR/NZD": "EUR COT LF short -46.4k. ECB hike priced in. EUR/NZD continues its upward push as the European Central Bank delivered a 25-basis-point rate hike today, raising its deposit facility rate to 2.50%. In contrast, the RBNZ holds at 2.75% after rate cuts, with institutional confidence further shaken by Assistant Governor Karen Silk's departure. Global supply chain friction near Hormuz hits New Zealand's trade outlook harder than the Eurozone's, widening the fundamental gap between the two currencies. The euro's policy rate advantage keeps the cross firmly in buyer control",
+      "GBP/NZD": "GBP COT LF long +40.4k. BoE hike priced in. GBP/NZD trades at elevated levels as UK inflation rising to 3.1% YoY bolsters the Bank of England's hawkish stance ahead of its September 17 decision. The New Zealand dollar remains weighed down by RBNZ monetary easing and export headwinds caused by Middle Eastern trade bottlenecks. Leveraged funds hold significant net long positions in Sterling, providing robust momentum against the Kiwi. Divergent monetary policy paths continue to drive capital out of NZD and into GBP",
+      "AUD/NZD": "AUD COT LF long +48.4k. RBA hike priced in. AUD/NZD maintains a strong bullish trend as RBA Governor Michele Bullock signals sustained monetary tightness, contrasting with the RBNZ's rate-cutting cycle. New Zealand's economic outlook is further hampered by leadership turnover at the central bank and reduced global demand for agricultural exports due to Hormuz shipping issues. Australia's unemployment rate rising to 4.5% in September did little to derail the cross's upward trajectory. Heavy speculative positioning in AUD long contracts supports ongoing cross-rate outperformance",
+      "NZD/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. NZD/JPY remains pinned near recent lows as the Bank of Japan prepares for its September 18 policy meeting, where a 25-basis-point rate hike is 78% priced in. RBNZ holds at 2.75%. Geopolitical risks in the Strait of Hormuz continue to suppress risk sentiment for commodity FX. Downside option skew in yen crosses indicates institutional demand for protective put options against further NZD weakness",
+      "NZD/CAD": "CAD COT LF short -56.9k. BoC hike priced in. NZD/CAD trades with a persistent downside bias as Canadian July CPI accelerating to 3.0% YoY highlights relative monetary tightness from the Bank of Canada. The Kiwi remains weighed down by RBNZ monetary easing and negative sentiment surrounding Assistant Governor Karen Silk's resignation. Although falling crude oil prices have temporarily slowed CAD momentum, the Canadian dollar holds a clear fundamental edge over the Kiwi. The cross remains anchored near multi-week lows",
+      "NZD/CHF": "NZD/CHF stays locked near historic lows as the erosion of RBNZ interest rate support removes structural buying interest. The Swiss National Bank remains on hold at 0.00%, but its intervention presence deters heavy short franc speculation. Geopolitical shipping shocks and weak Chinese import demand continue to hit New Zealand's agricultural exports hard. With market volatility subdued (VIX at 17.0), price action is dictated by NZD underperformance rather than safe-haven flows"
+    },
+    "USD": {
+      "EUR/USD": "EUR COT LF short -46.4k. ECB hike priced in. EUR/USD trades with caution as the European Central Bank executed a 25-basis-point rate hike today, raising its refinancing rate to 2.65%, while Eurozone industrial production shrank for a second month. Meanwhile, the US Dollar Index tested 99.00 ahead of today's FOMC decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. Rising oil prices crossing $100 per barrel have boosted Treasury yields, reinforcing higher-for-longer rate expectations. Nomura highlights long-term ECB-Fed policy divergence as a potential structural tailwind for the euro",
+      "GBP/USD": "GBP COT LF long +40.4k. BoE hike priced in. GBP/USD holds near 1.3477 ahead of today's FOMC decision, where a rate hike is priced in as markets await policy guidance from the Federal Reserve. UK August inflation accelerated to 3.1% YoY, matching expectations and keeping the Bank of England hawkish ahead of its September 17 meeting. Deutsche Bank noted that rising price pressures present a major challenge for the BoE, while SONIA rates at 3.7307% provide yield support. CFTC positioning shows leveraged funds crowded long in Sterling, leaving cable sensitive to Powell's press conference tone",
+      "USD/JPY": "JPY COT LF short -53.3k. BoJ hike priced in. USD/JPY trades around 155.06 ahead of the FOMC policy decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. The Bank of Japan meets on September 18 with a 25-basis-point rate hike 78% priced in, focusing attention on Governor Kazuo Ueda's press conference. Japan's proposal to increase defense spending to 3.5% of GDP has elevated JGB yields, while US Treasury Secretary Scott Bessent noted a stronger yen benefits US exports. Options markets exhibit a strong -1.98 put skew, reflecting institutional downside risk management",
+      "AUD/USD": "AUD COT LF long +48.4k. RBA hike priced in. AUD/USD hovers near 0.7132 ahead of today's FOMC decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. RBA Governor Michele Bullock's hawkish policy path and a stabilizing Westpac Leading Index provide support, offsetting a September rise in Australian unemployment to 4.5%. CFTC data shows extreme long positioning in AUD at net +48,379 contracts (93rd percentile), leaving the pair exposed to hawkish Fed surprises. Commodity price fluctuations and global trade risks remain key drivers",
+      "USD/CAD": "CAD COT LF short -56.9k. BoC hike priced in. USD/CAD trades near three-month highs around 1.3950 ahead of the FOMC decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. The Canadian dollar remains under pressure despite Statistics Canada reporting July CPI accelerated to 3.0% YoY, above expectations due to travel and energy costs. Falling crude oil prices, driven by expanding U.S. crude inventories, have sapped support for CAD. Leveraged net short positions in CAD stand at -56,922 contracts, amplifying upward draft in the pair",
+      "USD/CHF": "USD/CHF trades near 0.8205 ahead of today's FOMC decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. The Swiss National Bank holds its policy rate at 0.00%, with foreign currency reserves incurring a CHF 8.2 billion loss in Q1 2026. SNB intervention warnings continue to cap unhedged franc strength, leaving the exchange rate sensitive to U.S. 10-year Treasury yield shifts. Low global volatility (VIX at 17.0) eliminates safe-haven flows, leaving monetary policy differentials as the dominant catalyst",
+      "NZD/USD": "NZD/USD trades near two-month lows around the mid-0.5700s ahead of the FOMC decision, where a rate hike is priced in as markets await policy guidance from Fed Chair Jerome Powell. RBNZ holds at 2.75%. Critical shipping disruptions in the Strait of Hormuz have triggered massive USD safe-haven demand while severely impacting New Zealand's export-dependent trade balance. The pair remains technically fragile below its 20-day, 50-day, and 200-day moving average cluster"
+    }
   },
   "driver_sources": {
     "EUR": [
       {
-        "title": "EUR/USD analysis: Dollar remains in driving seat",
-        "url": "https://www.forex.com/ie/news-and-analysis/eur-usd-analysis-dollar-remains-in-driving-seat"
+        "title": "Euro To Dollar 2026 Forecast: ECB-Fed Divergence Could Lift EUR Says Nomura - Forex Factory",
+        "url": "https://www.forexfactory.com/news/1375117-euro-to-dollar-2026-forecast-ecb-fed-divergence-could"
       },
       {
-        "title": "NZD/USD, AUD/NZD: Why the inflation beat may not be as hawkish as it looks | FOREX.com Europe",
-        "url": "https://www.forex.com/ie/news-and-analysis/nzd-usd-aud-nzd-why-the-inflation-beat-may-not-be-as-hawkish-as-it-looks"
+        "title": "Dollar ticks higher as oil prices climb, Fed rate hike chances firm - KITCO",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-09-15/dollar-ticks-higher-oil-prices-climb-fed-rate-hike-chances-firm"
       },
       {
-        "title": "A key week for EUR/USD: ECB decision and US inflation in focus",
-        "url": "https://www.fxstreet.com/news/a-key-week-for-eur-usd-ecb-decision-and-us-inflation-in-focus-202609080646"
+        "title": "Traders bet the ECB will stick with steady rates, keeping one eye on the euro - KITCO",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-02-05/traders-bet-ecb-will-stick-steady-rates-keeping-one-eye-euro"
       },
       {
-        "title": "Currency Volatility: Dollar Strength, Euro Weakness?",
-        "url": "https://www.jpmorgan.com/insights/global-research/currencies/currency-volatility-dollar-strength"
+        "title": "ECB rate hike baked in, but what happens next? - CNBC",
+        "url": "https://www.cnbc.com/video/2026/09/10/ecb-rate-hike-b.html"
+      }
+    ],
+    "GBP": [
+      {
+        "title": "G10’s ‘surprise’ currency star could stumble as peers hike interest rates - CNBC",
+        "url": "https://www.cnbc.com/2026/09/09/fx-currencies-interest-rate-hikes.html"
+      },
+      {
+        "title": "Sterling extends rally on firm rate-hike bets, subdued dollar - KITCO",
+        "url": "https://www.kitco.com/news/off-the-wire/2026-08-21/sterling-extends-rally-firm-rate-hike-bets-subdued-dollar"
+      },
+      {
+        "title": "Pound Sterling Today: Weak UK Payrolls Unlikely To Stop BoE Hikes - Exchange Rates UK",
+        "url": "https://www.exchangerates.org.uk/news/45969/2026-05-20-pound-sterling-today-weak-uk-payrolls-unlikely-to-stop-boe-hikes.html"
+      },
+      {
+        "title": "Pound Sterling: “We Now Expect Quarterly Growth To Stagnate In Q3,” Say UK Economists - Exchange Rates UK",
+        "url": "https://www.exchangerates.org.uk/news/45911/2026-05-15-pound-sterling-we-now-expect-quarterly-growth-to-stagnate-in-q3-uk-economists.html"
+      }
+    ],
+    "JPY": [
+      {
+        "title": "Global forex shifts: Yen carry trade unwinds amid policy divergence | MarketPulse by OANDA Group",
+        "url": "https://www.marketpulse.com/news/global-forex-shifts-yen-carry-trade-unwinds-amid-policy-divergence"
+      },
+      {
+        "title": "Daily Navigator- 16/9/2026 – Market Outlook - Standard Chartered",
+        "url": "https://www.sc.com/ae/market-outlook/daily-navigator-16-9-2026?mvog=1"
+      },
+      {
+        "title": "3 Assets to Watch (Sept 14-18): USDJPY, GBPUSD, and Gold brace for potential Fed, BoE, BoJ rate hikes",
+        "url": "https://www.bybit.com/en/learn/market-pulse/3-assets-to-watch-september-14-18-USDJPY-GBPUSD-gold-XAUUSD-Fed-BoE-BoJ-rate-hikes"
+      },
+      {
+        "title": "USD/JPY Outlook: Bulls get a lifeline from the bond bloodbath",
+        "url": "https://www.forex.com/en-sg/news-and-analysis/usd-jpy-outlook-bulls-get-a-lifeline-from-the-bond-bloodbath"
+      }
+    ],
+    "AUD": [
+      {
+        "title": "AUD to INR forecast: rate history and key drivers | Finder",
+        "url": "https://www.finder.com.au/international-money-transfers/aud-to-inr-forecast"
+      },
+      {
+        "title": "AUD to MYR Forecast for 2026, 2027, 2028–2030, 2040 and Beyond | LiteFinance",
+        "url": "https://www.litefinance.org/blog/analysts-opinions/aud-to-myr-forecast-and-prediction"
+      },
+      {
+        "title": "AUD/USD (AUDUSD) Drops on Jun 23: What Are the Key Reasons?",
+        "url": "https://www.tradingkey.com/news/market-movers/261983675-market-movers-audusd-20260623"
+      },
+      {
+        "title": "FX Markets And Central Banks Overview: USD/CAD, AUD/USD | Seeking Alpha",
+        "url": "https://seekingalpha.com/article/4939284-fx-markets-central-banks-overview-usdcad-audusd"
+      }
+    ],
+    "CAD": [
+      {
+        "title": "USD/CAD Surges: Currency Pair Hits Stunning Three-Month High Amid Dollar Weakness | Forex News USD | CryptoRank.io",
+        "url": "https://cryptorank.io/news/feed/c2d7d-usd-cad-three-month-highs-analysis"
+      },
+      {
+        "title": "FX Markets And Central Banks Overview: USD/CAD, AUD/USD",
+        "url": "https://seekingalpha.com/article/4939284-fx-markets-central-banks-overview-usdcad-audusd"
+      },
+      {
+        "title": "Strongest Currency in the World: Top 15 Rankings 2026",
+        "url": "https://admiralmarkets.com/education/articles/forex-basics/strongest-currency-in-the-world"
+      },
+      {
+        "title": "What Was the Highest Gold Price Ever? Updates on Gold's Record-Breaking Performance",
+        "url": "https://investingnews.com/daily/resource-investing/precious-metals-investing/gold-investing/highest-price-for-gold"
+      }
+    ],
+    "CHF": [
+      {
+        "title": "Swiss Franc to Euro Exchange Rate Today | CHF/EUR Converter",
+        "url": "https://www.exchangerates.org.uk/Swiss-Francs-to-Euros-currency-conversion-page.html"
+      },
+      {
+        "title": "USD/CHF Forecast | Will USD/CHF Go Up or Down? | Capital.com",
+        "url": "https://capital.com/en-int/analysis/usd-to-chf-forecast"
+      },
+      {
+        "title": "Strongest Currency in the World: Top 15 Rankings 2026",
+        "url": "https://admiralmarkets.com/education/articles/forex-basics/strongest-currency-in-the-world"
+      }
+    ],
+    "NZD": [
+      {
+        "title": "NZD/USD Plummets as Critical Hormuz Disruption Sparks Intense USD Demand | Forex News commodities | CryptoRank.io",
+        "url": "https://cryptorank.io/news/feed/45b9f-nzd-usd-hormuz-disruption-usd-demand"
+      },
+      {
+        "title": "NZD/USD (NZDUSD) Is up 0.51% on Aug 21: What Is Behind the Currency Move?",
+        "url": "https://www.tradingkey.com/news/market-movers/262123374-market-movers-nzdusd-20260821"
+      },
+      {
+        "title": "Most Traded Currencies 2025: US Dollar Leads as Yuan Climbs | Capital.com",
+        "url": "https://capital.com/en-int/learn/most-traded-currencies"
+      }
+    ],
+    "USD": [
+      {
+        "title": "Daily Navigator- 16/9/2026 – Market Outlook - Standard Chartered",
+        "url": "https://www.sc.com/ae/market-outlook/daily-navigator-16-9-2026?mvog=1"
+      },
+      {
+        "title": "Global forex shifts: Yen carry trade unwinds amid policy divergence.",
+        "url": "https://www.marketpulse.com/news/global-forex-shifts-yen-carry-trade-unwinds-amid-policy-divergence"
+      },
+      {
+        "title": "GBP/USD Forex Signal 16/09: Key 1.3465 and 1.3500 Level",
+        "url": "https://www.dailyforex.com/forex-technical-analysis/2026/09/gbpusd-signal-range-before-fed-16-september-2026/249756"
+      },
+      {
+        "title": "USD/JPY Forecast 16/09: Tests ¥156 Resistance (Video)",
+        "url": "https://www.dailyforex.com/forex-technical-analysis/2026/09/usdjpy-forecast-16-september-2026/249765"
       }
     ]
   },
   "_inputs_snap": {
     "USD": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hold",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "EUR": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hike",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "GBP": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
-      "bias": "hold",
-      "bias_updated": "2026-09-14"
+      "rate_updated": "2026-09-16",
+      "bias": "hike",
+      "bias_updated": "2026-09-15"
     },
     "JPY": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hike",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "AUD": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hike",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "CAD": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hike",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "CHF": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hold",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "NZD": {
       "cot_we": "2026-09-08",
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hike",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "NOK": {
       "cot_we": null,
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hike",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     },
     "SEK": {
       "cot_we": null,
-      "rate_updated": "2026-09-15",
+      "rate_updated": "2026-09-16",
       "bias": "hold",
-      "bias_updated": "2026-09-14"
+      "bias_updated": "2026-09-15"
     }
   }
 }
