@@ -8826,20 +8826,6 @@ async function fetchFedExpectations() {
       const current = parseFloat(obs[0].value);
 
       const meetings = meetingsRes?.meetings?.[ccy];
-      // v8.498.0: previously re-derived nextMtg client-side from a plain
-      // nextMeetingISO <= today date check whenever the stored next meeting
-      // was today or earlier — but "today" alone doesn't mean the decision
-      // has been published yet. meetings.json's own nextMeeting/nextMeetingISO
-      // already come from _meeting_resolved()/_next_unresolved_meetings()
-      // (workflow_meetings.yml), which only advances past a meeting once its
-      // actual has genuinely been released, and it's kept fresh via the
-      // repository_dispatch[cb-rate-decision] fast path the instant a
-      // decision posts. This client-side override used a weaker test than
-      // the backend's own, so on the meeting's own decision day it could
-      // silently advance the displayed date to the meeting after next while
-      // bias/hikeProb/fwdRate stayed correctly tied to the current meeting —
-      // showing one row split across two different meetings at once. Fixed
-      // by trusting the backend's already-resolved-aware field directly.
       const nextMtg = meetings?.nextMeeting || '—';
 
       const trendDir     = computeCBTrend(obs);   
