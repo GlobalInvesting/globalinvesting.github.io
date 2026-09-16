@@ -2,14 +2,7 @@ name: Update Calendar Completeness (secondary source)
 
 on:
   schedule:
-    # 4x/day, ~1h after each update-economic-calendar.yml primary refresh
-    # (05:30/09:30/13:30/20:30 UTC) so the alias-builder always has same-day
-    # primary-side forecast/actual data to value-match against — was weekly
-    # (Monday-only), which left every actual published later in the week
-    # waiting up to 6 days for a second-source recovery chance. This is the
-    # public site repo (unlimited free Actions minutes), so this cadence
-    # costs nothing budget-wise; matched to update-economic-calendar.yml's
-    # own cadence rather than picked arbitrarily.
+
     - cron: '30 6 * * *'
     - cron: '30 10 * * *'
     - cron: '30 14 * * *'
