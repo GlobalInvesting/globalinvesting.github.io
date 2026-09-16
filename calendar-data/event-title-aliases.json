@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-16T00:13:43Z",
-  "scriptVersion": "1.5",
+  "generatedAt": "2026-09-16T00:31:16Z",
+  "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 21,
+  "aliasCount": 23,
   "aliases": [
     {
       "currency": "EUR",
@@ -204,7 +204,7 @@
           "dateISO": "2026-09-07",
           "forecast_primary": 5.1,
           "forecast_secondary": 5.5,
-          "actual_primary": null,
+          "actual_primary": 5.4,
           "actual_secondary": 5.4,
           "previous_primary": 5.4,
           "previous_secondary": 5.4,
@@ -356,7 +356,7 @@
           "dateISO": "2026-09-15",
           "forecast_primary": 23.8,
           "forecast_secondary": 38.0,
-          "actual_primary": null,
+          "actual_primary": 25.8,
           "actual_secondary": 25.8,
           "previous_primary": 31.4,
           "previous_secondary": 31.4,
@@ -401,6 +401,34 @@
           "actual_secondary_raw": "7.60",
           "forecast_secondary_raw": "14",
           "previous_secondary_raw": "20.60"
+        }
+      }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom Average Weekly Earnings, Regular Pay y/y",
+      "manual": true,
+      "secondary_title": "United Kingdom Average Earnings excl. Bonus (3Mo/Yr)",
+      "evidence": {
+        "secondary": {
+          "actual_primary": null,
+          "actual_secondary_raw": "3.5%",
+          "dateISO": "2026-09-15",
+          "manual_note": "TE and Yahoo agree with each other (actual 3.5%, previous 3.5%) on 2026-09-15, even though neither matches our primary source's own stated previous (3.4%) within FORECAST_TOLERANCE (0.1pp diff, genuine primary-source data-quality gap, not a different series)."
+        }
+      }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom Average Weekly Earnings, Total Pay y/y",
+      "manual": true,
+      "secondary_title": "United Kingdom Average Earnings incl. Bonus (3Mo/Yr)",
+      "evidence": {
+        "secondary": {
+          "actual_primary": null,
+          "actual_secondary_raw": "3.9%",
+          "dateISO": "2026-09-15",
+          "manual_note": "TE and Yahoo agree with each other (actual 3.9%, previous ~4.2%) on 2026-09-15 on the same ONS series ('Total Pay' == 'incl. Bonus'); our primary source's own forecast (4.5%) diverges more from TE's (4.0%) than previous does (4.3% vs 4.2%, 0.1pp) -- forecasts legitimately vary by vendor consensus panel and are not the identity signal here; `previous`, the fixed historical fact both secondary vendors independently corroborate, is."
         }
       }
     }
