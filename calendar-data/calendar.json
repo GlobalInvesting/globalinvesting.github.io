@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-16T12:33:09Z",
-  "generatedAt": "2026-09-16T12:33:09Z",
+  "lastUpdate": "2026-09-16T14:03:02Z",
+  "generatedAt": "2026-09-16T14:03:02Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1209,14 +1209,14 @@
       "std": 0.707107
     },
     "USD/business inventories mom": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 0.070711
+      "n": 3,
+      "mean": 0.4,
+      "std": 0.781025
     },
     "USD/nahb housing market index": {
-      "n": 2,
-      "mean": 0.5,
-      "std": 2.12132
+      "n": 3,
+      "mean": -1.333333,
+      "std": 3.511885
     },
     "EUR/current account s.a": {
       "n": 2,
@@ -1597,6 +1597,11 @@
       "n": 2,
       "mean": 0.45,
       "std": 0.070711
+    },
+    "USD/retail inventories mom": {
+      "n": 2,
+      "mean": 0.45,
+      "std": 0.494975
     },
     "USD/initial jobless claims 4-week average": {
       "n": 3,
@@ -61528,7 +61533,7 @@
       "flag": "🇺🇸",
       "event": "United States Business Inventories m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.8%",
       "forecast": "-0.5%",
       "previous": "0.0%"
     },
@@ -61541,7 +61546,7 @@
       "flag": "🇺🇸",
       "event": "United States Retail Inventories m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.8%",
       "forecast": "0.7%",
       "previous": "0.7%"
     },
@@ -61554,7 +61559,7 @@
       "flag": "🇺🇸",
       "event": "United States Retail Inventories excl. Autos m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.8%",
       "forecast": null,
       "previous": "0.7%"
     },
@@ -61567,7 +61572,7 @@
       "flag": "🇺🇸",
       "event": "United States NAHB Housing Market Index",
       "impact": "low",
-      "actual": null,
+      "actual": "32",
       "forecast": "37",
       "previous": "35"
     },
