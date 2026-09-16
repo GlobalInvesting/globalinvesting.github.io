@@ -3540,6 +3540,23 @@ let STATIC_YIELDS = null;
 let _lastDrawnYields = null; 
 let _lastDrawnPrior  = null; 
 
+function _crSplinePath(ctx, pts) {
+  if (pts.length < 2) return;
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  if (pts.length === 2) { ctx.lineTo(pts[1][0], pts[1][1]); return; }
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i === 0 ? 0 : i - 1];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2 < pts.length ? i + 2 : pts.length - 1];
+    const cp1x = p1[0] + (p2[0] - p0[0]) / 6;
+    const cp1y = p1[1] + (p2[1] - p0[1]) / 6;
+    const cp2x = p2[0] - (p3[0] - p1[0]) / 6;
+    const cp2y = p2[1] - (p3[1] - p1[1]) / 6;
+    ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2[0], p2[1]);
+  }
+}
+
 function drawYieldCurveAndCache(points, priorPoints) {
   _lastDrawnYields = points;
   _lastDrawnPrior  = priorPoints || null;
@@ -3615,29 +3632,37 @@ function drawYieldCurve(points, priorPoints) {
 
   const priorPts = prevVals.map((v,i) => v != null ? [px(i), py(v)] : null).filter(Boolean);
   if (priorPts.length >= 2) {
-    ctx.beginPath(); ctx.strokeStyle=_tc('--border2'); ctx.lineWidth=1;
-    priorPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+    ctx.beginPath(); ctx.strokeStyle=_tc('--text3'); ctx.lineWidth=1.3; ctx.setLineDash([4,3]);
+    _crSplinePath(ctx, priorPts);
     ctx.stroke();
+    ctx.setLineDash([]);
   }
 
   const curPts = vals.map((v,i) => v != null ? [px(i), py(v)] : null).filter(Boolean);
   if (curPts.length >= 2) {
+    const grad = ctx.createLinearGradient(0, PAD_T, 0, PAD_T+cH);
+    grad.addColorStop(0,   _themeColorAlpha('--chart-line', 0.30));
+    grad.addColorStop(0.7, _themeColorAlpha('--chart-line', 0.06));
+    grad.addColorStop(1,   _themeColorAlpha('--chart-line', 0.00));
     ctx.beginPath();
-    curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+    _crSplinePath(ctx, curPts);
     ctx.lineTo(curPts[curPts.length-1][0], PAD_T+cH);
     ctx.lineTo(PAD_L, PAD_T+cH);
     ctx.closePath();
-    ctx.fillStyle=_themeColorAlpha('--chart-line', 0.07); ctx.fill();
+    ctx.fillStyle=grad; ctx.fill();
 
-    ctx.beginPath(); ctx.strokeStyle=_tc('--chart-line'); ctx.lineWidth=1.8;
-    curPts.forEach(([x,y],i) => i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y));
+    ctx.beginPath();
+    ctx.lineJoin='round'; ctx.lineCap='round';
+    ctx.strokeStyle=_tc('--chart-line'); ctx.lineWidth=2.2;
+    _crSplinePath(ctx, curPts);
     ctx.stroke();
 
     vals.forEach((v, i) => {
       if (v == null) return;
       const x = px(i), y = py(v);
       ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
-      ctx.fillStyle=_tc('--chart-line'); ctx.fill();
+      ctx.fillStyle=_tc('--bg'); ctx.fill();
+      ctx.lineWidth=1.6; ctx.strokeStyle=_tc('--chart-line'); ctx.stroke();
     });
   }
 
@@ -3645,13 +3670,20 @@ function drawYieldCurve(points, priorPoints) {
   labels.forEach((t,i) => ctx.fillText(t, px(i), H-5));
 
   ctx.textAlign='left';
-  ctx.fillStyle=_tc('--chart-line'); ctx.fillText('● Current', PAD_L, PAD_T-2);
-  ctx.fillStyle=_tc('--text3'); ctx.fillText('● Prior',   PAD_L+52, PAD_T-2);
+  const legY = PAD_T-5;
+  ctx.lineWidth=2; ctx.lineCap='round';
+  ctx.strokeStyle=_tc('--chart-line'); ctx.beginPath(); ctx.moveTo(PAD_L,legY); ctx.lineTo(PAD_L+12,legY); ctx.stroke();
+  ctx.fillStyle=_tc('--text2'); ctx.font='8px Courier New'; ctx.fillText('Current', PAD_L+16, legY+3);
+  const legX2 = PAD_L+62;
+  ctx.setLineDash([3,2]); ctx.lineWidth=1.3; ctx.strokeStyle=_tc('--text3');
+  ctx.beginPath(); ctx.moveTo(legX2,legY); ctx.lineTo(legX2+12,legY); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillText('Prior', legX2+16, legY+3);
   if (!isLive) {
-    ctx.fillStyle=_tc('--text3'); ctx.fillText('(static)', PAD_L+92, PAD_T-2);
+    ctx.fillStyle=_tc('--text3'); ctx.fillText('(static)', legX2+56, legY+3);
   } else {
     const spr = (vals[n-1] ?? 0) - (vals[0] ?? 0); 
-    if (spr < 0) { ctx.fillStyle=_themeColorAlpha('--down', 0.6); ctx.fillText('■ Inverted', PAD_L+92, PAD_T-2); }
+    if (spr < 0) { ctx.fillStyle=_themeColorAlpha('--down', 0.7); ctx.fillText('■ Inverted', legX2+56, legY+3); }
   }
 
   const real2y  = vals[labels.indexOf('2Y')];
