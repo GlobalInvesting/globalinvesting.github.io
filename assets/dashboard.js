@@ -8848,30 +8848,45 @@ async function fetchFedExpectations() {
       const hikeProb = meetings?.hikeProb ?? null;  
       const probSrc  = biasSource || 'OIS/futures';
       const _haveProbData = cutProb !== null || hikeProb !== null;
+      // Conviction tiering (WIRP/FedWatch-style): the bias field itself is a
+      // threshold-crossing binary (any move past the fwd/policy threshold gets
+      // labeled 'hike'/'cut'), so a 40%-priced lean and a 100%-priced call both
+      // render as the same word/color with only an 8px trailing % to tell them
+      // apart. Below CONVICTION_THRESHOLD, prefix "Lean " and mute the main
+      // label so a weak signal doesn't visually read as equal-conviction to a
+      // fully-priced one.
+      const CONVICTION_THRESHOLD = 60; // %
       let probSuffix = '';
+      let leanPrefix = '';
+      let convictionNote = '';
       if (_haveProbData) {
         if (meetingsBias === 'hike') {
           const hp = hikeProb ?? 0;
           const probCls = hp >= 60 ? 'up' : hp >= 40 ? '' : 'flat';
           probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a hike at next meeting · ${probSrc}">${hp}%↑</span>`;
+          if (hp < CONVICTION_THRESHOLD) { leanPrefix = 'Lean '; convictionNote = ` (leaning — ${hp}% priced, below ${CONVICTION_THRESHOLD}% conviction)`; }
         } else if (meetingsBias === 'cut') {
           const cp = cutProb ?? 0;
           const probCls = cp >= 60 ? 'down' : cp >= 40 ? '' : 'flat';
           probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of a cut at next meeting · ${probSrc}">${cp}%↓</span>`;
+          if (cp < CONVICTION_THRESHOLD) { leanPrefix = 'Lean '; convictionNote = ` (leaning — ${cp}% priced, below ${CONVICTION_THRESHOLD}% conviction)`; }
         } else {
           const holdProb = Math.max(0, 100 - (cutProb ?? 0) - (hikeProb ?? 0));
           const probCls = holdProb >= 60 ? 'flat' : '';
           probSuffix = ` <span class="${probCls}" style="font-size:8px;font-family:var(--font-mono);opacity:0.85;white-space:nowrap;" title="Market-implied probability of no change at next meeting · ${probSrc}">${holdProb}%→</span>`;
+          if (holdProb < CONVICTION_THRESHOLD) { leanPrefix = 'Lean '; convictionNote = ` (leaning — ${holdProb}% priced, below ${CONVICTION_THRESHOLD}% conviction)`; }
         }
       }
+      const leanStyle = leanPrefix ? 'opacity:0.7;' : '';
+      const biasTipFull = biasTip + convictionNote;
 
       let biasLabel;
       if (meetingsBias === 'cut') {
-        biasLabel = `<span class="down" title="${biasTip}">↓ Cut</span>` + probSuffix;
+        biasLabel = `<span class="down" style="${leanStyle}" title="${biasTipFull}">↓ ${leanPrefix}Cut</span>` + probSuffix;
       } else if (meetingsBias === 'hike') {
-        biasLabel = `<span class="up" title="${biasTip}">↑ Hike</span>` + probSuffix;
+        biasLabel = `<span class="up" style="${leanStyle}" title="${biasTipFull}">↑ ${leanPrefix}Hike</span>` + probSuffix;
       } else if (meetingsBias === 'hold') {
-        biasLabel = `<span class="flat" title="${biasTip}">→ Hold</span>` + probSuffix;
+        biasLabel = `<span class="flat" style="${leanStyle}" title="${biasTipFull}">→ ${leanPrefix}Hold</span>` + probSuffix;
       } else {
         const fbTip = 'Estimated from rate trajectory · OIS source unavailable';
         biasLabel = trendDir === 'down' ? `<span class="down" title="${fbTip}">~ ↓ Cut</span>`
