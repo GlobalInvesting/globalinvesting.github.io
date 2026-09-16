@@ -54,7 +54,10 @@
   border: none;
   outline: none;
   color: var(--text);
-  font: 500 14px var(--font-ui);
+  font: 500 16px var(--font-ui);
+}
+@media (min-width: 700px) {
+  #cmdbar-input { font-size: 14px; }
 }
 #cmdbar-input::placeholder { color: var(--text3); }
 #cmdbar-esc {
