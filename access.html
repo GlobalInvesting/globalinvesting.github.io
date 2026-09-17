@@ -613,7 +613,7 @@ a { color: inherit; text-decoration: none; }
       "name": "What are the OIS-implied central bank rate expectations?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTR for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, RBNZ OCR OIS for NZD, NOWA OIS for NOK, and SWESTR OIS for SEK. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points."
+        "text": "The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTR for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, RBNZ OCR OIS for NZD, NOWA OIS for NOK, and SWESTR OIS for SEK. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points. A fourth column cross-checks that OIS-implied bias against the currency’s own 2Y sovereign yield: a gray dot means the 2Y’s recent move agrees with what OIS has priced in, while an orange arrow flags a 2Y move that is both statistically unusual versus the rest of the G10 and running against the OIS-implied direction — an early divergence signal, before it necessarily shows up in spot."
       }
     },
     {
@@ -901,7 +901,7 @@ a { color: inherit; text-decoration: none; }
         <div class="panel-feature-text">
           <div class="mobile-feature-eyebrow">Central Bank Policy</div>
           <div class="mobile-feature-title">CB Rate Expectations</div>
-          <p class="panel-feature-desc">OIS-implied cut/hold/hike probabilities for all 10 G10 central banks, built on each bank's own reference rate — <strong>SOFR, ESTER, SONIA, TONA</strong>. Every meeting on the calendar, with the market-implied bias at a glance.</p>
+          <p class="panel-feature-desc">OIS-implied cut/hold/hike probabilities for all 10 G10 central banks, built on each bank's own reference rate — <strong>SOFR, ESTER, SONIA, TONA</strong>. Every meeting on the calendar, with the market-implied bias at a glance — plus a 2Y yield cross-check that flags when a currency's own short-end move is running ahead of what OIS has priced in.</p>
         </div>
         <div class="panel-feature-img">
           <div class="scr-hero-wrap">
@@ -1011,7 +1011,7 @@ a { color: inherit; text-decoration: none; }
           </button>
           <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-4" data-idx="4">
             <span class="showcase-tab-title">Yield Curve &amp; Sovereign Spreads</span>
-            <span class="showcase-tab-desc">10Y sovereign spreads vs. the US across all ten G10 currencies, with 2Y yields and curve-slope side by side.</span>
+            <span class="showcase-tab-desc">10Y sovereign spreads vs. the US across all ten G10 currencies, each with its own 2Y spread column and curve-slope — plus a Momentum tab ranking the G10 by 5D/20D change in the 2Y-vs-US spread.</span>
           </button>
           <button type="button" class="showcase-tab" role="tab" aria-selected="false" aria-controls="showcase-frame" id="showcase-tab-5" data-idx="5">
             <span class="showcase-tab-title">News Feed</span>
@@ -1044,8 +1044,8 @@ a { color: inherit; text-decoration: none; }
             <div class="showcase-slide" data-idx="3" role="button" tabindex="-1" aria-label="Enlarge: Currency Strength (CSI)" data-caption="Currency Strength (CSI) — accumulated % return by currency (1M&ndash;All), with composite score, 1W strength, G10 rank, and strongest/weakest crosses per currency.">
               <img src="assets/screenshot-csi-web-terminal.png" data-src="assets/screenshot-csi-web-terminal.png" alt="Currency Strength Heatmap modal in the Global Investing web terminal, CSI tab, showing accumulated percent-return lines for all 10 G10 currencies with composite score, 1-week strength, rank, pairs won, and strongest/weakest crosses" width="690" height="575" loading="lazy">
             </div>
-            <div class="showcase-slide" data-idx="4" role="button" tabindex="-1" aria-label="Enlarge: Yield Curve &amp; Sovereign Spreads" data-caption="Yield Curve &amp; Sovereign Spreads — 10Y sovereign spreads vs. the US across all ten G10 currencies, with 2Y yields and curve-slope side by side.">
-              <img src="assets/screenshot-rates-spreads.png" data-src="assets/screenshot-rates-spreads.png" alt="Rates & Yield Curve panel, Spreads tab, showing sovereign 10Y spreads versus the US for all ten G10 currencies alongside 2Y yields and a curve-slope indicator" width="1100" height="607" loading="lazy">
+            <div class="showcase-slide" data-idx="4" role="button" tabindex="-1" aria-label="Enlarge: Yield Curve &amp; Sovereign Spreads" data-caption="Yield Curve &amp; Sovereign Spreads — 10Y sovereign spreads vs. the US across all ten G10 currencies, each with its own 2Y spread column and curve-slope — plus a Momentum tab ranking the G10 by 5D/20D change in the 2Y-vs-US spread.">
+              <img src="assets/screenshot-rates-spreads.png" data-src="assets/screenshot-rates-spreads.png" alt="Rates & Yield Curve panel, Spreads tab, showing sovereign 10Y spreads versus the US for all ten G10 currencies alongside a dedicated 2Y-vs-US spread column and a curve-slope indicator" width="1100" height="607" loading="lazy">
             </div>
             <div class="showcase-slide" data-idx="5" role="button" tabindex="-1" aria-label="Enlarge: News Feed" data-caption="News Feed — FX-relevant headlines filterable by currency, with source and timestamp on every entry.">
               <img src="assets/screenshot-news-feed.png" data-src="assets/screenshot-news-feed.png" alt="News Feed panel with currency filter pills (All, USD, EUR, GBP, JPY, AUD, CAD, CHF, NZD, NOK, SEK) and a list of FX-relevant headlines with source, timestamp, and summary" width="704" height="347" loading="lazy">
@@ -1354,7 +1354,7 @@ a { color: inherit; text-decoration: none; }
         </details>
         <details class="faq-item" name="faq-signals">
           <summary>What are the OIS-implied central bank rate expectations?</summary>
-          <p>The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTR for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, RBNZ OCR OIS for NZD, NOWA OIS for NOK, and SWESTR OIS for SEK. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points.</p>
+          <p>The CB Rate Expectations panel shows the market-consensus forward direction for all 10 G10 central banks (Fed, ECB, BoE, BoJ, RBA, BoC, SNB, RBNZ, Norges Bank, Riksbank), derived from overnight index swap (OIS) or equivalent futures markets: SOFR futures for USD, ESTR for EUR, SONIA for GBP, TONA for JPY, ASX 30-day IB cash rate futures for AUD, CORRA for CAD, SARON for CHF, RBNZ OCR OIS for NZD, NOWA OIS for NOK, and SWESTR OIS for SEK. Each bank shows its current policy rate, the next scheduled meeting date, the market-implied bias (Cut/Hold/Hike), and the implied probability in basis points. A fourth column cross-checks that OIS-implied bias against the currency’s own 2Y sovereign yield: a gray dot means the 2Y’s recent move agrees with what OIS has priced in, while an orange arrow flags a 2Y move that is both statistically unusual versus the rest of the G10 and running against the OIS-implied direction — an early divergence signal, before it necessarily shows up in spot.</p>
         </details>
         <details class="faq-item" name="faq-signals">
           <summary>What is the 25-delta Risk Reversal and why does it matter?</summary>

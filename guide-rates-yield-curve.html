@@ -350,6 +350,7 @@ a { color: inherit; text-decoration: none; }
     <a class="toc-item" href="#us-de">US–DE 10Y Spread</a>
     <a class="toc-item" href="#us-jp">US–JP 10Y Spread</a>
     <a class="toc-item" href="#country-tabs">Country Tabs &amp; Spreads</a>
+    <a class="toc-item" href="#momentum">2Y Momentum Screener</a>
     <a class="toc-item" href="#market-commentary">Detail View &amp; Market Commentary</a>
     <a class="toc-item" href="#fx-implication">FX Implications</a>
     <div class="toc-divider"></div>
@@ -478,16 +479,26 @@ a { color: inherit; text-decoration: none; }
     <div class="guide-section" id="country-tabs">
       <h2>Country Tabs &amp; Sovereign Spreads</h2>
       <p>Above the US yield grid, a row of country tabs (<strong>US · DE · GB · JP · AU · CA · NZ · NO · SE · CH</strong>) lets you switch the panel to that country's own yield data — its own tenor grid and curve where available, sourced from the same daily G10 rates data as the US panel. This covers all ten G10 economies directly.</p>
-      <p>A final <strong>Spreads</strong> tab replaces the country grid with a single consolidated table: each of the nine non-US G10 economies shown above, with its 10Y yield, the spread versus the US 10Y in basis points, its 2Y yield where available, and a curve-slope indicator. This is the fastest way to scan all cross-country spreads at once rather than switching tabs one at a time.</p>
+      <p>A final <strong>Spreads</strong> tab replaces the country grid with a single consolidated table: each of the nine non-US G10 economies shown above, with its 10Y yield and spread versus the US 10Y in basis points, its 2Y yield and 2Y spread versus the US in its own column, and a curve-slope indicator. This is the fastest way to scan all cross-country spreads at once rather than switching tabs one at a time.</p>
       <div class="callout">
         <div class="callout-label">Note</div>
         <strong>Two different things called "spreads."</strong> The US pane's own spread table (2Y–10Y, US–DE, US–JP) is fixed and always visible without switching tabs — it covers the two most-watched relationships by default. The <strong>Spreads</strong> tab is a separate, broader view covering all nine non-US economies at once. Use the US pane's table for a quick read on EUR/USD and USD/JPY specifically; use the Spreads tab to scan the full G10 set, including NOK and SEK.
       </div>
       <div class="scr-hero-wrap">
         <div class="scr-hero scr-hero-contain">
-          <img src="assets/screenshot-rates-spreads.png" alt="Rates & Yield Curve panel, Spreads tab, showing sovereign 10Y spreads versus the US for DE, GB, JP, AU, CA, NZ, NO, SE, and CH alongside 2Y yields and a curve-slope indicator" width="700" height="339" loading="lazy">
+          <img src="assets/screenshot-rates-spreads.png" alt="Rates & Yield Curve panel, Spreads tab, showing sovereign 10Y spreads versus the US for DE, GB, JP, AU, CA, NZ, NO, SE, and CH alongside a dedicated 2Y-vs-US spread column and a curve-slope indicator" width="700" height="339" loading="lazy">
         </div>
-        <p class="scr-meta"><strong>The Spreads tab.</strong> All nine non-US G10 economies at once — 10Y yield, spread versus the US 10Y in basis points, 2Y yield where available, and curve-slope indicator.</p>
+        <p class="scr-meta"><strong>The Spreads tab.</strong> All nine non-US G10 economies at once — 10Y yield, spread versus the US 10Y, 2Y yield and spread versus the US, and curve-slope indicator.</p>
+      </div>
+    </div>
+
+    <div class="guide-section" id="momentum">
+      <h2>2Y Momentum Screener</h2>
+      <p>A second tab next to <strong>Spreads</strong>, ranking the nine non-US G10 economies by how fast their 2Y-vs-US spread is moving — the 5-business-day and 20-business-day change in basis points, sorted by |5D change|. The 20-day change is also shown as a small centred bar, extending right (green) or left (red) from the middle of the row.</p>
+      <p>The point of this screener is timing, not level: a currency's 2Y-vs-US spread can sit far from zero and still be stable, or sit close to zero and be moving fast. A spread that is widening or narrowing quickly is repricing policy expectations <em>right now</em> — often before that shows up in spot, since positioning and carry flows tend to follow the rate move rather than lead it.</p>
+      <div class="callout">
+        <div class="callout-label">Data note</div>
+        This screener runs on a daily 2Y-yield history accumulated since September 2026 — a currency shows <strong>"Accumulating history…"</strong> instead of a number until it has at least 6 daily observations to compute a change from. Norway (NOK) started from zero and will populate as its own history builds; no figure is estimated or backfilled to fill the gap.
       </div>
     </div>
 
