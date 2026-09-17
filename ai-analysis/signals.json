@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-09-17T07:01:52Z",
+  "generated_at": "2026-09-17T12:02:36Z",
   "signals": [
     {
-      "time": "06:58",
+      "time": "12:00",
       "priority": "critical",
       "title": "USD/NOK — G10 Bilateral Theme + Fed Divergence",
-      "text": "The G10 scorecard shows USD leading performance with a 1W average of +1.041% across 9 pairs, while NOK lags at −1.001% across 2 pairs, generating an extreme bilateral spread of 2.042%. The divergence is fundamentally anchored by Fed policy after delivering a 25bp hike to 4.00% against Norges Bank on hold at 4.25%, with the US yield curve reinforcing policy strength in a bear flattener regime as 2s10s sits at +33.6bp. Spot trades at 9.426, holding above the SMA20 at 9.308 while remaining below the SMA50/200 cluster at 9.465/9.594. Retail positioning is one-sided at 91% long USD/NOK, presenting overhead positioning drag even as macro divergence accelerates. Trade bias: Long USD/NOK, underpinned by policy divergence and G10 momentum spread. Catalyst: Norges Bank policy decision 24 Sep. Risk: Brent crude rebound above $105/bbl that cushions NOK terms of trade and compresses the spread below 0.80%.",
+      "text": "The G10 Currency Strength Scorecard flags a major bilateral divergence as USD outperforms by +1.211% across 9 G10 pairs while NOK lags by −1.140% across 2 pairs, generating a 2.351% leader-to-laggard spread. USD/NOK trades at 9.4262, positioned above its SMA20 of 9.308 but below the SMA50/200 cluster at 9.465/9.594. The structural divergence is backed by central bank policy, with Fed SOFR OIS at 3.6400% against Norges Bank, while nominal rates favor NOK, Fed's restrictive real policy rate of +1.59% outperforms NOK's +1.57%. Furthermore, crude oil price weakness with WTI falling -1.66% to $100.70 removes fundamental support from the Norwegian Krone. Trade bias: Bullish USD/NOK, driven by broad G10 Dollar dominance and oil price drag on NOK. Catalyst: US Initial Jobless Claims and Philadelphia Fed Index releases today at 12:30 UTC. Risk: A rebound in WTI crude oil above $103.00 compresses the G10 performance spread below 0.80%.",
       "evidence": [
-        "USD 1W avg: +1.041% (n=9)",
-        "NOK 1W avg: -1.001% (n=2)",
-        "G10 spread: 2.042%"
+        "USD 1W avg: +1.211% (n=9)",
+        "NOK 1W avg: -1.140% (n=2)",
+        "G10 spread: 2.351%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:52",
+      "time": "11:57",
+      "priority": "critical",
+      "title": "USD/JPY — Options Skew + Fed Repricing",
+      "text": "USD/JPY trades at 155.825, holding below its SMA20/50/200 cluster at 157.04/159.27/158.39 following a 25bp Fed holds at 4.0%. Options markets show intense downside hedging with 25d Risk Reversals at −2.18 (strong put skew) while IV sits at 9.5% against HV30 of 9.9% (VRP −0.4%). Speculative positioning remains heavily short JPY with CFTC Leveraged Funds net at −53,255 contracts (30th percentile), creating a setup where hawkish Fed repricing faces severe downside option demand ahead of the Bank of Japan decision. Trade bias: Bullish USD/JPY, carry-supported above 155.00 while VIX remains contained at 15.9. Catalyst: BoJ Interest Rate Decision and Policy Statement upcoming at ~02:30 UTC. Risk: A hawkish BoJ rate hike triggers immediate short-covering and option-driven unwinds toward 153.50.",
+      "evidence": [
+        "USD/JPY 25d RR: -2.18",
+        "USD/JPY OIS Carry: +266bp",
+        "JPY COT LF Net: -53,255"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "11:55",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Positioning",
-      "text": "CFTC data shows Leveraged Funds net long AUD at +48,379 contracts, placing positioning at the 93rd percentile and +1.72 standard deviations of its 52-week historical distribution. This crowded spec long profile coincides with a WoW reduction of −1,871 contracts, signaling stall in accumulation. Spot trades at 0.7121, trapped between the SMA50 at 0.7080 and the SMA20 at 0.7170. Options markets reflect caution, with 1M implied volatility running at 7.2% against realized HV30 of 5.4%, generating an elevated vol risk premium of +1.8% alongside a mild −0.72 put skew. Trade bias: Neutral/range AUD/USD, crowded positioning limiting further upside extension. Catalyst: RBA policy meeting 29 Sep. Risk: Leveraged funds net positioning expanding above +55,000 contracts to drive a momentum breakout above 0.7170.",
+      "title": "GBP/USD — BoE Hold + Positioning Overhang",
+      "text": "GBP/USD trades at 1.3369 after the Bank of England maintained its policy rate at 4.00% via a 6-3 vote split, breaking below its SMA20/50/200 cluster at 1.3545/1.3483/1.3455. CFTC positioning shows Leveraged Funds holding an elevated net long of +40,361 contracts at the 86th percentile of its 52-week range (z = +1.02), creating significant unwind vulnerability as policy momentum stalls. The OIS CIP carry basis between SONIA (3.7312%) and SOFR (3.6400%) offers a negligible −9bp differential, leaving Sterling exposed without structural yield protection. Trade bias: Bearish GBP/USD, vulnerable to speculative long unwinds following the dovish BoE vote split. Catalyst: UK Retail Sales m/m release on Friday at 06:00 UTC. Risk: UK Retail Sales prints well above the 0.9% forecast, forcing market participants to reprice additional BoE tightening.",
       "evidence": [
-        "AUD COT LF net: +48,379 (pctl 93, z +1.72)",
-        "AUD/USD VRP: IV 7.2% vs HV30 5.4% — +1.8%",
-        "AUD/USD: 0.7121 (below SMA20 0.7170, above SMA50 0.7080)"
+        "GBP COT LF Net: +40,361 (pctl 86)",
+        "BoE Rate Decision: 4.00% (Hold)",
+        "GBP/USD: 1.3369"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:47",
+      "time": "11:52",
       "priority": "warning",
-      "title": "EUR/USD — Tariff Risk + Technical Breakdown",
-      "text": "EUR/USD trades at 1.1486, failing to recover ground and holding firmly below its SMA20 (1.1616), SMA50 (1.1538), and SMA200 (1.1635) stack. Fundamental headwinds intensified following US announcements reviving trade tariffs on European trade ties, compounding a widening policy spread where Fed at 4.00% maintains a 135bp nominal carry advantage over ECB at 2.65% (+145bp on an OIS SOFR-€STR basis). ESI prints show European data beats moderating to +11.2 while Spain unemployment data showed a sharp increase. Leveraged positioning sits net short EUR at −46,381 contracts, reflecting institutional entrenchment against euro upside. Trade bias: Bearish EUR/USD, weighed down by trade frictions and policy divergence. Catalyst: Eurozone Final CPI release today at 09:00 UTC. Risk: Headline CPI printing above the 2.8% consensus, triggering ECB rate hike repricing.",
+      "title": "EUR/USD — Hawkish Fed vs ECB Stagnation",
+      "text": "EUR/USD trades at 1.1473, resting below its SMA20/50/200 cluster at 1.1616/1.1538/1.1635 following the Fed's 25bp rate hike. The OIS rate differential shows SOFR at 3.6400% vs €STR at 2.1900%, giving the Dollar a +145bp CIP carry advantage over the Euro. CFTC Leveraged Funds are net short EUR at −46,381 contracts (34th percentile), reflecting institutional distribution, while 1M implied volatility sits at 4.9% vs HV30 of 4.3% (VRP +0.6%). Trade bias: Bearish EUR/USD, capped by structural USD yield advantage and persistent downside technical momentum. Catalyst: ECB President Lagarde speech at 10:30 UTC on Friday. Risk: Euro Area CPI revisions or hawkish ECB commentary spark a retracement back toward the SMA50 at 1.1538.",
       "evidence": [
-        "Fed 4.0% vs ECB 2.65% — 135bp USD carry advantage",
-        "EUR/USD OIS carry: SOFR 3.64% vs €STR 2.19% — +145bp",
-        "EUR/USD: 1.1486 (below SMA20 1.1616, SMA50 1.1538, SMA200 1.1635)"
+        "EUR/USD OIS Spread: +145bp (USD advantage)",
+        "EUR COT LF Net: -46,381",
+        "EUR/USD: 1.1473"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:42",
+      "time": "11:47",
       "priority": "info",
-      "title": "USD/CHF — Options Volatility Disconnect",
-      "text": "USD/CHF 1M implied volatility sits at 6.5% against a 30-day realized volatility of 7.4%, producing an inverted vol risk premium of −0.9%. This pricing anomaly indicates severe options market complacency relative to actual spot movement. Spot trades at 0.8238, holding firmly above its SMA20 (0.8094), SMA50 (0.8101), and SMA200 (0.7936) baseline, reinforced by an immense 400bp Fed-SNB nominal policy differential (Fed 4.00% vs SNB 0.00%). Leveraged funds maintain net short CHF at −13,968 contracts in the 12th percentile of historical positioning, confirming deep structural funding status. Trade bias: Long USD/CHF, supported by positive carry and low realized hedging costs. Catalyst: SNB policy decision 24 Sep. Risk: Broad cross-asset volatility spike taking VIX above 25.0, triggering rapid CHF funding unwind.",
+      "title": "NZD/USD — Retail Extreme vs Crowded Spec Short",
+      "text": "NZD/USD trades at 0.5734, holding below its SMA20/50/200 cluster at 0.5878/0.5858/0.5856. Retail sentiment from Retail sentiment data shows an extreme 87% long / 13% short stance, which sharply diverges from institutional CFTC Leveraged Funds positioning that remains net short −18,092 contracts at the 8th percentile of its 52-week historical range (z = −1.40). The pair is also fundamentally cheap on a BEER fair-value basis (z = −1.67σ, spot 0.5734 vs fair value 0.5802). Trade bias: Bearish NZD/USD, as retail long capitulation threatens further downside despite cheap valuation. Catalyst: New Zealand Trade Balance data at 22:45 UTC. Risk: RBNZ hawkish guidance forces institutional short covering back toward 0.5820.",
       "evidence": [
-        "USD/CHF VRP: IV 6.5% vs HV30 7.4% — -0.9%",
-        "Fed 4.0% vs SNB 0.0% — 400bp USD carry advantage",
-        "CHF COT LF net: -13,968 (pctl 12, z -1.09)"
+        "NZD Retail Sentiment: 87% Long",
+        "NZD COT LF Net: -18,092 (pctl 8)",
+        "NZD/USD BEER z-score: -1.67σ"
       ],
       "_source": "engine-ai-primary"
     }
