@@ -12332,6 +12332,11 @@ function initG8RatesTabs() {
     if (cty === 'spreads') renderSovereignSpreads();
     if (cty === 'momentum') renderMomentumScreener();
   });
+
+  const spreadsSel = document.getElementById('spreads-base-sel');
+  if (spreadsSel) spreadsSel.addEventListener('change', () => renderSovereignSpreads(spreadsSel.value));
+  const momentumSel = document.getElementById('momentum-base-sel');
+  if (momentumSel) momentumSel.addEventListener('change', () => renderMomentumScreener(momentumSel.value));
 }
 
 const G8_YIELD_MAP = {
@@ -12356,20 +12361,41 @@ async function renderG8YieldPane(cty) {
   if (!cfg) return;
 
   try {
-    const ext = await fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    const [ext, hist2y] = await Promise.all([
+      fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null),
+      // bond2y-data/ already accumulates daily history for the Momentum screener (v8.507.0) —
+      // reused here to derive a real day-over-day 2Y change instead of a hardcoded "—".
+      // No equivalent bond10y-data/ history exists yet, so 10Y change stays disclosed as untracked.
+      fetch('./bond2y-data/' + cfg.file + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+    ]);
     if (!ext) { contentEl.textContent = 'Data unavailable — extended-data/' + cfg.file + '.json'; return; }
 
     const d = ext.data ?? ext;
+    let chg2y = null;
+    if (Array.isArray(hist2y) && hist2y.length >= 2) {
+      const sorted = [...hist2y].sort((a, b) => a.date < b.date ? -1 : 1);
+      const last = sorted[sorted.length - 1], prev = sorted[sorted.length - 2];
+      if (last?.value != null && prev?.value != null) chg2y = (last.value - prev.value) * 100;
+    }
+
     let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${cfg.subtitle}</div>`;
     const cols = cfg.tenors.length === 1 ? '1fr' : '1fr 1fr';
     html += `<div class="rates-grid" style="margin-bottom:6px;grid-template-columns:${cols};">`;
     cfg.tenors.forEach(t => {
       const val = d[t.k];
       const valStr = val != null ? val.toFixed(2) + '%' : '—';
+      let chgStr = '—', chgCls = 'flat', chgTitle = 'No daily history pipeline for this tenor yet';
+      if (t.k === 'bond2y') {
+        chgTitle = 'Day-over-day change · sourced from bond2y-data/';
+        if (chg2y != null) {
+          chgStr = (chg2y >= 0 ? '+' : '') + chg2y.toFixed(1) + 'bp';
+          chgCls = chg2y > 0 ? 'up' : chg2y < 0 ? 'down' : 'flat';
+        }
+      }
       html += `<div class="rate-cell">` +
         `<div class="rate-cty">${t.label}</div>` +
         `<div class="rate-val">${valStr}</div>` +
-        `<div class="rate-chg flat">—</div>` +
+        `<div class="rate-chg ${chgCls}" title="${chgTitle}">${chgStr}</div>` +
         `</div>`;
     });
     html += '</div>';
@@ -12382,129 +12408,125 @@ async function renderG8YieldPane(cty) {
   }
 }
 
-async function renderSovereignSpreads() {
+// All 10 G10 rates currencies — shared by the country tabs, the Spreads base
+// selector, and the Momentum base selector, so a base/comparison currency
+// list only needs updating in one place.
+const G10_RATE_CCYS = [
+  { code: 'us', ccy: 'USD', label: 'United States' },
+  { code: 'de', ccy: 'EUR', label: 'Germany' },
+  { code: 'gb', ccy: 'GBP', label: 'UK' },
+  { code: 'jp', ccy: 'JPY', label: 'Japan' },
+  { code: 'au', ccy: 'AUD', label: 'Australia' },
+  { code: 'ca', ccy: 'CAD', label: 'Canada' },
+  { code: 'nz', ccy: 'NZD', label: 'New Zealand' },
+  { code: 'no', ccy: 'NOK', label: 'Norway' },
+  { code: 'se', ccy: 'SEK', label: 'Sweden' },
+  { code: 'ch', ccy: 'CHF', label: 'Switzerland' },
+];
+
+let _spreadsBaseCcy = 'USD';
+const _spreadsRowsCache = {}; // base ccy -> rendered tbody HTML, avoids refetching on toggle-back
+
+async function renderSovereignSpreads(base) {
+  base = base || _spreadsBaseCcy;
+  _spreadsBaseCcy = base;
+
   const tbody = document.getElementById('sovereign-spreads-tbody');
   if (!tbody) return;
-  if (tbody.dataset.loaded === '2') return; 
 
-  const countries = [
-    { code: 'de', file: 'EUR', label: 'DE' },
-    { code: 'gb', file: 'GBP', label: 'GB' },
-    { code: 'jp', file: 'JPY', label: 'JP' },
-    { code: 'au', file: 'AUD', label: 'AU' },
-    { code: 'ca', file: 'CAD', label: 'CA' },
-    { code: 'nz', file: 'NZD', label: 'NZ' },
-    { code: 'no', file: 'NOK', label: 'NO' },
-    { code: 'se', file: 'SEK', label: 'SE' },
-    { code: 'ch', file: 'CHF', label: 'CH' },
-  ];
+  const baseInfo = G10_RATE_CCYS.find(c => c.ccy === base) || G10_RATE_CCYS[0];
+  const baseShort = baseInfo.code.toUpperCase();
+  const baseLabelEl = document.getElementById('spreads-base-label');
+  if (baseLabelEl) baseLabelEl.textContent = baseShort;
+  const th10 = document.getElementById('spreads-th-10y');
+  const th2 = document.getElementById('spreads-th-2y');
+  if (th10) { th10.textContent = 'vs ' + baseShort + ' (bp)'; th10.title = 'Spread vs ' + baseShort + ' 10Y in basis points'; }
+  if (th2) { th2.textContent = 'vs ' + baseShort + ' (bp)'; th2.title = 'Spread vs ' + baseShort + ' 2Y in basis points'; }
 
-  const usExt = await fetch('./extended-data/USD.json').then(r => r.ok ? r.json() : null).catch(() => null);
-  const _usData = usExt?.data ?? usExt;
-  const us10y = _usData?.bond10y ?? null;
-  const us2y  = _usData?.bond2y  ?? null;
+  if (_spreadsRowsCache[base]) { tbody.innerHTML = _spreadsRowsCache[base]; return; }
+  tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:8px 0;">Loading…</td></tr>';
 
-  const rows = tbody.querySelectorAll('tr');
-  await Promise.all(countries.map(async (c, idx) => {
-    const row = rows[idx];
-    if (!row) return;
-    const tds = row.querySelectorAll('td');
+  const countries = G10_RATE_CCYS.filter(c => c.ccy !== base);
 
-    try {
-      const ext = await fetch('./extended-data/' + c.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
-      const _extData = ext?.data ?? ext;
-      const cty10y = _extData?.bond10y ?? null;
-      const cty2y  = _extData?.bond2y  ?? null;
-      const stale2y = ext?.sources?.bond2y === 'stale-cached';
+  try {
+    const baseExt = await fetch('./extended-data/' + base + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+    const baseData = baseExt?.data ?? baseExt;
+    const base10y = baseData?.bond10y ?? null;
+    const base2y = baseData?.bond2y ?? null;
 
-      const n10 = cty10y;
-      const n2  = cty2y;
-      const us10 = us10y;
-      const us2  = us2y;
+    const fmtSpread = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v) + ' bp';
+    const colorSpread = v => v == null ? '' : v > 20 ? 'var(--up)' : v < -20 ? 'var(--down)' : 'var(--text2)';
 
-      if (tds[0]) { tds[0].innerHTML = `<span class="fi fi-${c.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${c.label}</span>`; }
-      if (tds[1]) { tds[1].textContent = n10 != null ? n10.toFixed(2) + '%' : '—'; }
+    const rowsHtml = await Promise.all(countries.map(async c => {
+      try {
+        const ext = await fetch('./extended-data/' + c.ccy + '.json').then(r => r.ok ? r.json() : null).catch(() => null);
+        const d = ext?.data ?? ext;
+        const cty10y = d?.bond10y ?? null;
+        const cty2y = d?.bond2y ?? null;
+        const stale2y = ext?.sources?.bond2y === 'stale-cached';
 
-      if (tds[2]) {
-        const spread = (n10 != null && us10 != null) ? (n10 - us10) * 100 : null; 
-        if (spread != null) {
-          tds[2].textContent = (spread >= 0 ? '+' : '') + Math.round(spread) + ' bp';
-          tds[2].style.color = spread > 20 ? 'var(--up)' : spread < -20 ? 'var(--down)' : 'var(--text2)';
-        } else { tds[2].textContent = '—'; }
+        const spread10 = (cty10y != null && base10y != null) ? (cty10y - base10y) * 100 : null;
+        const spread2 = (cty2y != null && base2y != null && !stale2y) ? (cty2y - base2y) * 100 : null;
+        const slope = (cty2y != null && cty10y != null && !stale2y) ? (cty10y - cty2y) * 100 : null;
+
+        return `<tr>` +
+          `<td><span class="fi fi-${c.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${c.code.toUpperCase()}</span></td>` +
+          `<td>${cty10y != null ? cty10y.toFixed(2) + '%' : '—'}</td>` +
+          `<td style="color:${colorSpread(spread10)}">${fmtSpread(spread10)}</td>` +
+          `<td style="color:${stale2y ? 'var(--text3)' : ''}" title="${stale2y ? `Stale — no fresh 2Y source available this run (cached ${ext?.dates?.bond2y || 'unknown date'})` : ''}">${cty2y != null ? cty2y.toFixed(2) + '%' : '—'}</td>` +
+          `<td style="color:${colorSpread(spread2)}" title="${stale2y ? '2Y is stale-cached — spread excluded to avoid a false reading' : ''}">${fmtSpread(spread2)}</td>` +
+          `<td style="color:${slope == null ? '' : slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)'}" title="${slope == null ? (stale2y ? '2Y is stale-cached — slope excluded to avoid a false reading' : '') : slope < 0 ? 'Inverted curve' : slope < 25 ? 'Flat curve' : 'Normal curve'}">${slope == null ? '—' : (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp'}</td>` +
+        `</tr>`;
+      } catch {
+        return `<tr><td><span class="fi fi-${c.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${c.code.toUpperCase()}</span></td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>`;
       }
+    }));
 
-      if (tds[3]) {
-        tds[3].textContent = n2 != null ? n2.toFixed(2) + '%' : '—';
-        tds[3].style.color = stale2y ? 'var(--text3)' : '';
-        tds[3].title = stale2y
-          ? `Stale — no fresh 2Y source available this run (cached ${ext?.dates?.bond2y || 'unknown date'})`
-          : '';
-      }
-
-      if (tds[4]) {
-        const spread2y = (n2 != null && us2 != null && !stale2y) ? (n2 - us2) * 100 : null;
-        if (spread2y != null) {
-          tds[4].textContent = (spread2y >= 0 ? '+' : '') + Math.round(spread2y) + ' bp';
-          tds[4].style.color = spread2y > 20 ? 'var(--up)' : spread2y < -20 ? 'var(--down)' : 'var(--text2)';
-        } else {
-          tds[4].textContent = '—';
-          tds[4].style.color = '';
-        }
-        tds[4].title = stale2y ? '2Y is stale-cached — spread excluded to avoid a false reading' : '';
-      }
-
-
-      if (tds[5]) {
-        const slope = (n2 != null && n10 != null && !stale2y) ? (n10 - n2) * 100 : null; 
-        if (slope != null) {
-          tds[5].textContent = (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp';
-          tds[5].style.color = slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)';
-          tds[5].title = slope < 0 ? 'Inverted curve' : slope < 25 ? 'Flat curve' : 'Normal curve';
-        } else {
-          tds[5].textContent = '—';
-          tds[5].style.color = '';
-          tds[5].title = stale2y ? '2Y is stale-cached — slope excluded to avoid a false reading' : '';
-        }
-      }
-    } catch {
-      tds.forEach((td, i) => { if (i > 0) td.textContent = '—'; });
-    }
-  }));
-  tbody.dataset.loaded = '2';
+    const html = rowsHtml.join('');
+    _spreadsRowsCache[base] = html;
+    tbody.innerHTML = html;
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="6" style="color:var(--text3);text-align:center;padding:8px 0;">Data unavailable</td></tr>';
+  }
 }
 
-async function renderMomentumScreener() {
+let _momentumBaseCcy = 'USD';
+const _momentumRowsCache = {}; // base ccy -> rendered tbody HTML
+
+async function renderMomentumScreener(base) {
+  base = base || _momentumBaseCcy;
+  _momentumBaseCcy = base;
+
   const tbody = document.getElementById('momentum-screener-tbody');
   if (!tbody) return;
-  if (tbody.dataset.loaded === '2') return;
 
-  const countries = [
-    { ccy: 'EUR', code: 'de' },
-    { ccy: 'GBP', code: 'gb' },
-    { ccy: 'JPY', code: 'jp' },
-    { ccy: 'AUD', code: 'au' },
-    { ccy: 'CAD', code: 'ca' },
-    { ccy: 'NZD', code: 'nz' },
-    { ccy: 'NOK', code: 'no' },
-    { ccy: 'SEK', code: 'se' },
-    { ccy: 'CHF', code: 'ch' },
-  ];
+  const baseInfo = G10_RATE_CCYS.find(c => c.ccy === base) || G10_RATE_CCYS[0];
+  const baseShort = baseInfo.code.toUpperCase();
+  const baseLabelEl = document.getElementById('momentum-base-label');
+  if (baseLabelEl) baseLabelEl.textContent = baseShort;
+  const th2y = document.getElementById('mom-th-2y');
+  if (th2y) { th2y.textContent = '2Y vs ' + baseShort + ' (bp)'; th2y.title = 'Current 2Y yield spread vs ' + baseShort + ', in basis points'; }
 
-  const [usdHist, ...histRes] = await Promise.all([
-    fetch('./bond2y-data/USD.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+  if (_momentumRowsCache[base]) { tbody.innerHTML = _momentumRowsCache[base]; return; }
+  tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text3);text-align:center;padding:8px 0;">Loading…</td></tr>';
+
+  const countries = G10_RATE_CCYS.filter(c => c.ccy !== base);
+
+  const [baseHist, ...histRes] = await Promise.all([
+    fetch(`./bond2y-data/${base}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
     ...countries.map(c => fetch(`./bond2y-data/${c.ccy}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)),
   ]);
 
-  const usdByDate = {};
-  (Array.isArray(usdHist) ? usdHist : []).forEach(r => { usdByDate[r.date] = r.value; });
+  const baseByDate = {};
+  (Array.isArray(baseHist) ? baseHist : []).forEach(r => { baseByDate[r.date] = r.value; });
 
   const results = countries.map((c, i) => {
     const hist = histRes[i];
     if (!Array.isArray(hist) || !hist.length) return { ...c, insufficient: true };
 
     const spreadSeries = hist
-      .filter(r => usdByDate[r.date] != null)
-      .map(r => ({ date: r.date, spread: (r.value - usdByDate[r.date]) * 100 }))
+      .filter(r => baseByDate[r.date] != null)
+      .map(r => ({ date: r.date, spread: (r.value - baseByDate[r.date]) * 100 }))
       .sort((a, b) => a.date < b.date ? -1 : 1);
 
     if (spreadSeries.length < 6) return { ...c, insufficient: true };
@@ -12531,7 +12553,7 @@ async function renderMomentumScreener() {
     return `<span class="mom-bar-wrap"><span class="mom-bar-tick"></span><span class="mom-bar ${dir}" style="width:${pct}%;"></span></span>`;
   };
 
-  tbody.innerHTML = results.map(r => {
+  const html = results.map(r => {
     const flagHtml = `<span class="fi fi-${r.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${r.ccy}</span>`;
     if (r.insufficient) {
       return `<tr><td>${flagHtml}</td><td colspan="4" style="color:var(--text3);">Accumulating history…</td></tr>`;
@@ -12544,7 +12566,8 @@ async function renderMomentumScreener() {
       <td>${momBarHtml(r.d20)}</td>
     </tr>`;
   }).join('');
-  tbody.dataset.loaded = '2';
+  _momentumRowsCache[base] = html;
+  tbody.innerHTML = html;
 }
 
 const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',

@@ -1471,6 +1471,11 @@ a.export-btn { display: inline-block; text-decoration: none; }
   color: var(--text); border-radius: 3px; padding: 2px 5px;
 }
 .alert-select { flex: 1; min-width: 80px; }
+.rates-base-select {
+  font-size: 9.5px; font-family: var(--font-mono);
+  background: var(--bg2, #1a1f2e); border: 1px solid var(--border2);
+  color: var(--text2); border-radius: 3px; padding: 2px 5px; cursor: pointer;
+}
 .alert-input  { width: 64px; }
 .alert-add-btn {
   font-size: 9px; font-family: var(--font-mono); font-weight: 600;
