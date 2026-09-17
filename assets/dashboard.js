@@ -12321,29 +12321,36 @@ async function renderSovereignSpreads() {
       }
 
       if (tds[3]) {
-        const spread2y = (n2 != null && us2 != null) ? (n2 - us2) * 100 : null;
-        const s2Cls = spread2y == null ? '' : spread2y > 20 ? 'var(--up)' : spread2y < -20 ? 'var(--down)' : 'var(--text2)';
-        tds[3].innerHTML = n2 != null
-          ? `<span>${n2.toFixed(2)}%</span>` + (spread2y != null
-              ? `<span style="display:block;font-size:9px;color:${s2Cls};">${spread2y >= 0 ? '+' : ''}${Math.round(spread2y)} bp</span>`
-              : '')
-          : '—';
+        tds[3].textContent = n2 != null ? n2.toFixed(2) + '%' : '—';
         tds[3].style.color = stale2y ? 'var(--text3)' : '';
         tds[3].title = stale2y
           ? `Stale — no fresh 2Y source available this run (cached ${ext?.dates?.bond2y || 'unknown date'})`
-          : (spread2y != null ? `2Y spread vs US: ${spread2y >= 0 ? '+' : ''}${Math.round(spread2y)} bp` : '');
+          : '';
       }
 
       if (tds[4]) {
-        const slope = (n2 != null && n10 != null && !stale2y) ? (n10 - n2) * 100 : null; 
-        if (slope != null) {
-          tds[4].textContent = (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp';
-          tds[4].style.color = slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)';
-          tds[4].title = slope < 0 ? 'Inverted curve' : slope < 25 ? 'Flat curve' : 'Normal curve';
+        const spread2y = (n2 != null && us2 != null && !stale2y) ? (n2 - us2) * 100 : null;
+        if (spread2y != null) {
+          tds[4].textContent = (spread2y >= 0 ? '+' : '') + Math.round(spread2y) + ' bp';
+          tds[4].style.color = spread2y > 20 ? 'var(--up)' : spread2y < -20 ? 'var(--down)' : 'var(--text2)';
         } else {
           tds[4].textContent = '—';
           tds[4].style.color = '';
-          tds[4].title = stale2y ? '2Y is stale-cached — slope excluded to avoid a false reading' : '';
+        }
+        tds[4].title = stale2y ? '2Y is stale-cached — spread excluded to avoid a false reading' : '';
+      }
+
+
+      if (tds[5]) {
+        const slope = (n2 != null && n10 != null && !stale2y) ? (n10 - n2) * 100 : null; 
+        if (slope != null) {
+          tds[5].textContent = (slope >= 0 ? '+' : '') + slope.toFixed(0) + ' bp';
+          tds[5].style.color = slope < 0 ? 'var(--down)' : slope > 50 ? 'var(--up)' : 'var(--text2)';
+          tds[5].title = slope < 0 ? 'Inverted curve' : slope < 25 ? 'Flat curve' : 'Normal curve';
+        } else {
+          tds[5].textContent = '—';
+          tds[5].style.color = '';
+          tds[5].title = stale2y ? '2Y is stale-cached — slope excluded to avoid a false reading' : '';
         }
       }
     } catch {
