@@ -1531,6 +1531,7 @@
     overlay.classList.add('cal-fs-active');
     document.body.style.overflow = 'hidden';
     relayoutCalendar();
+    if (typeof window._giOpenFocusTrap === 'function') window._giOpenFocusTrap(overlay);
   }
 
   function closeCalFullscreen() {
@@ -1540,6 +1541,7 @@
 
     overlay.classList.remove('cal-fs-active');
     document.body.style.overflow = '';
+    if (typeof window._giCloseFocusTrap === 'function') window._giCloseFocusTrap();
 
     if (_calFsOriginalParent && panel) {
       _calFsOriginalParent.insertBefore(panel, _calFsOriginalNext);

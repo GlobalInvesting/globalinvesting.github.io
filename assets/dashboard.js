@@ -1025,6 +1025,43 @@ function _corrPairsSetTf(tf) {
   renderCorrPairsMatrix(tf);
 }
 
+let _giFocusTrapEls = null;
+let _giFocusTrapHandler = null;
+let _giFocusTrapReturnEl = null;
+
+function _giOpenFocusTrap(overlay) {
+  if (!overlay) return;
+  _giFocusTrapReturnEl = document.activeElement;
+  const sel = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+  _giFocusTrapEls = Array.prototype.slice.call(overlay.querySelectorAll(sel))
+    .filter(el => el.offsetParent !== null);
+  if (_giFocusTrapEls.length) _giFocusTrapEls[0].focus();
+  else overlay.setAttribute('tabindex', '-1'), overlay.focus();
+  _giFocusTrapHandler = function (e) {
+    if (e.key !== 'Tab' || !_giFocusTrapEls || !_giFocusTrapEls.length) return;
+    const first = _giFocusTrapEls[0];
+    const last = _giFocusTrapEls[_giFocusTrapEls.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+  document.addEventListener('keydown', _giFocusTrapHandler, true);
+}
+
+function _giCloseFocusTrap() {
+  if (_giFocusTrapHandler) document.removeEventListener('keydown', _giFocusTrapHandler, true);
+  _giFocusTrapHandler = null;
+  _giFocusTrapEls = null;
+  if (_giFocusTrapReturnEl && typeof _giFocusTrapReturnEl.focus === 'function') {
+    _giFocusTrapReturnEl.focus();
+  }
+  _giFocusTrapReturnEl = null;
+}
+
 function openCorrMtxFullscreen() {
   const overlay = document.getElementById('corr-mtx-fullscreen-overlay');
   if (!overlay) return;
@@ -1033,6 +1070,7 @@ function openCorrMtxFullscreen() {
   overlay.classList.add('corr-mtx-fs-active');
   document.body.style.overflow = 'hidden';
   renderCorrPairsMatrix(_corrPairsActiveTf);
+  _giOpenFocusTrap(overlay);
 }
 
 function closeCorrMtxFullscreen() {
@@ -1041,6 +1079,7 @@ function closeCorrMtxFullscreen() {
 
   overlay.classList.remove('corr-mtx-fs-active');
   document.body.style.overflow = '';
+  _giCloseFocusTrap();
 }
 
 function _corrMtxFsWireUp() {
@@ -1958,6 +1997,7 @@ function openCotBreakdownFullscreen() {
   overlay.classList.add('cot-breakdown-fs-active');
   document.body.style.overflow = 'hidden';
   renderCotBreakdown();
+  _giOpenFocusTrap(overlay);
 }
 
 function closeCotBreakdownFullscreen() {
@@ -1966,6 +2006,7 @@ function closeCotBreakdownFullscreen() {
 
   overlay.classList.remove('cot-breakdown-fs-active');
   document.body.style.overflow = '';
+  _giCloseFocusTrap();
 }
 
 function _cotBreakdownFsWireUp() {
@@ -13257,6 +13298,7 @@ function openIntelFullscreen() {
   document.body.style.overflow = 'hidden';
   _intelFsSetTab('news'); 
   _intelRelayoutColumns(); 
+  _giOpenFocusTrap(overlay);
 }
 
 function closeIntelFullscreen() {
@@ -13266,6 +13308,7 @@ function closeIntelFullscreen() {
   if (!overlay || !overlay.classList.contains('intel-fs-active')) return;
 
   overlay.classList.remove('intel-fs-active');
+  _giCloseFocusTrap();
   document.body.style.overflow = '';
 
   if (_intelFsOriginalScrollParent && scroll) {
@@ -14091,6 +14134,7 @@ function _lwOpenFullscreen() {
     }
     if (typeof window._sznResizeChart === 'function') window._sznResizeChart();
   }));
+  _giOpenFocusTrap(overlay);
 }
 
 function _lwCloseFullscreen() {
@@ -14103,6 +14147,7 @@ function _lwCloseFullscreen() {
   if (!overlay || !overlay.classList.contains('lw-fs-active')) return;
 
   overlay.classList.remove('lw-fs-active');
+  _giCloseFocusTrap();
   document.body.style.overflow = '';
 
   if (_lwFsOriginalParent) {
