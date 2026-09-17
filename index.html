@@ -466,7 +466,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
-<link rel="stylesheet" href="assets/dashboard.css?v=8.511.0">
+<link rel="stylesheet" href="assets/dashboard.css?v=8.515.0">
 <link rel="stylesheet" href="assets/command-bar.css?v=8.491.5">
 
 
@@ -1246,41 +1246,61 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
       
       <div id="rates-pane-spreads" class="rates-country-pane" style="display:none;padding:6px 10px 2px;">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Sovereign 10Y Spreads vs US — extended-data</div>
-        <table id="sovereign-spreads-table" aria-label="Sovereign 10Y spreads vs US" style="width:100%;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Sovereign 10Y Spreads vs <span id="spreads-base-label">US</span> — extended-data</div>
+          <select id="spreads-base-sel" class="rates-base-select" aria-label="Base currency for spread comparison" style="margin-left:auto;">
+            <option value="USD" selected>vs US</option>
+            <option value="EUR">vs DE (EUR)</option>
+            <option value="GBP">vs GB (GBP)</option>
+            <option value="JPY">vs JP (JPY)</option>
+            <option value="AUD">vs AU (AUD)</option>
+            <option value="CAD">vs CA (CAD)</option>
+            <option value="NZD">vs NZ (NZD)</option>
+            <option value="NOK">vs NO (NOK)</option>
+            <option value="SEK">vs SE (SEK)</option>
+            <option value="CHF">vs CH (CHF)</option>
+          </select>
+        </div>
+        <table id="sovereign-spreads-table" aria-label="Sovereign 10Y spreads vs selected base currency" style="width:100%;">
           <thead>
             <tr>
               <th style="text-align:left" scope="col">Country</th>
               <th scope="col" title="10Y yield">10Y</th>
-              <th scope="col" title="Spread vs US 10Y in basis points">vs US (bp)</th>
+              <th id="spreads-th-10y" scope="col" title="Spread vs US 10Y in basis points">vs US (bp)</th>
               <th scope="col" title="2Y yield">2Y</th>
-              <th scope="col" title="Spread vs US 2Y in basis points">vs US (bp)</th>
+              <th id="spreads-th-2y" scope="col" title="Spread vs US 2Y in basis points">vs US (bp)</th>
               <th scope="col" title="2Y–10Y curve slope">Curve</th>
             </tr>
           </thead>
           <tbody id="sovereign-spreads-tbody">
-            <tr><td>Germany</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>UK</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Japan</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Australia</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Canada</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>New Zealand</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Norway</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Sweden</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
-            <tr><td>Switzerland</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+            <tr><td colspan="6" style="color:var(--text3);text-align:center;padding:8px 0;">Loading…</td></tr>
           </tbody>
         </table>
         <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · FRED · ECB · BOE</div>
       </div>
       <div id="rates-pane-momentum" class="rates-country-pane" style="display:none;padding:6px 10px 2px;">
-        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">2Y vs US Spread Momentum — 5d / 20d change</div>
-        <table id="momentum-screener-table" aria-label="2Y vs US spread momentum screener" style="width:100%;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">2Y vs <span id="momentum-base-label">US</span> Spread Momentum — 5d / 20d change</div>
+          <select id="momentum-base-sel" class="rates-base-select" aria-label="Base currency for momentum comparison" style="margin-left:auto;">
+            <option value="USD" selected>vs US</option>
+            <option value="EUR">vs DE (EUR)</option>
+            <option value="GBP">vs GB (GBP)</option>
+            <option value="JPY">vs JP (JPY)</option>
+            <option value="AUD">vs AU (AUD)</option>
+            <option value="CAD">vs CA (CAD)</option>
+            <option value="NZD">vs NZ (NZD)</option>
+            <option value="NOK">vs NO (NOK)</option>
+            <option value="SEK">vs SE (SEK)</option>
+            <option value="CHF">vs CH (CHF)</option>
+          </select>
+        </div>
+        <table id="momentum-screener-table" aria-label="2Y spread momentum screener vs selected base currency" style="width:100%;">
           <thead>
             <tr>
               <th style="text-align:left" scope="col">Country</th>
-              <th scope="col" title="Current 2Y yield spread vs US, in basis points">2Y vs US (bp)</th>
-              <th scope="col" title="Change in the 2Y vs US spread over the last 5 business days">5D Δ (bp)</th>
-              <th scope="col" title="Change in the 2Y vs US spread over the last 20 business days">20D Δ (bp)</th>
+              <th id="mom-th-2y" scope="col" title="Current 2Y yield spread vs US, in basis points">2Y vs US (bp)</th>
+              <th scope="col" title="Change in the 2Y spread over the last 5 business days">5D Δ (bp)</th>
+              <th scope="col" title="Change in the 2Y spread over the last 20 business days">20D Δ (bp)</th>
               <th scope="col" style="width:52px;" title="20-business-day change, scaled">20D Δ</th>
             </tr>
           </thead>
@@ -2105,7 +2125,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.511.0" defer></script>
+<script src="assets/dashboard.js?v=8.515.0" defer></script>
 <script src="assets/command-bar.js?v=8.491.4" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 
