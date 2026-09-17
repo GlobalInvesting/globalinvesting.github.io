@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-17T12:31:24Z",
-  "generatedAt": "2026-09-17T12:31:24Z",
+  "lastUpdate": "2026-09-17T12:33:08Z",
+  "generatedAt": "2026-09-17T12:33:08Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1104,9 +1104,9 @@
       "std": 0.689807
     },
     "USD/philadelphia fed manufacturing index": {
-      "n": 3,
-      "mean": 28.166667,
-      "std": 5.653612
+      "n": 4,
+      "mean": 25.7,
+      "std": 6.756232
     },
     "USD/retail sales control group mom": {
       "n": 3,
@@ -1304,9 +1304,9 @@
       "std": 1.504438
     },
     "CAD/new housing price index mom": {
-      "n": 3,
-      "mean": 0.033333,
-      "std": 0.11547
+      "n": 4,
+      "mean": 0.025,
+      "std": 0.095743
     },
     "SEK/gdp growth rate qoq": {
       "n": 3,
@@ -1462,6 +1462,11 @@
       "n": 2,
       "mean": 1.9,
       "std": 2.404163
+    },
+    "USD/philadelphia fed employment": {
+      "n": 2,
+      "mean": 12.25,
+      "std": 20.435386
     },
     "EUR/france s&p global manufacturing pmi": {
       "n": 2,
@@ -62541,7 +62546,7 @@
       "flag": "🇨🇦",
       "event": "Canada Foreign Securities Purchases",
       "impact": "medium",
-      "actual": null,
+      "actual": "20.653B",
       "forecast": null,
       "previous": "40.828B"
     },
@@ -62554,7 +62559,7 @@
       "flag": "🇨🇦",
       "event": "Canada Foreign Securities Purchases by Canadians",
       "impact": "low",
-      "actual": null,
+      "actual": "-30.627B",
       "forecast": null,
       "previous": "35.432B"
     },
@@ -62567,7 +62572,7 @@
       "flag": "🇨🇦",
       "event": "Canada IPPI m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "1.3%",
       "forecast": "0.5%",
       "previous": "0.6%"
     },
@@ -62580,7 +62585,7 @@
       "flag": "🇨🇦",
       "event": "Canada IPPI y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "13.5%",
       "forecast": "10.5%",
       "previous": "12.4%"
     },
@@ -62619,7 +62624,7 @@
       "flag": "🇨🇦",
       "event": "Canada New Housing Price Index m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1%",
       "forecast": "-0.1%",
       "previous": "-0.1%"
     },
@@ -62684,7 +62689,7 @@
       "flag": "🇺🇸",
       "event": "Philadelphia Fed Manufacturing Index",
       "impact": "high",
-      "actual": null,
+      "actual": "37.8",
       "forecast": "19.5",
       "previous": "47.4"
     },
@@ -62697,7 +62702,7 @@
       "flag": "🇺🇸",
       "event": "Philadelphia Fed Employment",
       "impact": "medium",
-      "actual": null,
+      "actual": "11.8",
       "forecast": "14.0",
       "previous": "27.9"
     },
@@ -62710,7 +62715,7 @@
       "flag": "🇺🇸",
       "event": "Philadelphia Fed Business Conditions",
       "impact": "low",
-      "actual": null,
+      "actual": "52.9",
       "forecast": "54.7",
       "previous": "73.6"
     },
@@ -62723,7 +62728,7 @@
       "flag": "🇺🇸",
       "event": "Philadelphia Fed Prices Paid",
       "impact": "low",
-      "actual": null,
+      "actual": "48.6",
       "forecast": "49.0",
       "previous": "40.9"
     },
@@ -62736,7 +62741,7 @@
       "flag": "🇺🇸",
       "event": "Philadelphia Fed New Orders",
       "impact": "low",
-      "actual": null,
+      "actual": "29.2",
       "forecast": "28.7",
       "previous": "30.1"
     },
@@ -62749,7 +62754,7 @@
       "flag": "🇺🇸",
       "event": "Philadelphia Fed Capex Index",
       "impact": "low",
-      "actual": null,
+      "actual": "37.1",
       "forecast": "38.9",
       "previous": "48.2"
     },
@@ -64869,7 +64874,7 @@
       "event": "United States Initial Jobless Claims",
       "impact": "high",
       "actual": null,
-      "forecast": null,
+      "forecast": "189K",
       "previous": "196K"
     },
     {
@@ -64882,7 +64887,7 @@
       "event": "United States Continuing Jobless Claims",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "1.724M",
       "previous": "1.730M"
     },
     {
@@ -64895,7 +64900,7 @@
       "event": "United States Initial Jobless Claims 4-Week Average",
       "impact": "low",
       "actual": null,
-      "forecast": null,
+      "forecast": "202.851K",
       "previous": "203.250K"
     },
     {
