@@ -289,25 +289,51 @@ jobs:
             exit 0
           fi
 
+          # v8.521.0 FIX: this step's gate was "did economic-events.json
+          # change at all this run" + "is there a released, high-impact
+          # rate-decision actual within the last 3 days" -- with no check
+          # for whether THIS specific decision had already been dispatched.
+          # Any unrelated field changing elsewhere in the file (a forecast
+          # update on a different currency, for example) re-set CHANGED=1
+          # on a normal 5-minute cron tick, and the RATE_DEC scan then
+          # re-matched the SAME already-dispatched decision again, every
+          # time, for up to 3 days after every G10 rate decision -- firing
+          # repository_dispatch[cb-rate-decision] into both private repos
+          # (globalinvesting-scripts' update-rates.yml AND
+          # globalinvesting-engine's workflow_meetings.yml) roughly every
+          # 5 minutes for days, confirmed live via both repos' Actions run
+          # history. Fixed with a small persisted dedup log
+          # (calendar-data/cb-rate-dispatch-log.json, keyed on
+          # currency|dateISO|actual) committed alongside the calendar data:
+          # a decision is only dispatched once per distinct
+          # currency+date+actual-value combination; a later revision to
+          # the same event's actual (rare, but has happened for this
+          # project) still dispatches once, since the key changes with it.
           printf '%s\n' \
-            'import json,sys' \
+            'import json,os' \
             'from datetime import datetime,timezone,timedelta' \
             'cal=json.load(open("calendar-data/economic-events.json"))' \
             'events=cal.get("events",[])' \
             'today=datetime.now(timezone.utc).date()' \
             'window=set((today-timedelta(days=d)).strftime("%Y-%m-%d") for d in range(3))' \
             'kw=["interest rate decision","interest rate","rate decision","monetary policy decision","policy rate","cash rate"]' \
-            'hits=[ev["currency"]+":"+ev["actual"].strip() for ev in events if ev.get("released") and ev.get("dateISO") in window and ev.get("impact")=="high" and ev.get("actual","").strip() and any(k in (ev.get("title") or "").lower() for k in kw)]' \
+            'candidates=[ev for ev in events if ev.get("released") and ev.get("dateISO") in window and ev.get("impact")=="high" and ev.get("actual","").strip() and any(k in (ev.get("title") or "").lower() for k in kw)]' \
+            'log_path="calendar-data/cb-rate-dispatch-log.json"' \
+            'log=json.load(open(log_path)) if os.path.exists(log_path) else {}' \
+            'def key(ev): return ev["currency"]+"|"+ev["dateISO"]+"|"+ev["actual"].strip()' \
+            'new=[ev for ev in candidates if key(ev) not in log]' \
+            'hits=[ev["currency"]+":"+ev["actual"].strip() for ev in new]' \
+            'open("/tmp/new_rate_dec_keys.json","w").write(json.dumps([key(ev) for ev in new]))' \
             'print(",".join(hits) if hits else "")' \
             > /tmp/check_rate_dec.py
           RATE_DEC=$(python3 /tmp/check_rate_dec.py 2>/dev/null || echo "")
 
           if [ -z "${RATE_DEC}" ]; then
-            echo "No Interest Rate Decision actuals detected — skipping dispatch."
+            echo "No NEW Interest Rate Decision actuals since the last dispatch — skipping."
             exit 0
           fi
 
-          echo "Interest Rate Decision actual(s) detected: ${RATE_DEC}"
+          echo "New Interest Rate Decision actual(s) detected: ${RATE_DEC}"
           NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
           echo "Firing repository_dispatch[cb-rate-decision] -> GlobalInvesting/globalinvesting-scripts (update-rates.yml)"
@@ -337,3 +363,47 @@ jobs:
             echo "WARNING: dispatch to globalinvesting-engine returned HTTP ${HTTP_CODE_2} -- check PAT_TOKEN scope/expiry."
             cat /tmp/dispatch2.json 2>/dev/null || true
           fi
+
+      - name: Persist cb-rate-decision dispatch log (dedup, v8.521.0)
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          if [ ! -f /tmp/new_rate_dec_keys.json ]; then
+            exit 0
+          fi
+          NEW_KEYS=$(cat /tmp/new_rate_dec_keys.json)
+          if [ "${NEW_KEYS}" = "[]" ]; then
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          for i in 1 2 3; do
+            echo "--- Dispatch-log commit attempt $i ---"
+            git fetch origin main
+            git reset --hard origin/main
+
+            NEW_KEYS_JSON="${NEW_KEYS}" python3 -c "
+          import json, os
+          log_path = 'calendar-data/cb-rate-dispatch-log.json'
+          log = json.load(open(log_path)) if os.path.exists(log_path) else {}
+          new_keys = json.loads(os.environ['NEW_KEYS_JSON'])
+          now = __import__('datetime').datetime.now(__import__('datetime').timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
+          for k in new_keys:
+              log[k] = now
+          json.dump(log, open(log_path, 'w'), indent=2, sort_keys=True)
+          "
+            git add calendar-data/cb-rate-dispatch-log.json
+            if git diff --quiet && git diff --staged --quiet; then
+              echo "No changes vs remote HEAD — dedup entry already present (race resolved)."
+              exit 0
+            fi
+            git commit -m "cb-rate-decision dispatch log: $(date -u '+%Y-%m-%d %H:%M UTC')"
+            if git push origin main; then
+              echo "Dispatch log pushed on attempt $i."
+              exit 0
+            fi
+            echo "Push rejected (attempt $i) — retrying in $((i * 2))s..."
+            sleep $((i * 2))
+          done
+          echo "WARNING: could not persist dispatch log after 3 attempts — a duplicate dispatch is possible on the next matching run, not a data-loss risk."
