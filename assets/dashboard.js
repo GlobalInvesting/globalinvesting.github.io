@@ -899,11 +899,25 @@ async function renderCorrPairsMatrix(tf) {
   const corrMap = _pairsCorrMap(ids, rets, cfg.bars);
   const orderedIds = _pairsClusterOrder(ids, corrMap);
 
+  let bond2yByCcy = null, diffTagById = {};
+  if (tf === 'daily') {
+    bond2yByCcy = await _load2YDiffFactorSeries();
+    CORR_MTX_PAIRS.forEach(([id, base, quote]) => {
+      diffTagById[id] = _pairs2YDiffTag(base, quote, rets[id], bond2yByCcy);
+    });
+  }
+  const diffTitle = id => {
+    if (tf !== 'daily') return '';
+    const t = diffTagById[id];
+    if (!t || t.r == null) return ' · 2Y Diff factor: accumulating history (' + (t ? t.n : 0) + '/6 sessions min)';
+    return ' · 2Y Diff factor: r=' + (t.r >= 0 ? '+' : '') + t.r.toFixed(2) + ' (n=' + t.n + ')';
+  };
+
   let html = '<div id="corr-pairs-fs-wrap"><table id="corr-pairs-fs-table" aria-label="Pair correlation matrix, clustered by correlation"><thead><tr><th></th>' +
-    orderedIds.map(id => `<th scope="col">${lblById[id]}</th>`).join('') + '</tr></thead><tbody>';
+    orderedIds.map(id => `<th scope="col" title="${lblById[id]}${diffTitle(id)}">${lblById[id]}</th>`).join('') + '</tr></thead><tbody>';
 
   orderedIds.forEach(rowId => {
-    html += `<tr><th scope="row">${lblById[rowId]}</th>`;
+    html += `<tr><th scope="row" title="${lblById[rowId]}${diffTitle(rowId)}">${lblById[rowId]}</th>`;
     orderedIds.forEach(colId => {
       if (rowId === colId) {
         html += `<td style="background:var(--bg2);color:var(--text3);">—</td>`;
@@ -915,10 +929,67 @@ async function renderCorrPairsMatrix(tf) {
     });
     html += '</tr>';
   });
+  const diffFootnote = tf === 'daily'
+    ? ' · row/column headers carry a 2Y Diff factor tag (own FX return vs. change in that pair\'s 2Y yield spread, sourced from bond2y-data/, accumulated daily since 2026-09) — hover a header to see it; still accumulating history for most pairs'
+    : ' · 2Y Diff factor not shown on this tab (bond2y-data/ is daily-only, not blended into 4h/1h)';
   html += '</tbody></table>' +
-    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral seriation — pairs sorted by their loading on the correlation matrix's leading eigenvector, so the most strongly correlated pairs (positive or negative) cluster at the two edges and weakly-correlated pairs sit in the middle — not alphabetical</div></div>`;
+    `<div style="padding:8px 0 0;font-size:9px;color:var(--text3);">Pairwise Pearson · log-returns, last ${cfg.bars} ${tf === 'daily' ? 'daily closes' : tf + ' bars'} · rows/columns ordered by spectral seriation — pairs sorted by their loading on the correlation matrix's leading eigenvector, so the most strongly correlated pairs (positive or negative) cluster at the two edges and weakly-correlated pairs sit in the middle — not alphabetical${diffFootnote}</div></div>`;
 
   inner.innerHTML = html;
+}
+
+let _bond2yByCcyPromise = null;
+async function _load2YDiffFactorSeries() {
+  if (_bond2yByCcyPromise) return _bond2yByCcyPromise;
+  _bond2yByCcyPromise = (async () => {
+    const out = {};
+    await Promise.all(CORR_MTX_CCYS.map(async ccy => {
+      try {
+        const r = await fetch('./bond2y-data/' + ccy + '.json', { cache: 'no-store' });
+        const hist = r.ok ? await r.json() : null;
+        if (Array.isArray(hist) && hist.length) {
+          const byDate = {};
+          hist.forEach(row => { if (row && row.date != null && typeof row.value === 'number') byDate[row.date] = row.value; });
+          out[ccy] = byDate;
+        }
+      } catch (e) {  }
+    }));
+    return out;
+  })();
+  return _bond2yByCcyPromise;
+}
+
+function _diffByDate(seriesByDate) {
+  if (!seriesByDate) return null;
+  const dates = _sortDateKeys(Object.keys(seriesByDate));
+  if (dates.length < 2) return null;
+  const out = {};
+  for (let i = 1; i < dates.length; i++) {
+    out[dates[i]] = seriesByDate[dates[i]] - seriesByDate[dates[i - 1]];
+  }
+  return out;
+}
+
+// Factor 2Y Diff — correlates each pair's own daily FX return against the
+// day-over-day change in its (base 2Y - quote 2Y) yield spread, joined by
+// calendar date (v8.180.0/v8.273.0 join rule), zero new fetch beyond
+// bond2y-data/ already accumulated daily since v8.507.0. Daily cadence
+// only — bond2y-data has no 4h/1h granularity, so this factor is not
+// computed for those tabs rather than blended across mismatched cadences.
+function _pairs2YDiffTag(base, quote, fxRetsByDate, bond2yByCcy) {
+  const baseHist = bond2yByCcy[base], quoteHist = bond2yByCcy[quote];
+  if (!baseHist || !quoteHist || !fxRetsByDate) return { r: null, n: 0 };
+  const sharedDates = _sortDateKeys(Object.keys(baseHist).filter(d => Object.prototype.hasOwnProperty.call(quoteHist, d)));
+  if (sharedDates.length < 2) return { r: null, n: 0 };
+  const spreadByDate = {};
+  sharedDates.forEach(d => { spreadByDate[d] = baseHist[d] - quoteHist[d]; });
+  const spreadChangeByDate = _diffByDate(spreadByDate);
+  if (!spreadChangeByDate) return { r: null, n: 0 };
+  const jointDates = _sortDateKeys(Object.keys(fxRetsByDate).filter(d => Object.prototype.hasOwnProperty.call(spreadChangeByDate, d)));
+  const MIN_OBS = 6; // same accumulation floor as the Momentum screener (v8.507.0)
+  if (jointDates.length < MIN_OBS) return { r: null, n: jointDates.length };
+  const a = jointDates.map(d => fxRetsByDate[d]), b = jointDates.map(d => spreadChangeByDate[d]);
+  return { r: _pearsonCorr(a, b), n: jointDates.length };
 }
 
 function _corrPairsWireHover() {
@@ -12453,17 +12524,24 @@ async function renderMomentumScreener() {
 
   const fmtBp = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v) + ' bp';
   const colorBp = v => v == null ? 'var(--text2)' : v > 20 ? 'var(--up)' : v < -20 ? 'var(--down)' : 'var(--text2)';
+  const momBarHtml = v => {
+    if (v == null) return '<span class="mom-bar-wrap"><span class="mom-bar-tick"></span></span>';
+    const pct = Math.min(Math.abs(v) * 2, 50);
+    const dir = v >= 0 ? 'pos' : 'neg';
+    return `<span class="mom-bar-wrap"><span class="mom-bar-tick"></span><span class="mom-bar ${dir}" style="width:${pct}%;"></span></span>`;
+  };
 
   tbody.innerHTML = results.map(r => {
     const flagHtml = `<span class="fi fi-${r.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${r.ccy}</span>`;
     if (r.insufficient) {
-      return `<tr><td>${flagHtml}</td><td colspan="3" style="color:var(--text3);">Accumulating history…</td></tr>`;
+      return `<tr><td>${flagHtml}</td><td colspan="4" style="color:var(--text3);">Accumulating history…</td></tr>`;
     }
     return `<tr>
       <td>${flagHtml}</td>
       <td style="color:${colorBp(r.now)}">${fmtBp(r.now)}</td>
       <td style="color:${colorBp(r.d5)}">${fmtBp(r.d5)}</td>
       <td style="color:${colorBp(r.d20)}">${fmtBp(r.d20)}</td>
+      <td>${momBarHtml(r.d20)}</td>
     </tr>`;
   }).join('');
   tbody.dataset.loaded = '2';

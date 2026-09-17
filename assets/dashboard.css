@@ -1696,6 +1696,31 @@ a.export-btn { display: inline-block; text-decoration: none; }
   background: var(--border2);
   border-radius: 0;
 }
+.mom-bar-wrap {
+  display: inline-block;
+  width: 46px;
+  height: 6px;
+  background: var(--bg3);
+  border-radius: 1px;
+  vertical-align: middle;
+  position: relative;
+  overflow: hidden;
+}
+.mom-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.mom-bar.pos { background: var(--up); left: 50%; }
+.mom-bar.neg { background: var(--down); right: 50%; }
+.mom-bar-tick {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border2);
+}
 .es-bar-fill {
   position: absolute;
   top: 0;
