@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-17T07:24:57Z",
-  "generatedAt": "2026-09-17T07:24:57Z",
+  "lastUpdate": "2026-09-17T08:01:21Z",
+  "generatedAt": "2026-09-17T08:01:21Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-17",
   "rangeTo": "2026-10-01",
-  "totalEvents": 5335,
+  "totalEvents": 5337,
   "currencyCounts": {
     "GBP": 541,
     "EUR": 1495,
@@ -20,10 +20,10 @@
     "AUD": 324,
     "CHF": 161,
     "SEK": 221,
-    "NOK": 132
+    "NOK": 134
   },
   "impactCounts": {
-    "medium": 2311,
+    "medium": 2313,
     "high": 1717,
     "low": 1307
   },
@@ -62084,7 +62084,7 @@
       "flag": "🇳🇴",
       "event": "Norges Bank Regional Network - Output Growth",
       "impact": "low",
-      "actual": null,
+      "actual": "0.30",
       "forecast": "0.29",
       "previous": "0.40"
     },
@@ -64501,6 +64501,32 @@
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "ECB Economic Bulletin",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "24 Sep",
+      "dateISO": "2026-09-24",
+      "timeUTC": "08:00",
+      "country": "NOK",
+      "currency": "NOK",
+      "flag": "🇳🇴",
+      "event": "Norges Bank Interest Rate Decision",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "4.00%"
+    },
+    {
+      "date": "24 Sep",
+      "dateISO": "2026-09-24",
+      "timeUTC": "08:00",
+      "country": "NOK",
+      "currency": "NOK",
+      "flag": "🇳🇴",
+      "event": "Norges Bank Monetary Policy Report",
       "impact": "medium",
       "actual": null,
       "forecast": null,
