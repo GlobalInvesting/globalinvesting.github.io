@@ -998,7 +998,7 @@
     ensureMethodologyTooltip();  
     ensureHistModal();           
     _calRenderIndex = [];
-    const isDocked = !isCalFullscreenActive();
+    const isDocked = !isCalFullscreenActive() && window.innerWidth <= 900;
 
     const _now       = new Date();
     const nowMs      = _now.getTime();
@@ -1164,7 +1164,7 @@
         const localTime = toLocalTime(ev.dateISO, ev.timeUTC);
         const upcomingAttr = (!isPast) ? ' data-upcoming="1"' : '';
         const isTentative = ev.timeMode === 'tentative';
-        const tentativeTimeText = ev.timeUTC ? `~${ev.timeUTC} UTC` : 'Tentative';
+        const tentativeTimeText = ev.timeUTC ? `~${localTime}` : 'Tentative';
 
         const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
         let liveClass = '';
@@ -1173,7 +1173,7 @@
         if (!ev.timeUTC) {
           timeCellHtml = `<span class="cal-time-tentative" title="Day confirmed by the data provider; exact release time not yet published">${localTime}</span>`;
         } else if (isTentative) {
-          timeCellHtml = `<span class="cal-time-tentative" title="Estimated release time \u2014 provisional, not yet confirmed by the data provider. Shown in UTC, not your local time, since the calendar day this event is grouped under is anchored to the data provider's confirmed date, not to this estimate.">${tentativeTimeText}</span>`;
+          timeCellHtml = `<span class="cal-time-tentative" title="Estimated release time \u2014 provisional, not yet confirmed by the data provider. Shown in your local time (${tzLabel()}); the calendar day this event is grouped under stays anchored to the data provider's confirmed date, not to this estimate.">${tentativeTimeText}</span>`;
           dockedTimeLabel = tentativeTimeText;
         }
         let liveBadgeHtml = '';
@@ -1681,11 +1681,22 @@
   }
 
   let _calResizeTimer = null;
+  let _calWasMobile = window.innerWidth <= 900;
   window.addEventListener('resize', function () {
     const overlay = document.getElementById('cal-fullscreen-overlay');
-    if (!overlay || !overlay.classList.contains('cal-fs-active')) return;
-    clearTimeout(_calResizeTimer);
-    _calResizeTimer = setTimeout(relayoutCalendar, 150);
+    if (overlay && overlay.classList.contains('cal-fs-active')) {
+      clearTimeout(_calResizeTimer);
+      _calResizeTimer = setTimeout(relayoutCalendar, 150);
+      return;
+    }
+    const isMobileNow = window.innerWidth <= 900;
+    if (isMobileNow !== _calWasMobile) {
+      _calWasMobile = isMobileNow;
+      clearTimeout(_calResizeTimer);
+      _calResizeTimer = setTimeout(function () {
+        if (_lastEvents) buildPanel(_lastEvents, _lastSource, _lastHolidays);
+      }, 150);
+    }
   });
 
   document.getElementById('cal-fs-btn')?.addEventListener('click', openCalFullscreen);
