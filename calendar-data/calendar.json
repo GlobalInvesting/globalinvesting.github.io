@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-17T08:32:02Z",
-  "generatedAt": "2026-09-17T08:32:02Z",
+  "lastUpdate": "2026-09-17T09:01:19Z",
+  "generatedAt": "2026-09-17T09:01:19Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1692,6 +1692,16 @@
       "n": 2,
       "mean": 0.15,
       "std": 0.212132
+    },
+    "EUR/core cpi mom": {
+      "n": 2,
+      "mean": -0.15,
+      "std": 0.212132
+    },
+    "EUR/core cpi yoy": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.0
     },
     "NZD/gdt price index": {
       "n": 2,
@@ -62130,26 +62140,26 @@
     {
       "date": "17 Sep",
       "dateISO": "2026-09-17",
-      "timeUTC": "08:50",
+      "timeUTC": "08:59",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "France 3-Year OAT Auction",
       "impact": "low",
-      "actual": null,
+      "actual": "3.590%",
       "forecast": null,
       "previous": "3.170%"
     },
     {
       "date": "17 Sep",
       "dateISO": "2026-09-17",
-      "timeUTC": "08:50",
+      "timeUTC": "08:59",
       "country": "EUR",
       "currency": "EUR",
       "flag": "🇪🇺",
       "event": "France 5-Year OAT Auction",
       "impact": "low",
-      "actual": null,
+      "actual": "3.920%",
       "forecast": null,
       "previous": "3.370%"
     },
@@ -62162,7 +62172,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Core CPI m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
       "previous": "0.2%"
     },
@@ -62188,7 +62198,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Core CPI y/y",
       "impact": "medium",
-      "actual": null,
+      "actual": "2.4%",
       "forecast": "2.4%",
       "previous": "2.4%"
     },
@@ -62214,7 +62224,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI excl. Tobacco m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "0.5%",
       "previous": "0.2%"
     },
@@ -62227,7 +62237,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI excl. Tobacco y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.2%",
       "forecast": "2.8%",
       "previous": "2.9%"
     },
