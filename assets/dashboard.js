@@ -12285,10 +12285,10 @@ function initG8RatesTabs() {
 const G8_YIELD_MAP = {
   de: { file: 'EUR', label: 'Germany', subtitle: 'GERMANY · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y Bund' }, { k: 'bond10y', label: '10Y Bund' }] },
   gb: { file: 'GBP', label: 'UK',      subtitle: 'UK · SOVEREIGN BOND YIELDS',      tenors: [{ k: 'bond2y', label: '2Y Gilt' }, { k: 'bond10y', label: '10Y Gilt' }] },
-  jp: { file: 'JPY', label: 'Japan',   subtitle: 'JAPAN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond10y', label: '10Y JGB' }] },
-  au: { file: 'AUD', label: 'Australia', subtitle: 'AUSTRALIA · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y ACGB' }] },
+  jp: { file: 'JPY', label: 'Japan',   subtitle: 'JAPAN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y JGB' }, { k: 'bond10y', label: '10Y JGB' }] },
+  au: { file: 'AUD', label: 'Australia', subtitle: 'AUSTRALIA · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y ACGB' }, { k: 'bond10y', label: '10Y ACGB' }] },
   ca: { file: 'CAD', label: 'Canada',  subtitle: 'CANADA · SOVEREIGN BOND YIELDS',  tenors: [{ k: 'bond2y', label: '2Y CGB' }, { k: 'bond10y', label: '10Y CGB' }] },
-  nz: { file: 'NZD', label: 'New Zealand', subtitle: 'NEW ZEALAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond10y', label: '10Y NZGB' }] },
+  nz: { file: 'NZD', label: 'New Zealand', subtitle: 'NEW ZEALAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y NZGB' }, { k: 'bond10y', label: '10Y NZGB' }] },
   no: { file: 'NOK', label: 'Norway',   subtitle: 'NORWAY · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y NGB' }, { k: 'bond10y', label: '10Y NGB' }] },
   se: { file: 'SEK', label: 'Sweden',   subtitle: 'SWEDEN · SOVEREIGN BOND YIELDS',   tenors: [{ k: 'bond2y', label: '2Y SGB' }, { k: 'bond10y', label: '10Y SGB' }] },
   ch: { file: 'CHF', label: 'Switzerland', subtitle: 'SWITZERLAND · SOVEREIGN BOND YIELDS', tenors: [{ k: 'bond2y', label: '2Y Conf.' }, { k: 'bond10y', label: '10Y Conf.' }] },
