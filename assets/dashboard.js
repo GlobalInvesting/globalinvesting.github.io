@@ -12249,7 +12249,7 @@ function initG8RatesTabs() {
       const isActive = b === btn;
       b.setAttribute('aria-selected', isActive ? 'true' : 'false');
       b.style.background = isActive ? 'var(--accent)' : 'none';
-      b.style.color = isActive ? '#fff' : (b.dataset.cty === 'spreads' ? 'var(--accent)' : 'var(--text2)');
+      b.style.color = isActive ? '#fff' : ((b.dataset.cty === 'spreads' || b.dataset.cty === 'momentum') ? 'var(--accent)' : 'var(--text2)');
       b.style.border = isActive ? 'none' : '1px solid var(--border2)';
     });
 
@@ -12257,8 +12257,9 @@ function initG8RatesTabs() {
     const pane = document.getElementById('rates-pane-' + cty);
     if (pane) pane.style.display = '';
 
-    if (cty !== 'us' && cty !== 'spreads') renderG8YieldPane(cty);
+    if (cty !== 'us' && cty !== 'spreads' && cty !== 'momentum') renderG8YieldPane(cty);
     if (cty === 'spreads') renderSovereignSpreads();
+    if (cty === 'momentum') renderMomentumScreener();
   });
 }
 
@@ -12398,6 +12399,73 @@ async function renderSovereignSpreads() {
       tds.forEach((td, i) => { if (i > 0) td.textContent = '—'; });
     }
   }));
+  tbody.dataset.loaded = '2';
+}
+
+async function renderMomentumScreener() {
+  const tbody = document.getElementById('momentum-screener-tbody');
+  if (!tbody) return;
+  if (tbody.dataset.loaded === '2') return;
+
+  const countries = [
+    { ccy: 'EUR', code: 'de' },
+    { ccy: 'GBP', code: 'gb' },
+    { ccy: 'JPY', code: 'jp' },
+    { ccy: 'AUD', code: 'au' },
+    { ccy: 'CAD', code: 'ca' },
+    { ccy: 'NZD', code: 'nz' },
+    { ccy: 'NOK', code: 'no' },
+    { ccy: 'SEK', code: 'se' },
+    { ccy: 'CHF', code: 'ch' },
+  ];
+
+  const [usdHist, ...histRes] = await Promise.all([
+    fetch('./bond2y-data/USD.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+    ...countries.map(c => fetch(`./bond2y-data/${c.ccy}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)),
+  ]);
+
+  const usdByDate = {};
+  (Array.isArray(usdHist) ? usdHist : []).forEach(r => { usdByDate[r.date] = r.value; });
+
+  const results = countries.map((c, i) => {
+    const hist = histRes[i];
+    if (!Array.isArray(hist) || !hist.length) return { ...c, insufficient: true };
+
+    const spreadSeries = hist
+      .filter(r => usdByDate[r.date] != null)
+      .map(r => ({ date: r.date, spread: (r.value - usdByDate[r.date]) * 100 }))
+      .sort((a, b) => a.date < b.date ? -1 : 1);
+
+    if (spreadSeries.length < 6) return { ...c, insufficient: true };
+
+    const n = spreadSeries.length;
+    const now = spreadSeries[n - 1].spread;
+    const d5 = spreadSeries[n - 6].spread != null ? now - spreadSeries[n - 6].spread : null;
+    const d20 = n >= 21 ? now - spreadSeries[n - 21].spread : null;
+    return { ...c, now, d5, d20, insufficient: false };
+  });
+
+  results.sort((a, b) => {
+    const av = (!a.insufficient && a.d5 != null) ? Math.abs(a.d5) : -1;
+    const bv = (!b.insufficient && b.d5 != null) ? Math.abs(b.d5) : -1;
+    return bv - av;
+  });
+
+  const fmtBp = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v) + ' bp';
+  const colorBp = v => v == null ? 'var(--text2)' : v > 20 ? 'var(--up)' : v < -20 ? 'var(--down)' : 'var(--text2)';
+
+  tbody.innerHTML = results.map(r => {
+    const flagHtml = `<span class="fi fi-${r.code}" style="margin-right:4px;border-radius:1px;vertical-align:middle;"></span><span>${r.ccy}</span>`;
+    if (r.insufficient) {
+      return `<tr><td>${flagHtml}</td><td colspan="3" style="color:var(--text3);">Accumulating history…</td></tr>`;
+    }
+    return `<tr>
+      <td>${flagHtml}</td>
+      <td style="color:${colorBp(r.now)}">${fmtBp(r.now)}</td>
+      <td style="color:${colorBp(r.d5)}">${fmtBp(r.d5)}</td>
+      <td style="color:${colorBp(r.d20)}">${fmtBp(r.d20)}</td>
+    </tr>`;
+  }).join('');
   tbody.dataset.loaded = '2';
 }
 
@@ -13151,6 +13219,8 @@ function _repaintAfterExclusivePanelClosed() {
         if (cty && cty !== 'us') {
           if (cty === 'spreads' && typeof renderSovereignSpreads === 'function') {
             renderSovereignSpreads();
+          } else if (cty === 'momentum' && typeof renderMomentumScreener === 'function') {
+            renderMomentumScreener();
           } else if (typeof renderG8YieldPane === 'function') {
             const contentEl = document.getElementById('rates-g8-content-' + cty);
             if (contentEl) delete contentEl.dataset.loaded;
