@@ -3661,8 +3661,8 @@ function drawYieldCurve(points, priorPoints) {
       if (v == null) return;
       const x = px(i), y = py(v);
       ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI*2);
-      ctx.fillStyle=_tc('--bg'); ctx.fill();
-      ctx.lineWidth=1.6; ctx.strokeStyle=_tc('--chart-line'); ctx.stroke();
+      ctx.fillStyle=_tc('--chart-line'); ctx.fill();
+      ctx.lineWidth=1.6; ctx.strokeStyle=_tc('--bg'); ctx.stroke();
     });
   }
 
