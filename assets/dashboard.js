@@ -12361,12 +12361,14 @@ async function renderG8YieldPane(cty) {
   if (!cfg) return;
 
   try {
-    const [ext, hist2y] = await Promise.all([
+    const [ext, hist2y, hist10y] = await Promise.all([
       fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null),
       // bond2y-data/ already accumulates daily history for the Momentum screener (v8.507.0) —
       // reused here to derive a real day-over-day 2Y change instead of a hardcoded "—".
-      // No equivalent bond10y-data/ history exists yet, so 10Y change stays disclosed as untracked.
       fetch('./bond2y-data/' + cfg.file + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
+      // bond10y-data/ (v8.516.0) mirrors bond2y-data/'s daily accumulation for the 10Y tenor,
+      // written by log_10y_yield_history.py — same day-over-day derivation as 2Y below.
+      fetch('./bond10y-data/' + cfg.file + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
     ]);
     if (!ext) { contentEl.textContent = 'Data unavailable — extended-data/' + cfg.file + '.json'; return; }
 
@@ -12376,6 +12378,12 @@ async function renderG8YieldPane(cty) {
       const sorted = [...hist2y].sort((a, b) => a.date < b.date ? -1 : 1);
       const last = sorted[sorted.length - 1], prev = sorted[sorted.length - 2];
       if (last?.value != null && prev?.value != null) chg2y = (last.value - prev.value) * 100;
+    }
+    let chg10y = null;
+    if (Array.isArray(hist10y) && hist10y.length >= 2) {
+      const sorted = [...hist10y].sort((a, b) => a.date < b.date ? -1 : 1);
+      const last = sorted[sorted.length - 1], prev = sorted[sorted.length - 2];
+      if (last?.value != null && prev?.value != null) chg10y = (last.value - prev.value) * 100;
     }
 
     let html = `<div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${cfg.subtitle}</div>`;
@@ -12390,6 +12398,14 @@ async function renderG8YieldPane(cty) {
         if (chg2y != null) {
           chgStr = (chg2y >= 0 ? '+' : '') + chg2y.toFixed(1) + 'bp';
           chgCls = chg2y > 0 ? 'up' : chg2y < 0 ? 'down' : 'flat';
+        }
+      } else if (t.k === 'bond10y') {
+        chgTitle = 'Day-over-day change · sourced from bond10y-data/';
+        if (chg10y != null) {
+          chgStr = (chg10y >= 0 ? '+' : '') + chg10y.toFixed(1) + 'bp';
+          chgCls = chg10y > 0 ? 'up' : chg10y < 0 ? 'down' : 'flat';
+        } else {
+          chgTitle = 'Accumulating history — bond10y-data/ has no prior-day observation yet for this currency';
         }
       }
       html += `<div class="rate-cell">` +
@@ -12546,11 +12562,18 @@ async function renderMomentumScreener(base) {
 
   const fmtBp = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v) + ' bp';
   const colorBp = v => v == null ? 'var(--text2)' : v > 20 ? 'var(--up)' : v < -20 ? 'var(--down)' : 'var(--text2)';
-  const momBarHtml = v => {
+  // Bar direction is the 20D change in the (country − base) 2Y yield spread — the same
+  // rate-differential-momentum convention used industry-wide (e.g. Bloomberg WIRP-style
+  // 2s spread momentum): a widening spread in the country's favor (positive) signals that
+  // country's rate momentum outpacing the base; a narrowing/inverting spread (negative)
+  // signals the base's momentum is stronger.
+  const momBarHtml = (v, ccy, baseCcy) => {
     if (v == null) return '<span class="mom-bar-wrap"><span class="mom-bar-tick"></span></span>';
     const pct = Math.min(Math.abs(v) * 2, 50);
     const dir = v >= 0 ? 'pos' : 'neg';
-    return `<span class="mom-bar-wrap"><span class="mom-bar-tick"></span><span class="mom-bar ${dir}" style="width:${pct}%;"></span></span>`;
+    const leader = v >= 0 ? ccy : baseCcy;
+    const title = `${leader} has the stronger 2Y rate momentum (20D spread change ${v >= 0 ? '+' : ''}${v.toFixed(0)} bp in ${leader}'s favor)`;
+    return `<span class="mom-bar-wrap" title="${title}"><span class="mom-bar-tick"></span><span class="mom-bar ${dir}" style="width:${pct}%;"></span></span>`;
   };
 
   const html = results.map(r => {
@@ -12563,7 +12586,7 @@ async function renderMomentumScreener(base) {
       <td style="color:${colorBp(r.now)}">${fmtBp(r.now)}</td>
       <td style="color:${colorBp(r.d5)}">${fmtBp(r.d5)}</td>
       <td style="color:${colorBp(r.d20)}">${fmtBp(r.d20)}</td>
-      <td>${momBarHtml(r.d20)}</td>
+      <td>${momBarHtml(r.d20, r.ccy, base)}</td>
     </tr>`;
   }).join('');
   _momentumRowsCache[base] = html;
