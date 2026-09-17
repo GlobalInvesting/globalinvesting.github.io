@@ -197,7 +197,59 @@
       .cal-event-row.cal-live-soon:hover { background: rgba(255,167,38,.12); }
       .cal-event-row.cal-live-imminent { background: rgba(239,83,80,.10); }
       .cal-event-row.cal-live-imminent:hover { background: rgba(239,83,80,.16); }
+      .cal-card.cal-live-soon     { background: rgba(255,167,38,.06); }
+      .cal-card.cal-live-soon:hover { background: rgba(255,167,38,.12); }
+      .cal-card.cal-live-imminent { background: rgba(239,83,80,.10); }
+      .cal-card.cal-live-imminent:hover { background: rgba(239,83,80,.16); }
       .cal-live-countdown { animation: calLivePulse 1.1s ease-in-out infinite; color: var(--down); }
+    `;
+    document.head.appendChild(s);
+  }
+
+  function ensureDockedCalStyles() {
+    if (document.getElementById('cal-docked-style')) return;
+    const s = document.createElement('style');
+    s.id = 'cal-docked-style';
+    s.textContent = `
+      #cal-events-body.cal-docked .cal-time-block { display: flex; gap: 8px; padding: 0 8px; }
+      #cal-events-body.cal-docked .cal-time-label {
+        flex: 0 0 40px; padding-top: 8px; text-align: right;
+        font-size: 10px; font-weight: 500; color: var(--text2);
+        font-family: var(--font-mono); white-space: nowrap;
+      }
+      #cal-events-body.cal-docked .cal-time-rail {
+        flex: 1; min-width: 0; border-left: 1px solid var(--border); padding-left: 8px;
+      }
+      #cal-events-body.cal-docked .cal-card {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border);
+        transition: background .1s;
+      }
+      #cal-events-body.cal-docked .cal-time-rail .cal-card:last-child { border-bottom: none; }
+      #cal-events-body.cal-docked .cal-card:hover { background: var(--bg3); }
+      #cal-events-body.cal-docked .cal-card.cal-released { opacity: .55; }
+      #cal-events-body.cal-docked .cal-card.cal-holiday-row { opacity: .75; }
+      #cal-events-body.cal-docked .cal-card-left {
+        display: flex; align-items: flex-start; gap: 5px; min-width: 0;
+      }
+      #cal-events-body.cal-docked .cal-col.cal-title {
+        white-space: normal; overflow: visible; text-overflow: clip;
+        font-size: 12px; color: var(--text); line-height: 1.3; padding-right: 0;
+      }
+      #cal-events-body.cal-docked .cal-card-right { text-align: right; flex: 0 0 auto; padding-left: 4px; }
+      #cal-events-body.cal-docked .cal-card-actual {
+        font-size: 12px; font-family: var(--font-mono); color: var(--text); white-space: nowrap;
+      }
+      #cal-events-body.cal-docked .cal-card-sub {
+        font-size: 9px; font-family: var(--font-mono); color: var(--text3);
+        margin-top: 2px; white-space: nowrap;
+      }
+      #cal-view-all-link {
+        display: block; text-align: center; padding: 8px 10px;
+        font-size: 11px; color: var(--text2); cursor: pointer;
+        border-top: 1px solid var(--border); background: var(--head-bg);
+      }
+      #cal-view-all-link:hover { color: var(--text); background: var(--bg3); }
     `;
     document.head.appendChild(s);
   }
@@ -942,9 +994,11 @@
     const sourceEl  = document.getElementById('cal-panel-sub');
     if (!container) return;
     ensureLiveStyles();          
+    ensureDockedCalStyles();
     ensureMethodologyTooltip();  
     ensureHistModal();           
-    _calRenderIndex = [];        
+    _calRenderIndex = [];
+    const isDocked = !isCalFullscreenActive();
 
     const _now       = new Date();
     const nowMs      = _now.getTime();
@@ -1025,6 +1079,13 @@
       const isToday = dateISO === today;
       let gHtml = `<div class="cal-date-row" data-date="${dateISO}"${isToday ? ' data-today="1"' : ''}>${formatDate(dateISO)}</div>`;
 
+      const dockedGroups = [];
+      const pushDockedCard = (label, cardHtml) => {
+        const last = dockedGroups[dockedGroups.length - 1];
+        if (last && last.label === label) { last.html += cardHtml; }
+        else dockedGroups.push({ label, html: cardHtml });
+      };
+
       dayHols.forEach(hol => {
         const ccy = hol.currency || '';
         const f   = FLAG[ccy] || '';
@@ -1033,6 +1094,18 @@
           : '';
         const holTitle  = hol.title || 'Bank Holiday';
         const tooltipTx = `${_escAttr(holTitle)} — ${_escAttr(ccy)} market closed`;
+
+        if (isDocked) {
+          pushDockedCard('All day', `<div class="cal-card cal-holiday-row" title="${tooltipTx}">` +
+            `<div class="cal-card-left">` +
+            `<span class="cal-dot" style="background:var(--text3);margin-top:5px;" title="Market holiday"></span>` +
+            `${flagHtml}<div class="cal-col cal-title">${_escAttr(holTitle)}</div>` +
+            `</div>` +
+            `<div class="cal-card-right"><div class="cal-card-actual" style="color:var(--text3)">${_escAttr(ccy)}</div></div>` +
+            `</div>`);
+          return;
+        }
+
         gHtml += `<div class="cal-event-row cal-holiday-row" title="${tooltipTx}">` +
           `<div class="cal-col cal-time">All Day</div>` +
           `<div class="cal-col cal-ccy">${flagHtml}<span style="font-size:10px;">${_escAttr(ccy)}</span></div>` +
@@ -1096,21 +1169,48 @@
         const isLiveTarget = !!(liveTarget && liveTarget.ev === ev);
         let liveClass = '';
         let timeCellHtml = localTime;
+        let dockedTimeLabel = localTime;
         if (!ev.timeUTC) {
           timeCellHtml = `<span class="cal-time-tentative" title="Day confirmed by the data provider; exact release time not yet published">${localTime}</span>`;
         } else if (isTentative) {
           timeCellHtml = `<span class="cal-time-tentative" title="Estimated release time \u2014 provisional, not yet confirmed by the data provider. Shown in UTC, not your local time, since the calendar day this event is grouped under is anchored to the data provider's confirmed date, not to this estimate.">${tentativeTimeText}</span>`;
+          dockedTimeLabel = tentativeTimeText;
         }
+        let liveBadgeHtml = '';
         if (isLiveTarget) {
           const delta = liveTarget.evMs - nowMs;
           liveClass = delta <= CAL_LIVE_IMMINENT_MS ? ' cal-live-imminent' : ' cal-live-soon';
-          timeCellHtml = `<span class="cal-live-countdown" data-live-ms="${liveTarget.evMs}" ` +
+          const countdownHtml = `<span class="cal-live-countdown" data-live-ms="${liveTarget.evMs}" ` +
             `title="${localTime} local \u2014 next high-impact release">${fmtCountdown(delta)}</span>`;
+          timeCellHtml = countdownHtml;
+          liveBadgeHtml = ` ${countdownHtml}`;
         }
 
         const methodText  = _calMethodologyFor(ev.title);
         const histIdx     = _calRenderIndex.push(ev) - 1;
         const titleInner  = _escAttr(ev.title);
+
+        if (isDocked) {
+          const titleAttrs = methodText
+            ? ` data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}" data-cal-hist-idx="${histIdx}"`
+            : ` title="${_escAttr(ev.title)}" data-cal-hist-idx="${histIdx}"`;
+          const fcstOrDash = ev.forecast ? forecastHtml : '<span style="color:var(--text3)">—</span>';
+          const dockedSub  = `${previousHtml} \u2192 ${fcstOrDash}`;
+          const cardHtml = `<div class="cal-card${dimmed ? ' cal-released' : ''}${liveClass}"${upcomingAttr}>` +
+            `<div class="cal-card-left">` +
+            `<span class="cal-dot" style="background:${dot.color};margin-top:5px;" title="${dot.label} impact"></span>` +
+            `${flagHtml}` +
+            `<div class="cal-col cal-title" style="cursor:pointer;"${titleAttrs}>${titleInner}${liveBadgeHtml}</div>` +
+            `</div>` +
+            `<div class="cal-card-right">` +
+            `<div class="cal-card-actual">${actualHtml}</div>` +
+            `<div class="cal-card-sub">${dockedSub}</div>` +
+            `</div>` +
+            `</div>`;
+          pushDockedCard(dockedTimeLabel, cardHtml);
+          return;
+        }
+
         const titleCellHtml = methodText
           ? `<div class="cal-col cal-title" data-cal-tip="1" data-cal-tip-title="${_escAttr(ev.title)}" data-cal-tip-body="${_escAttr(methodText)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`
           : `<div class="cal-col cal-title" title="${_escAttr(ev.title)}" data-cal-hist-idx="${histIdx}" style="cursor:pointer;">${titleInner}</div>`;
@@ -1126,13 +1226,23 @@
 </div>`;
       });
 
+      if (isDocked && dockedGroups.length) {
+        gHtml += dockedGroups.map(g =>
+          `<div class="cal-time-block">` +
+          `<div class="cal-time-label">${_escAttr(g.label)}</div>` +
+          `<div class="cal-time-rail">${g.html}</div>` +
+          `</div>`
+        ).join('');
+      }
+
       groups.push({ dateISO, html: gHtml, rowCount: 1 + dayHols.length + dayEvs.length });
     });
 
     const splitCols = shouldSplitCalColumns() && groups.length > 1;
     container.classList.toggle('cal-cols-active', splitCols);
+    container.classList.toggle('cal-docked', isDocked);
     const staticHdr = document.getElementById('cal-static-col-header');
-    if (staticHdr) staticHdr.style.display = splitCols ? 'none' : 'grid';
+    if (staticHdr) staticHdr.style.display = (splitCols || isDocked) ? 'none' : 'grid';
     document.getElementById('section-tvcalendar')?.classList.toggle('cal-fs-split', splitCols);
 
     const ccyBox      = document.getElementById('cal-ccy-filter');
@@ -1191,6 +1301,9 @@
         `</div>`;
     } else {
       html = groups.map(g => g.html).join('');
+      if (isDocked) {
+        html += `<div id="cal-view-all-link" role="button" tabindex="0">Ver todos los eventos <i class="ti ti-chevron-down" aria-hidden="true"></i></div>`;
+      }
     }
 
     const isFirstRender     = container.dataset.calInitialized !== '1';
@@ -1286,6 +1399,7 @@
     setupWeekNavUI(); 
     setupMethodologyTooltipDelegation(container); 
     setupHistModalDelegation(container); 
+    setupViewAllLinkUI();
     tickLiveCountdown(); 
   }
 
@@ -1499,6 +1613,21 @@
   function shouldSplitCalColumns() {
     const overlay = document.getElementById('cal-fullscreen-overlay');
     return !!(overlay && overlay.classList.contains('cal-fs-active') && window.innerWidth >= 1400);
+  }
+
+  function isCalFullscreenActive() {
+    const overlay = document.getElementById('cal-fullscreen-overlay');
+    return !!(overlay && overlay.classList.contains('cal-fs-active'));
+  }
+
+  function setupViewAllLinkUI() {
+    const link = document.getElementById('cal-view-all-link');
+    if (!link) return;
+    link.setAttribute('aria-label', 'View all calendar events in fullscreen');
+    link.addEventListener('click', openCalFullscreen);
+    link.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCalFullscreen(); }
+    });
   }
 
   function buildCalColHeaderHtml() {
