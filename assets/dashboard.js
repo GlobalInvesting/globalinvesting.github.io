@@ -8839,22 +8839,6 @@ async function fetchFedExpectations() {
       )
     ]);
 
-    // OIS vs 2Y Cross-check (Option C — icon + tooltip, see mock-2y-ois-panels.html
-    // §5): each currency's own 2Y yield 5-business-day change, cross-referenced
-    // against how much of a near-term move the OIS-derived bias/probability
-    // (already in production above) has priced in. A currency where the OIS
-    // path says "Hold" with high conviction but the 2Y is moving hard is
-    // repricing ahead of the OIS snapshot — flagged. A currency whose 2Y move
-    // is small, or whose direction agrees with what's priced, is not.
-    //
-    // "Moving hard" is a cross-sectional z-score against the same day's other
-    // 9 currencies' own 5d changes, not a fixed bp threshold — this project's
-    // own standing rule (GUIDELINES.md, CRISIS_VIX_THRESHOLD incident) is that
-    // a magic-number cutoff must be justified externally or avoided; a
-    // relative/statistical cutoff among directly comparable series doesn't
-    // have that problem. Missing history (a currency with <6 logged rows,
-    // e.g. NOK before its own accumulation catches up) yields delta5d=null
-    // and is disclosed as "no icon" rather than guessed at.
     const bond2yDelta5d = {};
     currencies.forEach((c, i) => {
       const hist = bond2yHistRes[i];
@@ -9004,10 +8988,6 @@ async function fetchFedExpectations() {
       const meta = bankMeta[ccy];
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
-      // OIS vs 2Y Cross-check icon (Option C) — see the pre-pass above for
-      // bond2yDelta5d/_deltaMean/_deltaStd. Only renders when there's a real
-      // bias reading AND real 2Y history for this currency; otherwise the
-      // cell stays empty (disclosed gap, not guessed).
       let chk2yIcon = '';
       const d5 = bond2yDelta5d[ccy];
       if (_haveProbData && d5 != null && _deltaStd != null) {
@@ -9021,9 +9001,9 @@ async function fetchFedExpectations() {
         const probTxt = probPct != null ? ` (${probPct}%)` : '';
         const d5Txt = (d5 > 0 ? '+' : '') + d5 + 'bp';
         if (diverges) {
-          chk2yIcon = `<span class="warning" style="font-size:11px;cursor:default;" title="2Y corriendo por delante del path de OIS — OIS: ${biasWord}${probTxt} · 2Y 5d: ${d5Txt} (${z.toFixed(1)}σ vs G10)">${d5 > 0 ? '▲' : '▼'}</span>`;
+          chk2yIcon = `<span class="warning" style="font-size:11px;cursor:default;" title="2Y running ahead of the OIS-implied path — OIS: ${biasWord}${probTxt} · 2Y 5d: ${d5Txt} (${z.toFixed(1)}σ vs G10)">${d5 > 0 ? '▲' : '▼'}</span>`;
         } else {
-          chk2yIcon = `<span style="font-size:11px;cursor:default;color:var(--border2);" title="2Y alineado con el path implícito de OIS — OIS: ${biasWord}${probTxt} · 2Y 5d: ${d5Txt}">●</span>`;
+          chk2yIcon = `<span style="font-size:11px;cursor:default;color:var(--border2);" title="2Y aligned with the OIS-implied path — OIS: ${biasWord}${probTxt} · 2Y 5d: ${d5Txt}">●</span>`;
         }
       }
 
