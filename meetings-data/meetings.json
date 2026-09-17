@@ -66,8 +66,8 @@
       "fwdRate": 2.5
     },
     "GBP": {
-      "nextMeeting": "17 Sep",
-      "nextMeetingISO": "2026-09-17",
+      "nextMeeting": "5 Nov",
+      "nextMeetingISO": "2026-11-05",
       "allMeetings": [
         "2026-02-06",
         "2026-03-20",
@@ -89,13 +89,13 @@
         "17 Dec"
       ],
       "source": "bankofengland.co.uk",
-      "bias": "hold",
+      "bias": "hike",
       "biasSource": "SONIA futures, meeting-bracketed",
       "biasMethod": "ois",
       "biasUpdated": "2026-09-17",
       "cutProb": 0,
-      "hikeProb": 0,
-      "fwdRate": 3.7312
+      "hikeProb": 93,
+      "fwdRate": 3.9627
     },
     "JPY": {
       "nextMeeting": "18 Sep",
