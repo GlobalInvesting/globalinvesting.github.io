@@ -8827,14 +8827,51 @@ async function fetchFedExpectations() {
     const tbody = document.getElementById('fed-exp-tbody');
     if (!tbody) return;
 
-    const [meetingsRes, ...rateResponses] = await Promise.all([
+    const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+
+    const [meetingsRes, bond2yHistRes, ...rateResponses] = await Promise.all([
       fetch('./meetings-data/meetings.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
-      ...['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'].map(c =>
+      Promise.all(currencies.map(c =>
+        fetch(`./bond2y-data/${c}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)
+      )),
+      ...currencies.map(c =>
         fetch(`./rates/${c}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)
       )
     ]);
 
-    const currencies = ['USD','EUR','GBP','JPY','AUD','CAD','CHF','NZD','NOK','SEK'];
+    // OIS vs 2Y Cross-check (Option C — icon + tooltip, see mock-2y-ois-panels.html
+    // §5): each currency's own 2Y yield 5-business-day change, cross-referenced
+    // against how much of a near-term move the OIS-derived bias/probability
+    // (already in production above) has priced in. A currency where the OIS
+    // path says "Hold" with high conviction but the 2Y is moving hard is
+    // repricing ahead of the OIS snapshot — flagged. A currency whose 2Y move
+    // is small, or whose direction agrees with what's priced, is not.
+    //
+    // "Moving hard" is a cross-sectional z-score against the same day's other
+    // 9 currencies' own 5d changes, not a fixed bp threshold — this project's
+    // own standing rule (GUIDELINES.md, CRISIS_VIX_THRESHOLD incident) is that
+    // a magic-number cutoff must be justified externally or avoided; a
+    // relative/statistical cutoff among directly comparable series doesn't
+    // have that problem. Missing history (a currency with <6 logged rows,
+    // e.g. NOK before its own accumulation catches up) yields delta5d=null
+    // and is disclosed as "no icon" rather than guessed at.
+    const bond2yDelta5d = {};
+    currencies.forEach((c, i) => {
+      const hist = bond2yHistRes[i];
+      if (!Array.isArray(hist) || hist.length < 6) { bond2yDelta5d[c] = null; return; }
+      const sorted = [...hist].sort((a, b) => a.date < b.date ? -1 : 1);
+      const last = sorted[sorted.length - 1]?.value;
+      const prior = sorted[sorted.length - 6]?.value;
+      bond2yDelta5d[c] = (last != null && prior != null) ? Math.round((last - prior) * 100) : null; // bp
+    });
+    const _validDeltas = currencies.map(c => bond2yDelta5d[c]).filter(v => v != null);
+    let _deltaMean = null, _deltaStd = null;
+    if (_validDeltas.length >= 4) {
+      _deltaMean = _validDeltas.reduce((a, b) => a + b, 0) / _validDeltas.length;
+      const variance = _validDeltas.reduce((a, b) => a + (b - _deltaMean) ** 2, 0) / _validDeltas.length;
+      _deltaStd = Math.sqrt(variance);
+    }
+    const Z_THRESHOLD = 1.5;
     const bankMeta = {
       USD: { flag:'us', short:'Fed'    },
       EUR: { flag:'eu', short:'ECB'    },
@@ -8967,10 +9004,34 @@ async function fetchFedExpectations() {
       const meta = bankMeta[ccy];
       const flag = `<span class="fi fi-${meta.flag}" style="margin-right:4px;border-radius:2px;vertical-align:middle;"></span>`;
 
+      // OIS vs 2Y Cross-check icon (Option C) — see the pre-pass above for
+      // bond2yDelta5d/_deltaMean/_deltaStd. Only renders when there's a real
+      // bias reading AND real 2Y history for this currency; otherwise the
+      // cell stays empty (disclosed gap, not guessed).
+      let chk2yIcon = '';
+      const d5 = bond2yDelta5d[ccy];
+      if (_haveProbData && d5 != null && _deltaStd != null) {
+        const z = _deltaStd > 0 ? (d5 - _deltaMean) / _deltaStd : 0;
+        const movedSig = Math.abs(z) >= Z_THRESHOLD;
+        const actualDir = movedSig ? (d5 > 0 ? 1 : -1) : 0;
+        const expectedDir = meetingsBias === 'hike' ? 1 : meetingsBias === 'cut' ? -1 : 0;
+        const diverges = actualDir !== 0 && actualDir !== expectedDir;
+        const biasWord = meetingsBias === 'hike' ? 'Hike' : meetingsBias === 'cut' ? 'Cut' : 'Hold';
+        const probPct = meetingsBias === 'hike' ? (hikeProb ?? null) : meetingsBias === 'cut' ? (cutProb ?? null) : Math.max(0, 100 - (cutProb ?? 0) - (hikeProb ?? 0));
+        const probTxt = probPct != null ? ` (${probPct}%)` : '';
+        const d5Txt = (d5 > 0 ? '+' : '') + d5 + 'bp';
+        if (diverges) {
+          chk2yIcon = `<span class="warning" style="font-size:11px;cursor:default;" title="2Y corriendo por delante del path de OIS — OIS: ${biasWord}${probTxt} · 2Y 5d: ${d5Txt} (${z.toFixed(1)}σ vs G10)">${d5 > 0 ? '▲' : '▼'}</span>`;
+        } else {
+          chk2yIcon = `<span style="font-size:11px;cursor:default;color:var(--border2);" title="2Y alineado con el path implícito de OIS — OIS: ${biasWord}${probTxt} · 2Y 5d: ${d5Txt}">●</span>`;
+        }
+      }
+
       rows.push(`<tr title="Next meeting: ${nextMtg} · CIP 30d fwd">
         <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${flag}<span style="font-size:10px;">${meta.short}</span> <span style="color:var(--text3);font-size:9px;">${nextMtg}</span></td>
         <td style="overflow:hidden;white-space:nowrap;">${biasLabel}</td>
         <td style="color:var(--text2);font-family:var(--font-mono);font-size:10px;white-space:nowrap;padding-left:3px;padding-right:3px;">${fwdDisplay}</td>
+        <td style="text-align:center;white-space:nowrap;">${chk2yIcon}</td>
       </tr>`);
     });
 
