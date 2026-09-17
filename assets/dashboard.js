@@ -12321,11 +12321,17 @@ async function renderSovereignSpreads() {
       }
 
       if (tds[3]) {
-        tds[3].textContent = n2 != null ? n2.toFixed(2) + '%' : '—';
+        const spread2y = (n2 != null && us2 != null) ? (n2 - us2) * 100 : null;
+        const s2Cls = spread2y == null ? '' : spread2y > 20 ? 'var(--up)' : spread2y < -20 ? 'var(--down)' : 'var(--text2)';
+        tds[3].innerHTML = n2 != null
+          ? `<span>${n2.toFixed(2)}%</span>` + (spread2y != null
+              ? `<span style="display:block;font-size:9px;color:${s2Cls};">${spread2y >= 0 ? '+' : ''}${Math.round(spread2y)} bp</span>`
+              : '')
+          : '—';
         tds[3].style.color = stale2y ? 'var(--text3)' : '';
         tds[3].title = stale2y
           ? `Stale — no fresh 2Y source available this run (cached ${ext?.dates?.bond2y || 'unknown date'})`
-          : '';
+          : (spread2y != null ? `2Y spread vs US: ${spread2y >= 0 ? '+' : ''}${Math.round(spread2y)} bp` : '');
       }
 
       if (tds[4]) {
