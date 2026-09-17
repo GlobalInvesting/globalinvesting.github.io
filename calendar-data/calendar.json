@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-17T09:01:19Z",
-  "generatedAt": "2026-09-17T09:01:19Z",
+  "lastUpdate": "2026-09-17T09:03:07Z",
+  "generatedAt": "2026-09-17T09:03:07Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -594,9 +594,9 @@
       "std": 0.057735
     },
     "EUR/inflation rate mom": {
-      "n": 5,
-      "mean": -0.24,
-      "std": 1.537205
+      "n": 6,
+      "mean": -0.616667,
+      "std": 1.655798
     },
     "EUR/core inflation rate yoy": {
       "n": 3,
@@ -609,9 +609,9 @@
       "std": 0.166633
     },
     "EUR/inflation rate yoy": {
-      "n": 4,
-      "mean": -0.125,
-      "std": 0.15
+      "n": 5,
+      "mean": -0.02,
+      "std": 0.268328
     },
     "EUR/greece unemployment rate": {
       "n": 3,
@@ -1702,6 +1702,16 @@
       "n": 2,
       "mean": 0.0,
       "std": 0.0
+    },
+    "EUR/cpi excl. energy and unprocessed food mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
+    },
+    "EUR/cpi excl. energy and unprocessed food yoy": {
+      "n": 2,
+      "mean": -0.05,
+      "std": 0.070711
     },
     "NZD/gdt price index": {
       "n": 2,
@@ -62185,7 +62195,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.4%",
       "forecast": "2.9%",
       "previous": "2.9%"
     },
@@ -62211,7 +62221,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI y/y",
       "impact": "high",
-      "actual": null,
+      "actual": "3.2%",
       "forecast": "2.8%",
       "previous": "2.8%"
     },
@@ -62250,7 +62260,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI excl. Energy and Unprocessed Food m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.2%",
       "forecast": "0.2%",
       "previous": "0.2%"
     },
@@ -62263,7 +62273,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI excl. Energy and Unprocessed Food y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "2.1%",
       "forecast": "2.1%",
       "previous": "2.1%"
     },
@@ -62276,7 +62286,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area CPI",
       "impact": "low",
-      "actual": null,
+      "actual": "103.69",
       "forecast": null,
       "previous": "103.70"
     },
@@ -62289,7 +62299,7 @@
       "flag": "🇪🇺",
       "event": "Euro Area Core CPI",
       "impact": "medium",
-      "actual": null,
+      "actual": "103.06",
       "forecast": null,
       "previous": "103.07"
     },
