@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-17T07:24:17Z",
+  "generated_at": "2026-09-17T08:00:29Z",
   "source": "calendar-primary",
   "holidays": [],
   "events": [
@@ -11673,8 +11673,8 @@
       "impact": "low",
       "forecast": "0.29",
       "previous": "0.40",
-      "actual": null,
-      "released": false,
+      "actual": "0.30",
+      "released": true,
       "vendor": "calendar-primary"
     },
     {
@@ -14085,6 +14085,32 @@
     {
       "title": "ECB Economic Bulletin",
       "currency": "EUR",
+      "dateISO": "2026-09-24",
+      "timeUTC": "08:00",
+      "timeMode": "exact",
+      "impact": "medium",
+      "forecast": null,
+      "previous": null,
+      "actual": null,
+      "released": false,
+      "vendor": "calendar-primary"
+    },
+    {
+      "title": "Norges Bank Interest Rate Decision",
+      "currency": "NOK",
+      "dateISO": "2026-09-24",
+      "timeUTC": "08:00",
+      "timeMode": "exact",
+      "impact": "medium",
+      "forecast": null,
+      "previous": "4.00%",
+      "actual": null,
+      "released": false,
+      "vendor": "calendar-primary"
+    },
+    {
+      "title": "Norges Bank Monetary Policy Report",
+      "currency": "NOK",
       "dateISO": "2026-09-24",
       "timeUTC": "08:00",
       "timeMode": "exact",
