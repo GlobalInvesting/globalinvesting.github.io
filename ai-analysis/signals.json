@@ -1,51 +1,39 @@
 {
-  "generated_at": "2026-09-17T00:01:21Z",
+  "generated_at": "2026-09-17T03:24:22Z",
   "signals": [
     {
-      "time": "00:00",
+      "time": "03:24",
       "priority": "critical",
-      "title": "USD/SEK — G10 Bilateral Theme",
-      "text": "USD/SEK trades at 9.832, remaining well above its SMA20/50/200 cluster at 9.596, 9.595, and 9.353. Broad strength following the Fed's 25bp rate increase to 4.00% drives the greenback higher, while SEK faces structural drag from persistent domestic economic misses (SEK ESI at -29.2). The G10 strength scorecard flags USD as the top weekly performer at +1.264% across 9 pairs, whereas SEK sits at the bottom at -1.107% across 2 pairs, creating a 2.371% bilateral spread. USD/SEK BEER fair value z-score at +2.48σ flags rich valuation, yet policy rate divergence (Fed 4.0% vs Riksbank 1.75%) sustains structural capital flows toward the dollar. Trade bias: Bullish USD/SEK, driven by CB rate divergence and G10 scorecard momentum. Catalyst: US Initial Jobless Claims at 12:30 UTC. Risk: Spread compresses below 0.80% or USD drops back below SMA20 at 9.596.",
+      "title": "USD/SEK — G10 Bilateral Theme + Fed Divergence",
+      "text": "The G10 scorecard records USD as the weekly leader at +1.267% across 9 pairs while SEK lags at −1.074% across 2 pairs, generating an extreme 2.342% bilateral performance spread. The Fed policy rate of 4.0% against the Riksbank at 1.75% provides a substantial 225bp nominal policy advantage alongside an ESI divergence where USD prints +7.2 against SEK at −29.2. USD/SEK spot trades at 9.861, standing well clear of its rising SMA20/50/200 stack at 9.597, 9.596, and 9.353. Macro momentum and wider yield support heavily reinforce the upside, though the BEER valuation model notes spot is stretched at +1.83σ above fair value. Sustained divergence persists while US curve dynamics remain in a bear-flattener regime. Trade bias: Long USD/SEK, policy and data divergence trend continuation. Catalyst: US Initial Jobless Claims at 12:30 UTC. Risk: Spread compresses below 0.80% as US curve steepening unwinds the dollar premium.",
       "evidence": [
-        "USD 1W avg: +1.264% (n=9)",
-        "SEK 1W avg: -1.107% (n=2)",
-        "G10 spread: 2.371%"
+        "USD 1W avg: +1.267% (n=9)",
+        "SEK 1W avg: -1.074% (n=2)",
+        "G10 spread: 2.342%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:57",
+      "time": "03:18",
       "priority": "warning",
-      "title": "USD/JPY — Fed-BoJ Carry + Options Skew Divergence",
-      "text": "USD/JPY trades at 156.08, holding below its SMA20/50/200 cluster at 157.02, 159.26, and 158.39. The 266bp OIS carry advantage (SOFR 3.64% vs TONA 0.98%) and nominal differential (Fed 4.0% vs BoJ 1.0%) continue to support the dollar, supported by hawkish FOMC dot plots. However, 25-delta risk reversals print at -2.18, reflecting an aggressive options market skew for downside protection against BoJ policy tightening or intervention risk ahead of 160.00. JPY COT Leveraged Funds net short stands at -53,255 (pctl 30), despite a massive WoW buy-back of +58,042 contracts that signals short covering. Trade bias: Long USD/JPY, supported by carry while VIX remains contained at 17.7. Catalyst: BoJ Rate Decision and Press Conference at ~02:30 UTC. Risk: BoJ surprises with a hawkish stance or rate hike, triggering disorderly carry liquidation below 155.00.",
+      "title": "AUD/USD — Crowded Long Positioning Exhaustion",
+      "text": "AUD/USD trades at 0.7106, hovering just above its daily SMA50 at 0.708 while testing resistance below the SMA20 at 0.717. CFTC data shows leveraged funds holding an extended net long of +48,379 contracts, sitting at the 93rd percentile of its 52-week range with a z-score of +1.72. The latest reporting week reveals an outflow of −1,871 contracts alongside an Australian unemployment rate surprise of +0.2pp to 4.5% (a +2.50σ shock), signalling labor market softening. Despite a supportive +71bp AONIA over SOFR carry buffer, the options market displays caution via a −0.72 25d risk reversal put skew. The combination of stalled speculative additions and deteriorating domestic employment points to upside trend exhaustion. Trade bias: Short AUD/USD, positioning squeeze risk on stretched speculative longs. Catalyst: RBA meeting 29 Sep. Risk: Sustained close above 0.7170 validating trend continuation.",
       "evidence": [
-        "USD/JPY OIS spread: +266bp",
-        "USDJPY 25d RR: -2.18",
-        "JPY COT LF net: -53,255"
+        "AUD COT LF net: +48,379 (pctl 93, z +1.72)",
+        "AONIA 4.35% vs SOFR 3.64% — 71bp",
+        "AUD/USD: 0.7106"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:55",
+      "time": "03:14",
       "priority": "warning",
-      "title": "GBP/USD — CB Yield Parity + Energy Shock Hedging",
-      "text": "GBP/USD trades at 1.3385, holding below its SMA20/50/200 cluster at 1.3484 and 1.3455. The Fed's 25bp rate hike to 4.0% eliminates the Bank of England's (3.75%) policy rate premium, flipping the 1-month OIS carry differential to favor USD by +25bp. While UK headline inflation rose to 3.1% in August due to elevated energy prices, UK 10Y yields at 5.30% maintain a +28bp spread over US 10Y. COT positioning shows Leveraged Funds long at net +40,361 (pctl 86, z +1.02), but a WoW reduction of -7,143 contracts indicates specs are unwinding exposure. Option markets maintain a mild put skew with 1M 25d RR at -0.35, while 1M IV at 5.1% vs HV30 at 4.0% commands a +1.1% volatility risk premium. Trade bias: Bearish GBP/USD, following loss of central bank rate advantage and energy-driven stagflation risk. Catalyst: BoE Rate Decision and Minutes at 11:00 UTC. Risk: BoE delivers a hawkish rate increase, pushing price back above 1.3485.",
+      "title": "NZD/USD — Retail Extreme vs Macro Carry Headwinds",
+      "text": "NZD/USD trades at 0.5725, remaining locked beneath its descending SMA20 at 0.5878 and SMA50 at 0.5858. Retail sentiment data retail sentiment shows an extreme 89% long reading, diverging sharply from institutional positioning where leveraged funds hold −18,092 net short contracts at the 8th percentile of their 52-week range. The Fed-RBNZ OIS differential reflects a +125bp carry advantage favoring the dollar, reinforced by restrictive US real policy rates of +1.59% against New Zealand's +0.41%. Despite Q2 GDP printing slightly above consensus at 0.2% quarter-on-quarter, domestic activity shows underlying household strain. Retail traders attempting to catch the bottom run heavy liquidation risk against prevailing institutional flow and adverse carry. Trade bias: Bearish NZD/USD, contrarian alignment against retail extreme positioning. Catalyst: New Zealand Trade Balance at 22:45 UTC. Risk: RBNZ delivers an unexpected hawkish repricing at its next meeting, triggering a short-covering rally.",
       "evidence": [
-        "Fed 4.0% vs BoE 3.75% — +25bp USD carry",
-        "GBP COT LF net: +40,361 (pctl 86)",
-        "GBP/USD 1M VRP: +1.1%"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "23:48",
-      "priority": "info",
-      "title": "NZD/USD — COT Squeeze Setup vs Retail Sentiment Extreme",
-      "text": "NZD/USD trades at 0.5723, holding below its SMA20/50/200 cluster at 0.5879, 0.5858, and 0.5856. Better-than-expected Q2 GDP at +2.6% y/y provides fundamental backing for the RBNZ's hawkish stance (rate at 2.75%). COT Leveraged Funds hold a net short of -18,092 contracts at a 52-week percentile of 8 (z -1.40), indicating an extreme institutional short position that is vulnerable to a squeeze. Conversely, retail sentiment sits at an extreme 89% long, creating a sharp institutional-versus-retail divergence. Options BEER model flags NZD/USD as cheap at z=-1.80σ against fair value of 0.5854. Trade bias: Bullish NZD/USD, targeting a short-squeeze recovery toward moving average resistance. Catalyst: New Zealand Trade Balance release at 22:45 UTC. Risk: Broader USD strength accelerates, pushing spot below technical support at 0.5700.",
-      "evidence": [
-        "NZD COT LF net: -18,092 (pctl 8)",
-        "NZD/USD Retail: 89% Long",
-        "NZD GDP YoY: 2.6% vs 2.3% forecast"
+        "NZD/USD Retail: 89% Long (Myfxbook)",
+        "NZD COT LF net: -18,092 (pctl 8, z -1.40)",
+        "SOFR 3.64% vs OCR 2.75% — 89bp"
       ],
       "_source": "engine-ai-primary"
     }
