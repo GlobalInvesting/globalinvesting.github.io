@@ -1186,6 +1186,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <button class="rates-ctab"        data-cty="se"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">SE</button>
         <button class="rates-ctab"        data-cty="ch"  role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--text2);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">CH</button>
         <button class="rates-ctab"        data-cty="spreads" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--accent);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Spreads</button>
+        <button class="rates-ctab"        data-cty="momentum" role="tab" aria-selected="false" style="padding:2px 7px;font-size:10px;border:1px solid var(--border2);border-radius:3px;background:none;color:var(--accent);cursor:pointer;font-family:var(--font-ui);white-space:nowrap;">Momentum</button>
       </div>
 
       
@@ -1270,6 +1271,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           </tbody>
         </table>
         <div style="font-size:9px;color:var(--text3);margin-top:4px;">Daily sovereign yield pipeline · FRED · ECB · BOE</div>
+      </div>
+      <div id="rates-pane-momentum" class="rates-country-pane" style="display:none;padding:6px 10px 2px;">
+        <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">2Y vs US Spread Momentum — 5d / 20d change</div>
+        <table id="momentum-screener-table" aria-label="2Y vs US spread momentum screener" style="width:100%;">
+          <thead>
+            <tr>
+              <th style="text-align:left" scope="col">Country</th>
+              <th scope="col" title="Current 2Y yield spread vs US, in basis points">2Y vs US (bp)</th>
+              <th scope="col" title="Change in the 2Y vs US spread over the last 5 business days">5D Δ (bp)</th>
+              <th scope="col" title="Change in the 2Y vs US spread over the last 20 business days">20D Δ (bp)</th>
+            </tr>
+          </thead>
+          <tbody id="momentum-screener-tbody">
+            <tr><td colspan="4" style="color:var(--text3);text-align:center;padding:8px 0;">Loading…</td></tr>
+          </tbody>
+        </table>
+        <div style="font-size:9px;color:var(--text3);margin-top:4px;">Ranked by |5D Δ| · sourced from bond2y-data/, accumulated daily since 2026-09</div>
       </div>
     </div>
 
@@ -2086,7 +2104,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.508.0" defer></script>
+<script src="assets/dashboard.js?v=8.510.0" defer></script>
 <script src="assets/command-bar.js?v=8.491.4" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 
