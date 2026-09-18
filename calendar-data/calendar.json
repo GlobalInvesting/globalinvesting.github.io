@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-18T14:01:30Z",
-  "generatedAt": "2026-09-18T14:01:30Z",
+  "lastUpdate": "2026-09-18T14:03:26Z",
+  "generatedAt": "2026-09-18T14:03:26Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1492,6 +1492,11 @@
       "n": 2,
       "mean": 12.25,
       "std": 20.435386
+    },
+    "USD/cb leading economic index mom": {
+      "n": 2,
+      "mean": 0.15,
+      "std": 0.212132
     },
     "NZD/trade balance 12-months": {
       "n": 2,
@@ -63464,7 +63469,7 @@
       "flag": "🇺🇸",
       "event": "United States CB Leading Economic Index m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "-0.1%",
       "forecast": "-0.1%",
       "previous": "0.2%"
     },
