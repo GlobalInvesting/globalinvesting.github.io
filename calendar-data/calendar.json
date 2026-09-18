@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-18T10:11:17Z",
-  "generatedAt": "2026-09-18T10:11:17Z",
+  "lastUpdate": "2026-09-18T10:13:08Z",
+  "generatedAt": "2026-09-18T10:13:08Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1417,6 +1417,16 @@
       "n": 2,
       "mean": -0.05,
       "std": 0.212132
+    },
+    "EUR/portugal ppi mom": {
+      "n": 2,
+      "mean": 0.4,
+      "std": 0.141421
+    },
+    "EUR/portugal ppi yoy": {
+      "n": 2,
+      "mean": 0.45,
+      "std": 0.070711
     },
     "GBP/ppi input mom": {
       "n": 3,
@@ -63216,7 +63226,7 @@
       "flag": "🇪🇺",
       "event": "Portugal PPI MoM",
       "impact": "low",
-      "actual": null,
+      "actual": "0.8%",
       "forecast": "0.3%",
       "previous": "0.8%"
     },
@@ -63242,7 +63252,7 @@
       "flag": "🇪🇺",
       "event": "Portugal PPI YoY",
       "impact": "low",
-      "actual": null,
+      "actual": "7.2%",
       "forecast": "6.7%",
       "previous": "5.8%"
     },
