@@ -41,6 +41,12 @@ function _connect() {
     console.log("[fx-ws] Connected to FX proxy");
     _reconnectAttempts = 0;
     _connectedAt = Date.now();
+    // Evaluate the market-closed state right away -- on a closed market no
+    // tick will ever arrive to trigger an update, and the stale watchdog
+    // below only fires after TICK_STALE_MS (120s), which left the footer
+    // pinned to its hardcoded HTML default ("~5 MIN") for up to that long
+    // after every page load/reconnect.
+    _updateSourceLabel(null);
     _startStaleWatchdog();
   });
 

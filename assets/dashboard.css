@@ -342,7 +342,7 @@
   .t-down { color: var(--down); }
   #layout {
     display: grid;
-    grid-template-columns: 180px minmax(0,1fr) 220px;
+    grid-template-columns: 210px minmax(0,1fr) 260px;
     height: calc(100vh - 92px);
     height: calc(100dvh - 92px);
     overflow: hidden;
@@ -350,7 +350,7 @@
     width: 100%;
   }
   #layout.layout--no-right {
-    grid-template-columns: 180px 1fr 0;
+    grid-template-columns: 210px 1fr 0;
   }
   #layout.layout--no-right #rightpanel {
     display: none;

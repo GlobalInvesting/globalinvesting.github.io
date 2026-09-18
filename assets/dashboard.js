@@ -1290,9 +1290,11 @@ function populateHeatmap() {
   const _hasFhHm = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
   const _hmSubEl = document.getElementById('hm-panel-sub');
   if (_hmSubEl) {
-    _hmSubEl.textContent = _hasFhHm
-      ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
-      : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs';
+    _hmSubEl.textContent = isFxMarketClosedNow()
+      ? 'Market Closed \u00b7 G10 composite \u00b7 32 pairs'
+      : (_hasFhHm
+        ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
+        : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs');
   }
 
   if (typeof window._hmRefreshIfOpen === 'function') {
@@ -2535,7 +2537,7 @@ function updateFxPairsTableRT() {
   const _chartSub = document.querySelector('#section-fxpairs .panel-sub');
   if (_chartSub && _chartSub.textContent !== 'TradingView \u00b7 live data') {
     const _hasFh = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    _chartSub.textContent = _hasFh ? 'Live' : `Delayed ~5min`;
+    _chartSub.textContent = isFxMarketClosedNow() ? 'Market Closed' : (_hasFh ? 'Live' : `Delayed ~5min`);
   }
 
   _throttledPairDetailRefresh();
@@ -7037,7 +7039,7 @@ async function _renderLWChart(ohlcId, label) {
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
   if (panelSub) {
     const _hasFinnhubLive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    panelSub.textContent = _hasFinnhubLive ? 'Live' : 'Delayed ~5min';
+    panelSub.textContent = isFxMarketClosedNow() ? 'Market Closed' : (_hasFinnhubLive ? 'Live' : 'Delayed ~5min');
   }
 
   const _CB_NAMES = {

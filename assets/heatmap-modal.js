@@ -2069,15 +2069,22 @@
   };
 
   function _updateModalSourceLabels() {
+    const marketClosed = typeof window.isFxMarketClosedNow === 'function'
+      ? window.isFxMarketClosedNow()
+      : false;
     const hasFh = window.STOOQ_RT_CACHE
       ? Object.values(window.STOOQ_RT_CACHE).some(e => e?.fromFinnhub)
       : false;
-    const srcLabel = hasFh
-      ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
-      : 'G10 composite \u00b7 32 pairs \u00b7 Delayed ~5min';
-    const footerLabel = hasFh
-      ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
-      : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs';
+    const srcLabel = marketClosed
+      ? 'Market Closed \u00b7 G10 composite \u00b7 32 pairs'
+      : hasFh
+        ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
+        : 'G10 composite \u00b7 32 pairs \u00b7 Delayed ~5min';
+    const footerLabel = marketClosed
+      ? 'Market Closed \u00b7 G10 composite \u00b7 32 pairs'
+      : hasFh
+        ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
+        : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs';
     const subEl    = document.getElementById('hm-sub');
     const footerEl = document.getElementById('hm-footer-meta');
     if (subEl)    subEl.textContent    = srcLabel;

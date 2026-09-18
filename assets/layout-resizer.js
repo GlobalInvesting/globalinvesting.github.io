@@ -5,8 +5,8 @@
   var STORAGE_SIDEBAR = 'gi_layout_sidebar_w';
   var STORAGE_RIGHT   = 'gi_layout_right_w';
 
-  var DEFAULT_SIDEBAR = 180;
-  var DEFAULT_RIGHT   = 220;
+  var DEFAULT_SIDEBAR = 210;
+  var DEFAULT_RIGHT   = 260;
   var MIN_SIDEBAR     = 120;
   var MAX_SIDEBAR     = 320;
   var MIN_RIGHT       = 150;
