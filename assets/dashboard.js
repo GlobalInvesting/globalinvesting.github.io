@@ -12648,63 +12648,97 @@ async function renderMomentumScreener(base) {
 let _lwYieldViewActive = false;
 let _lwYieldSeriesA = null;
 let _lwYieldSeriesB = null;
+let _lwYieldResizeObs = null;
 
 function _lwCcyFlagCode(ccy) {
   const m = G10_RATE_CCYS.find(c => c.ccy === ccy);
   return m ? m.code : ccy.slice(0, 2).toLowerCase();
 }
 
-// Reverts the Price Chart from the dedicated 2Y-yield comparison view back to its
-// normal candlestick display: restores the candle series, the right price scale,
-// the volume pane and every main-pane indicator hidden on entry, and removes the
-// yield legend banner. Safe to call even if the view isn't active.
-function _lwExitYieldSpreadView() {
-  if (!_lwChart) return;
-  _lwYieldViewActive = false;
-  if (_lwYieldSeriesA) { try { _lwChart.removeSeries(_lwYieldSeriesA); } catch(_e) {} _lwYieldSeriesA = null; }
-  if (_lwYieldSeriesB) { try { _lwChart.removeSeries(_lwYieldSeriesB); } catch(_e) {} _lwYieldSeriesB = null; }
-  if (_lwCandleSeries) { try { _lwCandleSeries.applyOptions({ visible: true }); } catch(_e) {} }
-  try { _lwChart.priceScale('right').applyOptions({ visible: true }); } catch(_e) {}
-  try {
-    _lwChart.priceScale('volume').applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
-  } catch(_e) {}
-  Object.keys(window._indSeries || {}).forEach(function (id) {
-    if (!window._indPaneIndex || !window._indPaneIndex[id]) {
-      (window._indSeries[id] || []).forEach(function (s) { try { s.applyOptions({ visible: true }); } catch(_e) {} });
-    }
-  });
-  _lwReapplyPaneHeights();
+// Tears down the dedicated yield-spread chart instance and its banner only —
+// no re-render of the normal chart. Used internally when switching directly
+// from one yield-spread pair to another (Enter calls this instead of Exit, to
+// avoid rebuilding the candlestick chart just to immediately destroy it again).
+function _lwTeardownYieldView() {
+  if (_lwYieldResizeObs) { try { _lwYieldResizeObs.disconnect(); } catch(_e) {} _lwYieldResizeObs = null; }
+  if (_lwChart) { try { _lwChart.remove(); } catch(_e) {} _lwChart = null; }
+  _lwYieldSeriesA = null;
+  _lwYieldSeriesB = null;
   const banner = document.getElementById('lw-yield-banner');
   if (banner) banner.remove();
 }
 
-// Replaces the main Price Chart's own candlestick display with a dedicated 2Y
-// sovereign-yield comparison — both legs plotted as two distinctly-colored lines
-// sharing the chart's own right-axis scale (now reformatted to %), rather than an
-// overlay drawn on top of the candles or a separate modal. Triggered by clicking a
-// row in the Rates & Yield Curve panel's Spread & Momentum table.
+// Reverts the Price Chart from the dedicated 2Y-yield comparison view back to its
+// normal candlestick display. Destroys the temporary yield-spread chart outright
+// and re-runs the same chart-build path a symbol switch already uses
+// (_renderLWChart) instead of selectively re-showing state scattered across
+// several independent closures (moving averages, pane indicators, drawings, CB
+// markers) — that path already knows how to rebuild all of it correctly for the
+// active symbol. Safe to call even if the view isn't active.
+function _lwExitYieldSpreadView() {
+  if (!_lwYieldViewActive) return;
+  _lwYieldViewActive = false;
+  _lwTeardownYieldView();
+  if (_lwActiveOhlcId) {
+    _renderLWChart(_lwActiveOhlcId).catch(function (e) { console.warn('[yield-spread-view] exit re-render failed:', e.message); });
+  }
+}
+
+// Replaces the main Price Chart entirely with a dedicated 2Y sovereign-yield
+// comparison chart — destroying the active candlestick chart and everything tied
+// to it (moving averages, pane indicators, user drawings, CB-meeting markers),
+// the same destroy/recreate mechanism a symbol switch (e.g. Gold/WTI) already
+// uses, rather than hiding series on top of the existing chart instance — then
+// building a fresh chart holding only the two yield legs as distinctly-colored
+// lines on their own right-axis scale (%), fit to the chart's full width.
+// Triggered by clicking a row in the Rates & Yield Curve panel's Spread &
+// Momentum table.
 async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
-  if (!_lwChart || !_lwCandleSeries) return;
-  _lwExitYieldSpreadView();
+  const wrap = document.getElementById('tv-chart-wrap');
+  if (!wrap) return;
+  await _ensureLWLib();
+  const LWC = window.LightweightCharts;
+  if (!LWC) return;
+
+  if (_lwYieldViewActive) { _lwTeardownYieldView(); }
+  else { _destroyLWChart(); }
+  wrap.innerHTML = '';
+  wrap.style.marginBottom = '0';
+  wrap.style.pointerEvents = 'auto';
   _lwYieldViewActive = true;
 
-  try { _lwCandleSeries.applyOptions({ visible: false }); } catch(_e) {}
-  try { _lwChart.priceScale('volume').applyOptions({ scaleMargins: { top: 1, bottom: 0 } }); } catch(_e) {}
-  Object.keys(window._indSeries || {}).forEach(function (id) {
-    if (!window._indPaneIndex || !window._indPaneIndex[id]) {
-      (window._indSeries[id] || []).forEach(function (s) { try { s.applyOptions({ visible: false }); } catch(_e) {} });
-    }
-  });
-  try {
-    const panes = _lwChart.panes();
-    Object.keys(window._indPaneIndex || {}).forEach(function (id) {
-      const idx = window._indPaneIndex[id];
-      if (idx) { try { panes[idx].setHeight(0); } catch(_e) {} }
-    });
-  } catch(_e) {}
-  Object.keys(_lwCompareSeriesMap).forEach(function (uid) { _lwClearCompareOne(uid, true); });
+  const chartDiv = document.createElement('div');
+  chartDiv.style.cssText = 'width:100%;height:100%;touch-action:none;';
+  wrap.appendChild(chartDiv);
 
-  const LWC = window.LightweightCharts;
+  const chartW = wrap.offsetWidth  || wrap.clientWidth  || 600;
+  const chartH = wrap.offsetHeight || wrap.clientHeight || 290;
+
+  _lwChart = LWC.createChart(chartDiv, {
+    layout:      { background: { color: _themeColor('--bg') }, textColor: _themeColor('--text'), attributionLogo: false },
+    grid:        { vertLines: { color: _themeColorAlpha('--border', 0.5) }, horzLines: { color: _themeColorAlpha('--border', 0.5) } },
+    crosshair:   { mode: LWC.CrosshairMode.Normal,
+                   vertLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
+                   horzLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') } },
+    rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 65, scaleMargins: { top: 0.1, bottom: 0.1 } },
+    timeScale:   { borderColor: _themeColor('--border'), timeVisible: false, secondsVisible: false,
+                   rightOffset: 4, minBarSpacing: 1, fixLeftEdge: false, fixRightEdge: false },
+    handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
+    handleScale:   { mouseWheel: true, pinch: true, axisPressedMouseMove: { time: true, price: true } },
+    width:  chartW,
+    height: chartH,
+  });
+
+  if (typeof ResizeObserver !== 'undefined') {
+    _lwYieldResizeObs = new ResizeObserver(function (entries) {
+      for (const e of entries) {
+        const { width, height } = e.contentRect;
+        if (_lwChart && width > 0 && height > 0) { try { _lwChart.resize(width, height); } catch(_e) {} }
+      }
+    });
+    _lwYieldResizeObs.observe(chartDiv);
+  }
+
   const YIELD_COLORS = ['#42a5f5', '#ffa726']; // fixed, distinct hues — never the same palette index for both legs
   const legs = [
     { ccy: baseCcy, color: YIELD_COLORS[0] },
@@ -12723,8 +12757,8 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
   }).join('') +
     `<span class="lw-yield-spread" style="color:var(--text2);border-left:1px solid var(--border);padding-left:14px;">spread —</span>` +
     `<button id="lw-yield-close" title="Back to price chart" aria-label="Back to price chart" style="margin-left:4px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;line-height:1;padding:2px 4px;">&#10005;</button>`;
-  const chartWrap = document.getElementById('tv-chart-wrap');
-  if (chartWrap) chartWrap.appendChild(banner);
+  wrap.style.position = 'relative';
+  wrap.appendChild(banner);
   document.getElementById('lw-yield-close')?.addEventListener('click', _lwExitYieldSpreadView);
 
   const valEls = banner.querySelectorAll('.lw-yield-val');
@@ -12751,9 +12785,10 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
       return { series: mk, data: seriesData, ccy: l.ccy };
     }));
 
+    if (!_lwYieldViewActive || !_lwChart) return; // view was closed/replaced while fetching
+
     _lwYieldSeriesA = seriesA.series;
     _lwYieldSeriesB = seriesB.series;
-    try { _lwChart.priceScale('right').applyOptions({ visible: true, scaleMargins: { top: 0.1, bottom: 0.1 } }); } catch(_e) {}
     try { _lwChart.timeScale().fitContent(); } catch(_e) {}
 
     const lastA = seriesA.data[seriesA.data.length - 1].value;
