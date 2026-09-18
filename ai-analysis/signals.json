@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-09-18T00:01:10Z",
+  "generated_at": "2026-09-18T03:10:30Z",
   "signals": [
     {
-      "time": "23:58",
+      "time": "03:09",
       "priority": "critical",
       "title": "USD/NOK — G10 Bilateral Theme + Carry",
-      "text": "USD outperforms the G10 basket with a 1W average of +1.180% across 9 pairs, while NOK lags at -0.981% across 2 pairs, generating an extreme 2.161% leader-to-laggard spread. USD/NOK trades at 9.424, clearing its SMA20 at 9.312 while holding below the SMA50 at 9.459 and SMA200 at 9.591. The move is reinforced by policy divergence following the Fed's 4.0% hike relative to Norges Bank at 4.25%, with the Fed's restrictive stance driving broad dollar leadership. Retail positioning displays a strong long bias at 83% long versus 18% short, while NOK domestic data shows severe labor market dislocation with unemployment printing at 4.2% versus 4.6% expected (z = -5.03σ). The wide G10 bilateral divergence reflects persistent greenback capital absorption against commodity and high-beta currencies. Trade bias: Bullish USD/NOK; broad dollar outperformance anchors the upside. Catalyst: Norges Bank meeting 24 Sep — hike bias priced. Risk: G10 spread compresses below 1.20% as oil stabilizes above $101/bbl.",
+      "text": "USD/NOK trades at 9.419, holding above its SMA20 while sitting below its SMA50. The G10 scorecard shows USD leading with a 1W average of +1.211% across 9 pairs, while NOK lags as the weakest G10 currency with a 1W average of -0.976% across 2 pairs, producing a wide bilateral spread of 2.188%. A SOFR 3.62% versus NOK policy rate 4.25% spread creates a NOK carry advantage, yet NOK underperforms severely under the weight of negative domestic growth momentum and broad dollar demand. The options and positioning data reflect strong divergence as USD/SEK retail short extremes highlight aggressive positioning against the dollar, matching the broader G10 momentum divergence. Trade bias: Long USD/NOK, structural dollar outperformance against lagging Scandies. Catalyst: Norges Bank meeting 24 Sep — hold priced. Risk: Norwegian employment data surprises further to the upside and compresses the G10 performance gap.",
       "evidence": [
-        "USD 1W avg: +1.180% (n=9)",
-        "NOK 1W avg: -0.981% (n=2)",
-        "G10 spread: 2.161%"
+        "USD 1W avg: +1.211% (n=9)",
+        "NOK 1W avg: -0.976% (n=2)",
+        "G10 spread: 2.188%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:55",
+      "time": "03:06",
       "priority": "critical",
-      "title": "USD/JPY — Options Skew vs Carry",
-      "text": "USD/JPY trades at 156.13, holding below its daily SMA20 at 156.89, SMA50 at 159.14, and SMA200 at 158.40. Fed 4.0% vs BoJ 1.0% provides a 300bp policy carry advantage for USD, reflected in a +264bp SOFR-TONA OIS spread favoring the dollar. However, Saxo 25d risk reversals show a pronounced put skew of -2.08, signaling substantial institutional demand for downside protection ahead of the BoJ rate decision. Options volatility displays negative VRP with 1M ATM IV at 9.2% versus HV30 at 9.8% (-0.6% premium), reflecting compressed implied pricing relative to realized swings. Leveraged funds net short JPY stands at -53,255 contracts (pctl 30, z -0.53) following a massive WoW short-covering surge of +58,042 contracts. The heavy put skew and aggressive spec covering indicate asymmetric downside risk on any hawkish guidance. Trade bias: Neutral/bearish USD/JPY; severe options put skew caps carry-driven upside into event risk. Catalyst: BoJ Interest Rate Decision ~02:30 UTC — hike bias priced. Risk: BoJ holds rates without hawkish forward guidance, allowing the 300bp carry spread to reassert spot toward 157.00.",
+      "title": "USD/JPY — G10 Outperformance + CB Policy Shift",
+      "text": "USD/JPY trades at 156.703, positioned below its SMA20 at 156.89 and SMA50 at 159.14 following the Bank of Japan's rate hike to 1.25%. The 25d risk reversal sits at -2.08, showing strong put skew and elevated hedging demand for downside protection as the options market prices policy normalization. A SOFR 3.62% versus TONA 0.98% OIS differential provides supporting the dollar, even as the BoJ maintains an accommodative forward stance by signaling continued monetary support. Speculative positioning shows JPY net short at -53,255 contracts with a 52-week percentile of 30, reflecting an unwinding of historical shorts. Trade bias: Neutral/range USD/JPY, policy normalization pressures the carry trade against entrenched yield differentials. Catalyst: BoJ Press Conference at 06:30 UTC. Risk: BoJ rhetoric turns hawkish enough to accelerate the unwind of speculative JPY shorts and break the 155 support level.",
       "evidence": [
-        "USDJPY 25d RR: -2.08",
-        "USD/JPY IV vs HV30: 9.2% vs 9.8% (VRP -0.6%)",
-        "Fed 4.0% vs BoJ 1.0% — 300bp"
+        "USD/JPY spot: 156.703",
+        "USD/JPY 25d RR: -2.08",
+        "SOFR 3.62% vs TONA 0.98% — +264bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:52",
+      "time": "03:04",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long",
-      "text": "CFTC data shows AUD Leveraged Funds net long at +48,379 contracts (long% 69.6%), sitting at the 93rd percentile of its 52-week range with z = +1.72. The weekly positioning flow reversed with a WoW contraction of -1,871 contracts even as 4-week net added +2,652, highlighting stalling institutional momentum at multi-month extremes. Spot AUD/USD trades at 0.7117, situated below its SMA20 at 0.7170 but holding above the SMA50 at 0.7084 and SMA200 at 0.7013. RBA Governor Bullock stated that upside inflation risks flagged in August are materialising as Middle East tensions escalate, keeping the RBA cash rate at 4.35% versus Fed 4.0% (-35bp spread favoring AUD, with AONIA vs SOFR carry at -73bp). The combination of upper-decile speculative length, stalling weekly flow, and spot failure at the 20-day moving average points to late-trend positioning exhaustion. Trade bias: Neutral/bearish AUD/USD; crowded spec longs constrain upside despite hawkish rhetoric. Catalyst: RBA meeting 29 Sep — hike bias priced. Risk: Clean break above the SMA20 at 0.7170 on re-accelerating weekly leveraged fund inflows.",
+      "title": "GBP/JPY — Fair Value Dislocation + Carry Premium",
+      "text": "GBP/JPY trades at 209.412, reflecting strong cross-asset momentum as the pound maintains a carry advantage over the yen. The BEER fair value model places spot at a z-score of -3.02, indicating the pair is significantly cheap relative to model fair value at 215.47 with a solid fit. A SONIA 3.73% versus TONA 0.98% OIS carry differential of +275bp provides sustained fundamental support for the cross despite the broader G10 weakness in sterling. Retail sentiment shows an 81% long extreme in GBP/JPY, creating a contrarian caution flag as speculative positioning diverges from the fundamental valuation gap. Trade bias: Long GBP/JPY, mean-reversion toward fair value supported by a substantial carry premium. Catalyst: UK Retail Sales data at 06:00 UTC. Risk: Broad risk-off sentiment triggers a sharp liquidation of high-beta carry longs and accelerates spot divergence from fair value.",
       "evidence": [
-        "AUD COT LF net: +48,379 (pctl 93, z +1.72)",
-        "RBA 4.35% vs Fed 4.0% — -35bp AUD carry premium",
-        "AUD/USD SMA20: 0.7170 vs spot 0.7117"
+        "GBP/JPY BEER z-score: -3.02",
+        "SONIA 3.73% vs TONA 0.98% — +275bp",
+        "GBP/JPY spot: 209.412"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "23:48",
+      "time": "03:01",
       "priority": "warning",
-      "title": "GBP/USD — Technical Breakdown + G10 Laggard",
-      "text": "GBP/USD trades at 1.3359, breaking decisively below its moving average cluster where the SMA20 sits at 1.3532, SMA50 at 1.3482, and SMA200 at 1.3455. The pound has weakened across the G10 complex with a 1W average performance of -0.215% across 4 pairs following the BoE holding policy at 3.75%. Fed 4.0% vs BoE 3.75% maintains a 25bp policy rate advantage for USD, while the SONIA-SOFR OIS differential sits tight at -11bp. CFTC speculative positioning reveals vulnerability with GBP Leveraged Funds net long at +40,361 contracts (86th percentile, z = +1.02) despite aggressive liquidations of -7,143 contracts WoW and -2,361 contracts over 4 weeks. Sell-side research notes British Pound futures sliding to late-July lows after the BoE halted long-end gilt sales. The confluence of a technical break below all major daily moving averages and ongoing spec long unwinds leaves the pair vulnerable to further downside. Trade bias: Bearish GBP/USD; breakdown below the SMA200 accelerates positioning liquidation. Catalyst: UK Retail Sales at 06:00 UTC — forecast 0.9% m/m. Risk: Daily close back above the SMA200 at 1.3455, invalidating the technical breakdown.",
+      "title": "EUR/USD — Positioning + Options Skew",
+      "text": "EUR/USD trades at 1.1484, holding below its SMA20 at 1.1606 and SMA50 at 1.1539. Speculative positioning shows EUR net short at -46,381 contracts with a 52-week percentile of 34, while the 25d risk reversal rests near neutral at -0.22, signaling minimal directional options bias. A SOFR 3.62% versus ESTR 2.44% OIS differential provides favoring the dollar, reinforced by a real rate differential where the US sits at +1.59% against the euro area at +0.30%. Implied volatility sits at 4.7% against an HV30 of 4.3%, producing a mild vol premium of +0.4% that indicates subdued market fear ahead of European data releases. Trade bias: Bearish EUR/USD, restrictive US rate stance and steady dollar outperformance capping upside momentum. Catalyst: ECB President Lagarde Speech at 10:30 UTC. Risk: European inflation data prints significantly above expectations, forcing a hawkish repricing of ECB rate expectations.",
       "evidence": [
-        "GBP/USD spot: 1.3359 vs SMA200: 1.3455",
-        "GBP COT LF net: +40,361 (pctl 86, WoW -7,143)",
-        "Fed 4.0% vs BoE 3.75% — 25bp"
+        "EUR/USD spot: 1.1484",
+        "SOFR 3.62% vs ESTR 2.44% — +118bp",
+        "EUR/USD 25d RR: -0.22"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "02:55",
+      "priority": "info",
+      "title": "USD/CHF — Valuation Dislocation + Low Volatility",
+      "text": "USD/CHF trades at 0.8247, positioned above its SMA20 at 0.8107 and SMA50 at 0.8105. The BEER model flags the pair as rich with a z-score of +1.95, as spot at 0.8247 trades above model fair value at 0.8158. Options pricing shows implied volatility at 6.2% against an HV30 of 7.3%, yielding a negative VRP of -1.1% that highlights options complacency and thin protection demand. A SOFR 3.62% versus SARON -0.04% OIS differential delivers a +400bp carry advantage supporting long dollar positions, while retail sentiment shows a 69% short bias. Trade bias: Long USD/CHF, carry support offset by stretched valuation metrics and low implied volatility. Catalyst: SNB policy meeting 24 Sep — hold priced. Risk: Sudden risk-off repatriation flows drive a sharp safe-haven bid into the franc, unwinding the fair value premium.",
+      "evidence": [
+        "USD/CHF BEER z-score: +1.95",
+        "SOFR 3.62% vs SARON -0.04% — +400bp",
+        "USD/CHF IV: 6.2% vs HV30: 7.3%"
       ],
       "_source": "engine-ai-primary"
     }
