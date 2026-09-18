@@ -12707,6 +12707,15 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
   wrap.style.pointerEvents = 'auto';
   _lwYieldViewActive = true;
 
+  // The candlestick chart's own OHLC header (#lw-chart-header, e.g. "Euro /
+  // U.S. Dollar") lives outside #tv-chart-wrap and is untouched by destroying
+  // the chart instance above — it must be hidden explicitly here, the same
+  // way _renderLWChart() re-shows it on exit, or the prior symbol's name and
+  // OHLC readout keep showing above a chart that no longer has anything to
+  // do with that symbol.
+  const _yieldHdrEl = document.getElementById('lw-chart-header');
+  if (_yieldHdrEl) _yieldHdrEl.style.display = 'none';
+
   const chartDiv = document.createElement('div');
   chartDiv.style.cssText = 'width:100%;height:100%;touch-action:none;';
   wrap.appendChild(chartDiv);
@@ -12720,7 +12729,7 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
     crosshair:   { mode: LWC.CrosshairMode.Normal,
                    vertLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') },
                    horzLine: { color: _themeColorAlpha('--text2', 0.5), labelBackgroundColor: _themeColor('--bg3') } },
-    rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 65, scaleMargins: { top: 0.1, bottom: 0.1 } },
+    rightPriceScale: { borderColor: _themeColor('--border'), minimumWidth: 65, scaleMargins: { top: 0.06, bottom: 0.06 } },
     timeScale:   { borderColor: _themeColor('--border'), timeVisible: false, secondsVisible: false,
                    rightOffset: 4, minBarSpacing: 1, fixLeftEdge: false, fixRightEdge: false },
     handleScroll:  { mouseWheel: true, pressedMouseMove: true, horzTouchDrag: true, vertTouchDrag: false },
@@ -12766,13 +12775,20 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
 
   try {
     const [seriesA, seriesB] = await Promise.all(legs.map(async function (l) {
-      const mk = LWC.LineSeries
-        ? _lwChart.addSeries(LWC.LineSeries, {
-            color: l.color, lineWidth: 2, priceScaleId: 'right', priceFormat,
-            lastValueVisible: true, priceLineVisible: false })
-        : _lwChart.addLineSeries({
-            color: l.color, lineWidth: 2, priceScaleId: 'right', priceFormat,
-            lastValueVisible: true, priceLineVisible: false });
+      // AreaSeries with a gradient fill under each line — same visual
+      // language as the COT modal's charts (cot-modal-chart.js) — rather
+      // than a bare LineSeries; lineColor stays each leg's own fixed hue,
+      // topColor/bottomColor are that same hue at low alpha so the two
+      // gradients stay visually distinct instead of blending into one wash.
+      const seriesOpts = {
+        lineColor: l.color, topColor: l.color + '26', bottomColor: l.color + '02',
+        lineWidth: 2, priceScaleId: 'right', priceFormat,
+        lastValueVisible: true, priceLineVisible: false,
+        crosshairMarkerVisible: true, crosshairMarkerRadius: 4,
+      };
+      const mk = LWC.AreaSeries
+        ? _lwChart.addSeries(LWC.AreaSeries, seriesOpts)
+        : _lwChart.addAreaSeries(seriesOpts);
       const r = await fetch(`./bond2y-data/${l.ccy}.json`, { cache: 'no-store', signal: AbortSignal.timeout(6000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const hist = await r.json();
