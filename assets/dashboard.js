@@ -12638,24 +12638,145 @@ async function renderMomentumScreener(base) {
     tbody.addEventListener('click', function (e) {
       const row = e.target.closest('.mom-row');
       if (!row || !row.dataset.ccy) return;
-      if (typeof _lwOpenYieldSpreadOverlay === 'function') {
-        _lwOpenYieldSpreadOverlay(_momentumBaseCcy, row.dataset.ccy);
+      if (typeof _lwEnterYieldSpreadView === 'function') {
+        _lwEnterYieldSpreadView(_momentumBaseCcy, row.dataset.ccy);
       }
     });
   }
 }
 
-// Loads both legs of a 2Y yield spread (the Spread & Momentum table's base currency
-// plus the clicked row's currency) as a comparison-overlay pair on the main price
-// chart, replacing any 2Y overlay pair already shown so each click shows a clean pair
-// rather than accumulating series across clicks.
-function _lwOpenYieldSpreadOverlay(baseCcy, rowCcy) {
+let _lwYieldViewActive = false;
+let _lwYieldSeriesA = null;
+let _lwYieldSeriesB = null;
+
+function _lwCcyFlagCode(ccy) {
+  const m = G10_RATE_CCYS.find(c => c.ccy === ccy);
+  return m ? m.code : ccy.slice(0, 2).toLowerCase();
+}
+
+// Reverts the Price Chart from the dedicated 2Y-yield comparison view back to its
+// normal candlestick display: restores the candle series, the right price scale,
+// the volume pane and every main-pane indicator hidden on entry, and removes the
+// yield legend banner. Safe to call even if the view isn't active.
+function _lwExitYieldSpreadView() {
   if (!_lwChart) return;
-  Object.keys(_lwCompareSeriesMap)
-    .filter(function (k) { return k.indexOf('bond2y:') === 0; })
-    .forEach(function (k) { _lwClearCompareOne(k); });
-  _lwLoadCompare(baseCcy, baseCcy + ' 2Y', 'bond2y');
-  _lwLoadCompare(rowCcy, rowCcy + ' 2Y', 'bond2y');
+  _lwYieldViewActive = false;
+  if (_lwYieldSeriesA) { try { _lwChart.removeSeries(_lwYieldSeriesA); } catch(_e) {} _lwYieldSeriesA = null; }
+  if (_lwYieldSeriesB) { try { _lwChart.removeSeries(_lwYieldSeriesB); } catch(_e) {} _lwYieldSeriesB = null; }
+  if (_lwCandleSeries) { try { _lwCandleSeries.applyOptions({ visible: true }); } catch(_e) {} }
+  try { _lwChart.priceScale('right').applyOptions({ visible: true }); } catch(_e) {}
+  try {
+    _lwChart.priceScale('volume').applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+  } catch(_e) {}
+  Object.keys(window._indSeries || {}).forEach(function (id) {
+    if (!window._indPaneIndex || !window._indPaneIndex[id]) {
+      (window._indSeries[id] || []).forEach(function (s) { try { s.applyOptions({ visible: true }); } catch(_e) {} });
+    }
+  });
+  _lwReapplyPaneHeights();
+  const banner = document.getElementById('lw-yield-banner');
+  if (banner) banner.remove();
+}
+
+// Replaces the main Price Chart's own candlestick display with a dedicated 2Y
+// sovereign-yield comparison — both legs plotted as two distinctly-colored lines
+// sharing the chart's own right-axis scale (now reformatted to %), rather than an
+// overlay drawn on top of the candles or a separate modal. Triggered by clicking a
+// row in the Rates & Yield Curve panel's Spread & Momentum table.
+async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
+  if (!_lwChart || !_lwCandleSeries) return;
+  _lwExitYieldSpreadView();
+  _lwYieldViewActive = true;
+
+  try { _lwCandleSeries.applyOptions({ visible: false }); } catch(_e) {}
+  try { _lwChart.priceScale('volume').applyOptions({ scaleMargins: { top: 1, bottom: 0 } }); } catch(_e) {}
+  Object.keys(window._indSeries || {}).forEach(function (id) {
+    if (!window._indPaneIndex || !window._indPaneIndex[id]) {
+      (window._indSeries[id] || []).forEach(function (s) { try { s.applyOptions({ visible: false }); } catch(_e) {} });
+    }
+  });
+  try {
+    const panes = _lwChart.panes();
+    Object.keys(window._indPaneIndex || {}).forEach(function (id) {
+      const idx = window._indPaneIndex[id];
+      if (idx) { try { panes[idx].setHeight(0); } catch(_e) {} }
+    });
+  } catch(_e) {}
+  Object.keys(_lwCompareSeriesMap).forEach(function (uid) { _lwClearCompareOne(uid, true); });
+
+  const LWC = window.LightweightCharts;
+  const YIELD_COLORS = ['#42a5f5', '#ffa726']; // fixed, distinct hues — never the same palette index for both legs
+  const legs = [
+    { ccy: baseCcy, color: YIELD_COLORS[0] },
+    { ccy: rowCcy,  color: YIELD_COLORS[1] },
+  ];
+  const priceFormat = { type: 'custom', formatter: v => v.toFixed(2) + '%' };
+
+  const banner = document.createElement('div');
+  banner.id = 'lw-yield-banner';
+  banner.style.cssText = 'position:absolute;top:8px;left:8px;z-index:5;display:flex;align-items:center;gap:14px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono,monospace);font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.25);';
+  banner.innerHTML = legs.map(function (l) {
+    return `<span class="lw-yield-leg" data-ccy="${l.ccy}" style="display:flex;align-items:center;gap:5px;">` +
+      `<span class="fi fi-${_lwCcyFlagCode(l.ccy)}" style="border-radius:1px;"></span>` +
+      `<span style="color:var(--text2);">${l.ccy} 2Y</span>` +
+      `<span class="lw-yield-val" style="color:${l.color};font-weight:700;">—</span></span>`;
+  }).join('') +
+    `<span class="lw-yield-spread" style="color:var(--text2);border-left:1px solid var(--border);padding-left:14px;">spread —</span>` +
+    `<button id="lw-yield-close" title="Back to price chart" aria-label="Back to price chart" style="margin-left:4px;background:none;border:none;color:var(--text2);cursor:pointer;font-size:13px;line-height:1;padding:2px 4px;">&#10005;</button>`;
+  const chartWrap = document.getElementById('tv-chart-wrap');
+  if (chartWrap) chartWrap.appendChild(banner);
+  document.getElementById('lw-yield-close')?.addEventListener('click', _lwExitYieldSpreadView);
+
+  const valEls = banner.querySelectorAll('.lw-yield-val');
+  const spreadEl = banner.querySelector('.lw-yield-spread');
+
+  try {
+    const [seriesA, seriesB] = await Promise.all(legs.map(async function (l) {
+      const mk = LWC.LineSeries
+        ? _lwChart.addSeries(LWC.LineSeries, {
+            color: l.color, lineWidth: 2, priceScaleId: 'right', priceFormat,
+            lastValueVisible: true, priceLineVisible: false })
+        : _lwChart.addLineSeries({
+            color: l.color, lineWidth: 2, priceScaleId: 'right', priceFormat,
+            lastValueVisible: true, priceLineVisible: false });
+      const r = await fetch(`./bond2y-data/${l.ccy}.json`, { cache: 'no-store', signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const hist = await r.json();
+      const seriesData = (Array.isArray(hist) ? hist : [])
+        .filter(o => o.date && o.value != null)
+        .map(o => ({ time: o.date, value: parseFloat(o.value) }))
+        .sort((a, b) => a.time < b.time ? -1 : 1);
+      if (seriesData.length < 2) throw new Error('insufficient 2Y yield points for ' + l.ccy);
+      mk.setData(seriesData);
+      return { series: mk, data: seriesData, ccy: l.ccy };
+    }));
+
+    _lwYieldSeriesA = seriesA.series;
+    _lwYieldSeriesB = seriesB.series;
+    try { _lwChart.priceScale('right').applyOptions({ visible: true, scaleMargins: { top: 0.1, bottom: 0.1 } }); } catch(_e) {}
+    try { _lwChart.timeScale().fitContent(); } catch(_e) {}
+
+    const lastA = seriesA.data[seriesA.data.length - 1].value;
+    const lastB = seriesB.data[seriesB.data.length - 1].value;
+    const setLegend = (vA, vB) => {
+      valEls[0].textContent = vA == null ? '—' : vA.toFixed(2) + '%';
+      valEls[1].textContent = vB == null ? '—' : vB.toFixed(2) + '%';
+      const sp = (vA != null && vB != null) ? Math.round((vA - vB) * 100) : null;
+      spreadEl.textContent = sp == null ? 'spread —' : `spread ${sp >= 0 ? '+' : ''}${sp} bp`;
+    };
+    setLegend(lastA, lastB);
+
+    _lwChart.subscribeCrosshairMove(function (param) {
+      if (!_lwYieldViewActive) return;
+      if (!param || !param.time || !param.seriesData) { setLegend(lastA, lastB); return; }
+      const vA = param.seriesData.get(seriesA.series);
+      const vB = param.seriesData.get(seriesB.series);
+      setLegend(vA ? vA.value : null, vB ? vB.value : null);
+    });
+  } catch (err) {
+    console.warn('[yield-spread-view] Failed to load 2Y yield data:', err.message);
+    _lwExitYieldSpreadView();
+  }
 }
 
 const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
@@ -13809,17 +13930,16 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
     rate: [_themeColor('--up'), '#66bb6a', '#00897b'],
     esi:  [_themeColor('--chart-line'), '#4fc3f7', '#1565c0'],
     ohlc: [_themeColor('--orange'), '#ffb74d', '#e65100'],
-    bond2y: ['#42a5f5', _themeColor('--up'), '#ffb300'],
   };
   const palette = CMP_PALETTES[cmpType] || CMP_PALETTES.ohlc;
   const sameTypeCount = Object.keys(_lwCompareSeriesMap)
     .filter(function (k) { return k.indexOf(cmpType + ':') === 0; }).length;
   const CMP_COLOR = palette[sameTypeCount % palette.length];
   // Reserve this uid's slot synchronously, before the first await below: two calls
-  // fired back-to-back with no await between them (e.g. _lwOpenYieldSpreadOverlay's
-  // two same-tick bond2y calls, or the compare-list restore loop) would otherwise both
-  // compute sameTypeCount from an as-yet-unpopulated _lwCompareSeriesMap and pick the
-  // same palette color, since the real entry is only written after each fetch resolves.
+  // fired back-to-back with no await between them (e.g. the compare-list restore loop)
+  // would otherwise both compute sameTypeCount from an as-yet-unpopulated
+  // _lwCompareSeriesMap and pick the same palette color, since the real entry is only
+  // written after each fetch resolves.
   _lwCompareSeriesMap[uid] = 'pending';
 
   try {
@@ -13919,24 +14039,6 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
         const delta = seriesData[i].value - seriesData[i - 1].value;
         if (Math.abs(delta) >= 0.01) cmpDecisions[seriesData[i].time] = { delta };
       }
-
-    } else if (cmpType === 'bond2y') {
-      // bond2y-data/ is the same daily-accumulated 2Y sovereign-yield history the
-      // Spread & Momentum screener already reads (see renderMomentumScreener above) —
-      // reused here so a row click can plot both legs of the spread directly, in the
-      // same % units, with no normalization needed (unlike the 'ohlc' branch above).
-      const r = await fetch(`./bond2y-data/${cmpId}.json`, { cache: 'no-store', signal: AbortSignal.timeout(6000) });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const hist = await r.json();
-      if (!Array.isArray(hist) || hist.length < 2) throw new Error('no 2Y yield history');
-
-      seriesData = hist
-        .filter(o => o.date && o.value != null)
-        .map(o => ({ time: o.date, value: parseFloat(o.value) }))
-        .sort((a, b) => a.time < b.time ? -1 : 1);
-      if (seriesData.length < 2) throw new Error('insufficient 2Y yield points');
-
-      priceFormat = { type: 'custom', formatter: v => v.toFixed(2) + '%' };
 
     } else if (cmpType === 'esi') {
       const r = await fetch('./calendar-data/calendar.json', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
@@ -14043,12 +14145,12 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
     const cmpScaleId = 'cmp-' + cmpType;
     const cmpSeries = LWC.LineSeries
       ? _lwChart.addSeries(LWC.LineSeries, {
-          color: CMP_COLOR, lineWidth: (cmpType === 'rate' || cmpType === 'bond2y') ? 2 : 1.5,
+          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' })
       : _lwChart.addLineSeries({
-          color: CMP_COLOR, lineWidth: (cmpType === 'rate' || cmpType === 'bond2y') ? 2 : 1.5,
+          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
           priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' });
