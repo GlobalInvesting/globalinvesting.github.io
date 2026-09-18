@@ -12641,6 +12641,11 @@ async function renderMomentumScreener(base) {
       if (typeof _lwEnterYieldSpreadView === 'function') {
         _lwEnterYieldSpreadView(_momentumBaseCcy, row.dataset.ccy);
       }
+      // Scroll the Price Chart panel into view on both mobile and desktop —
+      // the row lives in the Rates & Yield Curve panel, which can sit well
+      // below (mobile, single-column) or simply out of the current scroll
+      // position (desktop, #main) from where the chart itself renders.
+      document.getElementById('section-fxpairs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
 }
@@ -12773,11 +12778,16 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
 
   const banner = document.createElement('div');
   banner.id = 'lw-yield-banner';
+  // Base (desktop) sizing is inline here; the <=900px breakpoint overrides
+  // padding/gap/font-size/offsets via #lw-yield-banner rules in index.html's
+  // mobile media block, the same !important-over-inline convention already
+  // used there for #split-layout-btn etc. — a fixed-position overlay banner
+  // at desktop density was covering chart content on narrow viewports.
   banner.style.cssText = 'position:absolute;top:8px;left:8px;z-index:5;display:flex;align-items:center;gap:14px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono,monospace);font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.25);';
   banner.innerHTML = legs.map(function (l) {
     return `<span class="lw-yield-leg" data-ccy="${l.ccy}" style="display:flex;align-items:center;gap:5px;">` +
       `<span class="fi fi-${_lwCcyFlagCode(l.ccy)}" style="border-radius:1px;"></span>` +
-      `<span style="color:var(--text2);">${l.ccy} 2Y</span>` +
+      `<span style="color:var(--text2);">${l.ccy}<span class="lw-yield-2y-tag"> 2Y</span></span>` +
       `<span class="lw-yield-val" style="color:${l.color};font-weight:700;">—</span></span>`;
   }).join('') +
     `<span class="lw-yield-spread" style="color:var(--text2);border-left:1px solid var(--border);padding-left:14px;">spread —</span>` +
