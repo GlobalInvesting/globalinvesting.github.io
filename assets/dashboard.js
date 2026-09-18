@@ -12550,6 +12550,26 @@ async function renderSovereignSpreads(base) {
 let _momentumBaseCcy = 'USD';
 const _momentumRowsCache = {}; // base ccy -> rendered tbody HTML
 
+// Date-aligned (country − base) 2Y yield spread, plus its 5D/20D change — the single
+// source of truth for "the spread" shared by the Spread & Momentum table's own rows
+// (renderMomentumScreener, below) and the dedicated comparison chart it opens
+// (openYieldSpreadModal, assets/yield-spread-modal.js), so the two never drift.
+function _bond2ySpreadStats(baseHist, hist) {
+  if (!Array.isArray(baseHist) || !Array.isArray(hist) || !hist.length) return null;
+  const baseByDate = {};
+  baseHist.forEach(r => { baseByDate[r.date] = r.value; });
+  const spreadSeries = hist
+    .filter(r => baseByDate[r.date] != null)
+    .map(r => ({ date: r.date, spread: (r.value - baseByDate[r.date]) * 100 }))
+    .sort((a, b) => a.date < b.date ? -1 : 1);
+  if (spreadSeries.length < 6) return null;
+  const n = spreadSeries.length;
+  const now = spreadSeries[n - 1].spread;
+  const d5 = spreadSeries[n - 6].spread != null ? now - spreadSeries[n - 6].spread : null;
+  const d20 = n >= 21 ? now - spreadSeries[n - 21].spread : null;
+  return { spreadSeries, now, d5, d20 };
+}
+
 async function renderMomentumScreener(base) {
   base = base || _momentumBaseCcy;
   _momentumBaseCcy = base;
@@ -12574,25 +12594,12 @@ async function renderMomentumScreener(base) {
     ...countries.map(c => fetch(`./bond2y-data/${c.ccy}.json`, { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null)),
   ]);
 
-  const baseByDate = {};
-  (Array.isArray(baseHist) ? baseHist : []).forEach(r => { baseByDate[r.date] = r.value; });
+  const baseHistArr = Array.isArray(baseHist) ? baseHist : [];
 
   const results = countries.map((c, i) => {
-    const hist = histRes[i];
-    if (!Array.isArray(hist) || !hist.length) return { ...c, insufficient: true };
-
-    const spreadSeries = hist
-      .filter(r => baseByDate[r.date] != null)
-      .map(r => ({ date: r.date, spread: (r.value - baseByDate[r.date]) * 100 }))
-      .sort((a, b) => a.date < b.date ? -1 : 1);
-
-    if (spreadSeries.length < 6) return { ...c, insufficient: true };
-
-    const n = spreadSeries.length;
-    const now = spreadSeries[n - 1].spread;
-    const d5 = spreadSeries[n - 6].spread != null ? now - spreadSeries[n - 6].spread : null;
-    const d20 = n >= 21 ? now - spreadSeries[n - 21].spread : null;
-    return { ...c, now, d5, d20, insufficient: false };
+    const stats = _bond2ySpreadStats(baseHistArr, histRes[i]);
+    if (!stats) return { ...c, insufficient: true };
+    return { ...c, now: stats.now, d5: stats.d5, d20: stats.d20, insufficient: false };
   });
 
   results.sort((a, b) => {
@@ -12622,7 +12629,7 @@ async function renderMomentumScreener(base) {
     if (r.insufficient) {
       return `<tr><td>${flagHtml}</td><td colspan="4" style="color:var(--text3);">Accumulating history…</td></tr>`;
     }
-    return `<tr class="mom-row" data-ccy="${r.ccy}" style="cursor:pointer;" title="Compare ${r.ccy} 2Y vs ${base} 2Y on the price chart">
+    return `<tr class="mom-row" data-ccy="${r.ccy}" style="cursor:pointer;" title="Open a dedicated ${r.ccy} vs ${base} 2Y yield comparison chart">
       <td>${flagHtml}</td>
       <td style="color:${colorBp(r.now)}">${fmtBp(r.now)}</td>
       <td style="color:${colorBp(r.d5)}">${fmtBp(r.d5)}</td>
@@ -12638,24 +12645,11 @@ async function renderMomentumScreener(base) {
     tbody.addEventListener('click', function (e) {
       const row = e.target.closest('.mom-row');
       if (!row || !row.dataset.ccy) return;
-      if (typeof _lwOpenYieldSpreadOverlay === 'function') {
-        _lwOpenYieldSpreadOverlay(_momentumBaseCcy, row.dataset.ccy);
+      if (typeof openYieldSpreadModal === 'function') {
+        openYieldSpreadModal(_momentumBaseCcy, row.dataset.ccy);
       }
     });
   }
-}
-
-// Loads both legs of a 2Y yield spread (the Spread & Momentum table's base currency
-// plus the clicked row's currency) as a comparison-overlay pair on the main price
-// chart, replacing any 2Y overlay pair already shown so each click shows a clean pair
-// rather than accumulating series across clicks.
-function _lwOpenYieldSpreadOverlay(baseCcy, rowCcy) {
-  if (!_lwChart) return;
-  Object.keys(_lwCompareSeriesMap)
-    .filter(function (k) { return k.indexOf('bond2y:') === 0; })
-    .forEach(function (k) { _lwClearCompareOne(k); });
-  _lwLoadCompare(baseCcy, baseCcy + ' 2Y', 'bond2y');
-  _lwLoadCompare(rowCcy, rowCcy + ' 2Y', 'bond2y');
 }
 
 const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
@@ -13809,7 +13803,6 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
     rate: [_themeColor('--up'), '#66bb6a', '#00897b'],
     esi:  [_themeColor('--chart-line'), '#4fc3f7', '#1565c0'],
     ohlc: [_themeColor('--orange'), '#ffb74d', '#e65100'],
-    bond2y: ['#42a5f5', _themeColor('--up'), '#ffb300'],
   };
   const palette = CMP_PALETTES[cmpType] || CMP_PALETTES.ohlc;
   const sameTypeCount = Object.keys(_lwCompareSeriesMap)
@@ -13913,24 +13906,6 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
         const delta = seriesData[i].value - seriesData[i - 1].value;
         if (Math.abs(delta) >= 0.01) cmpDecisions[seriesData[i].time] = { delta };
       }
-
-    } else if (cmpType === 'bond2y') {
-      // bond2y-data/ is the same daily-accumulated 2Y sovereign-yield history the
-      // Spread & Momentum screener already reads (see renderMomentumScreener above) —
-      // reused here so a row click can plot both legs of the spread directly, in the
-      // same % units, with no normalization needed (unlike the 'ohlc' branch above).
-      const r = await fetch(`./bond2y-data/${cmpId}.json`, { cache: 'no-store', signal: AbortSignal.timeout(6000) });
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const hist = await r.json();
-      if (!Array.isArray(hist) || hist.length < 2) throw new Error('no 2Y yield history');
-
-      seriesData = hist
-        .filter(o => o.date && o.value != null)
-        .map(o => ({ time: o.date, value: parseFloat(o.value) }))
-        .sort((a, b) => a.time < b.time ? -1 : 1);
-      if (seriesData.length < 2) throw new Error('insufficient 2Y yield points');
-
-      priceFormat = { type: 'custom', formatter: v => v.toFixed(2) + '%' };
 
     } else if (cmpType === 'esi') {
       const r = await fetch('./calendar-data/calendar.json', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
@@ -14037,12 +14012,12 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
     const cmpScaleId = 'cmp-' + cmpType;
     const cmpSeries = LWC.LineSeries
       ? _lwChart.addSeries(LWC.LineSeries, {
-          color: CMP_COLOR, lineWidth: (cmpType === 'rate' || cmpType === 'bond2y') ? 2 : 1.5,
+          color: CMP_COLOR, lineWidth: (cmpType === 'rate') ? 2 : 1.5,
           priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' })
       : _lwChart.addLineSeries({
-          color: CMP_COLOR, lineWidth: (cmpType === 'rate' || cmpType === 'bond2y') ? 2 : 1.5,
+          color: CMP_COLOR, lineWidth: (cmpType === 'rate') ? 2 : 1.5,
           priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' });
