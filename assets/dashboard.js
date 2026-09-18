@@ -12622,7 +12622,7 @@ async function renderMomentumScreener(base) {
     if (r.insufficient) {
       return `<tr><td>${flagHtml}</td><td colspan="4" style="color:var(--text3);">Accumulating history…</td></tr>`;
     }
-    return `<tr>
+    return `<tr class="mom-row" data-ccy="${r.ccy}" style="cursor:pointer;" title="Compare ${r.ccy} 2Y vs ${base} 2Y on the price chart">
       <td>${flagHtml}</td>
       <td style="color:${colorBp(r.now)}">${fmtBp(r.now)}</td>
       <td style="color:${colorBp(r.d5)}">${fmtBp(r.d5)}</td>
@@ -12632,6 +12632,30 @@ async function renderMomentumScreener(base) {
   }).join('');
   _momentumRowsCache[base] = html;
   tbody.innerHTML = html;
+
+  if (!tbody.dataset.clickBound) {
+    tbody.dataset.clickBound = '1';
+    tbody.addEventListener('click', function (e) {
+      const row = e.target.closest('.mom-row');
+      if (!row || !row.dataset.ccy) return;
+      if (typeof _lwOpenYieldSpreadOverlay === 'function') {
+        _lwOpenYieldSpreadOverlay(_momentumBaseCcy, row.dataset.ccy);
+      }
+    });
+  }
+}
+
+// Loads both legs of a 2Y yield spread (the Spread & Momentum table's base currency
+// plus the clicked row's currency) as a comparison-overlay pair on the main price
+// chart, replacing any 2Y overlay pair already shown so each click shows a clean pair
+// rather than accumulating series across clicks.
+function _lwOpenYieldSpreadOverlay(baseCcy, rowCcy) {
+  if (!_lwChart) return;
+  Object.keys(_lwCompareSeriesMap)
+    .filter(function (k) { return k.indexOf('bond2y:') === 0; })
+    .forEach(function (k) { _lwClearCompareOne(k); });
+  _lwLoadCompare(baseCcy, baseCcy + ' 2Y', 'bond2y');
+  _lwLoadCompare(rowCcy, rowCcy + ' 2Y', 'bond2y');
 }
 
 const _CCY_PFXS = ['united states ','euro area ','united kingdom ','japan ',
@@ -13785,6 +13809,7 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
     rate: [_themeColor('--up'), '#66bb6a', '#00897b'],
     esi:  [_themeColor('--chart-line'), '#4fc3f7', '#1565c0'],
     ohlc: [_themeColor('--orange'), '#ffb74d', '#e65100'],
+    bond2y: ['#42a5f5', _themeColor('--up'), '#ffb300'],
   };
   const palette = CMP_PALETTES[cmpType] || CMP_PALETTES.ohlc;
   const sameTypeCount = Object.keys(_lwCompareSeriesMap)
@@ -13888,6 +13913,24 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
         const delta = seriesData[i].value - seriesData[i - 1].value;
         if (Math.abs(delta) >= 0.01) cmpDecisions[seriesData[i].time] = { delta };
       }
+
+    } else if (cmpType === 'bond2y') {
+      // bond2y-data/ is the same daily-accumulated 2Y sovereign-yield history the
+      // Spread & Momentum screener already reads (see renderMomentumScreener above) —
+      // reused here so a row click can plot both legs of the spread directly, in the
+      // same % units, with no normalization needed (unlike the 'ohlc' branch above).
+      const r = await fetch(`./bond2y-data/${cmpId}.json`, { cache: 'no-store', signal: AbortSignal.timeout(6000) });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const hist = await r.json();
+      if (!Array.isArray(hist) || hist.length < 2) throw new Error('no 2Y yield history');
+
+      seriesData = hist
+        .filter(o => o.date && o.value != null)
+        .map(o => ({ time: o.date, value: parseFloat(o.value) }))
+        .sort((a, b) => a.time < b.time ? -1 : 1);
+      if (seriesData.length < 2) throw new Error('insufficient 2Y yield points');
+
+      priceFormat = { type: 'custom', formatter: v => v.toFixed(2) + '%' };
 
     } else if (cmpType === 'esi') {
       const r = await fetch('./calendar-data/calendar.json', { cache: 'no-store', signal: AbortSignal.timeout(8000) });
@@ -13994,12 +14037,12 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
     const cmpScaleId = 'cmp-' + cmpType;
     const cmpSeries = LWC.LineSeries
       ? _lwChart.addSeries(LWC.LineSeries, {
-          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+          color: CMP_COLOR, lineWidth: (cmpType === 'rate' || cmpType === 'bond2y') ? 2 : 1.5,
           priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' })
       : _lwChart.addLineSeries({
-          color: CMP_COLOR, lineWidth: cmpType === 'rate' ? 2 : 1.5,
+          color: CMP_COLOR, lineWidth: (cmpType === 'rate' || cmpType === 'bond2y') ? 2 : 1.5,
           priceScaleId: cmpScaleId, priceFormat,
           lastValueVisible: false, priceLineVisible: false,
           crosshairMarkerVisible: cmpType !== 'ohlc' });
