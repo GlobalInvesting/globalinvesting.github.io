@@ -1,10 +1,10 @@
 
-const CACHE_VERSION = 'gi-v8.534.2';
+const CACHE_VERSION = 'gi-v8.534.3';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
 const STATIC_PRECACHE = [
-  '/assets/dashboard.css?v=8.534.2',
+  '/assets/dashboard.css?v=8.534.3',
   '/assets/command-bar.css?v=8.491.5',
   '/assets/dashboard.js?v=8.534.2',
   '/assets/command-bar.js?v=8.491.4',
@@ -19,7 +19,7 @@ const STATIC_PRECACHE = [
   '/assets/heatmap-modal.js?v=2.6.7',
   '/assets/econ-surprises-modal.js?v=1.3.12',
   '/assets/onboarding.js?v=7.89.12',
-  '/assets/layout-resizer.js?v=1.0.1',
+  '/assets/layout-resizer.js?v=1.0.2',
   '/assets/feed.js?v=1.0.0',
   '/assets/share.js?v=1.1.0',
   '/assets/inline-panel.js?v=1.4.2',
