@@ -204,6 +204,22 @@ function _updateSourceLabel(pairId) {
   const qbLabel   = document.getElementById("qb-source-label");
   const delayChip = document.getElementById("footer-delay-label");
 
+  // The FX market's own weekend-closed state must win over both the
+  // "delayed" default and a genuinely live per-pair websocket feed -- a
+  // "LIVE"/"~5 MIN" label with the market shut makes no sense to a viewer,
+  // regardless of which upstream feed happened to answer last.
+  const marketClosed = typeof window.isFxMarketClosedNow === "function"
+    ? window.isFxMarketClosedNow()
+    : false;
+  if (marketClosed) {
+    if (qbLabel) qbLabel.textContent = "Market Closed";
+    if (delayChip) {
+      delayChip.textContent = "CLOSED";
+      delayChip.style.color = "var(--text3)";
+    }
+    return;
+  }
+
   if (pairId === null) {
     if (delayChip) {
       delayChip.textContent = "~5 MIN";

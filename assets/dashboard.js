@@ -344,6 +344,21 @@ function localHourToUTC(timeZone, localHour, now) {
   return ((localHour - offset) % 24 + 24) % 24;
 }
 
+// Single source of truth for the FX weekend-closed boundary (Fri 21:00 UTC
+// -> Sun 21:00 UTC), matching the session-status/liquidity-chart convention
+// used everywhere else in this file. Exposed on window so other deferred
+// scripts loaded after this one (e.g. fx-websocket.js) can reuse the exact
+// same boundary instead of leaving a delay/live label unaware of it.
+function isFxMarketClosedNow() {
+  const now = new Date();
+  const utcDay = now.getUTCDay();
+  const utcHour = now.getUTCHours();
+  return utcDay === 6
+    || (utcDay === 0 && utcHour < 21)
+    || (utcDay === 5 && utcHour >= 21);
+}
+window.isFxMarketClosedNow = isFxMarketClosedNow;
+
 function updateSessions(h) {
   const now = new Date();
   const sessions = SESSION_DEFS.map(s => ({
@@ -352,11 +367,7 @@ function updateSessions(h) {
     close: localHourToUTC(s.zone, s.closeLocal, now),
   }));
 
-  const utcDay = now.getUTCDay();   
-  const utcHour = now.getUTCHours();
-  const isWeekend = utcDay === 6
-    || (utcDay === 0 && utcHour < 21)
-    || (utcDay === 5 && utcHour >= 21);
+  const isWeekend = isFxMarketClosedNow();
 
   let activeLabel = isWeekend ? 'MARKET CLOSED' : 'INTER-SESSION';
 
@@ -2391,9 +2402,14 @@ async function fetchQuoteBarRT() {
     const hh = now.getHours().toString().padStart(2,'0');
     const mm = now.getMinutes().toString().padStart(2,'0');
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
-    const srcLabel = 'Delayed ~5min';  
     const qbLabel = document.getElementById('qb-source-label');
-    if (qbLabel) qbLabel.textContent = `${srcLabel} · ${hh}:${mm} ${tzAbbr}`;
+    if (qbLabel) {
+      if (isFxMarketClosedNow()) {
+        qbLabel.textContent = 'Market Closed';
+      } else {
+        qbLabel.textContent = `Delayed ~5min · ${hh}:${mm} ${tzAbbr}`;
+      }
+    }
   }
 }
 
