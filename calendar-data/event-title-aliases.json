@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-18T11:37:45Z",
+  "generatedAt": "2026-09-18T14:35:29Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 162,
+  "aliasCount": 166,
   "aliases": [
     {
       "currency": "EUR",
@@ -1284,10 +1284,10 @@
           "forecast_primary": -0.1,
           "forecast_secondary": 0.0,
           "actual_primary": -0.1,
-          "actual_secondary": null,
+          "actual_secondary": -0.1,
           "previous_primary": -0.1,
           "previous_secondary": -0.1,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "-0.1%",
           "forecast_secondary_raw": "0.0%",
           "previous_secondary_raw": "-0.1%"
         },
@@ -1417,7 +1417,7 @@
           "dateISO": "2026-09-18",
           "forecast_primary": null,
           "forecast_secondary": 1.25,
-          "actual_primary": 1.2,
+          "actual_primary": 1.25,
           "actual_secondary": 1.25,
           "previous_primary": 1.0,
           "previous_secondary": 1.0,
@@ -1426,6 +1426,70 @@
           "previous_secondary_raw": "1%"
         }
       }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom Retail Sales m/m",
+      "secondary_title": "United Kingdom Retail Sales MoM",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 0.9,
+          "forecast_secondary": -0.1,
+          "actual_primary": 0.5,
+          "actual_secondary": 0.5,
+          "previous_primary": 1.0,
+          "previous_secondary": -0.5,
+          "actual_secondary_raw": "0.5%",
+          "forecast_secondary_raw": "-0.1%",
+          "previous_secondary_raw": "-0.5%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 0.9,
+          "forecast_yahoo": null,
+          "actual_primary": 0.5,
+          "actual_yahoo": 0.5,
+          "previous_primary": 1.0,
+          "previous_yahoo": -0.5,
+          "actual_yahoo_raw": "0.5",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-0.5"
+        }
+      },
+      "yahoo_title": "Retail Sales MM"
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom Retail Sales y/y",
+      "secondary_title": "United Kingdom Retail Sales YoY",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 1.5,
+          "forecast_secondary": 2.0,
+          "actual_primary": 2.4,
+          "actual_secondary": 2.4,
+          "previous_primary": 4.2,
+          "previous_secondary": 1.2,
+          "actual_secondary_raw": "2.4%",
+          "forecast_secondary_raw": "2.0%",
+          "previous_secondary_raw": "1.2%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 1.5,
+          "forecast_yahoo": null,
+          "actual_primary": 2.4,
+          "actual_yahoo": 2.4,
+          "previous_primary": 4.2,
+          "previous_yahoo": 1.6,
+          "actual_yahoo_raw": "2.4",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "1.6"
+        }
+      },
+      "yahoo_title": "Retail Sales YY"
     },
     {
       "currency": "EUR",
@@ -1455,15 +1519,28 @@
           "dateISO": "2026-09-18",
           "forecast_primary": 76.1,
           "forecast_secondary": 76.4,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 76.3,
+          "actual_secondary": 76.3,
           "previous_primary": 76.3,
           "previous_secondary": 76.3,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "76.3%",
           "forecast_secondary_raw": "76.4%",
           "previous_secondary_raw": "76.3%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 76.1,
+          "forecast_yahoo": null,
+          "actual_primary": 76.3,
+          "actual_yahoo": 76.3,
+          "previous_primary": 76.3,
+          "previous_yahoo": 76.3,
+          "actual_yahoo_raw": "76.3",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "76.3"
         }
-      }
+      },
+      "yahoo_title": "Capacity Utilization SA*"
     },
     {
       "currency": "USD",
@@ -1474,13 +1551,13 @@
           "dateISO": "2026-09-18",
           "forecast_primary": 0.9,
           "forecast_secondary": 1.0,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 1.4,
+          "actual_secondary": 1.4,
           "previous_primary": 1.1,
-          "previous_secondary": 1.1,
-          "actual_secondary_raw": null,
+          "previous_secondary": 1.13,
+          "actual_secondary_raw": "1.4%",
           "forecast_secondary_raw": "1.0%",
-          "previous_secondary_raw": "1.1%"
+          "previous_secondary_raw": "1.13%"
         }
       }
     },
@@ -1568,13 +1645,13 @@
         "secondary": {
           "dateISO": "2026-09-22",
           "forecast_primary": null,
-          "forecast_secondary": 4.0,
+          "forecast_secondary": 9.0,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": 11.0,
           "previous_secondary": 11.0,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "4",
+          "forecast_secondary_raw": "9",
           "previous_secondary_raw": "11"
         }
       }
@@ -1587,13 +1664,13 @@
         "secondary": {
           "dateISO": "2026-09-22",
           "forecast_primary": -13.0,
-          "forecast_secondary": -10.0,
+          "forecast_secondary": -6.0,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": -8.0,
           "previous_secondary": -8.0,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "-10",
+          "forecast_secondary_raw": "-6",
           "previous_secondary_raw": "-8"
         }
       }
@@ -1663,13 +1740,13 @@
         "secondary": {
           "dateISO": "2026-09-23",
           "forecast_primary": 52.1,
-          "forecast_secondary": 51.7,
+          "forecast_secondary": 52.3,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": 51.7,
           "previous_secondary": 51.7,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "51.7",
+          "forecast_secondary_raw": "52.3",
           "previous_secondary_raw": "51.7"
         }
       }
@@ -1823,6 +1900,101 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": "0.1%",
           "previous_secondary_raw": "0.2%"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Michigan Consumer Sentiment",
+      "secondary_title": "United States Michigan Consumer Sentiment Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 47.8,
+          "forecast_secondary": 47.8,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 47.8,
+          "previous_secondary": 51.7,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "47.8",
+          "previous_secondary_raw": "51.7"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Michigan Consumer Expectations",
+      "secondary_title": "United States Michigan Consumer Expectations Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 45.8,
+          "forecast_secondary": 45.8,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 45.8,
+          "previous_secondary": 51.5,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "45.8",
+          "previous_secondary_raw": "51.5"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Michigan Current Conditions",
+      "secondary_title": "United States Michigan Current Conditions Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 50.9,
+          "forecast_secondary": 50.9,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 50.9,
+          "previous_secondary": 51.9,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "50.9",
+          "previous_secondary_raw": "51.9"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Michigan Inflation Expectations",
+      "secondary_title": "United States Michigan Inflation Expectations Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 4.6,
+          "forecast_secondary": 4.6,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 4.6,
+          "previous_secondary": 4.0,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "4.6%",
+          "previous_secondary_raw": "4%"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Michigan 5-Year Inflation Expectations",
+      "secondary_title": "United States Michigan 5 Year Inflation Expectations Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 3.4,
+          "forecast_secondary": 3.4,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 3.4,
+          "previous_secondary": 3.3,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "3.4%",
+          "previous_secondary_raw": "3.3%"
         }
       }
     },
@@ -2184,44 +2356,6 @@
           "actual_yahoo_raw": "1",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "-0.5"
-        }
-      }
-    },
-    {
-      "currency": "CAD",
-      "primary_title": "Canada Unemployment Rate",
-      "yahoo_title": "Unemployment Rate",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-04",
-          "forecast_primary": 6.4,
-          "forecast_yahoo": null,
-          "actual_primary": 6.4,
-          "actual_yahoo": 6.4,
-          "previous_primary": 6.4,
-          "previous_yahoo": 6.4,
-          "actual_yahoo_raw": "6.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "6.4"
-        }
-      }
-    },
-    {
-      "currency": "CAD",
-      "primary_title": "Canada Participation Rate",
-      "yahoo_title": "Participation Rate",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-04",
-          "forecast_primary": 65.0,
-          "forecast_yahoo": null,
-          "actual_primary": 65.0,
-          "actual_yahoo": 65.0,
-          "previous_primary": 65.1,
-          "previous_yahoo": 65.1,
-          "actual_yahoo_raw": "65",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "65.1"
         }
       }
     },
@@ -2716,82 +2850,6 @@
           "actual_yahoo_raw": "0.3",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "0.2"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Michigan Consumer Sentiment",
-      "yahoo_title": "U Mich Sentiment Prelim",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 49.8,
-          "forecast_yahoo": null,
-          "actual_primary": 47.8,
-          "actual_yahoo": 47.8,
-          "previous_primary": 51.7,
-          "previous_yahoo": 51.7,
-          "actual_yahoo_raw": "47.8",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "51.7"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Michigan Consumer Expectations",
-      "yahoo_title": "U Mich Expectations Prelim",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 51.2,
-          "forecast_yahoo": null,
-          "actual_primary": 45.8,
-          "actual_yahoo": 45.8,
-          "previous_primary": 51.5,
-          "previous_yahoo": 51.5,
-          "actual_yahoo_raw": "45.8",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "51.5"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Michigan Current Conditions",
-      "yahoo_title": "U Mich Conditions Prelim",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 49.0,
-          "forecast_yahoo": null,
-          "actual_primary": 50.9,
-          "actual_yahoo": 50.9,
-          "previous_primary": 51.9,
-          "previous_yahoo": 51.9,
-          "actual_yahoo_raw": "50.9",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "51.9"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Michigan 5-Year Inflation Expectations",
-      "yahoo_title": "U Mich 5-Yr Inf Prelim",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 3.2,
-          "forecast_yahoo": null,
-          "actual_primary": 3.4,
-          "actual_yahoo": 3.4,
-          "previous_primary": 3.3,
-          "previous_yahoo": 3.3,
-          "actual_yahoo_raw": "3.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "3.3"
         }
       }
     },
@@ -3419,6 +3477,63 @@
           "actual_yahoo_raw": "1.7",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "1.8"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Fed Industrial Production m/m",
+      "yahoo_title": "Industrial Production MM*",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 0.0,
+          "forecast_yahoo": null,
+          "actual_primary": 0.0,
+          "actual_yahoo": 0.0,
+          "previous_primary": 0.2,
+          "previous_yahoo": 0.2,
+          "actual_yahoo_raw": "0",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0.2"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Fed Manufacturing Production m/m",
+      "yahoo_title": "Industrial Production MM*",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": 0.0,
+          "forecast_yahoo": null,
+          "actual_primary": -0.3,
+          "actual_yahoo": 0.0,
+          "previous_primary": 0.2,
+          "previous_yahoo": 0.2,
+          "actual_yahoo_raw": "0",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0.2"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States CB Leading Economic Index m/m",
+      "yahoo_title": "Leading Index Chg MM",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-18",
+          "forecast_primary": -0.1,
+          "forecast_yahoo": null,
+          "actual_primary": -0.1,
+          "actual_yahoo": -0.1,
+          "previous_primary": 0.2,
+          "previous_yahoo": 0.2,
+          "actual_yahoo_raw": "-0.1",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0.2"
         }
       }
     },
