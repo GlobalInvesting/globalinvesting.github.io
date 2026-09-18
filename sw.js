@@ -14,7 +14,6 @@ const STATIC_PRECACHE = [
   '/assets/cot-modal-chart.js?v=7.99.0',
   '/assets/cb-rates-modal.js?v=8.0.8',
   '/assets/real-carry-modal.js?v=2.7.11',
-  '/assets/yield-spread-modal.js?v=1.0.0',
   '/assets/corr-modal.js?v=2.7.0',
   '/assets/yc-modal.js?v=8.8.7',
   '/assets/heatmap-modal.js?v=2.6.6',
