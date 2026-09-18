@@ -691,7 +691,15 @@ function openCOTModal(ccy,data,opts){
   const total=long_+short_,lPct=total>0?Math.round(long_/total*100):50;
   const amNet=data.assetManagerNet,ddNet=data.dealerNet,weekEnd=data.weekEnding||'',nWks=history.length;
   const amLong_=data.assetManagerLong,amShort_=data.assetManagerShort,ddLong_=data.dealerLong,ddShort_=data.dealerShort;
-  const zScore=_calcZ(history),pctHist=_calcPct(history),zInfo=_posLabel(zScore),isCrowded=Math.abs(zScore||0)>=1.5;
+  // Positioning Z-Score/percentile are computed against a trailing 52-week
+  // window, not the full stored history (which has held up to 522 weeks/
+  // ~10y since the 2026-08-26 depth increase) — matches this project's
+  // standing "COT z-score vs. 52-week history" convention (also documented
+  // in guide-cot.html's FAQ schema and mirrored by the MT5 EA) and the
+  // sibling "52-Week Range" section in this same tab, which already slices
+  // to history.slice(-52).
+  const zHist=history.slice(-52),zWindow=zHist.length;
+  const zScore=_calcZ(zHist),pctHist=_calcPct(zHist),zInfo=_posLabel(zScore),isCrowded=Math.abs(zScore||0)>=1.5;
   let wow=null,amWow=null,ddWow=null;
   if(history.length>=2){
     const prev=history[history.length-2];
@@ -770,7 +778,7 @@ function openCOTModal(ccy,data,opts){
         <div class="cot-ov-half">
           <div class="cot-ct">POSITIONING · Z-SCORE</div>
           <div class="cot-ov-bignum" style="color:${zCol}">${zStr}σ <span style="font-size:12px;color:var(--text2);font-weight:400">· ${pStr} pctile</span></div>
-          <div class="cot-ov-sub" style="margin-bottom:8px">${zInfo.txt} · ${nWks}w window</div>
+          <div class="cot-ov-sub" style="margin-bottom:8px">${zInfo.txt} · ${zWindow}w window</div>
           <div class="cot-gauge-track"><div class="cot-gauge-fill"></div><div id="cot-pin" class="cot-gauge-pin" style="left:50%"></div></div>
           <div class="cot-gauge-lbls"><span>Extreme Short</span><span>Neutral</span><span>Extreme Long</span></div>
         </div>
