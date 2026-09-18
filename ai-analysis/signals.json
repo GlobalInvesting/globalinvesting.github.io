@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-18T07:01:40Z",
+  "generated_at": "2026-09-18T11:57:47Z",
   "signals": [
     {
-      "time": "07:00",
+      "time": "11:52",
       "priority": "critical",
-      "title": "USD/NOK — G10 Bilateral Theme + Fed Divergence",
-      "text": "USD outperforms the G10 basket with a 1W average of +1.213% across 9 pairs, while NOK lags at −1.106% across 2 pairs, generating a critical 2.319% leader-laggard divergence. Fed holds at 4.0%. On the technical side, USD/NOK trades above its SMA20 at 9.311, with the SMA50 at 9.459 capping immediate extensions. With VIX at 15.4 reflecting normal volatility, broad cross-asset conditions favor sustained yield-driven dispersion over defensive positioning. The acute performance gap confirms strong capital flows favoring USD assets over high-beta commodity currencies. Trade bias: Long USD/NOK; policy divergence and bilateral spread expansion favor upside momentum. Catalyst: Norges Bank policy meeting 24 Sep. Risk: Norges Bank delivers an unexpectedly hawkish policy update, narrowing the bilateral spread below 0.80%.",
+      "title": "USD/JPY — G10 Bilateral Theme + Rate Differential",
+      "text": "USD/JPY trades at 157.87, testing below the SMA20 at 156.89 while holding under the SMA50 at 159.14. The 25d risk reversal sits at −2.08, showing a strong put skew as the options market prices hedging protection. The G10 strength scorecard confirms USD as the week's leader at +1.426% across 9 pairs against JPY as the laggard at −1.127% across 7 pairs, producing a 2.553% bilateral spread. The OIS carry differential of +264bp favoring USD from SOFR at 3.62% versus TONA at 0.98% underpins the divergence despite the Bank of Japan lifting rates to 1.25%. Trade bias: Long USD/JPY; carry advantage and scorecard outperformance sustain the structural bid. Catalyst: US Fed Industrial Production m/m at 13:15 UTC. Risk: Fed rate path reprices dovish and narrows the 264bp OIS spread, compressing the bilateral spread below 0.80%.",
       "evidence": [
-        "USD 1W avg: +1.213% (n=9)",
-        "NOK 1W avg: -1.106% (n=2)",
-        "G10 spread: 2.319%"
+        "USD 1W avg: +1.426% (n=9)",
+        "JPY 1W avg: -1.127% (n=7)",
+        "G10 spread: 2.553%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:57",
-      "priority": "critical",
-      "title": "USD/JPY — CB Surprise Repricing + Options Skew",
-      "text": "USD/JPY trades higher at 157.06 following the Bank of Japan rate increase to 1.25% in a split decision. The policy action failed to stem currency weakness as Governor Ueda signaled that trend inflation will only sustainably reach the 2% target around late FY2026 into FY2027. Nominal policy rates of Fed 4.0% vs BoJ 1.25% maintain a 275bp advantage favoring the dollar, while SOFR at 3.62% vs TONA at 0.98% keeps a +264bp OIS carry differential firmly in place. However, Saxo Bank 1M 25d risk reversals show a pronounced put skew of −2.08, indicating heavy demand for downside protection despite spot gains. Price trades below its SMA50 at 159.14 and SMA200 at 158.40, while remaining below the 160.00 threshold that previously triggered official verbal warnings. Trade bias: Neutral USD/JPY; wide carry premium conflicts with elevated downside options hedging. Catalyst: BoJ meeting 30 Oct. Risk: Sustained break above 160.00 escalates official intervention risk, accelerating downside options realization.",
-      "evidence": [
-        "Fed 4.0% vs BoJ 1.25% — 275bp",
-        "USD/JPY 25d RR: -2.08 (put skew)",
-        "USD/JPY: 157.06"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "06:54",
+      "time": "11:48",
       "priority": "warning",
-      "title": "GBP/USD — Crowded Long Unwind",
-      "text": "GBP speculative positioning sits in extended territory with CFTC Leveraged Funds holding net long +40,361 contracts, placing positioning at the 86th percentile of its 52-week range with a z-score of +1.02. Weekly flow shows momentum stalling, as leveraged funds cut net length by −7,143 contracts WoW and −2,361 over 4 weeks. GBP/USD spot trades at 1.3372, breaking beneath its technical cluster including the SMA20 at 1.3532, SMA50 at 1.3482, and SMA200 at 1.3455. The policy backdrop remains balanced with Fed at 4.0% vs BoE at 3.75% providing a narrow 25bp carry advantage to the dollar. The combination of stalled speculative inflows and a break below all major moving averages marks an ongoing positioning unwind rather than an orderly pause. Trade bias: Bearish GBP/USD; long liquidation drives downward momentum through moving-average support. Catalyst: BoE meeting 5 Nov. Risk: Leveraged funds resume net accumulation, driving spot back above the SMA200 at 1.3455.",
+      "title": "GBP/USD — Positioning + Volatility + Technical Anchor",
+      "text": "GBP/USD trades at 1.3348, sitting below the SMA20/50/200 cluster at 1.3532, 1.3482, and 1.3455. CFTC leveraged funds net long stands at +40,361 contracts in the 86th percentile of its 52-week range with a z-score of +1.02, reflecting a crowded long positioning base alongside a −7,143 weekly reduction. Implied volatility runs at 5.0% against an HV30 of 4.1%, producing a +0.9% volume risk premium that shows options pricing moderate protection above realized movement. The OIS carry spread shows an 11bp differential favoring GBP from SONIA at 3.73% versus SOFR at 3.62%, though the Bank of England holding Bank Rate at 3.75% leaves the real rate at +0.35% under a mildly restrictive setting. Trade bias: Short GBP/USD; crowded spec longs unwinding against moving-average resistance. Catalyst: US Fed Industrial Production m/m at 13:15 UTC. Risk: Speculative positioning resumes net additions and breaks the pair back above the SMA200 cluster at 1.3455.",
       "evidence": [
-        "GBP LF net: +40,361 (pctl 86, z +1.02)",
-        "GBP WoW delta: -7,143 contracts",
-        "GBP/USD: 1.3372 (below SMA20/50/200)"
+        "GBP COT lev_net: +40,361",
+        "GBP pctl(52w): 86",
+        "GBP/USD IV: 5.0%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:50",
+      "time": "11:45",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long + Technical Resistance",
-      "text": "CFTC Leveraged Funds hold net long +48,379 contracts in AUD, placing positioning at the 93rd percentile of its 52-week historical range with a z-score of +1.72. RBA holds at 4.35%. AUD/USD trades at 0.7129, holding above its SMA50 at 0.7084 and SMA200 at 0.7013, but pinned below the SMA20 resistance at 0.7170. Retail sentiment data retail sentiment sits balanced at 50% long and 50% short, offering no contrarian cushion against an institutional unwind. With speculative long exposure near the upper boundary of its annual distribution, upside progress faces heavy positioning friction unless fresh policy catalysts emerge. Trade bias: Neutral/range AUD/USD; crowded long positioning caps upside momentum into resistance. Catalyst: RBA meeting 29 Sep. Risk: Leveraged funds aggressively liquidate length below the SMA50 at 0.7084, triggering a broader trend reversal.",
+      "title": "AUD/USD — Positioning Extreme + Rate Differential",
+      "text": "AUD/USD trades at 0.7126, positioned below the SMA20 at 0.7170 while holding above the SMA50 at 0.7084 and SMA200 at 0.7013. CFTC leveraged funds net long is +48,379 contracts at the 93rd percentile of its 52-week range with a z-score of +1.72, establishing an extreme positioning footprint. The OIS carry differential shows a 73bp spread favoring AUD from AONIA at 4.35% versus SOFR at 3.62%, supported by a real policy rate of +0.85% under a mildly restrictive stance. Implied volatility stands at 6.6% against an HV30 of 5.7%, yielding a +0.9% risk premium that reflects steady option demand. Trade bias: Long AUD/USD; high positioning percentile sustained by a positive carry spread. Catalyst: Australia CFTC Non-Commercial Net Positions release at 19:30 UTC. Risk: Leveraged funds liquidate net longs and break the pair below the SMA50 support at 0.7084.",
       "evidence": [
-        "AUD LF net: +48,379 (pctl 93, z +1.72)",
-        "RBA 4.35% vs Fed 4.0% — -35bp",
-        "AUD/USD: 0.7129 (below SMA20 0.7170)"
+        "AUD COT lev_net: +48,379",
+        "AUD pctl(52w): 93",
+        "AUD/USD IV: 6.6%"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "11:40",
+      "priority": "info",
+      "title": "USD/CHF — Options Complacency + Valuation Extreme",
+      "text": "USD/CHF trades at 0.8255, positioned above the SMA20, SMA50, and SMA200 cluster at 0.8107, 0.8105, and 0.7938. The BEER model fair value z-score stands at +1.95σ, marking the pair as rich relative to rate differentials and risk sentiment. Implied volatility registers at 6.2% against an HV30 of 7.3%, generating a −1.1% volatility risk premium that indicates unusual options complacency and thin protection pricing. CFTC leveraged funds report a net short of −13,968 contracts at the 12th percentile of its 52-week range with a z-score of −1.09. Trade bias: Long USD/CHF; trend persistence despite option complacency and rich valuation. Catalyst: SNB policy meeting on 24 Sep. Risk: Valuation mean-reversion triggers a sharp correction toward the SMA50 level at 0.8105.",
+      "evidence": [
+        "USD/CHF IV: 6.2%",
+        "USD/CHF HV30: 7.3%",
+        "USD/CHF BEER z: +1.95σ"
       ],
       "_source": "engine-ai-primary"
     }
