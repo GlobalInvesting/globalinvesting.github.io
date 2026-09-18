@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-18T06:01:24Z",
-  "generatedAt": "2026-09-18T06:01:24Z",
+  "lastUpdate": "2026-09-18T06:02:55Z",
+  "generatedAt": "2026-09-18T06:02:55Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1164,9 +1164,9 @@
       "std": 1.09248
     },
     "EUR/germany ppi yoy": {
-      "n": 2,
-      "mean": 0.15,
-      "std": 0.212132
+      "n": 3,
+      "mean": 1.5,
+      "std": 2.343075
     },
     "CHF/balance of trade": {
       "n": 2,
@@ -1452,6 +1452,11 @@
       "n": 2,
       "mean": 0.1,
       "std": 0.141421
+    },
+    "EUR/germany ppi mom": {
+      "n": 2,
+      "mean": 0.05,
+      "std": 0.494975
     },
     "CAD/rmpi mom": {
       "n": 2,
@@ -63055,7 +63060,7 @@
       "flag": "🇪🇺",
       "event": "Germany PPI m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "1.6%",
       "forecast": "1.9%",
       "previous": "1.1%"
     },
@@ -63068,7 +63073,7 @@
       "flag": "🇪🇺",
       "event": "Germany PPI y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.7%",
       "forecast": "-0.5%",
       "previous": "3.0%"
     },
