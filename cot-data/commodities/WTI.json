@@ -1,21 +1,21 @@
 {
-  "netPosition": 139339,
-  "longPositions": 226753,
-  "shortPositions": 87414,
+  "netPosition": 136768,
+  "longPositions": 229893,
+  "shortPositions": 93125,
   "positionCategory": "Managed Money (speculative)",
   "secondaryCategory": "Swap Dealers",
   "tertiaryCategory": "Producer/Merchant/Processor/User (commercial hedgers)",
   "assetClass": "commodity",
   "displayName": "WTI Crude Oil",
-  "openInterestTotal": 2605602,
+  "openInterestTotal": 2725013,
   "contractMultiplier": 1000,
   "contractUnit": "BARRELS",
-  "assetManagerNet": -557311,
-  "assetManagerLong": 106560,
-  "assetManagerShort": 663871,
-  "dealerNet": 320886,
-  "dealerLong": 689493,
-  "dealerShort": 368607,
+  "assetManagerNet": -550744,
+  "assetManagerLong": 113449,
+  "assetManagerShort": 664193,
+  "dealerNet": 320588,
+  "dealerLong": 682933,
+  "dealerShort": 362345,
   "history": [
     {
       "weekEnding": "2022-02-08",
@@ -1936,12 +1936,20 @@
       "levShort": 87414,
       "assetManagerNet": -557311,
       "dealerNet": 320886
+    },
+    {
+      "weekEnding": "2026-09-15",
+      "levNet": 136768,
+      "levLong": 229893,
+      "levShort": 93125,
+      "assetManagerNet": -550744,
+      "dealerNet": 320588
     }
   ],
   "sourceType": "options_futures_combined",
   "source": "CFTC Official",
   "sourceUrl": "https://www.cftc.gov/dea/options/petroleum_lof.htm",
-  "reportDate": "2026-09-15",
-  "lastUpdate": "2026-09-15",
-  "weekEnding": "2026-09-08"
+  "reportDate": "2026-09-18",
+  "lastUpdate": "2026-09-18",
+  "weekEnding": "2026-09-15"
 }
