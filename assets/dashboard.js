@@ -12649,6 +12649,13 @@ let _lwYieldViewActive = false;
 let _lwYieldSeriesA = null;
 let _lwYieldSeriesB = null;
 let _lwYieldResizeObs = null;
+// _destroyLWChart() resets _lwActiveOhlcId to null as part of its normal
+// candle-chart teardown, so the symbol to return to on exit must be saved
+// separately before that call, not read back from _lwActiveOhlcId later —
+// reading it back left it permanently null and silently skipped the
+// re-render entirely, leaving #tv-chart-wrap empty (blank/black) after
+// closing the yield-spread view.
+let _lwYieldReturnOhlcId = null;
 
 function _lwCcyFlagCode(ccy) {
   const m = G10_RATE_CCYS.find(c => c.ccy === ccy);
@@ -12679,8 +12686,10 @@ function _lwExitYieldSpreadView() {
   if (!_lwYieldViewActive) return;
   _lwYieldViewActive = false;
   _lwTeardownYieldView();
-  if (_lwActiveOhlcId) {
-    _renderLWChart(_lwActiveOhlcId).catch(function (e) { console.warn('[yield-spread-view] exit re-render failed:', e.message); });
+  const _returnId = _lwYieldReturnOhlcId;
+  _lwYieldReturnOhlcId = null;
+  if (_returnId) {
+    _renderLWChart(_returnId).catch(function (e) { console.warn('[yield-spread-view] exit re-render failed:', e.message); });
   }
 }
 
@@ -12701,7 +12710,14 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
   if (!LWC) return;
 
   if (_lwYieldViewActive) { _lwTeardownYieldView(); }
-  else { _destroyLWChart(); }
+  else {
+    // Capture the symbol to return to BEFORE destroying the candle chart —
+    // _destroyLWChart() itself resets _lwActiveOhlcId to null, so reading it
+    // after this call (as the exit path used to) always finds nothing to
+    // re-render.
+    _lwYieldReturnOhlcId = _lwActiveOhlcId;
+    _destroyLWChart();
+  }
   wrap.innerHTML = '';
   wrap.style.marginBottom = '0';
   wrap.style.pointerEvents = 'auto';
