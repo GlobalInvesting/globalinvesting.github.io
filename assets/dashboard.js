@@ -1967,6 +1967,81 @@ function _cotNetExposureRankChartHtml(store) {
   return html;
 }
 
+function _cotPositioningVolDetail(d) {
+  const hist = (d && d.history) || [];
+  const nets = hist.map(h => h.levNet).filter(n => n != null);
+  if (nets.length < 20) return null;
+
+  const deltas = [];
+  for (let i = 1; i < nets.length; i++) deltas.push(nets[i] - nets[i - 1]);
+
+  const WIN = 8;
+  if (deltas.length < WIN + 8) return null;
+
+  const rollingVol = [];
+  for (let i = WIN - 1; i < deltas.length; i++) {
+    const win = deltas.slice(i - WIN + 1, i + 1);
+    const mean = win.reduce((a, b) => a + b, 0) / win.length;
+    const variance = win.reduce((a, b) => a + (b - mean) * (b - mean), 0) / win.length;
+    rollingVol.push(Math.sqrt(variance));
+  }
+
+  const tail = rollingVol.slice(-52);
+  if (tail.length < 8) return null;
+
+  const mean = tail.reduce((a, b) => a + b, 0) / tail.length;
+  const variance = tail.reduce((a, b) => a + (b - mean) * (b - mean), 0) / tail.length;
+  const sd = Math.sqrt(variance);
+  const current = tail[tail.length - 1];
+  const z = sd > 0 ? (current - mean) / sd : 0;
+  return { z, weeks: tail.length };
+}
+
+function _cotPositioningVolChartHtml(store) {
+  const rows = COT_BREAKDOWN_CCYS.map(ccy => {
+    const d = store.ccys[ccy];
+    const detail = d ? _cotPositioningVolDetail(d) : null;
+    return { ccy, detail };
+  });
+
+  const gridlines = [3, 1.5, 0, -1.5, -3];
+  let html = '<div id="cot-posvol-chart">'
+    + '<div id="cot-posvol-axis">' + gridlines.map(v => `<div class="cot-rank-axis-tick">${v > 0 ? '+' : ''}${v}σ</div>`).join('') + '</div>'
+    + '<div id="cot-posvol-plot">'
+    + '<div id="cot-posvol-gridlines">' + gridlines.map(v => {
+        const pct = ((v + 3) / 6) * 100;
+        return `<div class="cot-rank-gridline" style="bottom:${pct}%;${v === 0 ? 'border-top-style:dashed;' : ''}"></div>`;
+      }).join('') + '</div>'
+    + '<div id="cot-posvol-cols">';
+  rows.forEach(({ ccy, detail }) => {
+    const label = COT_BREAKDOWN_CCY_DISPLAY[ccy] || ccy;
+    if (!detail) {
+      html += '<div class="cot-rank-col">'
+        + `<div class="cot-rank-col-bararea" title="${ccy}: not enough history yet for this window"></div>`
+        + `<div class="cot-rank-col-ccy">${label}</div>`
+        + '</div>';
+      return;
+    }
+    const { z, weeks } = detail;
+    const zc = Math.max(-3, Math.min(3, z));
+    const pct = ((zc + 3) / 6) * 100;
+    const barBottom = Math.min(pct, 50);
+    const barHeight = Math.max(Math.abs(pct - 50), 1.5);
+    const unstable = Math.abs(z) > 1.5;
+    const bg = unstable ? 'var(--orange)' : (z >= 0 ? _cotRankBandColor(_COT_RANK_BAND_BLUE) : 'var(--text3)');
+    const zLabel = (z >= 0 ? '+' : '') + z.toFixed(2) + 'σ';
+    html += '<div class="cot-rank-col">'
+      + `<div class="cot-rank-col-bararea" title="${ccy}: positioning volatility at ${zLabel} vs its own trailing ${weeks}-week distribution">`
+      + `<div class="cot-rank-col-bar" style="bottom:${barBottom}%;height:${barHeight}%;background:${bg};"></div>`
+      + '</div>'
+      + `<div class="cot-rank-col-ccy">${label}</div>`
+      + '</div>';
+  });
+  html += '</div></div></div>';
+  html += '<div style="padding:6px 0 0;font-size:9px;color:var(--text3);">Z-score of the rolling 8-week std. dev. of week-over-week changes in Leveraged Funds net position, vs its own trailing 52-week distribution · orange = |Z| &gt; 1.5σ (positioning unusually unstable, not just crowded) · proxy for total open-interest volatility since per-week OI isn\'t in this history series</div>';
+  return html;
+}
+
 async function renderCotBreakdown() {
   const inner = document.getElementById('cot-breakdown-fullscreen-inner');
   if (!inner) return;
@@ -1988,6 +2063,8 @@ async function renderCotBreakdown() {
   html += '<div style="margin-top:16px;font-size:11px;color:var(--text3);font-weight:600;">Net Exposure % Rank — where current LF net position sits in its own trailing range (up to 52wk history)</div>';
   html += _cotNetExposureRankChartHtml(store);
   html += '<div style="padding:8px 0 14px;font-size:9px;color:var(--text3);">0% = most net-short leveraged-funds positioning in the lookback window, 100% = most net-long · lookback is the trailing 52 weeks per symbol (or however much history exists, if less) · Open Interest TOTAL / Contract Value columns come from the CFTC report\'s own header (TFF for FX and equity indices, Disaggregated for commodities)</div>';
+  html += '<div style="margin-top:6px;font-size:11px;color:var(--text3);font-weight:600;">Positioning Volatility (Z-score)</div>';
+  html += _cotPositioningVolChartHtml(store);
   inner.innerHTML = html;
 }
 
@@ -8339,12 +8416,6 @@ document.querySelectorAll('.top-nav a').forEach(a => {
 async function fetchCarryRanking() {
   const G8 = ['USD','EUR','GBP','JPY','AUD','CHF','CAD','NZD','NOK','SEK'];
 
-  function carryTV(long, short) {
-    if (short === 'USD') return 'FX_IDC:' + long + 'USD';
-    if (long  === 'USD') return 'FX_IDC:USD' + short;
-    return 'FX_IDC:' + long + short;
-  }
-
   function pairId(a, b) {
     const HV30_PAIRS = new Set([
       'eurusd','gbpusd','usdjpy','audusd','usdchf','usdcad','nzdusd',
@@ -8462,8 +8533,94 @@ async function fetchCarryRanking() {
     }
 
     const hasRealCarryData = allPairs.some(p => p.realCarry != null);
-    const hasVolData = allPairs.some(p => p.carryVol != null);
-    allPairs.sort((a, b) => {
+
+    _carryRankPairsCache = allPairs;
+    _initCarryRankToggle();
+
+    const headSpan = document.getElementById('carry-rank-subtitle');
+    if (headSpan) {
+      headSpan.textContent = hasRealCarryData
+        ? 'G10 · real carry · annualised'
+        : 'G10 · CB rate differential';
+    }
+
+    const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
+    if (sbHead && !sbHead._carryTipAttached) {
+      sbHead._carryTipAttached = true;
+      sbHead.style.cursor = 'help';
+
+      sbHead.addEventListener('mouseenter', ev => {
+        const tt = document.getElementById('fx-tt');
+        if (!tt) return;
+        const { title, body, ex } = _carryTooltipContent();
+        document.getElementById('fx-tt-title').textContent = title;
+        document.getElementById('fx-tt-body').textContent  = body;
+        const exEl = document.getElementById('fx-tt-ex');
+        exEl.textContent = ex; exEl.style.display = 'block';
+        tt.style.display = 'block';
+        requestAnimationFrame(() => window._fxTTPos && window._fxTTPos(ev.clientX, ev.clientY));
+      });
+      sbHead.addEventListener('mouseleave', () => {
+        const tt = document.getElementById('fx-tt');
+        if (tt) tt.style.display = 'none';
+      });
+    }
+    _carryRankHasRealData = hasRealCarryData;
+
+    _renderCarryRankRows(_carryRankMode);
+
+  } catch(e) {
+    console.warn('[CarryRanking]', e);
+    if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
+  }
+}
+
+function _carryTVSymbol(long, short) {
+  if (short === 'USD') return 'FX_IDC:' + long + 'USD';
+  if (long  === 'USD') return 'FX_IDC:USD' + short;
+  return 'FX_IDC:' + long + short;
+}
+
+let _carryRankMode = 'carry';
+let _carryRankPairsCache = null;
+let _carryRankHasRealData = false;
+
+function _carryTooltipContent() {
+  if (!_carryRankHasRealData) {
+    return {
+      title: 'CB Rate Differential',
+      body: 'CB policy rate differential (%) between the long and short leg. Real carry ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.',
+      ex: 'Example: AUD 4.35% − CHF 0.00% = +4.35% gross nominal differential.',
+    };
+  }
+  if (_carryRankMode === 'carryVol') {
+    return {
+      title: 'Carry-to-Vol Ranking',
+      body: 'Real carry ÷ HV30 — carry earned per unit of realized volatility, not the raw differential. Favors pairs that compensate for risk rather than just the highest spread; standard screening lens for institutional carry baskets. Toggle to Carry for the raw ranking.',
+      ex: 'Example: NOK/EUR real carry ≈ +1.5% ÷ HV30 3.8% = 0.39 carry-to-vol. Higher = more carry earned per unit of realized risk.',
+    };
+  }
+  return {
+    title: 'Real Carry Ranking',
+    body: 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Toggle to Carry/Vol to scale the same ranking by HV30 risk instead. Industry standard per Bloomberg FXFR.',
+    ex: 'Example: GBP/CHF nominal +3.77% − (BoE infl.exp 3.45% − SNB infl.exp 0.31%) = real carry +0.63%. Positive = long leg earns positive real carry after purchasing power adjustment.',
+  };
+}
+
+function _renderCarryRankRows(mode) {
+  const container = document.getElementById('carry-rank-rows');
+  if (!container) return;
+  const pairs = _carryRankPairsCache;
+  if (!pairs || !pairs.length) return;
+
+  const hasRealCarryData = pairs.some(p => p.realCarry != null);
+  const hasVolData = pairs.some(p => p.carryVol != null);
+
+  const top = pairs.slice();
+  if (mode === 'carryVol' && hasVolData) {
+    top.sort((a, b) => (b.carryVol ?? -Infinity) - (a.carryVol ?? -Infinity));
+  } else {
+    top.sort((a, b) => {
       if (hasRealCarryData) {
         const cipA = a.realCarry ?? -Infinity;
         const cipB = b.realCarry ?? -Infinity;
@@ -8476,68 +8633,69 @@ async function fetchCarryRanking() {
       }
       return b.diff - a.diff;
     });
+  }
 
-    const top = allPairs;
+  const btnCarry = document.getElementById('carry-mode-carry');
+  const btnCV = document.getElementById('carry-mode-carryvol');
+  if (btnCarry && btnCV) {
+    const cvActive = mode === 'carryVol';
+    btnCarry.setAttribute('aria-selected', cvActive ? 'false' : 'true');
+    btnCV.setAttribute('aria-selected', cvActive ? 'true' : 'false');
+    btnCarry.style.color = cvActive ? 'var(--text3)' : '#fff';
+    btnCV.style.color = cvActive ? '#fff' : 'var(--text3)';
+    btnCarry.classList.toggle('active', !cvActive);
+    btnCV.classList.toggle('active', cvActive);
+  }
 
+  const headerEl = document.getElementById('carry-rank-header');
+  if (headerEl) {
+    const hdrCell = (txt, tip, align) => `<span class="pd-section-lbl" style="padding:0;${align ? 'text-align:' + align + ';' : ''}" title="${tip}">${txt}</span>`;
+    headerEl.innerHTML = mode === 'carryVol'
+      ? hdrCell('#', 'Rank by carry-to-vol') + hdrCell('PAIR', 'Long/Short leg') + hdrCell('HV30', '30-day historical volatility (annualised) of the pair — the risk denominator') + '<span></span>' + hdrCell('C/VOL', 'Real carry \u00f7 HV30 \u2014 carry earned per unit of realized volatility. >1 = carry compensates well for the pair\u2019s risk \u00b7 <0 = negative real carry despite the nominal spread', 'right')
+      : hdrCell('#', 'Rank by real carry') + hdrCell('PAIR', 'Long/Short leg') + hdrCell('SPREAD', 'Gross nominal OIS/policy rate differential between the two legs') + '<span></span>' + hdrCell('CARRY', 'Real carry: nominal differential minus the inflation-expectations differential between the two legs', 'right');
+  }
+
+  if (mode === 'carryVol') {
+    const cvDisplay = top.map(p => Math.max(p.carryVol ?? 0, 0));
+    const maxCV = Math.max(...cvDisplay, 0.01);
+
+    container.innerHTML = top.map((p, idx) => {
+      const sym = _carryTVSymbol(p.long, p.short);
+      const hvStr = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
+      const cv = p.carryVol;
+      const cvStr = cv != null ? cv.toFixed(2) : '—';
+      const barPct = cv != null ? Math.max(Math.round((Math.max(cv, 0) / maxCV) * 100), 4) : 4;
+      const cls = cv != null ? (cv >= 1 ? 'pd-up' : cv < 0 ? 'down' : 'pd-dim') : 'pd-dim';
+      const barBg = cv != null && cv < 0 ? 'var(--down)' : 'var(--up)';
+      const realStr = p.realCarry != null ? (p.realCarry >= 0 ? '+' : '') + p.realCarry.toFixed(2) + '%' : '—';
+      const tip = `${p.long}/${p.short} · Carry/Vol ${cvStr} · Real carry ${realStr} · HV30 ${hvStr} — carry earned per unit of realized volatility · Click for real rate analysis`;
+      return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
+        <span class="cr-rank">${idx + 1}</span>
+        <span class="cr-pair">${p.long}/${p.short}</span>
+        <span class="cr-spread">${hvStr}</span>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%;background:${barBg};"></div></div>
+        <span class="cr-diff ${cls}">${cvStr}</span>
+      </div>`;
+    }).join('');
+  } else {
     const topDisplay = top.map(p => Math.max(p.realCarry ?? p.diff, 0));
     const maxDisplay = Math.max(...topDisplay, 0.01);
 
-    const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
-    if (headSpan) {
-      headSpan.textContent = hasRealCarryData
-        ? 'G10 · real carry · annualised'
-        : 'G10 · CB rate differential';
-    }
-
-    const sbHead = container.closest('.sb-section')?.querySelector('.sb-head');
-    if (sbHead && !sbHead._carryTipAttached) {
-      sbHead._carryTipAttached = true;
-      sbHead.style.cursor = 'help';
-      const tipTitle = hasRealCarryData ? 'Real Carry Ranking' : 'CB Rate Differential';
-      const tipBody  = hasRealCarryData
-        ? 'Ranked by real carry: nominal OIS rate differential minus the inflation expectations differential between the two legs (= real rate long − real rate short). Tiebreak: carry-to-vol (carry per unit of HV30 risk). Industry standard per Bloomberg FXFR. Click any row for full real rate breakdown.'
-        : 'CB policy rate differential (%) between the long and short leg. Real carry ranking requires inflation expectations data (unavailable). Click any row for real rate analysis.';
-      const tipEx = hasRealCarryData
-        ? 'Example: GBP/CHF nominal +3.77% − (BoE infl.exp 3.45% − SNB infl.exp 0.31%) = real carry +0.63%. Positive = long leg earns positive real carry after purchasing power adjustment.'
-        : 'Example: AUD 4.35% − CHF 0.00% = +4.35% gross nominal differential.';
-
-      sbHead.addEventListener('mouseenter', ev => {
-        const tt = document.getElementById('fx-tt');
-        if (!tt) return;
-        document.getElementById('fx-tt-title').textContent = tipTitle;
-        document.getElementById('fx-tt-body').textContent  = tipBody;
-        const exEl = document.getElementById('fx-tt-ex');
-        exEl.textContent = tipEx; exEl.style.display = 'block';
-        tt.style.display = 'block';
-        requestAnimationFrame(() => window._fxTTPos && window._fxTTPos(ev.clientX, ev.clientY));
-      });
-      sbHead.addEventListener('mouseleave', () => {
-        const tt = document.getElementById('fx-tt');
-        if (tt) tt.style.display = 'none';
-      });
-    }
-
     container.innerHTML = top.map((p, idx) => {
-      const sym = carryTV(p.long, p.short);
-
+      const sym = _carryTVSymbol(p.long, p.short);
       const spreadLabel = '+' + p.diff.toFixed(2) + '%';
-
       const realCarryVal = p.realCarry;
       const displayVal = realCarryVal != null
         ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2)
         : '+' + p.diff.toFixed(2);
-
       const barRaw = realCarryVal != null ? Math.max(realCarryVal, 0) : p.diff;
       const barPct = Math.max(Math.round((barRaw / maxDisplay) * 100), 4);
-
       const cls = realCarryVal != null
         ? (realCarryVal >= 0.5 ? 'pd-up' : realCarryVal <= -0.1 ? 'pd-dim' : '')
         : (p.diff > 2 ? 'pd-up' : p.diff > 0.5 ? '' : 'pd-dim');
-
       const realStr = realCarryVal != null ? (realCarryVal >= 0 ? '+' : '') + realCarryVal.toFixed(2) + '%' : '—';
       const hvStr   = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
       const tip = `${p.long}/${p.short} · Nominal ${spreadLabel} · Real carry ${realStr} · HV30 ${hvStr} — Click for real rate analysis`;
-
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
@@ -8546,23 +8704,29 @@ async function fetchCarryRanking() {
         <span class="cr-diff ${cls}">${displayVal}</span>
       </div>`;
     }).join('');
-
-    container.querySelectorAll('.carry-rank-row[data-long]').forEach(row => {
-      row.addEventListener('click', () => {
-        const longCcy  = row.dataset.long;
-        const shortCcy = row.dataset.short;
-        if (typeof window.openRealCarryModal === 'function') {
-          window.openRealCarryModal(longCcy, shortCcy);
-        } else {
-          loadTVChart(row.dataset.sym);
-        }
-      });
-    });
-
-  } catch(e) {
-    console.warn('[CarryRanking]', e);
-    if (container) container.innerHTML = '<div style="padding:6px 8px;font-size:10px;color:var(--text3);">Unavailable</div>';
   }
+
+  container.querySelectorAll('.carry-rank-row[data-long]').forEach(row => {
+    row.addEventListener('click', () => {
+      const longCcy  = row.dataset.long;
+      const shortCcy = row.dataset.short;
+      if (typeof window.openRealCarryModal === 'function') {
+        window.openRealCarryModal(longCcy, shortCcy);
+      } else {
+        loadTVChart(row.dataset.sym);
+      }
+    });
+  });
+}
+
+function _initCarryRankToggle() {
+  const btnCarry = document.getElementById('carry-mode-carry');
+  const btnCV = document.getElementById('carry-mode-carryvol');
+  if (!btnCarry || !btnCV || btnCarry._carryToggleWired) return;
+  btnCarry._carryToggleWired = true;
+  btnCV._carryToggleWired = true;
+  btnCarry.addEventListener('click', () => { _carryRankMode = 'carry'; _renderCarryRankRows('carry'); });
+  btnCV.addEventListener('click', () => { _carryRankMode = 'carryVol'; _renderCarryRankRows('carryVol'); });
 }
 
 async function fetchVolLeaderboard() {
