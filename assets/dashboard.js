@@ -8616,8 +8616,12 @@ function _renderCarryRankRows(mode) {
   const hasRealCarryData = pairs.some(p => p.realCarry != null);
   const hasVolData = pairs.some(p => p.carryVol != null);
 
-  const top = pairs.slice();
+  let top = pairs.slice();
+  let hiddenNoVol = 0;
   if (mode === 'carryVol' && hasVolData) {
+    const before = top.length;
+    top = top.filter(p => p.carryVol != null);
+    hiddenNoVol = before - top.length;
     top.sort((a, b) => (b.carryVol ?? -Infinity) - (a.carryVol ?? -Infinity));
   } else {
     top.sort((a, b) => {
@@ -8653,6 +8657,16 @@ function _renderCarryRankRows(mode) {
     headerEl.innerHTML = mode === 'carryVol'
       ? hdrCell('#', 'Rank by carry-to-vol') + hdrCell('PAIR', 'Long/Short leg') + hdrCell('HV30', '30-day historical volatility (annualised) of the pair — the risk denominator') + '<span></span>' + hdrCell('C/VOL', 'Real carry \u00f7 HV30 \u2014 carry earned per unit of realized volatility. >1 = carry compensates well for the pair\u2019s risk \u00b7 <0 = negative real carry despite the nominal spread', 'right')
       : hdrCell('#', 'Rank by real carry') + hdrCell('PAIR', 'Long/Short leg') + hdrCell('SPREAD', 'Gross nominal OIS/policy rate differential between the two legs') + '<span></span>' + hdrCell('CARRY', 'Real carry: nominal differential minus the inflation-expectations differential between the two legs', 'right');
+  }
+
+  const footEl = document.getElementById('carry-rank-footnote');
+  if (footEl) {
+    if (mode === 'carryVol' && hiddenNoVol > 0) {
+      footEl.textContent = `${hiddenNoVol} pair${hiddenNoVol === 1 ? '' : 's'} hidden \u2014 no HV30 data available`;
+      footEl.style.display = 'block';
+    } else {
+      footEl.style.display = 'none';
+    }
   }
 
   if (mode === 'carryVol') {
