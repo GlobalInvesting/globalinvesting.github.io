@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-18T23:30:37Z",
+  "generatedAt": "2026-09-19T11:20:46Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 166,
+  "aliasCount": 169,
   "aliases": [
     {
       "currency": "EUR",
@@ -1999,59 +1999,116 @@
       }
     },
     {
-      "currency": "CAD",
-      "primary_title": "Canada GDP q/q",
-      "yahoo_title": "GDP QQ",
+      "currency": "EUR",
+      "primary_title": "Euro Area Industrial Confidence Indicator",
+      "secondary_title": "Euro Area Industrial Sentiment",
       "evidence": {
-        "yahoo": {
-          "dateISO": "2026-08-28",
-          "forecast_primary": 0.0,
-          "forecast_yahoo": null,
-          "actual_primary": 0.8,
-          "actual_yahoo": 0.8,
-          "previous_primary": 0.0,
-          "previous_yahoo": 0.0,
-          "actual_yahoo_raw": "0.8",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0"
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": -5.7,
+          "forecast_secondary": -6.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": -5.3,
+          "previous_secondary": -5.3,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "-6",
+          "previous_secondary_raw": "-5.3"
         }
       }
     },
     {
-      "currency": "CAD",
-      "primary_title": "Canada GDP Implicit Price Index q/q",
-      "yahoo_title": "GDP Implicit Price QQ",
+      "currency": "EUR",
+      "primary_title": "Euro Area Services Sentiment Indicator",
+      "secondary_title": "Euro Area Services Sentiment",
       "evidence": {
-        "yahoo": {
-          "dateISO": "2026-08-28",
-          "forecast_primary": 0.7,
-          "forecast_yahoo": null,
-          "actual_primary": 2.5,
-          "actual_yahoo": 2.5,
-          "previous_primary": 1.1,
-          "previous_yahoo": 1.1,
-          "actual_yahoo_raw": "2.5",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "1.1"
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 6.6,
+          "forecast_secondary": 5.1,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 5.8,
+          "previous_secondary": 5.8,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "5.1",
+          "previous_secondary_raw": "5.8"
         }
       }
     },
     {
-      "currency": "CAD",
-      "primary_title": "Canada GDP Annualized q/q",
-      "yahoo_title": "GDP QQ Annualized",
+      "currency": "EUR",
+      "primary_title": "Euro Area Economic Sentiment Indicator",
+      "secondary_title": "Euro Area Economic Sentiment",
       "evidence": {
-        "yahoo": {
-          "dateISO": "2026-08-28",
-          "forecast_primary": 0.7,
-          "forecast_yahoo": null,
-          "actual_primary": 3.3,
-          "actual_yahoo": 3.3,
-          "previous_primary": -0.1,
-          "previous_yahoo": -0.1,
-          "actual_yahoo_raw": "3.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.1"
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 98.4,
+          "forecast_secondary": 97.5,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 98.4,
+          "previous_secondary": 98.4,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "97.5",
+          "previous_secondary_raw": "98.4"
+        }
+      }
+    },
+    {
+      "currency": "EUR",
+      "primary_title": "Euro Area Consumer Price Expectations",
+      "secondary_title": "Euro Area Consumer Inflation Expectations",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 32.0,
+          "forecast_secondary": 40.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 33.0,
+          "previous_secondary": 33.0,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "40",
+          "previous_secondary_raw": "33.0"
+        }
+      }
+    },
+    {
+      "currency": "EUR",
+      "primary_title": "Euro Area Industry Selling Price Expectations",
+      "secondary_title": "Euro Area Selling Price Expectations",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 14.2,
+          "forecast_secondary": 25.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 16.4,
+          "previous_secondary": 16.4,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "25",
+          "previous_secondary_raw": "16.4"
+        }
+      }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom 10-Year Treasury Gilt Auction",
+      "secondary_title": "United Kingdom Treasury Gilt 2036 Auction",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": null,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 5.155,
+          "previous_secondary": 5.155,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "5.155%"
         }
       }
     },
