@@ -1,63 +1,40 @@
 {
-  "generated_at": "2026-09-18T15:15:52Z",
+  "generated_at": "2026-09-19T11:38:06Z",
   "signals": [
     {
-      "time": "15:13",
+      "time": "11:31",
       "priority": "critical",
-      "title": "USD/JPY — Bank of Japan Rate Hike + Carry Repricing",
-      "text": "USD/JPY trades at 157.314, down sharply from the session's earlier 159-level prints following the Bank of Japan's decision to hike rates to 1.25% as Chief Ueda cited a definitive shift in the monetary policy phase. The move breaks the pair below its SMA20 at 156.89 and SMA50 at 159.14, while the 25d risk reversal sits at −1.88, reflecting intense hedging demand for downside protection. The OIS carry differential of Fed 4.0% vs BoJ 1.25% still provides a 275bp yield advantage for the US Dollar, but the policy shift compresses the previous momentum structure as realized volatility runs at 10.1% against an implied volatility of 8.0%, generating a −2.1% vol risk premium that marks unusual complacency in options supply prior to the decision. Trade bias: Bearish USD/JPY; policy repricing challenges the prevailing carry momentum. Catalyst: US September employment data. Risk: US yields retrace higher toward 5.00% and revive the carry trade, invalidating the downside break.",
+      "title": "USD/NOK — G10 Bilateral Theme + Geopolitical Tariff Escalation",
+      "text": "Trump signing the Russia sanctions bill opening China and India to secondary tariffs reinforces broad USD dominance, driving USD/NOK upward into the open. USD led G10 performance over the trailing week (+1.162%, n=9) while NOK lagged (-0.952%, n=2), establishing an extreme bilateral spread of 2.113% alongside a +135bp real policy rate differential favoring the dollar. The upcoming Norges Bank meeting on 24 Sep is the catalyst that determines whether monetary divergence can arrest the cross's upward trajectory. Trade bias: Bullish USD/NOK into the open; G10 divergence and tariff headline risk favor upside continuation. Catalyst: Norges Bank meeting on 24 Sep — hold vs hike decision. Risk: Brent crude rebound above $100/bbl or Norges Bank delivering a hawkish 25bp hike flips the cross lower.",
       "evidence": [
-        "BOJ rate hike to 1.25% (BoJ policy announcement, Sep 18)",
-        "USD/JPY at 157.314 (yfinance, Sep 18)",
-        "USD/JPY 25d RR: −1.88"
+        "USD 1W avg: +1.162% (n=9)",
+        "NOK 1W avg: -0.952% (n=2)",
+        "G10 spread: 2.113%",
+        "USD/NOK Friday close: 9.404"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:10",
-      "priority": "critical",
-      "title": "USD/SEK — G10 Bilateral Theme + Data Divergence",
-      "text": "USD/SEK trades at 9.807, anchored above its SMA20 at 9.613 and SMA50 at 9.599 as the US Dollar dominates G10 performance while the Swedish Krona lags sharply. The G10 scorecard shows a leader-to-laggard spread of 2.686% across a 1.422% average weekly gain for the USD and a −1.264% average weekly loss for the SEK across 2 pairs. Sweden's economic surprise index sits at −29.2, confirming persistent downside data misses that validate the krona's position as the weakest G10 currency this week, while the Fed's 4.0% policy rate against SEK's 1.75% maintains a decisive nominal rate advantage. Trade bias: Long USD/SEK; broad dollar outperformance supported by domestic growth divergence. Catalyst: Riksbank policy meeting on Sep 24. Risk: US economic data prints softer than expected, compressing the bilateral spread below the 0.80% threshold.",
-      "evidence": [
-        "USD 1W avg: +1.422% (n=9)",
-        "SEK 1W avg: −1.264% (n=2)",
-        "G10 spread: 2.686%"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "15:08",
+      "time": "11:31",
       "priority": "warning",
-      "title": "EUR/USD — Bearish Technical Structure + Options Hedging",
-      "text": "EUR/USD trades at 1.1465, holding below its SMA20 at 1.1606, SMA50 at 1.1539, and SMA200 at 1.1634 following post-Fed dollar strength that pushed the pair below the 1.1500 threshold. Leveraged funds hold a net short of −46,381 contracts with a 38.9% long share and a 52w percentile of 34, reflecting mild speculative downward pressure without extreme positioning. The 1M ATM implied volatility sits at 4.5% against a realized volatility of 4.3%, yielding a modest +0.2% vol risk premium while the 25d risk reversal reads −0.14 near neutral. The OIS carry differential of SOFR 3.62% vs €STR 2.44% provides a +118bp yield advantage that continues to anchor structural dollar support against the European currency. Trade bias: Bearish EUR/USD; technical breakdown below moving average cluster reinforces downside continuation. Catalyst: Germany Bbk President Nagel speech at 08:30 UTC. Risk: Spot reclaims the SMA50 at 1.1539, neutralizing the immediate bearish technical posture.",
+      "title": "AUD/USD — Crowded Speculative Longs Face Unwind Risk",
+      "text": "AUD COT leveraged funds net long +59.3k (74.2% long, 97th percentile, z=+2.11) exposes AUD/USD to aggressive long-unwind risk following Friday's 0.7121 close. While the RBA holds an explicit hike bias with a +50bp OIS carry advantage (AONIA 4.35% vs SOFR 3.85%), extended positioning leaves the pair vulnerable to tariff-related risk-off contagion. The RBA meeting on 29 Sep is the catalyst that tests whether the hawkish stance can defend the 0.7100 handle. Trade bias: Bearish AUD/USD on rallies; extreme COT positioning caps further upside. Catalyst: RBA meeting on 29 Sep — hike bias pricing. Risk: RBA delivers a surprise 25bp rate hike or global risk sentiment rebounds sharply.",
       "evidence": [
-        "EUR/USD at 1.1465 (yfinance, Sep 18)",
-        "EUR COT LF net: −46,381 (pctl 34)",
-        "SOFR 3.62% vs €STR 2.44% — +118bp"
+        "AUD COT LF net: +59,299 (74.2% long, 97th percentile, z=+2.11)",
+        "AUD/USD Friday close: 0.7121",
+        "OIS carry spread: -50bp (favors AUD)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "15:05",
-      "priority": "warning",
-      "title": "GBP/USD — Positioning Squeeze + Technical Rejection",
-      "text": "GBP/USD trades at 1.3361, failing to hold above its moving average cluster with the SMA20 at 1.3532, SMA50 at 1.3482, and SMA200 at 1.3455 all capping the upside. Leveraged funds hold a net long position of +40,361 contracts at the 86th percentile of its 52-week range, reflecting a crowded long configuration that faces liquidation pressure as prices slide to multi-month lows following the Bank of England's hold at 3.75%. The 25d risk reversal at −0.42 shows mild put skew, while options IV of 4.8% versus HV30 of 4.1% provides a +0.8% vol risk premium. The OIS carry differential of SOFR 3.62% vs SONIA 3.73% leaves a −11bp carry deficit for the greenback, making the pair's decline a pure positioning unwind rather than a yield-driven move. Trade bias: Bearish GBP/USD; crowded speculative longs vulnerable to further liquidation. Catalyst: US Baker Hughes oil and total rig counts at 17:00 UTC. Risk: Spot reclaims the SMA200 at 1.3455, invalidating the multi-week breakdown.",
-      "evidence": [
-        "GBP/USD at 1.3361 (yfinance, Sep 18)",
-        "GBP COT LF net: +40,361 (pctl 86, z +1.02)",
-        "SOFR 3.62% vs SONIA 3.73% — −11bp"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "15:00",
+      "time": "11:31",
       "priority": "info",
-      "title": "USD/CHF — Options Complacency + Valuation Premium",
-      "text": "USD/CHF trades at 0.8243, holding above its SMA20 at 0.8107, SMA50 at 0.8105, and SMA200 at 0.7938 within an established upward trend. The BEER-model misvaluation z-score sits at +1.95σ, marking the pair as rich relative to fair value estimate of 0.8158. Options data reveals 1M implied volatility at 5.9% against a realized volatility of 4Y-highs of 7.3%, resulting in a −1.4% vol risk premium that highlights unusual complacency in options pricing despite the elevated valuation. Leveraged funds hold a net short of −13,968 contracts at the 12th percentile of its 52w range, while the SNB policy rate remains at 0.0% against the Fed's 4.0% rate, maintaining a 400bp OIS carry premium that anchors the structural bid. Trade bias: Neutral/range USD/CHF; strong carry support offset by rich BEER model valuation. Catalyst: SNB policy meeting on Sep 24. Risk: Spot breaks below the SMA50 at 0.8105, triggering a mean-reversion move toward model fair value.",
+      "title": "EUR/USD — Crowded Net Short vs Bund-Treasury Spread Compression",
+      "text": "EUR COT leveraged funds net short -51.4k keeps EUR/USD pinned beneath technical resistance following Friday's 1.1489 close. European trade vulnerability to secondary US tariffs counteracts the ECB's rate level, while the -148bp 10Y Bund-Treasury spread maintains steady downside pressure toward 1.1400. The speech by Bundesbank President Nagel on Monday at 08:30 UTC is the catalyst that sets European rates expectations ahead of the ECB meeting on 29 Oct. Trade bias: Bearish EUR/USD; spot trading below 20/50/200 SMAs confirms structural weakness. Catalyst: Bundesbank President Nagel speech on Monday 08:30 UTC. Risk: Hawkish forward guidance from Nagel pushing 10Y Bund yields higher invalidates the short bias.",
       "evidence": [
-        "USD/CHF at 0.8243 (yfinance, Sep 18)",
-        "USD/CHF BEER misvaluation z-score: +1.95σ",
-        "Fed 4.0% vs SNB 0.0% — +400bp"
+        "EUR COT LF net: -51,355 (38.4% long, 32nd percentile)",
+        "EUR/USD Friday close: 1.1489 (below SMA20/50/200)",
+        "DE-US 10Y yield spread: -148bp"
       ],
       "_source": "engine-ai-primary"
     }
