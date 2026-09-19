@@ -8543,7 +8543,7 @@ async function fetchCarryRanking() {
     _carryRankPairsCache = allPairs;
     _initCarryRankToggle();
 
-    const headSpan = container.closest('.sb-section')?.querySelector('.sb-head span');
+    const headSpan = document.getElementById('carry-rank-subtitle');
     if (headSpan) {
       headSpan.textContent = hasRealCarryData
         ? 'G10 · real carry · annualised'
