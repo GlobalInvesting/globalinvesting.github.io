@@ -328,8 +328,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 #cot-posvol-plot{position:relative;flex:1;min-width:0}
 #cot-posvol-gridlines{position:absolute;inset:0 0 22px 0}
 #cot-posvol-cols{position:relative;display:flex;align-items:flex-end;gap:10px;height:100%;padding-bottom:22px}
-.toggle-btn-beta{font-family:var(--font-mono);font-size:9px;padding:3px 8px;border-radius:3px;border:1px solid var(--border2);background:var(--bg2);color:var(--text3);cursor:pointer}
-.toggle-btn-beta.active{background:rgba(79,127,255,0.15);border-color:var(--blue);color:var(--blue)}
 .beta-tag{display:inline-block;font-family:var(--font-mono);font-size:8px;color:var(--orange);border:1px solid rgba(246,148,28,0.4);background:rgba(246,148,28,0.08);padding:1px 5px;border-radius:3px;letter-spacing:.04em;margin-left:6px;vertical-align:1px}
 #corr-pairs-fs-wrap{padding:16px 20px 20px;}
 #corr-pairs-fs-table{border-collapse:separate;border-spacing:0;font-family:var(--font-mono);font-size:9px;width:100%;table-layout:fixed;}
@@ -701,9 +699,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sb-section">
       <div class="sb-head" style="display:flex;flex-direction:column;gap:1px;padding-bottom:5px;">Carry Trade Ranking<span class="beta-tag">BETA</span> <span style="font-size:8px;color:var(--text3);font-weight:normal;letter-spacing:.04em;">G10 &middot; real carry &middot; scroll for all pairs</span></div>
       <div style="display:flex;gap:6px;padding:6px 8px 2px;">
-        <button type="button" class="toggle-btn-beta active" id="carry-mode-carry">Carry</button>
-        <button type="button" class="toggle-btn-beta" id="carry-mode-carryvol">Carry/Vol</button>
+        <button type="button" class="carry-mode-tab active" id="carry-mode-carry" role="tab" aria-selected="true" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:#fff;border-radius:2px;cursor:pointer;line-height:1.4;">Carry</button>
+        <button type="button" class="carry-mode-tab" id="carry-mode-carryvol" role="tab" aria-selected="false" style="font-size:8px;padding:1px 5px;background:var(--bg3);border:1px solid var(--border2);color:var(--text3);border-radius:2px;cursor:pointer;line-height:1.4;">Carry/Vol</button>
       </div>
+      <div id="carry-rank-header" style="display:grid;grid-template-columns:10px 46px 36px 1fr 34px;gap:4px;padding:4px 8px 3px;"></div>
       <div id="carry-rank-rows" style="padding:0;overflow-y:auto;max-height:280px;scrollbar-width:thin;scrollbar-color:var(--border2) transparent;">
         <div style="padding:4px 8px;font-size:10px;color:var(--text3);">Loading…</div>
       </div>
