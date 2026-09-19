@@ -8626,8 +8626,21 @@ function _renderCarryRankRows(mode) {
   const btnCarry = document.getElementById('carry-mode-carry');
   const btnCV = document.getElementById('carry-mode-carryvol');
   if (btnCarry && btnCV) {
-    btnCarry.classList.toggle('active', mode !== 'carryVol');
-    btnCV.classList.toggle('active', mode === 'carryVol');
+    const cvActive = mode === 'carryVol';
+    btnCarry.setAttribute('aria-selected', cvActive ? 'false' : 'true');
+    btnCV.setAttribute('aria-selected', cvActive ? 'true' : 'false');
+    btnCarry.style.color = cvActive ? 'var(--text3)' : '#fff';
+    btnCV.style.color = cvActive ? '#fff' : 'var(--text3)';
+    btnCarry.classList.toggle('active', !cvActive);
+    btnCV.classList.toggle('active', cvActive);
+  }
+
+  const headerEl = document.getElementById('carry-rank-header');
+  if (headerEl) {
+    const hdrCell = (txt, tip, align) => `<span class="pd-section-lbl" style="padding:0;${align ? 'text-align:' + align + ';' : ''}" title="${tip}">${txt}</span>`;
+    headerEl.innerHTML = mode === 'carryVol'
+      ? hdrCell('#', 'Rank by carry-to-vol') + hdrCell('PAIR', 'Long/Short leg') + hdrCell('HV30', '30-day historical volatility (annualised) of the pair — the risk denominator') + '<span></span>' + hdrCell('C/VOL', 'Real carry \u00f7 HV30 \u2014 carry earned per unit of realized volatility. >1 = carry compensates well for the pair\u2019s risk \u00b7 <0 = negative real carry despite the nominal spread', 'right')
+      : hdrCell('#', 'Rank by real carry') + hdrCell('PAIR', 'Long/Short leg') + hdrCell('SPREAD', 'Gross nominal OIS/policy rate differential between the two legs') + '<span></span>' + hdrCell('CARRY', 'Real carry: nominal differential minus the inflation-expectations differential between the two legs', 'right');
   }
 
   if (mode === 'carryVol') {
@@ -8636,18 +8649,19 @@ function _renderCarryRankRows(mode) {
 
     container.innerHTML = top.map((p, idx) => {
       const sym = _carryTVSymbol(p.long, p.short);
-      const hvStr = p.hv30 != null ? 'HV ' + p.hv30.toFixed(1) + '%' : 'HV n/a';
+      const hvStr = p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a';
       const cv = p.carryVol;
       const cvStr = cv != null ? cv.toFixed(2) : '—';
       const barPct = cv != null ? Math.max(Math.round((Math.max(cv, 0) / maxCV) * 100), 4) : 4;
-      const cls = cv != null ? (cv >= 1 ? 'pd-up' : cv <= 0 ? 'pd-dim' : '') : 'pd-dim';
+      const cls = cv != null ? (cv >= 1 ? 'pd-up' : cv < 0 ? 'down' : 'pd-dim') : 'pd-dim';
+      const barBg = cv != null && cv < 0 ? 'var(--down)' : 'var(--up)';
       const realStr = p.realCarry != null ? (p.realCarry >= 0 ? '+' : '') + p.realCarry.toFixed(2) + '%' : '—';
-      const tip = `${p.long}/${p.short} · Carry/Vol ${cvStr} · Real carry ${realStr} · HV30 ${p.hv30 != null ? p.hv30.toFixed(1) + '%' : 'n/a'} — carry earned per unit of realized volatility · Click for real rate analysis`;
+      const tip = `${p.long}/${p.short} · Carry/Vol ${cvStr} · Real carry ${realStr} · HV30 ${hvStr} — carry earned per unit of realized volatility · Click for real rate analysis`;
       return `<div class="carry-rank-row" data-long="${p.long}" data-short="${p.short}" data-sym="${sym}" title="${tip}">
         <span class="cr-rank">${idx + 1}</span>
         <span class="cr-pair">${p.long}/${p.short}</span>
         <span class="cr-spread">${hvStr}</span>
-        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%"></div></div>
+        <div class="cr-bar-wrap"><div class="cr-bar" style="width:${barPct}%;background:${barBg};"></div></div>
         <span class="cr-diff ${cls}">${cvStr}</span>
       </div>`;
     }).join('');
