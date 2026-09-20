@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-20T21:01:13Z",
+  "generated_at": "2026-09-20T22:45:20Z",
   "signals": [
     {
-      "time": "20:55",
+      "time": "22:44",
       "priority": "critical",
-      "title": "USD/NOK — G10 Bilateral Theme + Geopolitical Divergence",
-      "text": "The G10 scorecard establishes USD as the strongest currency this week with a 1W average gain of +1.157% across 9 pairs, while NOK lags at −0.952% across 2 pairs, producing a wide 2.109% bilateral spread. USD/NOK trades at 9.404, holding above its SMA20 of 9.317 within a broader bear-steepener US yield curve regime where 10Y yields hold near 5.00%. The policy spread adds structural backing via Fed 4.00% vs Norges Bank 4.25%, with the geopolitical backdrop of the Strait of Hormuz closure headlines reinforcing the broad USD demand block. NOK's extreme underperformance despite firm crude oil at $96.1 highlights broad Scandinavian vulnerability against safe, high-yielding dollar assets. The move leaves USD/NOK positioned below its SMA50 at 9.452 and SMA200 at 9.587, creating room for mean reversion toward upper trendline resistance. Trade bias: Long USD/NOK; bilateral momentum and broad dollar outperformance dominate. Catalyst: Norges Bank meeting 24 Sep. Risk: G10 spread compresses below 0.80% alongside a sharp drop in US yields.",
+      "title": "USD/SEK — G10 Bilateral Theme + Sanctions Escalation",
+      "text": "USD ranks as the strongest currency in the G10 strength scorecard with a 1W average gain of +1.151% across 9 pairs, while SEK sits as the weakest currency at -0.875% across 2 pairs, generating an extreme 2.026% bilateral spread. DXY trades above its SMA20, 50, and 200 cluster at 100.22, whereas USD/SEK spot at 9.826 trades comfortably above its own moving average suite (SMA20 9.631, SMA50 9.602). This performance gap is reinforced by newly signed Russia sanctions opening secondary tariff risks for China and India, compounding pressure on open-economy, export-sensitive currencies like SEK. Monetary policy divergence amplifies the move, with the Fed hiking to 4.00% versus the Riksbank on hold at 1.75%, establishing a 225bp nominal policy rate buffer and a +1.91% real rate wedge in favor of the dollar. The Swedish ESI sits deeply negative at -29.2, underscoring persistent domestic economic misses relative to stable US prints. Trade bias: Bullish USD/SEK, bilateral theme reinforced by widening macro fundamentals. Catalyst: Riksbank meeting 24 Sep — hold bias priced. Risk: Riksbank executes a surprise 25bp hike or tariff rhetoric decompresses, narrowing the bilateral spread below 0.80%.",
       "evidence": [
-        "USD 1W avg: +1.157% (n=9)",
-        "NOK 1W avg: -0.952% (n=2)",
-        "G10 spread: 2.109%"
+        "USD 1W avg: +1.151% (n=9)",
+        "SEK 1W avg: -0.875% (n=2)",
+        "G10 spread: 2.026%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:51",
-      "priority": "warning",
-      "title": "USD/JPY — Options Skew Divergence + Volatility Depletion",
-      "text": "USD/JPY trades at 156.85, clearing its SMA20 at 156.79 while remaining capped below the SMA50 at 159.05. BoJ holds at 1.25%. Despite this spot resilience, the options market exhibits significant defensiveness, with 25d risk reversals printing an extreme put skew of −1.88 alongside 1M implied volatility of 8.0% against realized 30-day volatility of 9.9%, driving the volatility risk premium to −1.9%. CFTC data shows speculative leveraged funds expanding net longs to +20,069 contracts (pctl 95, z +1.57), signaling that the options market is actively buying downside protection against crowded speculative exposure even while VIX sits at 14.8 (low volatility). Technical resistance at the 159.05 SMA50 and intervention sensitivity around the 160.00 threshold define the topside limit. Trade bias: Neutral/range USD/JPY; wide OIS carry confronts heavy options downside skew and crowded speculative yen longs. Catalyst: BoJ meeting 30 Oct. Risk: Spot closes above the SMA50 at 159.05, forcing option put-skew unwinds.",
+      "time": "22:41",
+      "priority": "critical",
+      "title": "USD/JPY — Carry Persistence vs Intervention Skew",
+      "text": "USD/JPY trades at 157.00, holding above its SMA20 of 156.79 while remaining capped below the SMA50/200 cluster at 159.05/158.40. A 275bp Fed-BoJ policy rate spread and a +287bp SOFR-TONA OIS carry differential continue to anchor spot demand despite the Bank of Japan raising its policy rate to 1.25%. Options markets display pronounced asymmetric defense against upside extension, evidenced by 25d risk reversals printing at -1.88 alongside an ATM implied volatility of 8.0% against an HV30 of 9.9%, generating a negative volatility risk premium of -1.9%. CFTC data reveals leveraged funds swinging sharply net long JPY to +20,069 contracts (pctl 95, z +1.57) following a weekly delta of +73,324, representing speculative positioning crowded into the upper decile of its 52-week range. With VIX contained at 14.8, broad safe-haven flows are absent, leaving the pair dictated by carry stability versus positioning unwind risk as price nears historical intervention sensitivity levels toward 160.00. Trade bias: Neutral/range USD/JPY, carry support constrained by heavy downside options hedging and spec crowding. Catalyst: next BoJ meeting (mkt: 100% hold priced) 30 Oct — hold stance expected. Risk: Verbal intervention escalates or spot drops below SMA20 at 156.79, initiating leveraged long unwinds.",
       "evidence": [
-        "USD/JPY 25d RR: -1.88",
-        "VRP: -1.9% (IV 8.0% vs HV30 9.9%)",
-        "Fed 4.0% vs BoJ 1.25% — 275bp"
+        "Fed 4.00% vs BoJ 1.25% — 275bp",
+        "USD/JPY 25d RR: -1.88 put skew",
+        "JPY COT LF net: +20,069 (pctl 95, z +1.57)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:47",
+      "time": "22:38",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long Positioning + Technical Compression",
-      "text": "AUD/USD prints at 0.7121, compressed between its rising SMA50 at 0.7087 and declining SMA20 at 0.7168. CFTC leveraged fund positioning reflects extreme crowding, with net longs expanding by +10,920 contracts WoW to +59,299 contracts, placing positioning at the 97th percentile of its 52-week range with a z-score of +2.11. While the cash rate maintains an Australian advantage with RBA at 4.35% vs Fed at 4.00% (a 35bp AUD carry premium) and AONIA vs SOFR delivering −50bp, the failure of spot to clear the SMA20 confirms late-trend exhaustion. Additionally, 25d risk reversals reflect a persistent put skew of −0.66, demonstrating institutional reluctance to price topside follow-through. With leveraged longs heavily committed in the upper decile, the pair is vulnerable to a sharp unwind if US yields extend their bear steepening. Trade bias: Short AUD/USD; stretched institutional positioning faces technical resistance at the 20-day average. Catalyst: RBA meeting 29 Sep. Risk: Leveraged funds absorb supply with a daily spot close above 0.7170.",
+      "title": "AUD/USD — Crowded Long Positioning Friction",
+      "text": "AUD/USD trades at 0.7127, resting below its falling SMA20 at 0.7168 while supported above the SMA50 and SMA200 at 0.7087 and 0.7015. CFTC positioning shows leveraged funds holding +59,299 net long contracts, placing institutional exposure at the 97th percentile of its 52-week range (z +2.11) after adding +10,920 contracts WoW. The RBA at 4.35% maintains a 35bp carry advantage over the Fed at 4.00% (AONIA-SOFR spread favors AUD by 50bp), yet spot momentum has stalled against fresh US tariff threats against Asian trade partners. ATM implied volatility runs at 6.5% against an HV30 of 5.5% (VRP +1.0%), while the 25d risk reversal reflects a mild put skew of -0.66, indicating options dealers are paying for downside hedges despite the institutional net long. Heavy speculative crowding leaves the currency vulnerable to sharp positioning flushes if risk appetite deteriorates. Trade bias: Bearish AUD/USD, crowded long overhang limits upside follow-through. Catalyst: RBA meeting 29 Sep — hold widely expected. Risk: Sustained daily close above SMA20 at 0.7168 accompanied by renewed commodity inflows.",
       "evidence": [
         "AUD COT LF net: +59,299 (pctl 97, z +2.11)",
-        "RBA 4.35% vs Fed 4.00% — 35bp AUD carry premium",
-        "AUD/USD SMA20: 0.7168 vs Spot 0.7121"
+        "RBA 4.35% vs Fed 4.00% — -35bp",
+        "AUD/USD: 0.7127 (SMA20: 0.7168)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:40",
-      "priority": "info",
-      "title": "EUR/USD — Bearish Moving Average Breakdown + Real Rate Drag",
-      "text": "EUR/USD trades at 1.1486, sustaining an intraday breakdown below its entire daily moving average cluster consisting of the SMA50 at 1.1540, SMA20 at 1.1597, and SMA200 at 1.1633. The macro structure remains decisively negative as Fed 4.00% vs ECB 2.65% enforces a 135bp nominal carry deficit against the euro, mirrored by an OIS carry gap of +141bp favoring USD. Adjusting for market inflation expectations, the real policy rate differential sits at +1.59% for the US against +0.30% for the Eurozone, generating a restrictive 129bp real spread that maintains downward pressure on the currency pair. Options pricing remains muted with 25d risk reversals at −0.14 and implied volatility matching realized at 4.5% vs 4.2%, leaving spot guided primarily by rate spreads and US yield curve dynamics. Resistance now firms at the broken SMA50 at 1.1540, keeping immediate price risk tilted toward recent cycle lows. Trade bias: Bearish EUR/USD; spot remains suppressed below all major moving averages under real yield deficits. Catalyst: ECB President Lagarde Speech 21 Sep. Risk: Spot recovers and closes above the 1.1540 SMA50 barrier.",
+      "time": "22:33",
+      "priority": "warning",
+      "title": "EUR/USD — Bearish Moving Average Alignment + Carry Deficit",
+      "text": "EUR/USD trades at 1.1485, pinned beneath its descending SMA20 at 1.1597, SMA50 at 1.1540, and SMA200 at 1.1633. The Fed's policy rate of 4.00% versus the ECB at 2.65% enforces a 135bp nominal policy differential, reflected in a +141bp SOFR-€STR OIS advantage favoring the dollar and maintaining structural downward drag on the pair. Leveraged funds remain net short EUR by -51,355 contracts (pctl 32, z -0.36) following a WoW expansion of -4,974 contracts, confirming institutional alignment with the rate deficit. While ECB rhetoric leaves the door open to a further hike should energy pressures mount, European real yields (+0.30%) lag US real rates (+1.59%) by 129bp, preventing capital attraction. Implied volatility sits at 4.5% versus HV30 of 4.2% with 25d risk reversals flat at -0.14, demonstrating an orderly grind lower rather than a disorderly unwind. Trade bias: Bearish EUR/USD, moving average stack and carry deficit cap recovery attempts. Catalyst: ECB President Lagarde speech 21 Sep at 11:00 UTC. Risk: Hawkish forward guidance from Lagarde pushes EUR/USD through SMA50 resistance at 1.1540.",
       "evidence": [
-        "Fed 4.00% vs ECB 2.65% — 135bp spread favors USD",
-        "EUR/USD Spot 1.1486 vs SMA50 1.1540",
-        "Real rate spread: +129bp favors USD"
+        "Fed 4.00% vs ECB 2.65% — 135bp",
+        "EUR/USD: 1.1485 (below SMA20/50/200)",
+        "SOFR vs ESTR spread: +141bp"
       ],
       "_source": "engine-ai-primary"
     }
