@@ -1,40 +1,42 @@
 {
-  "generated_at": "2026-09-19T11:38:06Z",
+  "generated_at": "2026-09-20T11:52:13Z",
   "signals": [
     {
-      "time": "11:31",
+      "time": "11:50",
       "priority": "critical",
-      "title": "USD/NOK — G10 Bilateral Theme + Geopolitical Tariff Escalation",
-      "text": "Trump signing the Russia sanctions bill opening China and India to secondary tariffs reinforces broad USD dominance, driving USD/NOK upward into the open. USD led G10 performance over the trailing week (+1.162%, n=9) while NOK lagged (-0.952%, n=2), establishing an extreme bilateral spread of 2.113% alongside a +135bp real policy rate differential favoring the dollar. The upcoming Norges Bank meeting on 24 Sep is the catalyst that determines whether monetary divergence can arrest the cross's upward trajectory. Trade bias: Bullish USD/NOK into the open; G10 divergence and tariff headline risk favor upside continuation. Catalyst: Norges Bank meeting on 24 Sep — hold vs hike decision. Risk: Brent crude rebound above $100/bbl or Norges Bank delivering a hawkish 25bp hike flips the cross lower.",
+      "title": "USD/NOK — G10 Bilateral Theme + Sanctions Escalation",
+      "text": "USD outperforms the G10 board while NOK lags following President Trump signing a Russia sanctions bill opening China and India to secondary tariffs alongside heightened Strait of Hormuz tensions. Secondary tariff friction and geopolitical supply-chain disruption accelerate safe-haven capital into the greenback against energy-sensitive European currencies. The upcoming Norges Bank policy meeting on 24 Sep resolves whether rate guidance counteracts ongoing spot erosion above the 20-day SMA of 9.317. Trade bias: Bullish USD/NOK into the weekly open. Catalyst: Sydney open follow-through ahead of Norges Bank meeting on 24 Sep. Risk: Break below Friday close 9.404 toward the 20-day SMA (9.317) on de-escalation headlines.",
       "evidence": [
-        "USD 1W avg: +1.162% (n=9)",
+        "USD 1W avg: +1.160% (n=9)",
         "NOK 1W avg: -0.952% (n=2)",
-        "G10 spread: 2.113%",
-        "USD/NOK Friday close: 9.404"
+        "G10 spread: 2.112%",
+        "USD/NOK close: 9.404"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:31",
+      "time": "11:50",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Speculative Longs Face Unwind Risk",
-      "text": "AUD COT leveraged funds net long +59.3k (74.2% long, 97th percentile, z=+2.11) exposes AUD/USD to aggressive long-unwind risk following Friday's 0.7121 close. While the RBA holds an explicit hike bias with a +50bp OIS carry advantage (AONIA 4.35% vs SOFR 3.85%), extended positioning leaves the pair vulnerable to tariff-related risk-off contagion. The RBA meeting on 29 Sep is the catalyst that tests whether the hawkish stance can defend the 0.7100 handle. Trade bias: Bearish AUD/USD on rallies; extreme COT positioning caps further upside. Catalyst: RBA meeting on 29 Sep — hike bias pricing. Risk: RBA delivers a surprise 25bp rate hike or global risk sentiment rebounds sharply.",
+      "title": "AUD/USD — Crowded Long Positioning Unwind Risk",
+      "text": "AUD COT LF long +59.3k (74.2% long, 97th percentile, z=+2.11) creates crowded-long unwind risk after AUD/USD closed Friday at 0.7121 below its 20-day SMA (0.7168). A restrictive Fed stance (real policy rate +1.59% vs AUD +0.85%) and secondary tariff threats against China test speculative length despite positive AONIA carry (+50bp). The RBA policy meeting on 29 Sep is the catalyst that determines whether domestic rate support holds spot above the 50-day SMA (0.7087). Trade bias: Bearish AUD/USD into the open. Catalyst: RBA policy decision on 29 Sep. Risk: Sustained recovery above the 20-day SMA (0.7168) driven by extended domestic ESI outperformance (+14.2).",
       "evidence": [
-        "AUD COT LF net: +59,299 (74.2% long, 97th percentile, z=+2.11)",
-        "AUD/USD Friday close: 0.7121",
-        "OIS carry spread: -50bp (favors AUD)"
+        "AUD COT LF net: +59,299 (74.2% long, pctl 97, z=+2.11)",
+        "AUD/USD close: 0.7121",
+        "OIS carry: AONIA 4.35% vs SOFR 3.85% (-50bp favoring AUD)",
+        "US real rate: +1.59% vs AU real rate: +0.85%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "11:31",
+      "time": "11:50",
       "priority": "info",
-      "title": "EUR/USD — Crowded Net Short vs Bund-Treasury Spread Compression",
-      "text": "EUR COT leveraged funds net short -51.4k keeps EUR/USD pinned beneath technical resistance following Friday's 1.1489 close. European trade vulnerability to secondary US tariffs counteracts the ECB's rate level, while the -148bp 10Y Bund-Treasury spread maintains steady downside pressure toward 1.1400. The speech by Bundesbank President Nagel on Monday at 08:30 UTC is the catalyst that sets European rates expectations ahead of the ECB meeting on 29 Oct. Trade bias: Bearish EUR/USD; spot trading below 20/50/200 SMAs confirms structural weakness. Catalyst: Bundesbank President Nagel speech on Monday 08:30 UTC. Risk: Hawkish forward guidance from Nagel pushing 10Y Bund yields higher invalidates the short bias.",
+      "title": "EUR/USD — Crowded Net Short vs Multi-Horizon Technical Breakdown",
+      "text": "EUR COT LF short -51.4k (38.4% long) anchors an entrenched downside bias as EUR/USD closed Friday at 1.1490 beneath its 20-day (1.1597), 50-day (1.1540), and 200-day (1.1632) SMAs. SOFR-€STR carry advantage of +141bp and the US bear steepener curve regime (+32.8bp 2s10s) maintain structural capital flow favoring the dollar. Twin speeches by ECB President Lagarde on Monday resolve whether policy commentary offers counter-cyclical resistance against 1.1400. Trade bias: Bearish EUR/USD. Catalyst: ECB President Lagarde address at 11:00 UTC Monday. Risk: Daily close back above the 50-day SMA (1.1540) invalidating the technical breakdown.",
       "evidence": [
-        "EUR COT LF net: -51,355 (38.4% long, 32nd percentile)",
-        "EUR/USD Friday close: 1.1489 (below SMA20/50/200)",
-        "DE-US 10Y yield spread: -148bp"
+        "EUR COT LF net: -51,355 (38.4% long)",
+        "EUR/USD close: 1.1490 (below SMA20, SMA50, SMA200)",
+        "OIS carry: SOFR 3.85% vs ESTR 2.44% (+141bp favoring USD)",
+        "2s10s curve regime: Bear Steepener (+32.8bp)"
       ],
       "_source": "engine-ai-primary"
     }
