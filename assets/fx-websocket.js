@@ -157,7 +157,7 @@ function _applyTick(msg) {
       session_low:  null,
       hv30:      null,
       pct1w:     null,
-      fromFinnhub: true,
+      fromLiveFeed: true,
     };
   } else {
     const prevClose = cached.prev_close;
@@ -167,7 +167,7 @@ function _applyTick(msg) {
     cached.close = price;
     if (chg !== null) cached.chg = chg;
     if (pct !== null) cached.pct = pct;
-    cached.fromFinnhub = true;
+    cached.fromLiveFeed = true;
   }
 
   _lastTickTs = Date.now();

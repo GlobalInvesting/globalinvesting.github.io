@@ -1287,12 +1287,12 @@ function populateHeatmap() {
     </div>`;
   }).join('');
 
-  const _hasFhHm = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+  const _hasLiveFeedHm = Object.values(STOOQ_RT_CACHE).some(e => e?.fromLiveFeed);
   const _hmSubEl = document.getElementById('hm-panel-sub');
   if (_hmSubEl) {
     _hmSubEl.textContent = isFxMarketClosedNow()
       ? 'Market Closed \u00b7 G10 composite \u00b7 32 pairs'
-      : (_hasFhHm
+      : (_hasLiveFeedHm
         ? 'Live \u00b7 G10 composite \u00b7 32 pairs'
         : 'Delayed ~5min \u00b7 G10 composite \u00b7 32 pairs');
   }
@@ -2603,18 +2603,18 @@ function updateFxPairsTableRT() {
     const tzAbbr = now.toLocaleTimeString('en', {timeZoneName:'short'}).split(' ').pop() || 'LT';
     const _rtDay = now.getUTCDay(), _rtH = now.getUTCHours();
     const _rtWeekend = _rtDay === 6 || (_rtDay === 0 && _rtH < 21) || (_rtDay === 5 && _rtH >= 21);
-    const _hasFinnhub = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
+    const _hasLiveFeed = Object.values(STOOQ_RT_CACHE).some(e => e?.fromLiveFeed);
     upd.textContent = _rtWeekend
       ? `Last close: Fri · delayed`
-      : _hasFinnhub
+      : _hasLiveFeed
         ? `Live`
         : `${hh}:${mm} ${tzAbbr} · delayed ~5min`;
   }
 
   const _chartSub = document.querySelector('#section-fxpairs .panel-sub');
   if (_chartSub && _chartSub.textContent !== 'TradingView \u00b7 live data') {
-    const _hasFh = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    _chartSub.textContent = isFxMarketClosedNow() ? 'Market Closed' : (_hasFh ? 'Live' : `Delayed ~5min`);
+    const _hasLiveFeed = Object.values(STOOQ_RT_CACHE).some(e => e?.fromLiveFeed);
+    _chartSub.textContent = isFxMarketClosedNow() ? 'Market Closed' : (_hasLiveFeed ? 'Live' : `Delayed ~5min`);
   }
 
   _throttledPairDetailRefresh();
@@ -7115,8 +7115,8 @@ async function _renderLWChart(ohlcId, label) {
 
   const panelSub = document.querySelector('#section-fxpairs .panel-sub');
   if (panelSub) {
-    const _hasFinnhubLive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromFinnhub);
-    panelSub.textContent = isFxMarketClosedNow() ? 'Market Closed' : (_hasFinnhubLive ? 'Live' : 'Delayed ~5min');
+    const _hasLiveFeedActive = Object.values(STOOQ_RT_CACHE).some(e => e?.fromLiveFeed);
+    panelSub.textContent = isFxMarketClosedNow() ? 'Market Closed' : (_hasLiveFeedActive ? 'Live' : 'Delayed ~5min');
   }
 
   const _CB_NAMES = {
