@@ -2,14 +2,6 @@ name: Update Calendar Completeness (secondary source)
 
 on:
   schedule:
-    # 4x/day, ~1h after each update-economic-calendar.yml primary refresh
-    # (05:30/09:30/13:30/20:30 UTC) so the alias-builder always has same-day
-    # primary-side forecast/actual data to value-match against — was weekly
-    # (Monday-only), which left every actual published later in the week
-    # waiting up to 6 days for a second-source recovery chance. This is the
-    # public site repo (unlimited free Actions minutes), so this cadence
-    # costs nothing budget-wise; matched to update-economic-calendar.yml's
-    # own cadence rather than picked arbitrarily.
     - cron: '30 6 * * *'
     - cron: '30 10 * * *'
     - cron: '30 14 * * *'
@@ -102,34 +94,8 @@ jobs:
             echo "--- Attempt $i ---"
             git fetch origin main
             git reset --hard origin/main
-            # v2.2 FIX (2026-09-15): calendar.json has other independent
-            # writers in this same window (update-economic-calendar.yml,
-            # calendar-watcher.js's own direct-commit fallback) — a blind cp
-            # of this run's once-computed file over the just-reset remote
-            # state discards whatever either of them committed between this
-            # run's checkout and this retry. Re-merge instead of overwrite,
-            # reusing this run's already-fetched TE data (never re-fetched
-            # here). See fetch_te_calendar.py v2.2 and CHANGELOG.md.
             python3 private-scripts/fetch_te_calendar.py --remerge /tmp/te_full_events_fresh.json
-            # event-title-aliases.json has exactly one writer in this
-            # pipeline (this same step) — safe to restore this run's own
-            # computed copy directly, no race to protect against.
             cp /tmp/event_title_aliases_fresh.json calendar-data/event-title-aliases.json
-            # v2.3 FIX (2026-09-15): build_calendar_title_aliases.py's v1.4
-            # repair-in-place pass (apply_secondary_actuals()/
-            # apply_yahoo_actuals()) already patched economic-events.json
-            # once, earlier in this job, before this retry loop's own
-            # `git reset --hard` wiped that local write — and the file was
-            # never even staged, since this step's `git add` line only
-            # listed calendar.json/event-title-aliases.json. Confirmed live:
-            # "Euro Area ZEW Economic Sentiment Indicator"'s alias evidence
-            # (previous=31.4 on both primary and secondary, actual=25.8) had
-            # been correct and stable for hours while economic-events.json's
-            # own row stayed null the whole time. Re-apply the same,
-            # already-computed alias file's repair against the freshly-reset
-            # economic-events.json on every attempt (never overwrites an
-            # actual already on disk — see that function's own docstring),
-            # then actually stage the file below.
             python3 private-scripts/build_calendar_title_aliases.py --apply-only /tmp/event_title_aliases_fresh.json
             git add calendar-data/calendar.json calendar-data/event-title-aliases.json calendar-data/economic-events.json
             if git diff --quiet && git diff --staged --quiet; then
