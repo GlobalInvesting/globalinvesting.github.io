@@ -1,30 +1,30 @@
 {
-  "lastUpdate": "2026-09-19T23:58:52Z",
-  "generatedAt": "2026-09-19T23:58:52Z",
+  "lastUpdate": "2026-09-20T09:55:25Z",
+  "generatedAt": "2026-09-20T09:55:25Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
   "source": "Calendar feed",
   "errorMessage": null,
   "fetchErrors": [],
-  "rangeFrom": "2025-09-19",
+  "rangeFrom": "2025-09-22",
   "rangeTo": "2026-10-03",
-  "totalEvents": 5395,
+  "totalEvents": 5384,
   "currencyCounts": {
-    "JPY": 356,
-    "EUR": 1518,
-    "GBP": 541,
-    "CAD": 324,
-    "USD": 1677,
+    "EUR": 1516,
+    "USD": 1676,
     "CHF": 160,
+    "GBP": 537,
+    "CAD": 321,
     "AUD": 321,
+    "JPY": 355,
     "NZD": 140,
     "SEK": 221,
     "NOK": 137
   },
   "impactCounts": {
-    "high": 1714,
-    "medium": 2318,
+    "medium": 2315,
+    "high": 1706,
     "low": 1363
   },
   "surpriseStats": {
@@ -1855,126 +1855,6 @@
     }
   },
   "events": [
-    {
-      "currency": "JPY",
-      "event": "BoJ Interest Rate Decision",
-      "dateISO": "2025-09-19",
-      "actual": "0.5%",
-      "forecast": "0.5",
-      "previous": "0.5",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "03:50"
-    },
-    {
-      "currency": "EUR",
-      "event": "PPI YoY",
-      "dateISO": "2025-09-19",
-      "actual": "-2.2%",
-      "forecast": "-1.7",
-      "previous": "-1.5",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Retail Sales ex Fuel YoY",
-      "dateISO": "2025-09-19",
-      "actual": "1.2%",
-      "forecast": "1.0",
-      "previous": "1.0",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Retail Sales ex Fuel MoM",
-      "dateISO": "2025-09-19",
-      "actual": "0.8%",
-      "forecast": "0.7",
-      "previous": "0.4",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Retail Sales MoM",
-      "dateISO": "2025-09-19",
-      "actual": "0.5%",
-      "forecast": "0.3",
-      "previous": "0.5",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "GBP",
-      "event": "Retail Sales YoY",
-      "dateISO": "2025-09-19",
-      "actual": "0.7%",
-      "forecast": "0.6",
-      "previous": "0.8",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "06:00"
-    },
-    {
-      "currency": "EUR",
-      "event": "Business Confidence",
-      "dateISO": "2025-09-19",
-      "actual": "96",
-      "forecast": "96.0",
-      "previous": "97.0",
-      "impact": "medium",
-      "importance": 2,
-      "source": "Myfxbook",
-      "timeUTC": "06:45"
-    },
-    {
-      "currency": "CAD",
-      "event": "Retail Sales MoM",
-      "dateISO": "2025-09-19",
-      "actual": "-0.8%",
-      "forecast": "-0.8",
-      "previous": "1.6",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "CAD",
-      "event": "Retail Sales YoY",
-      "dateISO": "2025-09-19",
-      "actual": "4%",
-      "forecast": "3.5",
-      "previous": "6.5",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
-    {
-      "currency": "CAD",
-      "event": "Retail Sales Ex Autos MoM",
-      "dateISO": "2025-09-19",
-      "actual": "-1.2%",
-      "forecast": "-0.7",
-      "previous": "2.2",
-      "impact": "high",
-      "importance": 3,
-      "source": "Myfxbook",
-      "timeUTC": "12:30"
-    },
     {
       "currency": "EUR",
       "event": "Consumer Confidence",
@@ -49052,19 +48932,6 @@
       "previous": "-10.4K"
     },
     {
-      "date": "29 Aug",
-      "dateISO": "2026-08-29",
-      "timeUTC": "00:00",
-      "country": "USD",
-      "currency": "USD",
-      "flag": "🇺🇸",
-      "event": "United States Jackson Hole Economic Symposium",
-      "impact": "medium",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
       "date": "30 Aug",
       "dateISO": "2026-08-30",
       "timeUTC": "23:50",
@@ -65017,7 +64884,7 @@
       "event": "Belgium Business Confidence",
       "impact": "low",
       "actual": null,
-      "forecast": "-13",
+      "forecast": "-13.5",
       "previous": "-13.2"
     },
     {
