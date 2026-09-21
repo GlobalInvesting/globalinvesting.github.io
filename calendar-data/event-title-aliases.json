@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-21T13:09:55Z",
+  "generatedAt": "2026-09-21T16:32:46Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 189,
+  "aliasCount": 190,
   "aliases": [
     {
       "currency": "EUR",
@@ -1615,8 +1615,21 @@
           "actual_secondary_raw": "-0.04",
           "forecast_secondary_raw": "0.2",
           "previous_secondary_raw": "0.08"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-21",
+          "forecast_primary": 0.01,
+          "forecast_yahoo": null,
+          "actual_primary": -0.04,
+          "actual_yahoo": -0.04,
+          "previous_primary": -0.08,
+          "previous_yahoo": -0.08,
+          "actual_yahoo_raw": "-0.04",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-0.08"
         }
-      }
+      },
+      "yahoo_title": "National Activity Index"
     },
     {
       "currency": "EUR",
@@ -2033,6 +2046,25 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": "3.4%",
           "previous_secondary_raw": "3.3%"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Dallas Fed Manufacturing Index",
+      "secondary_title": "United States Dallas Fed Manufacturing Index",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-28",
+          "forecast_primary": 7.2,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 11.6,
+          "previous_secondary": 11.6,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "11.6"
         }
       }
     },
