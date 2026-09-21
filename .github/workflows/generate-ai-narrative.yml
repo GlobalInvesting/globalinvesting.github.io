@@ -7,11 +7,11 @@ on:
   repository_dispatch:
     types: [trigger-ai-narrative]
   schedule:
-    - cron: '0  0  * * *'
-    - cron: '55 6  * * *'
-    - cron: '55 11 * * *'
-    - cron: '55 20 * * *'
-    - cron: '25 22 * * 5'
+    - cron: '20 0  * * *'
+    - cron: '20 7  * * *'
+    - cron: '20 12 * * *'
+    - cron: '20 21 * * *'
+    - cron: '50 22 * * 5'
   workflow_dispatch:
 
 env:
@@ -42,26 +42,9 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           path: engine
 
-      - name: Idempotency guard — skip if a sibling trigger already ran this cycle
+      - name: Idempotency guard -- skip if a sibling trigger already ran this cycle
         id: guard
-        run: |
-          SKIP=false
-          if [ "${{ github.event_name }}" != "workflow_dispatch" ] && [ -f "site/ai-analysis/index.json" ]; then
-            GENERATED_AT=$(python3 -c "import json; d=json.load(open('site/ai-analysis/index.json')); print(d.get('generated_at',''))" 2>/dev/null || echo "")
-            if [ -n "$GENERATED_AT" ]; then
-              AGE_MIN=$(python3 -c "
-          from datetime import datetime, timezone
-          ts = '$GENERATED_AT'.replace('Z', '+00:00')
-          age = (datetime.now(timezone.utc) - datetime.fromisoformat(ts)).total_seconds() / 60
-          print(int(age))
-          " 2>/dev/null || echo 9999)
-              if [ "$AGE_MIN" -lt 20 ] 2>/dev/null; then
-                echo "site/ai-analysis/index.json was generated ${AGE_MIN} min ago (< 20 min) — a sibling trigger already completed this cycle. Skipping the rest of this run."
-                SKIP=true
-              fi
-            fi
-          fi
-          echo "skip=$SKIP" >> "$GITHUB_OUTPUT"
+        run: python3 engine/scripts/ai_run_guard.py --event "${{ github.event_name }}" --site site
 
       - name: Set up Python
         if: steps.guard.outputs.skip != 'true'
