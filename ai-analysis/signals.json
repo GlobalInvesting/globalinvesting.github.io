@@ -1,63 +1,53 @@
 {
-  "generated_at": "2026-09-21T07:01:37Z",
+  "generated_at": "2026-09-21T12:01:13Z",
   "signals": [
     {
-      "time": "07:00",
+      "time": "11:55",
       "priority": "critical",
-      "title": "USD/JPY — Macro Alignment vs Crowded Specs",
-      "text": "USD/JPY trades at 157.06, holding above its SMA20 at 156.79 while remaining below the SMA50/200 cluster. BoJ holds at 1.25%. CFTC positioning shows JPY Leveraged Funds net long at +20,069 contracts (pctl 95, z +1.57), signaling a crowded speculative long position after a massive WoW shift of +73,324 contracts. Options markets aggressively hedge downside exposure, with 25d Risk Reversals printing a heavy -1.88 put skew, while USD/JPY VRP sits negative at -1.9% (IV 8.0% vs HV30 9.9%), reflecting thin options supply. This establishes an asymmetric setup where crowded spec longs and options downside hedges conflict with persistent underlying carry. Trade bias: Bullish USD/JPY, carry support outweighs split BOJ hike impact. Catalyst: ECB President Lagarde speech at 11:00 UTC and US 2Y Note Auction at 17:00 UTC. Risk: VIX spikes above 25 or BOJ intervention rhetoric accelerates, forcing a rapid liquidation of carry positions.",
+      "title": "CHF/JPY — G10 Bilateral Theme + Divergent Real Rates",
+      "text": "CHF/JPY trades at 191.49, outperforming across G10 currency strength scorecards as the Swiss franc leads peers with a 1W average of +0.438% across six pairs while the Japanese yen lags at -0.861% across seven pairs, generating a bilateral spread of 1.299%. SNB policy rate sits at 0.00% with an inflation expectation of 1.24% and a resulting real rate of -1.24%, while the BoJ policy rate is 1.25% with an inflation expectation of 2.70% and a real rate of -1.45%. The SNB zero-rate stance contrasts with the SNB-BoJ carry differential of -125bp favoring the yen, yet fair-value models indicate CHF/JPY at 190.83 is cheap relative to its model fair value of 196.20 with a z-score of -1.68σ. Trade bias: Long CHF/JPY; persistent franc strength against a weak yen supports continued bilateral outperformance. Catalyst: Swiss National Bank policy meeting on 24 Sep with SNB on hold at 0.00%. Risk: Rapid unwinding of cross-currency carry trades compresses the spread below the 0.80% threshold.",
       "evidence": [
-        "USD/JPY: 157.06",
-        "Fed-BoJ OIS Carry: +287bp",
-        "JPY COT LF Net: +20,069 (pctl 95)"
+        "CHF 1W avg: +0.438% (n=6)",
+        "JPY 1W avg: -0.861% (n=7)",
+        "G10 spread: 1.299%",
+        "CHF/JPY Fair Value z: -1.68σ"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:57",
+      "time": "11:52",
       "priority": "warning",
-      "title": "AUD/JPY — G10 Bilateral Theme + Carry",
-      "text": "AUD/JPY trades at 111.96, benefiting from a dominant G10 cross-currency divergence where AUD is the strongest G10 currency (1W avg +0.297% across 4 pairs) and JPY is the weakest (1W avg -0.622% across 7 pairs), producing a 0.919% bilateral spread. Hawkish RBA bets—supported by Australian Big Four banks aligning on a September hike to 4.60%—boost AUD sentiment alongside a solid Economic Surprise Index reading of +14.2. RBA at 4.35% vs BOJ at 1.25% creates a +310bp rate differential (+337bp on AONIA vs TONA OIS), giving AUD/JPY the highest carry advantage in the G10 space. CFTC data shows AUD Leveraged Funds net long at +59,299 contracts (pctl 97, z +2.11), marking a crowded institutional position that reflects sustained momentum. Trade bias: Long AUD/JPY, driven by G10 performance spread and carry yield advantage. Catalyst: next RBA meeting (mkt: 100% hold priced) on 29 September. Risk: Global risk-off sentiment triggers a sharp unwind of crowded AUD longs.",
+      "title": "GBP/USD — CB Divergence + Moving Average Cluster",
+      "text": "GBP/USD trades at 1.3396, positioned below the SMA20 at 1.3519, the SMA50 at 1.3482, and the SMA200 at 1.3455. Fed holds at 4.00%. British pound speculative positioning stands at +18,698 contracts, placing it at the 60th percentile of its 52-week range with a z-score of +0.28, while 25-day risk reversals show a mild put skew at -0.42. The Bank of England left rates unchanged at its September meeting while signaling an insurance hike in November, providing little immediate support to sterling as economic surprise index reads +5.3. Trade bias: Neutral to bearish GBP/USD; moving average overhead resistance caps near-term recovery attempts. Catalyst: United Kingdom S&P Global PMIs on 22 Sep. Risk: UK PMI prints significantly above consensus expectations and narrows yield spreads in favor of sterling.",
       "evidence": [
-        "AUD 1W avg: +0.297% (n=4)",
-        "JPY 1W avg: -0.622% (n=7)",
-        "G10 spread: 0.919%"
+        "GBP/USD: 1.3396",
+        "OIS spread: SOFR 3.85% vs SONIA 3.73% — 12bp",
+        "GBP COT LF net: +18,698 (pctl 60)",
+        "GBP/USD 25d RR: -0.42"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:55",
+      "time": "11:47",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long vs Retail Sentiment",
-      "text": "AUD/USD trades at 0.7132, sitting below its SMA20 at 0.7168 but above the SMA50 at 0.7087. RBA at 4.35% vs Fed at 4.00% creates a -35bp rate differential (-50bp on OIS), favoring AUD carry over USD. CFTC data reports AUD Leveraged Funds net long at +59,299 contracts (pctl 97, z +2.11), indicating an extreme, crowded institutional long position at the top of its 52-week historical range. Meanwhile, Retail sentiment data retail sentiment is balanced at 49% long / 51% short, showing no retail divergence and leaving institutional positioning to drive price action. 1M ATM IV sits at 6.5% vs HV30 of 5.5%, generating a +1.0% VRP that indicates modest option demand for downside protection. Trade bias: Neutral/Caution AUD/USD, crowded spec long limits fresh upside momentum near SMA20. Catalyst: Next RBA policy meeting on 29 September. Risk: Australia employment data upside surprise forces further hawkish RBA repricing.",
+      "title": "AUD/USD — Positioning Extreme + Carry Premium",
+      "text": "AUD/USD trades at 0.7140, trading below the SMA20 at 0.7168 but holding above the SMA50 at 0.7087 and the SMA200 at 0.7015. RBA holds at 4.35%. Speculative positioning shows leveraged funds net long +59,299 contracts, reaching the 97th percentile of its 52-week range with a z-score of +2.11 and weekly additions of +10,920 contracts, while retail sentiment registers 48% long and 52% short. The economic surprise index reads +14.2 alongside a strong inflation expectation of 3.50% and a real policy rate of +0.85%, confirming a mildly restrictive policy stance. Trade bias: Long AUD/USD; carry advantage and positive economic data sustain momentum despite extreme positioning. Catalyst: RBA policy meeting on 29 Sep with AONIA at 4.3500% and a hold expected. Risk: Extreme speculative long positioning unwinds sharply if external commodity demand softens.",
       "evidence": [
-        "AUD/USD: 0.7132",
-        "AUD COT LF Net: +59,299 (pctl 97)",
-        "RBA-Fed OIS Spread: -50bp"
+        "AUD/USD: 0.7140",
+        "AUD COT LF net: +59,299 (pctl 97, z +2.11)",
+        "OIS spread: SOFR 3.85% vs AONIA 4.35% — -50bp"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:52",
-      "priority": "warning",
-      "title": "USD/CHF — Policy Rate Differential + ESI",
-      "text": "USD/CHF trades at 0.8233, maintaining a clear bullish structure above its SMA20 (0.8117), SMA50 (0.8108), and SMA200 (0.7939). Fed at 4.00% vs SNB at 0.00% generates a massive +400bp rate differential, providing structural carry support for USD. CFTC positioning shows CHF Leveraged Funds net short at -16,664 contracts (pctl 7, z -1.36), confirming strong speculative short exposure near historical deciles. However, Swiss economic data shows persistent strength with a CHF ESI of +22.1 (strongest in G10), while USD ESI sits near neutral at +2.2. USD/CHF options print an IV of 5.9% vs HV30 of 7.2% (VRP -1.2%), pointing to thin option supply and potential volatility expansion. Trade bias: Bullish USD/CHF, carry differential dominates despite robust Swiss macro data releases. Catalyst: SNB interest rate decision on 24 September. Risk: SNB delivers a hawkish surprise or intervenes directly to support CHF.",
-      "evidence": [
-        "USD/CHF: 0.8233",
-        "Fed-SNB Rate Spread: +400bp",
-        "CHF ESI: +22.1"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "06:48",
+      "time": "11:40",
       "priority": "info",
-      "title": "GBP/USD — Moving Average Resistance + Negative Yield Spread Momentum",
-      "text": "GBP/USD trades at 1.3381, trapped below its moving average cluster with close at 1.3395, SMA20 at 1.3519, SMA50 at 1.3482, and SMA200 at 1.3455. Fed at 4.00% vs BoE at 3.75% creates a +25bp rate differential (+12bp on OIS), favoring USD carry. The UK-US 2Y yield spread sits at -13bp, with 5D momentum moving -30bp and 20D moving -26bp in favor of USD. CFTC data shows GBP Leveraged Funds net long at +18,698 (pctl 60), down -21,663 contracts WoW as institutional longs trim exposure following the BoE hold. Options exhibit a mild put skew with 25d Risk Reversals at -0.42 and IV at 4.8% vs HV30 at 4.0% (+0.8% VRP). Trade bias: Bearish GBP/USD, technical resistance and negative 2Y yield momentum weigh on price. Catalyst: Next BoE rate decision on 5 November. Risk: UK inflation prints trigger aggressive BoE hike repricing.",
+      "title": "NZD/USD — Options Complacency + Neutral Positioning",
+      "text": "NZD/USD trades at 0.5737, remaining below the SMA20 at 0.5854, the SMA50 at 0.5856, and the SMA200 at 0.5856. The Reserve Bank of New Zealand holds its policy rate at 2.75% with OCR-overnight at 2.7500% compared to the Federal Reserve SOFR at 3.8500%, maintaining a 125bp carry advantage for the US dollar. Speculative positioning sits at -2,319 contracts, representing the 44th percentile of its 52-week range with a z-score of -0.08, while retail sentiment shows an extreme 87% long against 13% short, creating a clear divergence between institutional and retail participants. The economic surprise index registers +4.2 with inflation expectations at 2.34% and a real policy rate of +0.41%. Trade bias: Neutral NZD/USD; range-bound technical structure with retail long extremes warning of potential mean reversion. Catalyst: New Zealand Westpac McDermott Miller Consumer Confidence survey. Risk: Retail long participants capitulate and spark a deeper break below the 0.5700 support level.",
       "evidence": [
-        "GBP/USD: 1.3381",
-        "UK-US 2Y Spread 5D Δ: -30bp",
-        "GBP COT LF WoW: -21,663"
+        "NZD/USD: 0.5737",
+        "NZD COT LF net: -2,319 (pctl 44)",
+        "Retail sentiment: 87% long / 13% short"
       ],
       "_source": "engine-ai-primary"
     }
