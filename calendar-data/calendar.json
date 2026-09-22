@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-22T06:59:16Z",
-  "generatedAt": "2026-09-22T06:59:16Z",
+  "lastUpdate": "2026-09-22T07:01:30Z",
+  "generatedAt": "2026-09-22T07:01:30Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,7 +9,7 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-22",
   "rangeTo": "2026-10-06",
-  "totalEvents": 5447,
+  "totalEvents": 5452,
   "currencyCounts": {
     "EUR": 1545,
     "USD": 1689,
@@ -19,13 +19,13 @@
     "AUD": 323,
     "JPY": 356,
     "NZD": 143,
-    "SEK": 221,
+    "SEK": 226,
     "NOK": 140
   },
   "impactCounts": {
-    "medium": 2329,
+    "medium": 2330,
     "high": 1707,
-    "low": 1411
+    "low": 1415
   },
   "surpriseStats": {
     "AUD/rba weighted median cpi mom": {
@@ -66099,8 +66099,8 @@
       "event": "Spain CPI m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.5%",
+      "previous": "0.7%"
     },
     {
       "date": "29 Sep",
@@ -66112,8 +66112,8 @@
       "event": "Spain CPI y/y",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "4.7%",
+      "previous": "4.3%"
     },
     {
       "date": "29 Sep",
@@ -66125,8 +66125,8 @@
       "event": "Spain HICP m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.2%",
+      "previous": "0.7%"
     },
     {
       "date": "29 Sep",
@@ -66138,8 +66138,8 @@
       "event": "Spain HICP y/y",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "4.9%",
+      "previous": "4.6%"
     },
     {
       "date": "29 Sep",
@@ -66153,6 +66153,71 @@
       "actual": null,
       "forecast": "0.9%",
       "previous": "-0.3%"
+    },
+    {
+      "date": "29 Sep",
+      "dateISO": "2026-09-29",
+      "timeUTC": "07:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Business Confidence",
+      "impact": "low",
+      "actual": null,
+      "forecast": "106.2",
+      "previous": "107.4"
+    },
+    {
+      "date": "29 Sep",
+      "dateISO": "2026-09-29",
+      "timeUTC": "07:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Manufacturing Confidence",
+      "impact": "low",
+      "actual": null,
+      "forecast": "103.3",
+      "previous": "103.8"
+    },
+    {
+      "date": "29 Sep",
+      "dateISO": "2026-09-29",
+      "timeUTC": "07:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Consumer Confidence",
+      "impact": "low",
+      "actual": null,
+      "forecast": "103.3",
+      "previous": "95.8"
+    },
+    {
+      "date": "29 Sep",
+      "dateISO": "2026-09-29",
+      "timeUTC": "07:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Inflation Expectations",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "6.2%",
+      "previous": "7.0%"
+    },
+    {
+      "date": "29 Sep",
+      "dateISO": "2026-09-29",
+      "timeUTC": "07:00",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Economic Tendency Indicator",
+      "impact": "low",
+      "actual": null,
+      "forecast": "104.4",
+      "previous": "103.7"
     },
     {
       "date": "29 Sep",
