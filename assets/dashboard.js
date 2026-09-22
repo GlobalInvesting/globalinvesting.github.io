@@ -399,8 +399,17 @@ function updateSessions(h) {
     if (open) activeLabel = s.id.toUpperCase().replace('NEWYORK','NEW YORK');
   });
 
-  setEl('session-label', activeLabel + (isWeekend ? '' : ' SESSION'));
-  setEl('session-status', isWeekend ? activeLabel : (activeLabel + ' · ACTIVE'));
+  // v8.537.0: 'INTER-SESSION' already contains the word "SESSION" — appending
+  // ' SESSION' unconditionally (the pre-fix behavior) produced a literal
+  // "INTER-SESSION SESSION" in the topbar during the gap between sessions,
+  // and "INTER-SESSION · ACTIVE" in the sidebar (nothing is actually active
+  // during that gap). A real session name ('TOKYO', 'LONDON', etc.) and the
+  // weekend label ('MARKET CLOSED') don't have this problem — only the
+  // inter-session default does, since it's the one label that already
+  // spells out "SESSION" on its own.
+  const isInterSession = !isWeekend && activeLabel === 'INTER-SESSION';
+  setEl('session-label', activeLabel + ((isWeekend || isInterSession) ? '' : ' SESSION'));
+  setEl('session-status', (isWeekend || isInterSession) ? activeLabel : (activeLabel + ' · ACTIVE'));
 }
 
 setInterval(updateClock, 1000);
