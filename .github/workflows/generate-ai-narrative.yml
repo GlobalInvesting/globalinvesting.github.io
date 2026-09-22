@@ -60,6 +60,10 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         run: mkdir -p site/ai-analysis
 
+      - name: Health monitor -- capture before
+        if: steps.guard.outputs.skip != 'true'
+        run: python3 engine/scripts/run_health.py capture-before --site site --out /tmp/health_before.json
+
       - name: Generate narrative and signals
         if: steps.guard.outputs.skip != 'true'
         working-directory: site
@@ -92,6 +96,14 @@ jobs:
               python ../engine/scripts/generate_narrative_signals.py --mode intraday
             fi
           fi
+
+      - name: Health monitor -- record
+        if: steps.guard.outputs.skip != 'true' && always()
+        run: |
+          python3 engine/scripts/run_health.py record --site site \
+            --before /tmp/health_before.json \
+            --event "${{ github.event_name }}" \
+            --run-id "${{ github.run_id }}"
 
       - name: Display output summary
         if: always()
@@ -136,6 +148,7 @@ jobs:
           [ -f ai-analysis/currency-drivers.json ] && cp ai-analysis/currency-drivers.json /tmp/ai_analysis_fresh/
           [ -f ai-analysis/session-context.json  ] && cp ai-analysis/session-context.json  /tmp/ai_analysis_fresh/
           [ -f ai-analysis/call-budget-state.json ] && cp ai-analysis/call-budget-state.json /tmp/ai_analysis_fresh/
+          [ -f ai-analysis/run-health.jsonl ] && cp ai-analysis/run-health.jsonl /tmp/ai_analysis_fresh/
           [ -f feed.xml  ] && cp feed.xml  /tmp/ai_analysis_fresh/
           [ -f feed.json ] && cp feed.json /tmp/ai_analysis_fresh/
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
@@ -151,11 +164,13 @@ jobs:
             [ -f /tmp/ai_analysis_fresh/currency-drivers.json ] && cp /tmp/ai_analysis_fresh/currency-drivers.json ai-analysis/
             [ -f /tmp/ai_analysis_fresh/session-context.json  ] && cp /tmp/ai_analysis_fresh/session-context.json  ai-analysis/
             [ -f /tmp/ai_analysis_fresh/call-budget-state.json ] && cp /tmp/ai_analysis_fresh/call-budget-state.json ai-analysis/
+            [ -f /tmp/ai_analysis_fresh/run-health.jsonl ] && cp /tmp/ai_analysis_fresh/run-health.jsonl ai-analysis/
             [ -f /tmp/ai_analysis_fresh/feed.xml  ] && cp /tmp/ai_analysis_fresh/feed.xml  .
             [ -f /tmp/ai_analysis_fresh/feed.json ] && cp /tmp/ai_analysis_fresh/feed.json .
             git add ai-analysis/index.json ai-analysis/signals.json ai-analysis/session-context.json ai-analysis/context_snapshot.json
             git add ai-analysis/currency-drivers.json ai-analysis/session-context.json 2>/dev/null || true
             git add ai-analysis/call-budget-state.json 2>/dev/null || true
+            git add ai-analysis/run-health.jsonl 2>/dev/null || true
             git add feed.xml feed.json 2>/dev/null || true
             if git diff --quiet && git diff --staged --quiet; then
               echo "No changes vs remote HEAD — skipping commit."
