@@ -1,19 +1,23 @@
 {
-  "updated_utc": "2026-09-22T12:31:07.759332+00:00",
-  "updated_label": "12:31 UTC",
+  "updated_utc": "2026-09-22T12:40:55.134439+00:00",
+  "updated_label": "12:40 UTC",
   "total": 52,
-  "total_high": 44,
-  "total_med": 5,
+  "total_high": 41,
+  "total_med": 4,
   "sources_active": [
     "ActionForex",
     "BabyPips",
     "Bank of Canada",
+    "Bank of England",
+    "Barchart",
     "FT Bonds",
     "FXStreet",
     "FinancialJuice",
+    "Finnhub",
     "ForexLive",
     "InvestingLive",
     "Marc to Market",
+    "Nasdaq FX",
     "RBA",
     "RTT News"
   ],
@@ -22,6 +26,22 @@
     "en": 52
   },
   "articles": [
+    {
+      "id": "165511feb413",
+      "cur": "USD",
+      "impact": "high",
+      "title": "Is a Fed Rate Hike Good or Bad for Stocks? You Might Be Surprised.",
+      "expand": "For the first time in more than three years, the Federal Reserve raised interest rates. Stocks initially fell on the news, and the Dow had its worst day in about a month. The market then rebounded slightly, but the 10-year Treasury yield sits near 5%. So the natural question is:",
+      "source": "Nasdaq FX",
+      "link": "https://www.nasdaq.com/articles/fed-rate-hike-good-or-bad-stocks-you-might-be-surprised",
+      "time": "12:27",
+      "ts": 1790080020000,
+      "featured": true,
+      "lang": "en",
+      "date": "22 Sep",
+      "datetime": "2026-09-22T12:27:00+00:00",
+      "recent": true
+    },
     {
       "id": "14e96dc4c38c",
       "cur": "GBP",
@@ -39,12 +59,12 @@
       "recent": true
     },
     {
-      "id": "9c86dcf70441",
+      "id": "0e2e5940acb1",
       "cur": "USD",
       "impact": "high",
       "title": "Morning Kickstart: Oil falls as Saudi pipeline restarts; USD gives back early gains.",
       "expand": "The U.S. dollar is mixed as North American traders arrive. It spiked higher across the board during the European morning, but has given back much of that move. The greenback is still higher against the GBP, CAD and AUD, lower against the JPY, CHF and NZD, and little changed against the EUR. Oil is the main story. Saudi Arabia has restarted its East–West pipeline, which carries crude to the Red Sea port of Yanbu. Exports from Yanbu could resume later Tuesday, although the pipeline is initially operating at a reduced rate. The restart has eased some immediate supply concerns and helped push crud...",
-      "source": "InvestingLive",
+      "source": "Finnhub",
       "link": "https://investinglive.com/technical-analysis/morning-kickstart-oil-falls-as-saudi-pipeline-restarts-usd-gives-back-early-gains/",
       "time": "12:11",
       "ts": 1790079103000,
@@ -279,6 +299,22 @@
       "recent": true
     },
     {
+      "id": "bbe5f6b0e2fa",
+      "cur": "CHF",
+      "impact": "low",
+      "title": "SNB: Middle East conflict means we remain prepared to intervene in the foreign exchange market should the need arise",
+      "expand": "",
+      "source": "FinancialJuice",
+      "link": "https://www.financialjuice.com/News/9773401/SNB-Middle-East-conflict-means-we-remain-prepared-to-intervene-in-the-foreign-exchange-market-should-the-need-arise.aspx?xy=rss",
+      "time": "10:17",
+      "ts": 1790072276000,
+      "featured": false,
+      "lang": "en",
+      "date": "22 Sep",
+      "datetime": "2026-09-22T10:17:56+00:00",
+      "recent": true
+    },
+    {
       "id": "cd8df032a0dc",
       "cur": "USD",
       "impact": "high",
@@ -292,22 +328,6 @@
       "lang": "en",
       "date": "22 Sep",
       "datetime": "2026-09-22T10:08:29+00:00",
-      "recent": true
-    },
-    {
-      "id": "9667010fd477",
-      "cur": "USD",
-      "impact": "high",
-      "title": "Oil prices extend decline as Saudi Arabia restarts East-West pipeline, prepares to resume crude exports",
-      "expand": "Saudi Arabia is preparing to resume crude oil exports from the Red Sea port of Yanbu as early as Tuesday, according to people familiar with the matter, in another sign that the kingdom is gradually restoring its disrupted oil export infrastructure. Several Asian refiners have reportedly been informed by Saudi Aramco that they will soon be able to collect crude from Yanbu again. The development follows the shutdown of Saudi Arabia’s East-West oil pipeline after drone attacks earlier this month. The pipeline connects the kingdom’s major oil-producing areas in the east with Yanbu on the Red Sea c...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/news/oil-prices-extend-decline-as-saudi-arabia-restarts-east-west-pipeline-prepares-to-resume-crude-exports/",
-      "time": "10:07",
-      "ts": 1790071672000,
-      "featured": true,
-      "lang": "en",
-      "date": "22 Sep",
-      "datetime": "2026-09-22T10:07:52+00:00",
       "recent": true
     },
     {
@@ -375,19 +395,19 @@
       "recent": true
     },
     {
-      "id": "ee7e66db5b5f",
-      "cur": "CAD",
-      "impact": "med",
-      "title": "USD/CAD Price Forecast: Bulls retain control near August 6 highs, just below mid-1.4000s",
-      "expand": "The USD/CAD pair extends its consolidative price move through the early European session on Tuesday, trading below 1.4050, or the highest since August 6, amid mixed fundamental cues.",
+      "id": "959936f366de",
+      "cur": "GBP",
+      "impact": "low",
+      "title": "British Pound: BoE pricing keeps rangebound against Euro – ING",
+      "expand": "ING’s Francesco Pesole notes EUR/GBP has held a tight 0.855–0.860 range since early September after a Bank of England (BoE) meeting that did not strongly challenge aggressive market tightening expectations.",
       "source": "FXStreet",
-      "link": "https://www.fxstreet.com/news/usd-cad-price-forecast-bulls-retain-control-near-august-6-highs-just-below-mid-14000s-202609220810",
-      "time": "08:10",
-      "ts": 1790064643000,
+      "link": "https://www.fxstreet.com/news/british-pound-boe-pricing-keeps-rangebound-against-euro-ing-202609220816",
+      "time": "08:16",
+      "ts": 1790064971000,
       "featured": false,
       "lang": "en",
       "date": "22 Sep",
-      "datetime": "2026-09-22T08:10:43+00:00",
+      "datetime": "2026-09-22T08:16:11+00:00",
       "recent": true
     },
     {
@@ -695,6 +715,22 @@
       "recent": true
     },
     {
+      "id": "be526faebe0e",
+      "cur": "CAD",
+      "impact": "low",
+      "title": "Make This 1 Trade Now as U.S.-Canada Trade Friction Drags On",
+      "expand": "December Canada dollar futures present a selling opportunity on more price weakness.",
+      "source": "Barchart",
+      "link": "https://www.barchart.com/story/news/4712948/make-this-1-trade-now-as-u-s-canada-trade-friction-drags-on",
+      "time": "14:37",
+      "ts": 1790001431000,
+      "featured": false,
+      "lang": "en",
+      "date": "21 Sep",
+      "datetime": "2026-09-21T14:37:11+00:00",
+      "recent": true
+    },
+    {
       "id": "cf6fa399b19f",
       "cur": "CHF",
       "impact": "high",
@@ -725,6 +761,22 @@
       "date": "21 Sep",
       "datetime": "2026-09-21T13:13:41+00:00",
       "recent": true
+    },
+    {
+      "id": "a0715cbf9fde",
+      "cur": "GBP",
+      "impact": "low",
+      "title": "Foreign Currency Reserves 2026 – Market Notice 21 September 2026",
+      "expand": "Not for distribution, directly or indirectly, in or into the United States, Canada, Australia, Japan or any other jurisdiction where it is unlawful to distribute this announcement",
+      "source": "Bank of England",
+      "link": "https://www.bankofengland.co.uk/markets/market-notices/2026/september/foreign-currency-reserves-2026-market-notice-21-september-2026",
+      "time": "11:30",
+      "ts": 1789990200000,
+      "featured": false,
+      "lang": "en",
+      "date": "21 Sep",
+      "datetime": "2026-09-21T11:30:00+00:00",
+      "recent": false
     },
     {
       "id": "83415492d6d9",
@@ -804,54 +856,6 @@
       "lang": "en",
       "date": "18 Sep",
       "datetime": "2026-09-18T12:59:28+00:00",
-      "recent": false
-    },
-    {
-      "id": "d6def98825c4",
-      "cur": "GBP",
-      "impact": "high",
-      "title": "How have interest rate expectations changed after this week's events?",
-      "expand": "Rate hikes by year-end RBA: 40 bps (97% probability of rate hike at the next meeting) 2027: 58 bps BoE: 38 bps (65% probability of rate hike at the next meeting) 2027: 103 bps ECB: 35 bps (57% probability of no change at the next meeting) 2027: 83 bps BoC: 34 bps (58% probability of rate hike at the next meeting) 2027: 121 bps Fed: 33 bps (57% probability of rate hike at the next meeting) 2027: 73 bps RBNZ: 33 bps (60% probability of rate hike at the next meeting) 2027: 103 bps BoJ: 22 bps (65% probability of no change at the next meeting) 2027: 92 bps SNB: 11 bps (91% probability of no change...",
-      "source": "ForexLive",
-      "link": "https://investinglive.com/central-banks/how-have-interest-rate-expectations-changed-after-this-week-s-events-3/",
-      "time": "12:36",
-      "ts": 1789735004000,
-      "featured": false,
-      "lang": "en",
-      "date": "18 Sep",
-      "datetime": "2026-09-18T12:36:44+00:00",
-      "recent": false
-    },
-    {
-      "id": "e1210b055761",
-      "cur": "JPY",
-      "impact": "high",
-      "title": "BoJ Recap: Not as hawkish as expected",
-      "expand": "The Bank of Japan (BoJ) raised its short-term interest-rate target to 1.25% from 1.00% in a 7-2 vote, marking another step in the normalisation of monetary policy and widely matching what everyone has been expecting for weeks.",
-      "source": "FXStreet",
-      "link": "https://www.fxstreet.com/analysis/boj-recap-not-as-hawkish-as-expected-202609181233",
-      "time": "12:33",
-      "ts": 1789734790000,
-      "featured": false,
-      "lang": "en",
-      "date": "18 Sep",
-      "datetime": "2026-09-18T12:33:10+00:00",
-      "recent": false
-    },
-    {
-      "id": "ea3b77aef973",
-      "cur": "EUR",
-      "impact": "high",
-      "title": "ECB’s Lagarde Says Rates Will Not Move in Lockstep With Energy Prices",
-      "expand": "European Central Bank President Christine Lagarde, speaking at a news conference in Dublin on Friday, pushed back against expectations that soaring oil and gas prices would automatically produce an aggressive series of rate increases. Interest rates “do not move in lockstep with the price of energy,” she said, because the shock affects not only inflation [&#8230;] The post ECB’s Lagarde Says Rates Will Not Move in Lockstep With Energy Prices appeared first on ActionForex .",
-      "source": "ActionForex",
-      "link": "https://www.actionforex.com/live-comments/654638-ecbs-lagarde-says-rates-will-not-move-in-lockstep-with-energy-prices/",
-      "time": "12:32",
-      "ts": 1789734726000,
-      "featured": false,
-      "lang": "en",
-      "date": "18 Sep",
-      "datetime": "2026-09-18T12:32:06+00:00",
       "recent": false
     }
   ]
