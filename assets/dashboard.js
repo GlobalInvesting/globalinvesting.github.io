@@ -2312,6 +2312,7 @@ function _wireTickerTooltip(track) {
   const hide = () => { tip.classList.remove('tk-open'); tip.setAttribute('aria-hidden', 'true'); };
 
   track.addEventListener('mouseover', (e) => {
+    track.style.animationPlayState = 'paused';
     const el = e.target.closest('.ticker-item');
     if (!el || !track.contains(el)) return;
     const idx = parseInt(el.dataset.tkIdx, 10);
@@ -2353,10 +2354,8 @@ function _wireTickerTooltip(track) {
     });
   });
 
-  track.addEventListener('mouseout', (e) => {
-    const el = e.target.closest('.ticker-item');
-    if (!el) return;
-    if (e.relatedTarget && el.contains(e.relatedTarget)) return;
+  track.addEventListener('mouseleave', () => {
+    track.style.animationPlayState = 'running';
     hide();
   });
 
