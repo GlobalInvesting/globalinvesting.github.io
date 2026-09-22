@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-22T11:57:16Z",
+  "generatedAt": "2026-09-22T15:07:02Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 186,
+  "aliasCount": 187,
   "aliases": [
     {
       "currency": "EUR",
@@ -1587,55 +1587,55 @@
       }
     },
     {
-      "currency": "USD",
-      "primary_title": "Chicago Fed National Activity Index",
-      "secondary_title": "United States Chicago Fed National Activity Index",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-21",
-          "forecast_primary": 0.01,
-          "forecast_secondary": 0.2,
-          "actual_primary": -0.04,
-          "actual_secondary": -0.04,
-          "previous_primary": -0.08,
-          "previous_secondary": 0.08,
-          "actual_secondary_raw": "-0.04",
-          "forecast_secondary_raw": "0.2",
-          "previous_secondary_raw": "0.08"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-21",
-          "forecast_primary": 0.01,
-          "forecast_yahoo": null,
-          "actual_primary": -0.04,
-          "actual_yahoo": -0.04,
-          "previous_primary": -0.08,
-          "previous_yahoo": -0.08,
-          "actual_yahoo_raw": "-0.04",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.08"
-        }
-      },
-      "yahoo_title": "National Activity Index"
-    },
-    {
       "currency": "EUR",
       "primary_title": "Euro Area Consumer Confidence Index",
-      "secondary_title": "Euro Area Consumer Confidence Flash",
+      "secondary_title": "Euro Area Consumer Confidence Final",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-09-22",
-          "forecast_primary": -14.6,
-          "forecast_secondary": -17.0,
+          "dateISO": "2026-09-29",
+          "forecast_primary": -16.5,
+          "forecast_secondary": -16.5,
           "actual_primary": null,
           "actual_secondary": null,
-          "previous_primary": -15.5,
+          "previous_primary": -16.5,
           "previous_secondary": -15.5,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "-17",
+          "forecast_secondary_raw": "-16.5",
           "previous_secondary_raw": "-15.5"
         }
       }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Richmond Fed Manufacturing Index",
+      "secondary_title": "United States Richmond Fed Manufacturing Index",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-22",
+          "forecast_primary": null,
+          "forecast_secondary": 3.0,
+          "actual_primary": -2.0,
+          "actual_secondary": -2.0,
+          "previous_primary": null,
+          "previous_secondary": 4.0,
+          "actual_secondary_raw": "-2",
+          "forecast_secondary_raw": "3",
+          "previous_secondary_raw": "4"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-22",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": -2.0,
+          "actual_yahoo": -2.0,
+          "previous_primary": null,
+          "previous_yahoo": 4.0,
+          "actual_yahoo_raw": "-2",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "4"
+        }
+      },
+      "yahoo_title": "Rich Fed Comp. Index"
     },
     {
       "currency": "USD",
@@ -1646,34 +1646,28 @@
           "dateISO": "2026-09-22",
           "forecast_primary": null,
           "forecast_secondary": 9.0,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": -5.0,
+          "actual_secondary": -5.0,
           "previous_primary": 11.0,
           "previous_secondary": 11.0,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "-5",
           "forecast_secondary_raw": "9",
           "previous_secondary_raw": "11"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "Richmond Fed Services Revenues",
-      "secondary_title": "United States Richmond Fed Services Revenues Index",
-      "evidence": {
-        "secondary": {
+        },
+        "yahoo": {
           "dateISO": "2026-09-22",
-          "forecast_primary": -13.0,
-          "forecast_secondary": -6.0,
-          "actual_primary": null,
-          "actual_secondary": null,
-          "previous_primary": -8.0,
-          "previous_secondary": -8.0,
-          "actual_secondary_raw": null,
-          "forecast_secondary_raw": "-6",
-          "previous_secondary_raw": "-8"
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": -5.0,
+          "actual_yahoo": -5.0,
+          "previous_primary": 11.0,
+          "previous_yahoo": 11.0,
+          "actual_yahoo_raw": "-5",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "11"
         }
-      }
+      },
+      "yahoo_title": "Rich Fed Mfg Shipments"
     },
     {
       "currency": "EUR",
@@ -2242,6 +2236,44 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": null,
           "previous_secondary_raw": "0.4%"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Dallas Fed Services Revenues",
+      "secondary_title": "United States Dallas Fed Services Revenues Index",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 7.7,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 6.6,
+          "previous_secondary": 6.6,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "6.6"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Dallas Fed Services Business Activity",
+      "secondary_title": "United States Dallas Fed Services Index",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 0.1,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 4.2,
+          "previous_secondary": 4.2,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "4.2"
         }
       }
     },
@@ -2926,25 +2958,6 @@
           "actual_yahoo_raw": "4.6",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "4.2"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Existing Home Sales m/m",
-      "yahoo_title": "Exist. Home Sales % Chg",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-10",
-          "forecast_primary": 0.1,
-          "forecast_yahoo": null,
-          "actual_primary": -2.0,
-          "actual_yahoo": -2.0,
-          "previous_primary": -1.7,
-          "previous_yahoo": -1.7,
-          "actual_yahoo_raw": "-2",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-1.7"
         }
       }
     },
@@ -3914,6 +3927,25 @@
           "actual_yahoo_raw": "-0.1",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "0.2"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "Richmond Fed Services Revenues",
+      "yahoo_title": "Rich Fed, Services Index",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-22",
+          "forecast_primary": -13.0,
+          "forecast_yahoo": null,
+          "actual_primary": 0.0,
+          "actual_yahoo": 0.0,
+          "previous_primary": -8.0,
+          "previous_yahoo": -8.0,
+          "actual_yahoo_raw": "0",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-8"
         }
       }
     },
