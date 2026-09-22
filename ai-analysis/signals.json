@@ -1,51 +1,51 @@
 {
-  "generated_at": "2026-09-22T21:02:39Z",
+  "generated_at": "2026-09-22T23:38:45Z",
   "signals": [
     {
-      "time": "20:58",
+      "time": "23:36",
       "priority": "critical",
-      "title": "CHF/JPY — G10 Bilateral Theme + Policy Divergence",
-      "text": "CHF outperforms the G10 complex with a 1W average of +0.715% across 6 pairs, while JPY lags at −0.744% across 7 pairs, opening an extreme 1.460% bilateral spread that clears the critical threshold. CHF/JPY trades at 191.77, sustaining upward momentum despite an inverted SNB 0.00% vs BoJ 1.25% nominal rate spread that creates a 125bp carry penalty for holding CHF. Switzerland's Economic Surprise Index print of +22.1 confirms broad fundamental data outperformance versus JPY's +9.9, reinforcing the flow divergence. The outperformance continues even as SARON trades at −0.04% against TONA at 0.98%, showing structural demand overcoming nominal funding drag ahead of central bank events. Trade bias: Long CHF/JPY; momentum and domestic data beats overcome negative carry drag. Catalyst: SNB Interest Rate Decision on 24 Sep. Risk: SNB signals readiness to counter franc strength, triggering a sharp pullback toward 190.00.",
+      "title": "CHF/JPY — G10 Bilateral Theme + Oil Supply Shift",
+      "text": "CHF outperforms across the G10 board with a 1W average gain of +0.722% across 6 pairs, while JPY lags at −0.779% across 7 pairs, establishing a 1.502% leader-to-laggard divergence. The SNB holds policy at 0.00% versus the BoJ at 1.25%, creating a −125bp carry deficit for the franc, yet the pair continues to push to 191.851. Geopolitical reports of Iranian proposals to restore passage through the Strait of Hormuz have triggered crude declines, driving JPY volatility while failing to halt safe asset divergence. Swiss macro performance reinforces the trend, with the CHF Economic Surprise Index leading at +22.1 compared to JPY at +9.9. Trade bias: Bullish CHF/JPY, momentum continuation against negative carry. Catalyst: SNB Interest Rate Decision 24 Sep — hold priced. Risk: SNB signals readiness to counter franc strength, compressing the 1.502% spread.",
       "evidence": [
-        "CHF 1W avg: +0.715% (n=6)",
-        "JPY 1W avg: -0.744% (n=7)",
-        "G10 spread: 1.460%"
+        "CHF 1W avg: +0.722% (n=6)",
+        "JPY 1W avg: -0.779% (n=7)",
+        "G10 spread: 1.502%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:54",
+      "time": "23:33",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Long",
-      "text": "CFTC COT data shows Leveraged Funds net long 59,299 contracts in AUD (week ending Sep 15), printing at the 97th percentile of its 52-week range with a z-score of +2.11. Despite institutional positioning running in its upper decile alongside +10,920 WoW accumulation, AUD/USD trades at 0.7117, holding below its daily SMA20 at 0.7166 while remaining above the SMA50 at 0.7091. A 35bp policy carry advantage favors AUD via RBA 4.35% vs Fed 4.00%, yet the 25d Risk Reversal sits at −0.69, indicating options desks maintain a persistent put skew and demand downside protection. This combination of stretched institutional positioning, soft options skew, and immediate technical resistance signals late-trend exhaustion rather than breakout momentum. Trade bias: Neutral AUD/USD; crowded speculative longs cap immediate upside into moving-average resistance. Catalyst: Australia Employment Change on 23 Sep (01:30 UTC). Risk: Strong employment surprise forces a technical break above the SMA20 at 0.7166.",
+      "title": "USD/JPY — Options Downside Hedging vs Carry",
+      "text": "USD/JPY trades at 157.46, positioned above its SMA20 of 156.61 but below its SMA50 at 158.85 and SMA200 at 158.42. The 1M 25-delta risk reversal sits at −2.27, reflecting an extreme put skew that marks strong institutional demand for dollar downside protection. This hedging activity directly contradicts speculative positioning, where CFTC Leveraged Funds hold net long JPY positions of +20,069 contracts in the 95th percentile of the 52-week range after a massive +73,324 WoW surge. The SOFR-TONA carry spread delivers +287bp in favor of USD, keeping the spot rate supported despite options skew pricing sharp headline risk around geopolitical developments in Hormuz. Trade bias: Neutral USD/JPY, directional tension between +287bp carry and −2.27 put skew. Catalyst: BoJ Trimmed Mean Core CPI 23 Sep. Risk: Spot closes above the SMA50 at 158.85, forcing options put unwinds.",
+      "evidence": [
+        "USD/JPY 25d RR: -2.27",
+        "JPY COT LF net: +20,069 (pctl 95)",
+        "SOFR vs TONA: +287bp"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "23:31",
+      "priority": "warning",
+      "title": "AUD/USD — Crowded Long Positioning Confronts Slowing Growth",
+      "text": "AUD/USD trades at 0.7116, testing the band between its SMA50 at 0.7094 and SMA20 of 0.7164. CFTC Leveraged Funds sit net long +59,299 contracts, placing positioning at the 97th percentile of its 52-week distribution with a z-score of +2.11. Despite this institutional crowding, Australian flash PMI data slowed to a third-quarter low, introducing macro friction against the RBA's 4.35% policy stance. RBA-Fed carry still offers a +35bp AUD premium, but recent 5-day yield momentum has deteriorated by −12bp against the US curve. Trade bias: Bearish AUD/USD, crowded long liquidation risk. Catalyst: Australia Employment Report 23 Sep. Risk: Australian employment change prints well above the 29.2K forecast, renewing policy divergence.",
       "evidence": [
         "AUD COT LF net: +59,299 (pctl 97, z +2.11)",
-        "AUD/USD 25d RR: -0.69 put skew",
-        "AUD/USD: 0.7117 (SMA20: 0.7166)"
+        "AUD/USD SMA20/50: 0.7164 / 0.7094",
+        "Fed 4.0% vs RBA 4.35% — 35bp AUD carry premium"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "20:50",
-      "priority": "warning",
-      "title": "USD/JPY — Volatility Disconnect + Carry",
-      "text": "USD/JPY trades at 157.37, positioned above its SMA20 at 156.70 but capped beneath its SMA50 at 158.94 and SMA200 at 158.41. The Fed-BoJ carry spread provides structural insulation via SOFR at 3.85% vs TONA at 0.98%, delivering a +287bp carry advantage that favors USD. Saxo 1M options analytics show ATM implied volatility at 7.9% against a 30-day realized volatility of 9.7%, generating a negative volatility risk premium of −1.8% alongside a sharp 25d Risk Reversal put skew of −2.27. This options dynamic reveals acute demand for downside strike protection despite subdued spot volatility and stable carry dynamics. Traders are paying up for tail hedges against rapid unwinds even as VIX trades at 14.2 in a contained volatility regime. Trade bias: Long USD/JPY; carry advantage sustains spot while holding above the SMA20. Catalyst: BoJ Core CPI releases on 23 Sep (05:00 UTC). Risk: Disappointing US yields or BoJ inflation acceleration breaks spot below the SMA20 at 156.70.",
-      "evidence": [
-        "Fed 4.00% vs BoJ 1.25% — 275bp",
-        "USD/JPY IV 7.9% vs HV30 9.7% (VRP -1.8%)",
-        "USD/JPY 25d RR: -2.27 put skew"
-      ],
-      "_source": "engine-ai-primary"
-    },
-    {
-      "time": "20:46",
+      "time": "23:25",
       "priority": "info",
-      "title": "EUR/USD — Bear Flattener Pressure + Correlation Breakdown",
-      "text": "EUR/USD trades at 1.1452, firmly beneath its SMA20 at 1.1587, SMA50 at 1.1542, and SMA200 at 1.1631. The sovereign 2-year yield spread trades at −156bp in USD's favor, with 20-day momentum shifting 18bp further toward the US dollar while the Treasury curve remains locked in a bear flattener regime. CFTC data reflects net short Leveraged Funds positioning of −51,355 contracts at the 32nd percentile, indicating moderate institutional distribution without reaching historical oversold territory. The rolling 252-day correlation between EUR/USD and the EuroStoxx 50 has collapsed to +0.029 against its norm of +0.144 (z = −1.76σ), disconnecting equity sentiment from European currency pricing as hawkish ECB rhetoric absorbs energy shock inputs. Hawkish Bundesbank comments keep policy restrictive, but the 135bp Fed 4.00% vs ECB 2.65% policy spread continues to cap rallies. Trade bias: Bearish EUR/USD; monetary divergence and moving-average resistance limit recovery scope. Catalyst: Euro Area Flash PMIs on 23 Sep (08:00 UTC). Risk: Composite PMI print surprises above 52.5, triggering a short-covering squeeze toward 1.1542.",
+      "title": "EUR/USD — Bearish Technical Breakdown and Fed Policy Spread",
+      "text": "EUR/USD trades at 1.1451, establishing an intraday position below its SMA20 at 1.1576, SMA50 at 1.1542, and SMA200 at 1.1630. The Fed policy rate of 4.00% stands against the ECB at 2.65%, generating a 135bp nominal yield spread in favor of the dollar, while the SOFR-€STR differential provides USD with a +141bp carry advantage. The US 2-year yield spread over German Bunds sits at −156bp, widening by 18bp in favor of USD over the past 20 sessions. Persistent technical resistance across all major daily moving averages limits upward momentum, while German export concerns continue to weigh on the single currency. Trade bias: Bearish EUR/USD, structural yield disadvantage below moving average cluster. Catalyst: Eurozone Flash PMIs 23 Sep. Risk: Spot recovers and closes above the SMA50 at 1.1542, neutralizing immediate downside momentum.",
       "evidence": [
-        "Fed 4.00% vs ECB 2.65% — 135bp",
-        "DE-US 2Y spread: -156bp (20D Δ -18bp)",
-        "EUR/USD vs EuroStoxx: corr +0.029 (z -1.76σ)"
+        "EUR/USD: 1.1451 vs SMA20 1.1576 / SMA50 1.1542",
+        "Fed 4.00% vs ECB 2.65% — 135bp spread favors USD",
+        "SOFR vs €STR: +141bp"
       ],
       "_source": "engine-ai-primary"
     }
