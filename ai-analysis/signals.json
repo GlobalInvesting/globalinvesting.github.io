@@ -1,51 +1,63 @@
 {
-  "generated_at": "2026-09-22T07:01:44Z",
+  "generated_at": "2026-09-22T12:02:53Z",
   "signals": [
     {
-      "time": "06:58",
+      "time": "11:58",
       "priority": "critical",
-      "title": "CHF/JPY — G10 Bilateral Theme + Carry Deficit",
-      "text": "CHF posts a weekly average gain of +0.577% across 6 pairs while JPY weakens to −1.028% across 7 pairs, driving the G10 bilateral spread to 1.605%. CHF/JPY trades at 191.993, extending gains despite an inverted nominal policy rate gap where SNB sits at 0.00% versus BoJ at 1.25%, conferring a 125bp carry advantage to JPY. The outperformance is driven by macro fundamentals and safe-haven rotation, with Swiss data leading the G10 via an ESI of +22.1 compared to Japan's +9.9, alongside a real policy rate differential of +0.21% favoring CHF due to lower domestic inflation expectations. Options hedging remains heavily skewed against further JPY depreciation across crosses, as EUR/JPY 25d risk reversals sit at an extreme put skew of −1.98. Trade bias: Long CHF/JPY; structural momentum and Swiss economic resilience override nominal carry headwinds. Catalyst: SNB policy meeting 24 Sep — hold expected. Risk: A hawkish surprise from BoJ core CPI metrics or official verbal rhetoric triggers a rapid unwind of extended JPY short positions.",
+      "title": "CHF/JPY — G10 Bilateral Theme + Carry",
+      "text": "CHF/JPY trades at 191.78, up 0.22% on the session and anchoring the broader divergence between safe-haven strength and yen weakness. CHF 1W avg: +0.776% (n=6) leads G10 peers on sustained data beats, while JPY 1W avg: -0.681% (n=7) sits at the bottom of the scorecard amid persistent rate headwinds and declining oil prices. The G10 spread between the two extremes stands at 1.457%, surpassing the threshold for a major bilateral theme. SNB policy rate at 0.00% versus BoJ at 1.25% creates a -125bp carry deficit for CHF over JPY, yet the franc maintains its structural bid on an ESI index of +22.1 and positive real rate dynamics. Trade bias: Long CHF/JPY; bilateral divergence driven by franc strength and yen underperformance. Catalyst: SNB interest rate decision and monetary policy assessment on 24 September. Risk: SNB signals unexpected dovishness or negative real yield compression, sparking an aggressive unwind of franc longs.",
       "evidence": [
-        "CHF 1W avg: +0.577% (n=6)",
-        "JPY 1W avg: -1.028% (n=7)",
-        "G10 spread: 1.605%"
+        "CHF 1W avg: +0.776% (n=6)",
+        "JPY 1W avg: -0.681% (n=7)",
+        "G10 spread: 1.457%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:54",
-      "priority": "warning",
-      "title": "USD/JPY — Carry Premium + Options Downside Skew",
-      "text": "USD/JPY trades at 157.64, holding comfortably above its SMA20 of 156.70 while remaining below the SMA50 and SMA200 cluster at 158.94 and 158.41. The pair is supported by a 275bp policy rate buffer with the Fed at 4.00% versus BoJ at 1.25%, translating to a +287bp SOFR-TONA OIS carry advantage. However, the options market exhibits pronounced asymmetry: 1M 25d risk reversals print at −2.19, reflecting aggressive institutional demand for USD/JPY downside puts despite low equity volatility indicated by VIX at 14.9. Furthermore, 1M implied volatility at 8.2% trades 1.5 points below 30-day realized volatility of 9.7%, signaling negative vol risk premium and severe complacency. Speculative positioning shows leveraged funds building net longs to +20,069 contracts, reaching the 95th percentile of the 52-week historical range with a WoW inflow of +73,324. Trade bias: Neutral/tactical short USD/JPY; severe options downside skew and crowded futures positioning cap topside carry follow-through. Catalyst: BoJ Trimmed Mean Core CPI release at 05:00 UTC. Risk: A sustained breakout above the SMA50 at 158.94 invalidates the bearish hedging signal and resumes the structural carry trend.",
+      "time": "11:54",
+      "priority": "critical",
+      "title": "USD/JPY — Crowded Positioning + Options Skew",
+      "text": "USD/JPY changes hands at 157.12, holding above its SMA20 at 156.70 while remaining capped by the SMA50 at 158.94. The 25d risk reversal sits at -2.19, signalling an intense put skew where options market participants pay heavy premiums for downside protection. CFTC speculative net long positioning for JPY stands at +20,069 contracts with a 52-week percentile of 95 and a z-score of +1.57, showing crowded positioning that leaves the currency vulnerable to sharp reversals. SOFR at 3.85% versus TONA at 0.98% provides a robust +287bp carry advantage favoring the US dollar. VIX prints at 14.7 under normal volatility conditions, indicating that carry considerations dominate price action while safe-haven flows remain muted. Trade bias: Long USD/JPY; carry support holds the pair bid despite heavy options hedging. Catalyst: BoJ trimmed mean core CPI y/y on 23 September. Risk: VIX climbs above 25, triggering a rapid unwinding of crowded long positions.",
       "evidence": [
-        "Fed 4.00% vs BoJ 1.25% — 275bp",
-        "USD/JPY 25d RR: -2.19 (Saxo, 1M indicative mid)",
-        "USD/JPY VRP: -1.5% (IV 8.2% vs HV30 9.7%)"
+        "USD/JPY: 157.12",
+        "JPY COT LF net: +20,069 (pctl 95)",
+        "25d RR: -2.19"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:51",
+      "time": "11:50",
       "priority": "warning",
-      "title": "AUD/USD — Crowded Speculative Long + RBA Policy Differential",
-      "text": "AUD/USD trades at 0.7119, positioned below its SMA20 of 0.7166 but holding above its SMA50 at 0.7091 and SMA200 at 0.7017. CFTC data indicates leveraged fund net longs have expanded to +59,299 contracts, placing positioning in the 97th percentile of its 52-week range with a z-score of +2.11 after an inflow of +10,920 contracts WoW. Fundamental support stems from RBA cash rate at 4.35% versus Fed funds at 4.00%, securing a 35bp Australian carry premium and a +50bp AONIA-SOFR OIS spread. RBA Governor Bullock underscored this stance by emphasizing second-round inflation risks from elevated crude prices and geopolitical tensions, which aligns with robust domestic data reflected in an ESI of +18.3. However, with options risk reversals printing a modest put skew of −0.65 and 3-layer positioning reaching historical saturation, top-end extension is structurally constrained. Trade bias: Long AUD/USD; persistent rate advantage supports spot while crowded speculative longs limit near-term momentum. Catalyst: RBA policy meeting 29 Sep — hold expected. Risk: Australia employment report misses consensus of 29.2K, triggering a liquidation of stretched leveraged longs below the 0.7091 SMA50 support.",
+      "title": "AUD/USD — Positioning + VRP + Momentum",
+      "text": "AUD/USD trades at 0.7115, positioned above its SMA50 at 0.7091 and SMA200 at 0.7017, but dipping below its SMA20 at 0.7166. CFTC speculative positioning shows a net long of +59,299 contracts, placing the 52-week percentile at 97 with a z-score of +2.11, marking an extreme crowded long. Implied volatility at 6.4% against a realized 30-day volatility of 5.5% generates a positive volatility risk premium of +0.9%, showing options markets pricing steady upside protection. SOFR at 3.85% versus AONIA at 4.35% establishes a -50bp carry differential favoring the Australian dollar, reinforced by an ESI index of +18.3. Trade bias: Long AUD/USD; strong economic surprise index supports the elevated positioning despite near-term moving average resistance. Catalyst: Australia employment change and unemployment rate on 23 September. Risk: Employment data misses expectations, triggering a sharp long-unwind across crowded spec positions.",
       "evidence": [
-        "AUD COT LF net: +59,299 (pctl 97, z +2.11)",
-        "RBA 4.35% vs Fed 4.00% — -35bp",
-        "AUD/USD SMA cluster: SMA20 0.7166 / SMA50 0.7091"
+        "AUD/USD: 0.7115",
+        "AUD COT LF net: +59,299 (pctl 97)",
+        "VRP: +0.9%"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "06:46",
+      "time": "11:45",
       "priority": "warning",
-      "title": "NZD/USD — Retail Extreme + Policy Carry Disadvantage",
-      "text": "NZD/USD trades at 0.5743, pinned beneath its moving average resistance cluster with SMA20 at 0.5842, SMA50 at 0.5856, and SMA200 at 0.5855. Retail sentiment on Retail sentiment data displays an extreme contrarian bias with 87% of traders positioned long against 13% short, diverging directly from institutional leveraged funds who hold a net short position of −2,319 contracts. Macro headwinds remain substantial as the Fed's 4.00% policy rate maintains a 125bp carry advantage at 2.75%, generating a persistent 110bp drag via short-end yield differentials. The 2Y sovereign bond spread reflects this divergence, sitting at −89bp against US Treasuries following a 24bp narrowing in USD's favor over the trailing 20 sessions. This combination of structural carry deficit and retail crowding creates asymmetric vulnerability to downward continuation. Trade bias: Bearish NZD/USD; contrarian retail positioning extreme combined with negative policy carry favors retesting recent lows. Catalyst: RBNZ policy decision 28 Oct — hike bias priced. Risk: A coordinated recovery across broad risk assets drives spot back through the SMA20 barrier at 0.5842, triggering an unwind of institutional short hedges.",
+      "title": "EUR/USD — Late-Trend Caution + Vol Skew",
+      "text": "EUR/USD trades at 1.1467, lingering below its SMA20 at 1.1587, SMA50 at 1.1542, and SMA200 at 1.1631. The 1M ATM implied volatility rests at 4.7% against a 30-day realized volatility of 4.2%, producing a modest positive volatility risk premium of +0.5%. The 25-day risk reversal prints at -0.21, reflecting a near-neutral stance in the options market. CFTC speculative net positioning shows a net short of -51,355 contracts at the 32nd percentile of its 52-week range, with a four-week change of +24,680 contracts indicating steady short covering that contrasts with the softer spot price. SOFR at 3.85% versus €STR at 2.44% provides a +141bp carry advantage supporting the US dollar. Trade bias: Bearish EUR/USD; technical positioning below major moving averages limits recovery momentum. Catalyst: Germany and Euro Area S&P Global manufacturing and services PMIs on 23 September. Risk: PMI prints exceed expectations and spark a broader short-covering rally toward the SMA50.",
       "evidence": [
-        "NZD/USD Retail: 87% Long vs 13% Short",
-        "Fed 4.00% vs RBNZ 2.75% — 125bp",
-        "NZD/USD Technical: below SMA20 (0.5842) / SMA50 (0.5856)"
+        "EUR/USD: 1.1467",
+        "EUR COT LF net: -51,355 (pctl 32)",
+        "VRP: +0.5%"
+      ],
+      "_source": "engine-ai-primary"
+    },
+    {
+      "time": "11:40",
+      "priority": "info",
+      "title": "USD/CHF — Options Complacency + Valuation",
+      "text": "USD/CHF stands at 0.8193, holding above its SMA20 at 0.8127, SMA50 at 0.8109, and SMA200 at 0.7940. Implied volatility sits at 6.1% compared to a 30-day realized volatility of 7.3%, generating a negative volatility risk premium of -1.2% that highlights unusual complacency and thin options supply. CFTC speculative positioning registers a net short of -16,664 contracts for the Swiss franc at the 7th percentile of its 52-week range, indicating deeply entrenched franc shorts. SOFR at 3.85% against SARON at -0.04% maintains a wide +400bp carry advantage for the US dollar. Trade bias: Long USD/CHF; wide rate differential preserves upward momentum despite options market complacency. Catalyst: SNB interest rate decision and monetary policy assessment on 24 September. Risk: SNB surprises with hawkish policy guidance, triggering an immediate compression of USD/CHF toward the SMA20.",
+      "evidence": [
+        "USD/CHF: 0.8193",
+        "CHF COT LF net: -16,664 (pctl 7)",
+        "VRP: -1.2%"
       ],
       "_source": "engine-ai-primary"
     }
