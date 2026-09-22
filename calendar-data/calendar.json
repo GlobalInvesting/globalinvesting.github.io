@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-22T16:15:29Z",
-  "generatedAt": "2026-09-22T16:15:29Z",
+  "lastUpdate": "2026-09-22T16:17:23Z",
+  "generatedAt": "2026-09-22T16:17:23Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,23 +9,23 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-22",
   "rangeTo": "2026-10-06",
-  "totalEvents": 5460,
+  "totalEvents": 5538,
   "currencyCounts": {
-    "EUR": 1546,
-    "USD": 1694,
-    "CHF": 162,
-    "GBP": 544,
-    "CAD": 326,
-    "AUD": 323,
-    "JPY": 356,
-    "NZD": 143,
-    "SEK": 226,
-    "NOK": 140
+    "EUR": 1595,
+    "USD": 1700,
+    "CHF": 163,
+    "GBP": 548,
+    "CAD": 327,
+    "AUD": 327,
+    "JPY": 364,
+    "NZD": 144,
+    "SEK": 229,
+    "NOK": 141
   },
   "impactCounts": {
-    "medium": 2333,
-    "high": 1707,
-    "low": 1420
+    "medium": 2367,
+    "high": 1711,
+    "low": 1460
   },
   "surpriseStats": {
     "AUD/rba weighted median cpi mom": {
@@ -330,13 +330,13 @@
     },
     "EUR/germany retail sales yoy": {
       "n": 4,
-      "mean": -0.125,
-      "std": 1.890987
+      "mean": -0.9,
+      "std": 2.434475
     },
     "EUR/germany retail sales mom": {
       "n": 4,
-      "mean": -0.7,
-      "std": 2.193931
+      "mean": -1.55,
+      "std": 2.282542
     },
     "EUR/france inflation rate yoy": {
       "n": 3,
@@ -585,8 +585,8 @@
     },
     "EUR/france industrial production mom": {
       "n": 3,
-      "mean": 0.2,
-      "std": 0.360555
+      "mean": -0.133333,
+      "std": 0.404145
     },
     "EUR/italy retail sales mom": {
       "n": 4,
@@ -714,9 +714,9 @@
       "std": 0.11547
     },
     "EUR/france current account": {
-      "n": 2,
-      "mean": 1.35,
-      "std": 0.494975
+      "n": 3,
+      "mean": -0.066667,
+      "std": 2.478575
     },
     "NZD/business nz pmi": {
       "n": 2,
@@ -1304,7 +1304,7 @@
       "std": 0.707107
     },
     "EUR/gdp growth rate qoq": {
-      "n": 2,
+      "n": 3,
       "mean": 0.2,
       "std": 0.0
     },
@@ -1384,12 +1384,12 @@
       "std": 0.565685
     },
     "EUR/employment change yoy": {
-      "n": 2,
-      "mean": -0.05,
-      "std": 0.070711
+      "n": 3,
+      "mean": -0.033333,
+      "std": 0.057735
     },
     "EUR/employment change qoq": {
-      "n": 2,
+      "n": 3,
       "mean": 0.0,
       "std": 0.0
     },
@@ -50162,9 +50162,9 @@
       "flag": "🇪🇺",
       "event": "Germany Retail Sales m/m",
       "impact": "medium",
-      "actual": "0.0%",
+      "actual": "-3.4%",
       "forecast": "-0.4%",
-      "previous": "-0.3%"
+      "previous": "-1.1%"
     },
     {
       "date": "1 Sep",
@@ -50175,7 +50175,7 @@
       "flag": "🇪🇺",
       "event": "Germany Retail Sales y/y",
       "impact": "low",
-      "actual": "0.6%",
+      "actual": "-2.5%",
       "forecast": "0.7%",
       "previous": "-0.2%"
     },
@@ -51336,7 +51336,7 @@
       "flag": "🇪🇺",
       "event": "Italy New Car Registrations m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "-43.7%",
       "forecast": null,
       "previous": "-15.9%"
     },
@@ -51349,7 +51349,7 @@
       "flag": "🇪🇺",
       "event": "Italy New Car Registrations y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.2%",
       "forecast": null,
       "previous": "3.9%"
     },
@@ -53241,7 +53241,7 @@
       "impact": "medium",
       "actual": "2.5%",
       "forecast": "2.9%",
-      "previous": "-3.8%"
+      "previous": "3.1%"
     },
     {
       "date": "4 Sep",
@@ -53254,7 +53254,7 @@
       "impact": "medium",
       "actual": "13.1%",
       "forecast": "-2.7%",
-      "previous": "1.6%"
+      "previous": "6.5%"
     },
     {
       "date": "4 Sep",
@@ -54529,7 +54529,7 @@
       "impact": "medium",
       "actual": "-1.1%",
       "forecast": "-0.4%",
-      "previous": "0.4%"
+      "previous": "0.2%"
     },
     {
       "date": "7 Sep",
@@ -54542,7 +54542,7 @@
       "impact": "low",
       "actual": "-1.6%",
       "forecast": "-0.7%",
-      "previous": "-0.5%"
+      "previous": "-0.1%"
     },
     {
       "date": "7 Sep",
@@ -54790,6 +54790,71 @@
       "actual": "-3.1B",
       "forecast": "-2.9B",
       "previous": "-2.6B"
+    },
+    {
+      "date": "7 Sep",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area GDP q/q",
+      "impact": "medium",
+      "actual": "0.6%",
+      "forecast": "0.4%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "7 Sep",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area GDP y/y",
+      "impact": "medium",
+      "actual": "1.2%",
+      "forecast": "1.0%",
+      "previous": "1.0%"
+    },
+    {
+      "date": "7 Sep",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Employment Change q/q",
+      "impact": "low",
+      "actual": "0.1%",
+      "forecast": "0.1%",
+      "previous": "0.1%"
+    },
+    {
+      "date": "7 Sep",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Employment Change y/y",
+      "impact": "low",
+      "actual": "0.5%",
+      "forecast": "0.5%",
+      "previous": "0.5%"
+    },
+    {
+      "date": "7 Sep",
+      "dateISO": "2026-09-07",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Employment Level",
+      "impact": "medium",
+      "actual": "176.4482M",
+      "forecast": null,
+      "previous": "176.577M"
     },
     {
       "date": "7 Sep",
@@ -55579,7 +55644,7 @@
       "impact": "low",
       "actual": "-5.7%",
       "forecast": "-0.9%",
-      "previous": "1.2%"
+      "previous": "4.4%"
     },
     {
       "date": "8 Sep",
@@ -55592,7 +55657,7 @@
       "impact": "medium",
       "actual": "21.3B",
       "forecast": "16.3B",
-      "previous": "14.5B"
+      "previous": "15.4B"
     },
     {
       "date": "8 Sep",
@@ -55603,9 +55668,9 @@
       "flag": "🇪🇺",
       "event": "Germany Trade Balance n.s.a.",
       "impact": "low",
-      "actual": "22.1B",
+      "actual": "22.2B",
       "forecast": "15.4B",
-      "previous": "14.2B"
+      "previous": "18.8B"
     },
     {
       "date": "8 Sep",
@@ -55645,6 +55710,19 @@
       "actual": "-6.669B",
       "forecast": "-5.820B",
       "previous": "-5.847B"
+    },
+    {
+      "date": "8 Sep",
+      "dateISO": "2026-09-08",
+      "timeUTC": "06:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France Current Account",
+      "impact": "low",
+      "actual": "-4.7B",
+      "forecast": "-1.8B",
+      "previous": "-1.4B"
     },
     {
       "date": "8 Sep",
@@ -56110,9 +56188,9 @@
       "flag": "🇪🇺",
       "event": "France Industrial Production m/m",
       "impact": "low",
-      "actual": "-0.1%",
-      "forecast": "-0.6%",
-      "previous": "-0.1%"
+      "actual": "-0.4%",
+      "forecast": "0.1%",
+      "previous": "0.1%"
     },
     {
       "date": "9 Sep",
@@ -57424,8 +57502,8 @@
       "event": "Germany Current Account n.s.a.",
       "impact": "low",
       "actual": "21.2B",
-      "forecast": null,
-      "previous": null
+      "forecast": "12.6B",
+      "previous": "19.0B"
     },
     {
       "date": "11 Sep",
@@ -58791,19 +58869,6 @@
     {
       "date": "15 Sep",
       "dateISO": "2026-09-15",
-      "timeUTC": "06:45",
-      "country": "EUR",
-      "currency": "EUR",
-      "flag": "🇪🇺",
-      "event": "France Current Account",
-      "impact": "low",
-      "actual": null,
-      "forecast": null,
-      "previous": null
-    },
-    {
-      "date": "15 Sep",
-      "dateISO": "2026-09-15",
       "timeUTC": "07:00",
       "country": "EUR",
       "currency": "EUR",
@@ -59902,7 +59967,7 @@
       "impact": "low",
       "actual": "4.0%",
       "forecast": null,
-      "previous": null
+      "previous": "4.3%"
     },
     {
       "date": "16 Sep",
@@ -59915,7 +59980,7 @@
       "impact": "low",
       "actual": "0.7%",
       "forecast": null,
-      "previous": null
+      "previous": "1.6%"
     },
     {
       "date": "16 Sep",
@@ -66884,8 +66949,8 @@
       "event": "Japan Retail Sales m/m",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.8%",
+      "previous": "2.4%"
     },
     {
       "date": "29 Sep",
@@ -66897,8 +66962,8 @@
       "event": "Japan Retail Sales y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.0%",
+      "previous": "4.0%"
     },
     {
       "date": "29 Sep",
@@ -66910,8 +66975,8 @@
       "event": "Japan Large Retailer's Sales y/y",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.4%",
+      "previous": "1.4%"
     },
     {
       "date": "29 Sep",
@@ -66950,7 +67015,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "6.4%"
     },
     {
       "date": "29 Sep",
@@ -66963,7 +67028,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-4.2%"
     },
     {
       "date": "30 Sep",
@@ -66975,8 +67040,8 @@
       "event": "New Zealand ANZ Business Confidence",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "43.0",
+      "previous": "53.7"
     },
     {
       "date": "30 Sep",
@@ -66988,8 +67053,8 @@
       "event": "New Zealand ANZ Activity Outlook",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "55.7",
+      "previous": "48.2"
     },
     {
       "date": "30 Sep",
@@ -67014,8 +67079,8 @@
       "event": "Australia Building Approvals m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.6%",
+      "previous": "-3.6%"
     },
     {
       "date": "30 Sep",
@@ -67028,7 +67093,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-4.2%"
     },
     {
       "date": "30 Sep",
@@ -67041,7 +67106,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "0.5%"
     },
     {
       "date": "30 Sep",
@@ -67053,8 +67118,8 @@
       "event": "RBA Private Sector Credit m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.8%",
+      "previous": "0.6%"
     },
     {
       "date": "30 Sep",
@@ -67107,6 +67172,84 @@
       "actual": null,
       "forecast": "5.2%",
       "previous": "4.1%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Retail Sales m/m",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "-0.7%",
+      "previous": "-3.4%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Retail Sales y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "-1.3%",
+      "previous": "-2.5%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Import Price Index m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Import Price Index y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "6.8%",
+      "previous": "6.8%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Export Price Index m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.3%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Export Price Index y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "4.4%",
+      "previous": "4.2%"
     },
     {
       "date": "30 Sep",
@@ -67209,8 +67352,8 @@
       "event": "France CPI m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.4%",
+      "previous": "0.7%"
     },
     {
       "date": "30 Sep",
@@ -67222,8 +67365,8 @@
       "event": "France CPI y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "2.6%",
+      "previous": "2.4%"
     },
     {
       "date": "30 Sep",
@@ -67235,8 +67378,8 @@
       "event": "France HICP m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.5%",
+      "previous": "0.7%"
     },
     {
       "date": "30 Sep",
@@ -67248,8 +67391,8 @@
       "event": "France HICP y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.0%",
+      "previous": "2.6%"
     },
     {
       "date": "30 Sep",
@@ -67274,8 +67417,8 @@
       "event": "France PPI m/m",
       "impact": "low",
       "actual": null,
-      "forecast": "-0.7%",
-      "previous": "-0.4%"
+      "forecast": "-0.1%",
+      "previous": "1.1%"
     },
     {
       "date": "30 Sep",
@@ -67423,6 +67566,32 @@
     {
       "date": "30 Sep",
       "dateISO": "2026-09-30",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain Current Account",
+      "impact": "low",
+      "actual": null,
+      "forecast": "5.244B",
+      "previous": "2.410B"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "08:00",
+      "country": "NOK",
+      "currency": "NOK",
+      "flag": "🇳🇴",
+      "event": "Norges Bank Foreign Exchange Daily Purchase",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
       "timeUTC": "08:30",
       "country": "EUR",
       "currency": "EUR",
@@ -67560,8 +67729,8 @@
       "event": "Italy CPI m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.2%",
+      "previous": "0.5%"
     },
     {
       "date": "30 Sep",
@@ -67573,8 +67742,8 @@
       "event": "Italy CPI y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.3%",
+      "previous": "3.3%"
     },
     {
       "date": "30 Sep",
@@ -67586,8 +67755,8 @@
       "event": "Italy HICP m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.2%",
+      "previous": "0.1%"
     },
     {
       "date": "30 Sep",
@@ -67599,8 +67768,8 @@
       "event": "Italy HICP y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.5%",
+      "previous": "3.2%"
     },
     {
       "date": "30 Sep",
@@ -67626,7 +67795,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.39%"
     },
     {
       "date": "30 Sep",
@@ -67709,6 +67878,58 @@
     {
       "date": "30 Sep",
       "dateISO": "2026-09-30",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany CPI m/m",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "0.5%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany CPI y/y",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.7%",
+      "previous": "2.9%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany HICP m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "-0.2%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "12:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany HICP y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "3.1%",
+      "previous": "2.9%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
       "timeUTC": "12:15",
       "country": "USD",
       "currency": "USD",
@@ -67716,8 +67937,8 @@
       "event": "United States ADP Nonfarm Employment Change",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "41K",
+      "previous": "38K"
     },
     {
       "date": "30 Sep",
@@ -67729,8 +67950,8 @@
       "event": "United States Wholesale Inventories m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.9%",
+      "previous": "1.3%"
     },
     {
       "date": "30 Sep",
@@ -67755,8 +67976,8 @@
       "event": "United States Retail Inventories m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.8%",
+      "previous": "0.8%"
     },
     {
       "date": "30 Sep",
@@ -67769,7 +67990,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "0.8%"
     },
     {
       "date": "30 Sep",
@@ -68112,6 +68333,32 @@
     {
       "date": "30 Sep",
       "dateISO": "2026-09-30",
+      "timeUTC": "21:45",
+      "country": "NZD",
+      "currency": "NZD",
+      "flag": "🇳🇿",
+      "event": "New Zealand Building Consents m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.8%",
+      "previous": "-4.3%"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
+      "timeUTC": "23:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia S&P Global Manufacturing PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": "51.4",
+      "previous": "52.0"
+    },
+    {
+      "date": "30 Sep",
+      "dateISO": "2026-09-30",
       "timeUTC": "23:50",
       "country": "JPY",
       "currency": "JPY",
@@ -68263,7 +68510,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "1082.9B"
     },
     {
       "date": "30 Sep",
@@ -68276,7 +68523,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-1522.8B"
     },
     {
       "date": "1 Oct",
@@ -68290,6 +68537,19 @@
       "actual": null,
       "forecast": "54",
       "previous": "55.4"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan au Jibun Bank Manufacturing PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": "55.4",
+      "previous": "55.1"
     },
     {
       "date": "1 Oct",
@@ -68315,7 +68575,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-3.3%"
     },
     {
       "date": "1 Oct",
@@ -68328,7 +68588,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-2.5%"
     },
     {
       "date": "1 Oct",
@@ -68340,8 +68600,8 @@
       "event": "Australia Trade Balance",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-0.245B",
+      "previous": "1.923B"
     },
     {
       "date": "1 Oct",
@@ -68379,8 +68639,8 @@
       "event": "RBA Index of Commodity Prices y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "17.2%",
+      "previous": "15.5%"
     },
     {
       "date": "1 Oct",
@@ -68392,8 +68652,8 @@
       "event": "Switzerland CPI m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.3%",
+      "previous": "0.4%"
     },
     {
       "date": "1 Oct",
@@ -68405,8 +68665,34 @@
       "event": "Switzerland CPI y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.0%",
+      "previous": "0.8%"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "06:30",
+      "country": "CHF",
+      "currency": "CHF",
+      "flag": "🇨🇭",
+      "event": "Switzerland Retail Sales y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "1.6%",
+      "previous": "2.3%"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "06:30",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Silf/Swedbank Manufacturing PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": "56.6",
+      "previous": "56.1"
     },
     {
       "date": "1 Oct",
@@ -68419,7 +68705,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-25.6%"
     },
     {
       "date": "1 Oct",
@@ -68432,7 +68718,20 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "7.4%"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "07:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain S&P Global Manufacturing PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "48.6",
+      "previous": "49.5"
     },
     {
       "date": "1 Oct",
@@ -68444,8 +68743,8 @@
       "event": "Switzerland procure.ch Manufacturing PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "52.2",
+      "previous": "57.1"
     },
     {
       "date": "1 Oct",
@@ -68476,6 +68775,45 @@
     {
       "date": "1 Oct",
       "dateISO": "2026-10-01",
+      "timeUTC": "07:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy S&P Global Manufacturing PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "51.1",
+      "previous": "49.6"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "07:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France S&P Global Manufacturing PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "07:55",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany S&P Global Manufacturing PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
@@ -68496,6 +68834,32 @@
       "event": "Italy Unemployment Rate",
       "impact": "low",
       "actual": null,
+      "forecast": "6.0%",
+      "previous": "5.8%"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area S&P Global Manufacturing PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom S&P Global/CIPS Manufacturing PMI",
+      "impact": "medium",
+      "actual": null,
       "forecast": null,
       "previous": null
     },
@@ -68510,7 +68874,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.079%"
     },
     {
       "date": "1 Oct",
@@ -68523,7 +68887,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.255%"
     },
     {
       "date": "1 Oct",
@@ -68536,7 +68900,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.796%"
     },
     {
       "date": "1 Oct",
@@ -68549,7 +68913,20 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "4.230%"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Unemployment Rate",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "6.5%",
+      "previous": "6.4%"
     },
     {
       "date": "1 Oct",
@@ -68606,6 +68983,84 @@
     {
       "date": "1 Oct",
       "dateISO": "2026-10-01",
+      "timeUTC": "12:00",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "BoE MPC Member Mann Speech",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims",
+      "impact": "high",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Continuing Jobless Claims",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "12:30",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States Initial Jobless Claims 4-Week Average",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "13:30",
+      "country": "CAD",
+      "currency": "CAD",
+      "flag": "🇨🇦",
+      "event": "Canada S&P Global Manufacturing PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": "51.8",
+      "previous": "53.0"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States S&P Global Manufacturing PMI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "52.6",
+      "previous": "53.9"
+    },
+    {
+      "date": "1 Oct",
+      "dateISO": "2026-10-01",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
@@ -68613,8 +69068,8 @@
       "event": "United States ISM Manufacturing PMI",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "56.0",
+      "previous": "54.6"
     },
     {
       "date": "1 Oct",
@@ -68626,8 +69081,8 @@
       "event": "United States ISM Manufacturing Prices Paid",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "76.3",
+      "previous": "71.1"
     },
     {
       "date": "1 Oct",
@@ -68639,8 +69094,8 @@
       "event": "United States ISM Manufacturing Employment",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "52.0",
+      "previous": "51.2"
     },
     {
       "date": "1 Oct",
@@ -68652,8 +69107,8 @@
       "event": "United States ISM Manufacturing New Orders",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "56.4",
+      "previous": "53.7"
     },
     {
       "date": "1 Oct",
@@ -68665,8 +69120,8 @@
       "event": "United States Construction Spending m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-0.3%",
+      "previous": "-0.5%"
     },
     {
       "date": "1 Oct",
@@ -68692,7 +69147,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.820%"
     },
     {
       "date": "1 Oct",
@@ -68705,7 +69160,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.920%"
     },
     {
       "date": "1 Oct",
@@ -68718,7 +69173,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-43.7%"
     },
     {
       "date": "1 Oct",
@@ -68731,7 +69186,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.2%"
     },
     {
       "date": "1 Oct",
@@ -68743,8 +69198,8 @@
       "event": "Japan Tokyo CPI y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.9%",
+      "previous": "1.9%"
     },
     {
       "date": "1 Oct",
@@ -68756,8 +69211,8 @@
       "event": "Japan Tokyo CPI excl. Food and Energy y/y",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "2.3%",
+      "previous": "2.0%"
     },
     {
       "date": "1 Oct",
@@ -68769,8 +69224,8 @@
       "event": "Japan Tokyo Core CPI y/y",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.9%",
+      "previous": "1.8%"
     },
     {
       "date": "1 Oct",
@@ -68783,7 +69238,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "0.2%"
     },
     {
       "date": "1 Oct",
@@ -68808,8 +69263,8 @@
       "event": "Japan Jobs to Applicants Ratio",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.19",
+      "previous": "1.18"
     },
     {
       "date": "1 Oct",
@@ -68821,8 +69276,8 @@
       "event": "BoJ Monetary Base y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-14.8%",
+      "previous": "-15.7%"
     },
     {
       "date": "2 Oct",
@@ -68925,8 +69380,8 @@
       "event": "Spain Unemployment Change",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "6.847K",
+      "previous": "44.419K"
     },
     {
       "date": "2 Oct",
@@ -68938,8 +69393,8 @@
       "event": "Italy Retail Sales m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.4%",
+      "previous": "-0.4%"
     },
     {
       "date": "2 Oct",
@@ -68951,8 +69406,8 @@
       "event": "Italy Retail Sales y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "1.9%",
+      "previous": "0.8%"
     },
     {
       "date": "2 Oct",
@@ -69009,6 +69464,110 @@
     {
       "date": "2 Oct",
       "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Core CPI m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.2%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI m/m",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "4.2%",
+      "previous": "0.4%"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Core CPI y/y",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "2.4%",
+      "previous": "2.4%"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI y/y",
+      "impact": "high",
+      "actual": null,
+      "forecast": "3.0%",
+      "previous": "3.2%"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI excl. Energy and Unprocessed Food m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "0.2%"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI excl. Energy and Unprocessed Food y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "2.2%",
+      "previous": "2.1%"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area CPI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": "103.69"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Core CPI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "103.06"
+    },
+    {
+      "date": "2 Oct",
+      "dateISO": "2026-10-02",
       "timeUTC": "12:30",
       "country": "USD",
       "currency": "USD",
@@ -69016,8 +69575,8 @@
       "event": "United States Unemployment Rate",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "4.1%",
+      "previous": "4.1%"
     },
     {
       "date": "2 Oct",
@@ -69029,8 +69588,8 @@
       "event": "United States Nonfarm Payrolls",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "52K",
+      "previous": "162K"
     },
     {
       "date": "2 Oct",
@@ -69042,8 +69601,8 @@
       "event": "United States Participation Rate",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "61.7%",
+      "previous": "61.6%"
     },
     {
       "date": "2 Oct",
@@ -69055,8 +69614,8 @@
       "event": "United States Average Hourly Earnings m/m",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.3%",
+      "previous": "0.3%"
     },
     {
       "date": "2 Oct",
@@ -69068,8 +69627,8 @@
       "event": "United States Average Hourly Earnings y/y",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.3%",
+      "previous": "3.1%"
     },
     {
       "date": "2 Oct",
@@ -69081,8 +69640,8 @@
       "event": "United States Average Weekly Hours",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "34.3",
+      "previous": "34.4"
     },
     {
       "date": "2 Oct",
@@ -69094,8 +69653,8 @@
       "event": "United States Government Payrolls",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0K",
+      "previous": "35K"
     },
     {
       "date": "2 Oct",
@@ -69107,8 +69666,8 @@
       "event": "United States Private Nonfarm Payrolls",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "49K",
+      "previous": "127K"
     },
     {
       "date": "2 Oct",
@@ -69120,8 +69679,8 @@
       "event": "United States U6 Unemployment Rate",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "7.5%",
+      "previous": "7.7%"
     },
     {
       "date": "2 Oct",
@@ -69133,8 +69692,8 @@
       "event": "United States Manufacturing Payrolls",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0K",
+      "previous": "16K"
     },
     {
       "date": "2 Oct",
@@ -69146,8 +69705,8 @@
       "event": "United States Factory Orders m/m",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-0.2%",
+      "previous": "0.9%"
     },
     {
       "date": "2 Oct",
@@ -69159,8 +69718,8 @@
       "event": "United States Factory Orders excl. Transportation m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-0.1%",
+      "previous": "0.6%"
     },
     {
       "date": "2 Oct",
@@ -69462,6 +70021,32 @@
       "previous": null
     },
     {
+      "date": "4 Oct",
+      "dateISO": "2026-10-04",
+      "timeUTC": "22:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia S&P Global Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "51.9",
+      "previous": "53.2"
+    },
+    {
+      "date": "4 Oct",
+      "dateISO": "2026-10-04",
+      "timeUTC": "22:00",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia S&P Global Composite PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "52.7"
+    },
+    {
       "date": "5 Oct",
       "dateISO": "2026-10-05",
       "timeUTC": "00:00",
@@ -69471,8 +70056,8 @@
       "event": "New Zealand ANZ Commodity Price Index m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "0.2%",
+      "previous": "-0.4%"
     },
     {
       "date": "5 Oct",
@@ -69486,6 +70071,32 @@
       "actual": null,
       "forecast": "53.6",
       "previous": "55.4"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan au Jibun Bank Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "51.7",
+      "previous": "52.5"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan au Jibun Bank Composite PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": "53.5"
     },
     {
       "date": "5 Oct",
@@ -69516,6 +70127,149 @@
     {
       "date": "5 Oct",
       "dateISO": "2026-10-05",
+      "timeUTC": "05:00",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Consumer Confidence Index",
+      "impact": "low",
+      "actual": null,
+      "forecast": "37.0",
+      "previous": "35.5"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "06:30",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Silf/Swedbank Services PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": "57.8",
+      "previous": "55.8"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "06:30",
+      "country": "SEK",
+      "currency": "SEK",
+      "flag": "🇸🇪",
+      "event": "Sweden Silf/Swedbank Composite PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": "55.9"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain S&P Global Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "57.1",
+      "previous": "57.8"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:15",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Spain S&P Global Composite PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": "55.8"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy S&P Global Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "54.1",
+      "previous": "55.2"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:45",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Italy S&P Global Composite PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": "53.6"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France S&P Global Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France S&P Global Composite PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:55",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany S&P Global Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "07:55",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany S&P Global Composite PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
       "timeUTC": "08:00",
       "country": "EUR",
       "currency": "EUR",
@@ -69530,6 +70284,32 @@
       "date": "5 Oct",
       "dateISO": "2026-10-05",
       "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area S&P Global Services PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "08:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area S&P Global Composite PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "08:00",
       "country": "GBP",
       "currency": "GBP",
       "flag": "🇬🇧",
@@ -69537,7 +70317,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-39.8%"
     },
     {
       "date": "5 Oct",
@@ -69550,7 +70330,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "13.7%"
     },
     {
       "date": "5 Oct",
@@ -69575,8 +70355,60 @@
       "event": "Euro Area Sentix Investor Confidence",
       "impact": "low",
       "actual": null,
+      "forecast": "-4.3",
+      "previous": "5.1"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom S&P Global/CIPS Services PMI",
+      "impact": "medium",
+      "actual": null,
       "forecast": null,
       "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "08:30",
+      "country": "GBP",
+      "currency": "GBP",
+      "flag": "🇬🇧",
+      "event": "United Kingdom S&P Global/CIPS Composite PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area PPI m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "1.6%"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area PPI y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "6.6%",
+      "previous": "5.8%"
     },
     {
       "date": "5 Oct",
@@ -69588,8 +70420,8 @@
       "event": "Norway HPI y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.1%",
+      "previous": "2.6%"
     },
     {
       "date": "5 Oct",
@@ -69602,7 +70434,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "2.1%"
     },
     {
       "date": "5 Oct",
@@ -69615,7 +70447,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "0.8%"
     },
     {
       "date": "5 Oct",
@@ -69628,7 +70460,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-20.7%"
     },
     {
       "date": "5 Oct",
@@ -69641,7 +70473,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "2.6%"
     },
     {
       "date": "5 Oct",
@@ -69666,6 +70498,45 @@
       "event": "Spain Consumer Confidence",
       "impact": "low",
       "actual": null,
+      "forecast": "77.4",
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "12:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France 3-Month BTF Auction",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "12:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France 6-Month BTF Auction",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": null
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "12:50",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "France 12-Month BTF Auction",
+      "impact": "low",
+      "actual": null,
       "forecast": null,
       "previous": null
     },
@@ -69685,6 +70556,32 @@
     {
       "date": "5 Oct",
       "dateISO": "2026-10-05",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States S&P Global Services PMI",
+      "impact": "high",
+      "actual": null,
+      "forecast": "58.0",
+      "previous": "56.5"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
+      "timeUTC": "13:45",
+      "country": "USD",
+      "currency": "USD",
+      "flag": "🇺🇸",
+      "event": "United States S&P Global Composite PMI",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "56.8",
+      "previous": "56.0"
+    },
+    {
+      "date": "5 Oct",
+      "dateISO": "2026-10-05",
       "timeUTC": "14:00",
       "country": "USD",
       "currency": "USD",
@@ -69692,8 +70589,8 @@
       "event": "United States CB Employment Trends Index",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "108.66",
+      "previous": "108.53"
     },
     {
       "date": "5 Oct",
@@ -69705,8 +70602,8 @@
       "event": "United States ISM Non-Manufacturing PMI",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "54.7",
+      "previous": "55.4"
     },
     {
       "date": "5 Oct",
@@ -69718,8 +70615,8 @@
       "event": "United States ISM Non-Manufacturing Employment",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "48.3",
+      "previous": "47.8"
     },
     {
       "date": "5 Oct",
@@ -69731,8 +70628,8 @@
       "event": "United States ISM Non-Manufacturing New Orders",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "57.7",
+      "previous": "60.9"
     },
     {
       "date": "5 Oct",
@@ -69744,8 +70641,8 @@
       "event": "United States ISM Non-Manufacturing Prices Paid",
       "impact": "high",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "76.9",
+      "previous": "72.6"
     },
     {
       "date": "5 Oct",
@@ -69757,8 +70654,8 @@
       "event": "United States ISM Non-Manufacturing Business Activity",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "58.3",
+      "previous": "61.7"
     },
     {
       "date": "5 Oct",
@@ -69822,8 +70719,21 @@
       "event": "Australia ANZ Job Advertisements m/m",
       "impact": "low",
       "actual": null,
+      "forecast": "-0.5%",
+      "previous": "2.5%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "03:35",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan 10-Year JGB Auction",
+      "impact": "medium",
+      "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "2.995%"
     },
     {
       "date": "6 Oct",
@@ -69835,8 +70745,8 @@
       "event": "Switzerland Unemployment Rate",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.1%",
+      "previous": "3.1%"
     },
     {
       "date": "6 Oct",
@@ -69848,8 +70758,34 @@
       "event": "Switzerland Unemployment Rate n.s.a.",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "3.1%",
+      "previous": "3.0%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Factory Orders m/m",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "3.7%",
+      "previous": "2.5%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "06:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Germany Factory Orders y/y",
+      "impact": "medium",
+      "actual": null,
+      "forecast": "17.7%",
+      "previous": "13.1%"
     },
     {
       "date": "6 Oct",
@@ -69861,8 +70797,8 @@
       "event": "France Industrial Production m/m",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-0.1%",
+      "previous": "-0.4%"
     },
     {
       "date": "6 Oct",
@@ -69875,7 +70811,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-145.9B"
     },
     {
       "date": "6 Oct",
@@ -69939,8 +70875,8 @@
       "event": "Spain Industrial Production y/y",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "2.4%",
+      "previous": "2.3%"
     },
     {
       "date": "6 Oct",
@@ -69966,7 +70902,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "2.623%"
     },
     {
       "date": "6 Oct",
@@ -69979,7 +70915,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "2.832%"
     },
     {
       "date": "6 Oct",
@@ -69997,6 +70933,32 @@
     {
       "date": "6 Oct",
       "dateISO": "2026-10-06",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Retail Sales m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "-0.1%",
+      "previous": "-0.6%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "09:00",
+      "country": "EUR",
+      "currency": "EUR",
+      "flag": "🇪🇺",
+      "event": "Euro Area Retail Sales y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "1.2%",
+      "previous": "0.6%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
       "timeUTC": "09:30",
       "country": "EUR",
       "currency": "EUR",
@@ -70005,7 +70967,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "3.27%"
     },
     {
       "date": "6 Oct",
@@ -70075,6 +71037,19 @@
     {
       "date": "6 Oct",
       "dateISO": "2026-10-06",
+      "timeUTC": "10:30",
+      "country": "AUD",
+      "currency": "AUD",
+      "flag": "🇦🇺",
+      "event": "Australia Westpac-MI Consumer Sentiment m/m",
+      "impact": "low",
+      "actual": null,
+      "forecast": "3.0%",
+      "previous": "6.0%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
       "timeUTC": "12:30",
       "country": "CAD",
       "currency": "CAD",
@@ -70083,7 +71058,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "75.368B"
     },
     {
       "date": "6 Oct",
@@ -70096,7 +71071,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "76.137B"
     },
     {
       "date": "6 Oct",
@@ -70108,8 +71083,8 @@
       "event": "Canada Trade Balance",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-2.971B",
+      "previous": "0.769B"
     },
     {
       "date": "6 Oct",
@@ -70121,8 +71096,8 @@
       "event": "United States Trade Balance",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-81.515B",
+      "previous": "-88.576B"
     },
     {
       "date": "6 Oct",
@@ -70135,7 +71110,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "310.723B"
     },
     {
       "date": "6 Oct",
@@ -70148,7 +71123,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "399.299B"
     },
     {
       "date": "6 Oct",
@@ -70160,8 +71135,8 @@
       "event": "Canada Ivey PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "56.2",
+      "previous": "64.3"
     },
     {
       "date": "6 Oct",
@@ -70174,7 +71149,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "62.7"
     },
     {
       "date": "6 Oct",
@@ -70186,8 +71161,8 @@
       "event": "New Zealand GDT Price Index",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "-0.2%",
+      "previous": "-1.1%"
     },
     {
       "date": "6 Oct",
@@ -70213,7 +71188,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "4.474%"
     },
     {
       "date": "6 Oct",
@@ -70226,7 +71201,7 @@
       "impact": "medium",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-3.5"
     },
     {
       "date": "6 Oct",
@@ -70239,7 +71214,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-16.6"
     },
     {
       "date": "6 Oct",
@@ -70252,7 +71227,46 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "-6.9"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Labor Cash Earnings y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "2.8%",
+      "previous": "4.7%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Overtime Pay y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "2.5%",
+      "previous": "3.1%"
+    },
+    {
+      "date": "6 Oct",
+      "dateISO": "2026-10-06",
+      "timeUTC": "23:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan Real Wage y/y",
+      "impact": "low",
+      "actual": null,
+      "forecast": "0.0%",
+      "previous": "2.4%"
     },
     {
       "date": "6 Oct",
@@ -70265,7 +71279,7 @@
       "impact": "low",
       "actual": null,
       "forecast": null,
-      "previous": null
+      "previous": "1207.5B"
     }
   ]
 }
