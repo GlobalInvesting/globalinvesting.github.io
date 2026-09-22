@@ -2311,7 +2311,18 @@ function _wireTickerTooltip(track) {
 
   const hide = () => { tip.classList.remove('tk-open'); tip.setAttribute('aria-hidden', 'true'); };
 
+  let closeTimer = null;
+  const cancelClose = () => { if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; } };
+  const scheduleClose = () => {
+    cancelClose();
+    closeTimer = setTimeout(() => {
+      track.style.animationPlayState = 'running';
+      hide();
+    }, 150);
+  };
+
   track.addEventListener('mouseover', (e) => {
+    cancelClose();
     track.style.animationPlayState = 'paused';
     const el = e.target.closest('.ticker-item');
     if (!el || !track.contains(el)) return;
@@ -2354,19 +2365,19 @@ function _wireTickerTooltip(track) {
     });
   });
 
-  track.addEventListener('mouseleave', (e) => {
-    if (tip.contains(e.relatedTarget)) return;
-    track.style.animationPlayState = 'running';
-    hide();
+  track.addEventListener('mouseleave', () => {
+    scheduleClose();
   });
 
-  tip.addEventListener('mouseleave', (e) => {
-    if (track.contains(e.relatedTarget)) return;
-    track.style.animationPlayState = 'running';
-    hide();
+  tip.addEventListener('mouseenter', () => {
+    cancelClose();
   });
 
-  window.addEventListener('scroll', hide, true);
+  tip.addEventListener('mouseleave', () => {
+    scheduleClose();
+  });
+
+  window.addEventListener('scroll', () => { cancelClose(); track.style.animationPlayState = 'running'; hide(); }, true);
 }
 
 const QB_STOOQ_PAIRS = [
