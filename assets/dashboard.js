@@ -2252,14 +2252,18 @@ function buildNewsTicker(items) {
   if (!track || !items.length) return;
 
   const src = items.slice(0, 15);
-  const makeItem = item => {
+  window._tickerItemsData = src;
+  const makeItem = (item, i) => {
     const cur   = item.cur || item.currency || '';
     const title = item.title || '';
     const short = title.length > 90 ? title.slice(0, 87) + '\u2026' : title;
-    return '<span class="ticker-item">' + (cur ? '<span class="t-tag">' + cur + '</span> \u00b7 ' : '') + short + '</span>';
+    return '<span class="ticker-item" data-tk-idx="' + i + '">' +
+      (cur ? '<span class="t-tag">' + giEscHtml(cur) + '</span> \u00b7 ' : '') +
+      giEscHtml(short) + '</span>';
   };
 
   track.innerHTML = src.map(makeItem).join('') + src.map(makeItem).join('');
+  _wireTickerTooltip(track);
 
   track.style.animation = 'none';
   track.style.transform = 'translateX(0)';
@@ -2296,6 +2300,67 @@ function buildNewsTicker(items) {
       window._tickerRO.observe(track.parentElement);
     });
   });
+}
+
+function _wireTickerTooltip(track) {
+  if (track.dataset.tkWired) return;
+  track.dataset.tkWired = '1';
+
+  const tip = document.getElementById('ticker-tooltip');
+  if (!tip) return;
+
+  const hide = () => { tip.classList.remove('tk-open'); tip.setAttribute('aria-hidden', 'true'); };
+
+  track.addEventListener('mouseover', (e) => {
+    const el = e.target.closest('.ticker-item');
+    if (!el || !track.contains(el)) return;
+    const idx = parseInt(el.dataset.tkIdx, 10);
+    const item = (window._tickerItemsData || [])[idx];
+    if (!item) return;
+
+    const cur    = item.cur || item.currency || '';
+    const title  = item.title || '';
+    const body   = item.expand || '';
+    const source = item.source || '';
+    const time   = item.date ? (item.date + (item.time ? ' \u00b7 ' + item.time : '')) : (item.time || '');
+    const link   = (item.link || '').startsWith('https://') ? item.link : '';
+
+    tip.innerHTML =
+      '<div class="tk-tt-head">' +
+        '<span class="tk-tt-src">' + (source ? giEscHtml(source) : 'Noticias') + '</span>' +
+        (time ? '<span class="tk-tt-time">' + giEscHtml(time) + '</span>' : '') +
+      '</div>' +
+      '<div class="tk-tt-title">' + giEscHtml(title) + '</div>' +
+      (body ? '<div class="tk-tt-body">' + giEscHtml(body) + '</div>' : '') +
+      (cur ? '<span class="tk-tt-cur">' + giEscHtml(cur) + '</span>' : '') +
+      (link ? '<a class="tk-tt-link" href="' + link + '" target="_blank" rel="noopener noreferrer">Leer nota completa \u2192</a>' : '');
+
+    const r = el.getBoundingClientRect();
+    const tw = 340;
+    let left = Math.min(r.left, window.innerWidth - tw - 12);
+    left = Math.max(12, left);
+    let top = r.bottom + 6;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.classList.add('tk-open');
+    tip.setAttribute('aria-hidden', 'false');
+
+    requestAnimationFrame(() => {
+      const th = tip.getBoundingClientRect().height;
+      if (top + th > window.innerHeight - 8) {
+        tip.style.top = Math.max(8, r.top - th - 6) + 'px';
+      }
+    });
+  });
+
+  track.addEventListener('mouseout', (e) => {
+    const el = e.target.closest('.ticker-item');
+    if (!el) return;
+    if (e.relatedTarget && el.contains(e.relatedTarget)) return;
+    hide();
+  });
+
+  window.addEventListener('scroll', hide, true);
 }
 
 const QB_STOOQ_PAIRS = [
