@@ -84,6 +84,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           cp news-data/news.json /tmp/news_fresh.json
+          cp news-data/news-first-seen.json /tmp/news_first_seen_fresh.json
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M UTC')
 
           for i in 1 2 3 4 5; do
@@ -91,7 +92,8 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             cp /tmp/news_fresh.json news-data/news.json
-            git add news-data/news.json
+            cp /tmp/news_first_seen_fresh.json news-data/news-first-seen.json
+            git add news-data/news.json news-data/news-first-seen.json
             if git diff --staged --quiet; then
               echo "Sin cambios vs remote HEAD — skipping commit."
               echo "pushed=false" >> "$GITHUB_OUTPUT"
