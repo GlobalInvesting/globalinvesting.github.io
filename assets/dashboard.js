@@ -2328,13 +2328,13 @@ function _wireTickerTooltip(track) {
 
     tip.innerHTML =
       '<div class="tk-tt-head">' +
-        '<span class="tk-tt-src">' + (source ? giEscHtml(source) : 'Noticias') + '</span>' +
+        '<span class="tk-tt-src">' + (source ? giEscHtml(source) : 'News') + '</span>' +
         (time ? '<span class="tk-tt-time">' + giEscHtml(time) + '</span>' : '') +
       '</div>' +
       '<div class="tk-tt-title">' + giEscHtml(title) + '</div>' +
       (body ? '<div class="tk-tt-body">' + giEscHtml(body) + '</div>' : '') +
       (cur ? '<span class="tk-tt-cur">' + giEscHtml(cur) + '</span>' : '') +
-      (link ? '<a class="tk-tt-link" href="' + link + '" target="_blank" rel="noopener noreferrer">Leer nota completa \u2192</a>' : '');
+      (link ? '<a class="tk-tt-link" href="' + link + '" target="_blank" rel="noopener noreferrer">Read full article \u2192</a>' : '');
 
     const r = el.getBoundingClientRect();
     const tw = 340;
@@ -2354,7 +2354,14 @@ function _wireTickerTooltip(track) {
     });
   });
 
-  track.addEventListener('mouseleave', () => {
+  track.addEventListener('mouseleave', (e) => {
+    if (tip.contains(e.relatedTarget)) return;
+    track.style.animationPlayState = 'running';
+    hide();
+  });
+
+  tip.addEventListener('mouseleave', (e) => {
+    if (track.contains(e.relatedTarget)) return;
     track.style.animationPlayState = 'running';
     hide();
   });

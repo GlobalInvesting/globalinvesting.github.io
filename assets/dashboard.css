@@ -347,7 +347,7 @@
     background: var(--bg2); border: 1px solid var(--border2);
     border-radius: 6px; box-shadow: 0 10px 28px rgba(0,0,0,.45);
     padding: 12px 14px; z-index: 500;
-    font-family: var(--font-ui); pointer-events: none;
+    font-family: var(--font-ui);
   }
   .tk-tooltip.tk-open { display: block; }
   .tk-tt-head {
