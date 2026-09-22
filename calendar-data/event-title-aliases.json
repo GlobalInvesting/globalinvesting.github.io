@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-22T00:14:40Z",
+  "generatedAt": "2026-09-22T11:57:16Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 187,
+  "aliasCount": 186,
   "aliases": [
     {
       "currency": "EUR",
@@ -161,18 +161,18 @@
     {
       "currency": "JPY",
       "primary_title": "Japan Coincident Index",
-      "secondary_title": "Japan Coincident Index Prel",
+      "secondary_title": "Japan Coincident Index Final",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-09-07",
-          "forecast_primary": 116.2,
-          "forecast_secondary": 118.8,
-          "actual_primary": 120.6,
-          "actual_secondary": 120.6,
-          "previous_primary": 118.5,
+          "dateISO": "2026-09-29",
+          "forecast_primary": 120.6,
+          "forecast_secondary": 120.6,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 120.6,
           "previous_secondary": 118.9,
-          "actual_secondary_raw": "120.6",
-          "forecast_secondary_raw": "118.8",
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "120.6",
           "previous_secondary_raw": "118.9"
         }
       }
@@ -180,18 +180,18 @@
     {
       "currency": "JPY",
       "primary_title": "Japan Leading Index",
-      "secondary_title": "Japan Leading Economic Index Prel",
+      "secondary_title": "Japan Leading Economic Index Final",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-09-07",
-          "forecast_primary": 117.4,
-          "forecast_secondary": 116.8,
-          "actual_primary": 117.9,
-          "actual_secondary": 117.9,
-          "previous_primary": 116.5,
+          "dateISO": "2026-09-29",
+          "forecast_primary": 117.9,
+          "forecast_secondary": 117.9,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 117.9,
           "previous_secondary": 116.2,
-          "actual_secondary_raw": "117.9",
-          "forecast_secondary_raw": "116.8",
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "117.9",
           "previous_secondary_raw": "116.2"
         }
       }
@@ -1981,25 +1981,6 @@
     },
     {
       "currency": "USD",
-      "primary_title": "United States Michigan Current Conditions",
-      "secondary_title": "United States Michigan Current Conditions Final",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-25",
-          "forecast_primary": 50.9,
-          "forecast_secondary": 50.9,
-          "actual_primary": null,
-          "actual_secondary": null,
-          "previous_primary": 50.9,
-          "previous_secondary": 51.9,
-          "actual_secondary_raw": null,
-          "forecast_secondary_raw": "50.9",
-          "previous_secondary_raw": "51.9"
-        }
-      }
-    },
-    {
-      "currency": "USD",
       "primary_title": "United States Michigan Inflation Expectations",
       "secondary_title": "United States Michigan Inflation Expectations Final",
       "evidence": {
@@ -2052,6 +2033,44 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": null,
           "previous_secondary_raw": "11.6"
+        }
+      }
+    },
+    {
+      "currency": "AUD",
+      "primary_title": "RBA Interest Rate Decision",
+      "secondary_title": "Australia RBA Interest Rate Decision",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": null,
+          "forecast_secondary": 4.35,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 4.35,
+          "previous_secondary": 4.35,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "4.35%",
+          "previous_secondary_raw": "4.35%"
+        }
+      }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "BoE M4 Money Supply m/m",
+      "secondary_title": "United Kingdom M4 Money Supply MoM",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-29",
+          "forecast_primary": 0.3,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": -0.3,
+          "previous_secondary": -0.3,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "-0.3%"
         }
       }
     },
@@ -2850,44 +2869,6 @@
           "actual_yahoo_raw": "0.5",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "0.5"
-        }
-      }
-    },
-    {
-      "currency": "AUD",
-      "primary_title": "Australia NAB Business Confidence",
-      "yahoo_title": "NAB Business Confidence*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-08",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": -8.0,
-          "actual_yahoo": -8.0,
-          "previous_primary": null,
-          "previous_yahoo": -6.0,
-          "actual_yahoo_raw": "-8",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-6"
-        }
-      }
-    },
-    {
-      "currency": "AUD",
-      "primary_title": "Australia NAB Business Conditions",
-      "yahoo_title": "NAB Business Conditions*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-08",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": -1.0,
-          "actual_yahoo": -1.0,
-          "previous_primary": null,
-          "previous_yahoo": 4.0,
-          "actual_yahoo_raw": "-1",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "4"
         }
       }
     },
