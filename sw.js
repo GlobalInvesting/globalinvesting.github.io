@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = 'gi-v8.540.3';
+const CACHE_VERSION = 'gi-v8.540.4';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
