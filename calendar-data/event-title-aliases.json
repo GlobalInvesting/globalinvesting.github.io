@@ -1,29 +1,10 @@
 {
-  "generatedAt": "2026-09-22T23:44:03Z",
+  "generatedAt": "2026-09-23T11:57:55Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 213,
+  "aliasCount": 207,
   "aliases": [
-    {
-      "currency": "EUR",
-      "primary_title": "Euro Area Core CPI y/y",
-      "secondary_title": "Euro Area Core Inflation Rate YoY Final",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-17",
-          "forecast_primary": 2.4,
-          "forecast_secondary": 2.4,
-          "actual_primary": 2.4,
-          "actual_secondary": 2.4,
-          "previous_primary": 2.4,
-          "previous_secondary": 2.5,
-          "actual_secondary_raw": "2.4%",
-          "forecast_secondary_raw": "2.4%",
-          "previous_secondary_raw": "2.5%"
-        }
-      }
-    },
     {
       "currency": "AUD",
       "primary_title": "Australia GDP q/q",
@@ -40,21 +21,8 @@
           "actual_secondary_raw": "0.4%",
           "forecast_secondary_raw": "0.2%",
           "previous_secondary_raw": "0.3%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": 0.5,
-          "forecast_yahoo": null,
-          "actual_primary": 0.4,
-          "actual_yahoo": 0.4,
-          "previous_primary": 0.3,
-          "previous_yahoo": 0.3,
-          "actual_yahoo_raw": "0.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.3"
         }
-      },
-      "yahoo_title": "Real GDP QQ SA"
+      }
     },
     {
       "currency": "AUD",
@@ -72,21 +40,8 @@
           "actual_secondary_raw": "2.1%",
           "forecast_secondary_raw": "1.6%",
           "previous_secondary_raw": "2.5%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": -21.5,
-          "forecast_yahoo": null,
-          "actual_primary": 2.1,
-          "actual_yahoo": 2.1,
-          "previous_primary": 2.5,
-          "previous_yahoo": 2.5,
-          "actual_yahoo_raw": "2.1",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "2.5"
         }
-      },
-      "yahoo_title": "Real GDP YY SA"
+      }
     },
     {
       "currency": "NZD",
@@ -104,21 +59,8 @@
           "actual_secondary_raw": "2.75%",
           "forecast_secondary_raw": "2.75%",
           "previous_secondary_raw": "2.5%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": 2.75,
-          "actual_yahoo": 2.75,
-          "previous_primary": 2.5,
-          "previous_yahoo": 2.5,
-          "actual_yahoo_raw": "2.75",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "2.5"
         }
-      },
-      "yahoo_title": "Cash Rate"
+      }
     },
     {
       "currency": "GBP",
@@ -1045,6 +987,25 @@
     },
     {
       "currency": "EUR",
+      "primary_title": "Euro Area Core CPI y/y",
+      "secondary_title": "Euro Area Core Inflation Rate YoY Flash",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-02",
+          "forecast_primary": 2.4,
+          "forecast_secondary": 2.5,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 2.4,
+          "previous_secondary": 2.4,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "2.5%",
+          "previous_secondary_raw": "2.4%"
+        }
+      }
+    },
+    {
+      "currency": "EUR",
       "primary_title": "Euro Area CPI",
       "secondary_title": "Euro Area CPI Flash",
       "evidence": {
@@ -1754,11 +1715,11 @@
           "dateISO": "2026-09-23",
           "forecast_primary": 53.0,
           "forecast_secondary": 52.7,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 52.7,
+          "actual_secondary": 52.7,
           "previous_primary": 52.7,
           "previous_secondary": 52.7,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "52.7",
           "forecast_secondary_raw": "52.7",
           "previous_secondary_raw": "52.7"
         }
@@ -1773,11 +1734,11 @@
           "dateISO": "2026-09-23",
           "forecast_primary": 51.1,
           "forecast_secondary": 51.5,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 53.0,
+          "actual_secondary": 53.0,
           "previous_primary": 51.6,
           "previous_secondary": 51.6,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "53",
           "forecast_secondary_raw": "51.5",
           "previous_secondary_raw": "51.6"
         }
@@ -1792,11 +1753,11 @@
           "dateISO": "2026-09-23",
           "forecast_primary": 51.1,
           "forecast_secondary": 51.7,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 53.1,
+          "actual_secondary": 53.1,
           "previous_primary": 52.0,
           "previous_secondary": 52.0,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "53.1",
           "forecast_secondary_raw": "51.7",
           "previous_secondary_raw": "52.0"
         }
@@ -1812,10 +1773,10 @@
           "forecast_primary": 52.1,
           "forecast_secondary": 51.5,
           "actual_primary": null,
-          "actual_secondary": null,
+          "actual_secondary": 52.0,
           "previous_primary": 51.7,
           "previous_secondary": 51.7,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "52",
           "forecast_secondary_raw": "51.5",
           "previous_secondary_raw": "51.7"
         }
@@ -2786,13 +2747,13 @@
         "secondary": {
           "dateISO": "2026-09-30",
           "forecast_primary": 51.4,
-          "forecast_secondary": 51.7,
+          "forecast_secondary": 49.3,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": 52.0,
           "previous_secondary": 52.0,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "51.7",
+          "forecast_secondary_raw": "49.3",
           "previous_secondary_raw": "52.0"
         }
       }
@@ -3174,44 +3135,6 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": null,
           "previous_secondary_raw": "0.6%"
-        }
-      }
-    },
-    {
-      "currency": "AUD",
-      "primary_title": "Australia Gross Fixed Capital Formation q/q",
-      "yahoo_title": "Gross Fixed Capital Exp SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": 0.0,
-          "forecast_yahoo": null,
-          "actual_primary": -0.3,
-          "actual_yahoo": -0.3,
-          "previous_primary": 3.0,
-          "previous_yahoo": 3.0,
-          "actual_yahoo_raw": "-0.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "3"
-        }
-      }
-    },
-    {
-      "currency": "AUD",
-      "primary_title": "Australia Final Consumption Expenditure q/q",
-      "yahoo_title": "Final Consumption Exp QQ SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": 0.4,
-          "forecast_yahoo": null,
-          "actual_primary": 0.5,
-          "actual_yahoo": 0.5,
-          "previous_primary": 0.3,
-          "previous_yahoo": 0.3,
-          "actual_yahoo_raw": "0.5",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.3"
         }
       }
     },
@@ -3820,82 +3743,6 @@
           "actual_yahoo_raw": "0.2",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "0.3"
-        }
-      }
-    },
-    {
-      "currency": "SEK",
-      "primary_title": "Sweden CPI m/m",
-      "yahoo_title": "CPI MM*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 0.2,
-          "forecast_yahoo": null,
-          "actual_primary": -0.3,
-          "actual_yahoo": -0.3,
-          "previous_primary": -0.3,
-          "previous_yahoo": -0.3,
-          "actual_yahoo_raw": "-0.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.3"
-        }
-      }
-    },
-    {
-      "currency": "SEK",
-      "primary_title": "Sweden CPI y/y",
-      "yahoo_title": "CPI YY*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 0.4,
-          "forecast_yahoo": null,
-          "actual_primary": 0.3,
-          "actual_yahoo": 0.3,
-          "previous_primary": 0.2,
-          "previous_yahoo": 0.3,
-          "actual_yahoo_raw": "0.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.3"
-        }
-      }
-    },
-    {
-      "currency": "SEK",
-      "primary_title": "Sweden CPIF m/m",
-      "yahoo_title": "CPIF MM*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 0.4,
-          "forecast_yahoo": null,
-          "actual_primary": -0.2,
-          "actual_yahoo": -0.2,
-          "previous_primary": -0.3,
-          "previous_yahoo": -0.3,
-          "actual_yahoo_raw": "-0.2",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.3"
-        }
-      }
-    },
-    {
-      "currency": "SEK",
-      "primary_title": "Sweden CPIF y/y",
-      "yahoo_title": "CPIF YY*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 0.8,
-          "forecast_yahoo": null,
-          "actual_primary": 0.7,
-          "actual_yahoo": 0.7,
-          "previous_primary": 0.7,
-          "previous_yahoo": 0.7,
-          "actual_yahoo_raw": "0.7",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.7"
         }
       }
     },
