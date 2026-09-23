@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-23T11:57:55Z",
+  "generatedAt": "2026-09-23T15:08:46Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 207,
+  "aliasCount": 200,
   "aliases": [
     {
       "currency": "AUD",
@@ -937,21 +937,8 @@
           "actual_secondary_raw": "-17.3%",
           "forecast_secondary_raw": "-5.6%",
           "previous_secondary_raw": "18.3%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-16",
-          "forecast_primary": 11.6,
-          "forecast_yahoo": null,
-          "actual_primary": -17.3,
-          "actual_yahoo": -17.3,
-          "previous_primary": 18.5,
-          "previous_yahoo": 18.5,
-          "actual_yahoo_raw": "-17.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "18.5"
         }
-      },
-      "yahoo_title": "Building Permits MM"
+      }
     },
     {
       "currency": "USD",
@@ -1772,7 +1759,7 @@
           "dateISO": "2026-09-23",
           "forecast_primary": 52.1,
           "forecast_secondary": 51.5,
-          "actual_primary": null,
+          "actual_primary": 52.0,
           "actual_secondary": 52.0,
           "previous_primary": 51.7,
           "previous_secondary": 51.7,
@@ -2918,13 +2905,13 @@
         "secondary": {
           "dateISO": "2026-10-01",
           "forecast_primary": 52.6,
-          "forecast_secondary": 53.0,
+          "forecast_secondary": 57.0,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": 53.9,
           "previous_secondary": 53.9,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "53",
+          "forecast_secondary_raw": "57",
           "previous_secondary_raw": "53.9"
         }
       }
@@ -3425,6 +3412,25 @@
     },
     {
       "currency": "USD",
+      "primary_title": "United States Core PPI m/m",
+      "yahoo_title": "PPI exFood/Energy MM",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-10",
+          "forecast_primary": 0.6,
+          "forecast_yahoo": null,
+          "actual_primary": 0.2,
+          "actual_yahoo": 0.2,
+          "previous_primary": 0.2,
+          "previous_yahoo": 0.2,
+          "actual_yahoo_raw": "0.2",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0.2"
+        }
+      }
+    },
+    {
+      "currency": "USD",
       "primary_title": "United States Core PPI y/y",
       "yahoo_title": "PPI exFood/Energy YY",
       "evidence": {
@@ -3572,177 +3578,6 @@
           "actual_yahoo_raw": "-9.66",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "-10.45"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States CPI m/m",
-      "yahoo_title": "CPI MM, SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 0.0,
-          "forecast_yahoo": null,
-          "actual_primary": 0.4,
-          "actual_yahoo": 0.4,
-          "previous_primary": 0.1,
-          "previous_yahoo": 0.1,
-          "actual_yahoo_raw": "0.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.1"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Core CPI m/m",
-      "yahoo_title": "Core CPI MM, SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 0.2,
-          "forecast_yahoo": null,
-          "actual_primary": 0.3,
-          "actual_yahoo": 0.3,
-          "previous_primary": 0.2,
-          "previous_yahoo": 0.2,
-          "actual_yahoo_raw": "0.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.2"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States CPI y/y",
-      "yahoo_title": "CPI YY, NSA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 2.7,
-          "forecast_yahoo": null,
-          "actual_primary": 3.4,
-          "actual_yahoo": 3.4,
-          "previous_primary": 3.4,
-          "previous_yahoo": 3.4,
-          "actual_yahoo_raw": "3.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "3.4"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Core CPI y/y",
-      "yahoo_title": "Core CPI YY, NSA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 2.3,
-          "forecast_yahoo": null,
-          "actual_primary": 2.4,
-          "actual_yahoo": 2.4,
-          "previous_primary": 2.5,
-          "previous_yahoo": 2.5,
-          "actual_yahoo_raw": "2.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "2.5"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States CPI n.s.a.",
-      "yahoo_title": "CPI Index, NSA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 336.147,
-          "forecast_yahoo": null,
-          "actual_primary": 334.98,
-          "actual_yahoo": 334.98,
-          "previous_primary": 333.918,
-          "previous_yahoo": 333.92,
-          "actual_yahoo_raw": "334.98",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "333.92"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Core CPI",
-      "yahoo_title": "Core CPI Index, SA*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 336.88,
-          "forecast_yahoo": null,
-          "actual_primary": 337.765,
-          "actual_yahoo": 337.77,
-          "previous_primary": 336.789,
-          "previous_yahoo": 336.79,
-          "actual_yahoo_raw": "337.77",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "336.79"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States Real Earnings m/m",
-      "yahoo_title": "Real Weekly Earnings MM",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": -0.4,
-          "forecast_yahoo": null,
-          "actual_primary": 0.2,
-          "actual_yahoo": 0.2,
-          "previous_primary": 0.0,
-          "previous_yahoo": 0.0,
-          "actual_yahoo_raw": "0.2",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States CPI n.s.a. m/m",
-      "yahoo_title": "Core CPI MM, SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": 0.3,
-          "actual_yahoo": 0.3,
-          "previous_primary": 0.0,
-          "previous_yahoo": 0.2,
-          "actual_yahoo_raw": "0.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.2"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "Cleveland Fed Median CPI m/m",
-      "yahoo_title": "Cleveland Fed CPI*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 0.3,
-          "forecast_yahoo": null,
-          "actual_primary": 0.2,
-          "actual_yahoo": 0.2,
-          "previous_primary": 0.3,
-          "previous_yahoo": 0.3,
-          "actual_yahoo_raw": "0.2",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.3"
         }
       }
     },
@@ -4313,6 +4148,25 @@
           "actual_yahoo_raw": "0",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "-8"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States EIA Refinery Utilization Rate Change",
+      "yahoo_title": "EIA Wkly Refn Util*",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-23",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": -2.8,
+          "actual_yahoo": -2.8,
+          "previous_primary": -1.0,
+          "previous_yahoo": -1.0,
+          "actual_yahoo_raw": "-2.8",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "-1"
         }
       }
     },
