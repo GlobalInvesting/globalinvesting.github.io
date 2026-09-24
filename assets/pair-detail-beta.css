@@ -1,4 +1,4 @@
-/* pair-detail-beta.css v0.1.0 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
+/* pair-detail-beta.css v0.2.0 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
 #pdt-panel { border-top: 1px solid var(--border); background: var(--bg); }
 
 #pdt-tabs {
@@ -65,3 +65,28 @@
   .pdt-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pdt-tab { min-height: 44px; }
 }
+
+/* Collapsible container (grid-rows trick: animates to/from content height without JS measuring) */
+.pdt-head { display: flex; align-items: center; }
+.pdt-toggle {
+  display: inline-flex; align-items: center; gap: 8px; padding: 0; margin: 0;
+  background: transparent; border: 0; color: inherit; font: inherit;
+  letter-spacing: inherit; text-transform: inherit; cursor: pointer;
+}
+.pdt-toggle:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 2px; }
+.pdt-chev {
+  width: 6px; height: 6px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg); transition: transform .2s ease; margin-top: -2px;
+}
+.pdt-toggle[aria-expanded="false"] .pdt-chev { transform: rotate(-45deg); margin-top: 0; }
+.pdt-collapsible { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .22s ease, visibility 0s linear 0s; }
+.pdt-collapsible[data-open="false"] { grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows .22s ease, visibility 0s linear .22s; }
+.pdt-collapsible-inner { min-height: 0; overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .pdt-collapsible, .pdt-collapsible[data-open="false"], .pdt-chev { transition: none; }
+}
+
+/* Legacy detail (buildInlineDetail output) embedded in Overview */
+.pdt-overview > .pdt-cols { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border); }
+.pdt-legacy { min-width: 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
+.pdt-legacy .pd-inline-scroll { overflow-x: auto; }

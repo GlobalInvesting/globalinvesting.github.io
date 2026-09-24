@@ -7557,7 +7557,17 @@ document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
+// Unified Pair Detail (beta feature flag): when <html data-pair-detail="unified"> is set, the per-row
+// accordions below delegate to the single panel under the chart (assets/pair-detail-beta.js).
+// Inert in production — the attribute is absent there.
+function _giUnifiedPairDetail(row) {
+  if (document.documentElement.dataset.pairDetail !== 'unified') return false;
+  document.dispatchEvent(new CustomEvent('gi:pairDetailToggle', { detail: { sym: row.dataset.sym } }));
+  return true;
+}
+
 function toggleInlineDetail(row) {
+  if (_giUnifiedPairDetail(row)) return;
   const tvSym = row.dataset.sym;
   const tbody = row.closest('tbody');
   if (!tbody) return;
@@ -7988,6 +7998,7 @@ document.getElementById('sidebar')?.addEventListener('click', e => {
 });
 
 function toggleSidebarDetail(row) {
+  if (_giUnifiedPairDetail(row)) return;
   const tvSym  = row.dataset.sym;
   const sidebar = row.closest('#sidebar');
   if (!sidebar) return;

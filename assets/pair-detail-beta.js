@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.1.0
+ * pair-detail-beta.js v0.2.0
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -8,6 +8,10 @@
  *   ./ai-analysis/session-context.json     -> Session Context (per currency x session)
  *   ./ai-analysis/currency-drivers.json    -> Strength Drivers (per currency x pair note)
  *   ./fair-value-data/summary.json         -> Fair Value / Overview (per pair)
+ *
+ * Overview embeds the legacy per-row detail (dashboard.js buildInlineDetail: price, Price & Spreads,
+ * Volatility, COT, Retail) so nothing from the old accordion is lost, plus the new snapshots.
+ * Row clicks in FX Pairs / Crosses reach this panel through the 'gi:pairDetailToggle' event.
  *
  * Rules: no inline handlers, no innerHTML with data (text is set via textContent),
  * external URLs limited to http(s), ARIA tabs pattern (roving tabindex, arrow keys).
@@ -24,10 +28,12 @@
     { name: 'New York', start: 12, end: 21 }
   ];
   var REFRESH_MS = 5 * 60 * 1000;
+  var LEGACY_REFRESH_MS = 30 * 1000;
+  var OPEN_KEY = 'gi.pairDetail.open';
   var STALE_HOURS = 26;
 
-  var root, tabsEl, subEl;
-  var state = { pair: null, tab: 'overview', data: null, loadedAt: 0, loading: null };
+  var root, tabsEl, subEl, toggleBtn, contentEl;
+  var state = { pair: null, sym: null, tab: 'overview', open: true, data: null, loadedAt: 0, loading: null, legacyEl: null, legacyAt: 0 };
 
   /* ---------- helpers ---------- */
   function el(tag, cls, text) {
@@ -233,6 +239,23 @@
     return block('FX FAIR VALUE \u00b7 ' + p.label, [grid, gauge(fv.z), meta, footer('Fair Value model', d.fair.generated_at)]);
   }
 
+  function legacyDetail() {
+    var host = el('div', 'pdt-legacy');
+    state.legacyEl = host;
+    if (typeof window.buildInlineDetail === 'function' && state.sym) {
+      host.appendChild(el('div', 'pdt-empty', 'Loading\u2026'));
+      state.legacyAt = Date.now();
+      try { Promise.resolve(window.buildInlineDetail(state.sym, host)).catch(function () {}); } catch (e) { /* legacy renderer unavailable */ }
+    }
+    return host;
+  }
+  function refreshLegacy() {
+    if (!state.open || state.tab !== 'overview' || !state.legacyEl || !state.legacyEl.isConnected) return;
+    if (Date.now() - state.legacyAt < LEGACY_REFRESH_MS) return;
+    state.legacyAt = Date.now();
+    try { Promise.resolve(window.buildInlineDetail(state.sym, state.legacyEl)).catch(function () {}); } catch (e) { /* keep last render */ }
+  }
+
   function renderOverview(p, d) {
     var r = fvNumbers(p, d), dec = decimals(p);
     var nodes = [];
@@ -254,7 +277,10 @@
       return t ? el('p', 'pdt-text', c + ' \u00b7 ' + live.name + ': ' + t) : null;
     }).filter(Boolean);
     nodes.push(block('LIVE SESSION', sessNodes.length ? sessNodes.concat([footer('AI Analytics', d.session.generated_at)]) : [note('No live-session note available.')]));
-    return twoCol(nodes[0], nodes[1]);
+    var wrap = el('div', 'pdt-overview');
+    wrap.appendChild(legacyDetail());
+    wrap.appendChild(twoCol(nodes[0], nodes[1]));
+    return wrap;
   }
 
   var RENDER = { overview: renderOverview, macro: renderMacro, session: renderSession, strength: renderStrength, fairvalue: renderFairValue };
@@ -265,6 +291,7 @@
   function renderTab(tab) {
     var host = panelEl(tab);
     if (!host) return;
+    if (!state.open) return;
     host.textContent = '';
     if (!state.pair) { host.appendChild(note('Detail is available for G10 currency pairs.')); return; }
     if (!state.data) { host.appendChild(note('Loading\u2026')); return; }
@@ -285,14 +312,42 @@
     renderTab(tab);
   }
 
-  function setPair(sym) {
+  function setOpen(open, persist) {
+    var was = state.open;
+    state.open = !!open;
+    toggleBtn.setAttribute('aria-expanded', state.open ? 'true' : 'false');
+    contentEl.setAttribute('data-open', state.open ? 'true' : 'false');
+    if (state.open) contentEl.removeAttribute('inert'); else contentEl.setAttribute('inert', '');
+    if (persist !== false) {
+      try { localStorage.setItem(OPEN_KEY, state.open ? 'true' : 'false'); } catch (e) { /* storage unavailable */ }
+    }
+    if (state.open && !was) renderTab(state.tab);
+  }
+
+  function onRowToggle(e) {
+    var sym = e.detail && e.detail.sym, p = parseSym(sym);
+    if (!p) return;
+    var same = state.pair && state.pair.key === p.key;
+    if (same && state.open) { setOpen(false); return; }
+    state.sym = sym;
+    if (!same) setPair(sym, true);
+    setOpen(true);
+    if (root.scrollIntoView) {
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      root.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+    }
+  }
+
+  function setPair(sym, force) {
     var p = parseSym(sym);
     var key = p ? p.key : null;
-    if ((state.pair && state.pair.key) === key && state.data) return;
+    if (!force && (state.pair && state.pair.key) === key && state.data) return;
     state.pair = p;
+    state.sym = p ? sym : null;
     subEl.textContent = p ? p.label : '\u2014';
+    var before = state.loadedAt;
     renderTab(state.tab);
-    load(false).then(function () { renderTab(state.tab); });
+    load(false).then(function () { if (state.loadedAt !== before) renderTab(state.tab); });
   }
 
   function currentSym() {
@@ -302,9 +357,14 @@
 
   function init() {
     root = document.getElementById('pdt-panel');
+    toggleBtn = document.getElementById('pdt-toggle');
+    contentEl = document.getElementById('pdt-content');
     tabsEl = document.getElementById('pdt-tabs');
     subEl = document.getElementById('pdt-sub');
-    if (!root || !tabsEl || !subEl) return;
+    if (!root || !tabsEl || !subEl || !toggleBtn || !contentEl) return;
+
+    toggleBtn.addEventListener('click', function () { setOpen(!state.open); });
+    document.addEventListener('gi:pairDetailToggle', onRowToggle);
 
     tabsEl.addEventListener('click', function (e) {
       var b = e.target.closest('[data-pdt-tab]');
@@ -326,8 +386,11 @@
       new MutationObserver(function () { setPair(currentSym()); })
         .observe(chartTabs, { attributes: true, subtree: true, attributeFilter: ['class'] });
     }
-    document.addEventListener('gi:quotesLoaded', function () { setPair(currentSym()); });
+    document.addEventListener('gi:quotesLoaded', function () { if (!state.pair) setPair(currentSym()); else refreshLegacy(); });
 
+    var stored = null;
+    try { stored = localStorage.getItem(OPEN_KEY); } catch (e) { /* storage unavailable */ }
+    setOpen(stored !== 'false', false);
     selectTab('overview', false);
     setPair(currentSym());
   }
