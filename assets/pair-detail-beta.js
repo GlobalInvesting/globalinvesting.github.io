@@ -216,7 +216,7 @@
       var row = el('section', 'pdt-sess' + (st === 'live' ? ' pdt-sess-live' : st === 'upcoming' ? ' pdt-sess-upcoming' : ''));
       var head = el('div', 'pdt-sess-head');
       head.appendChild(el('h3', 'pdt-sess-name', sess.name.toUpperCase()));
-      head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : st === 'upcoming' ? 'UPCOMING' : 'CLOSED'));
+      if (st !== 'upcoming') head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : 'CLOSED'));
       row.appendChild(head);
       row.appendChild(el('p', 'pdt-text', st === 'upcoming' ? opensInText(sess, now) : (sessionNote(p, sc, sess.name) || '\u2014')));
       wrap.appendChild(row);

@@ -1,4 +1,4 @@
-/* pair-detail-beta.css v0.7.1 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
+/* pair-detail-beta.css v0.7.2 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
 #pdt-panel { --pdt-card: color-mix(in srgb, var(--bg2) 35%, var(--bg)); border-top: 1px solid var(--border); background: var(--bg); }
 
 #pdt-tabs {
@@ -43,9 +43,8 @@
 .pdt-sess-live .pdt-sess-name { color: var(--blue); }
 .pdt-sess-live .pdt-text { color: var(--text); }
 .pdt-chip { font: 700 8px/1 var(--font-ui); letter-spacing: .07em; padding: 2px 4px; border-radius: 2px; border: 1px solid transparent; }
-.pdt-chip-live { color: var(--blue); background: rgba(56, 139, 253, .15); border-color: rgba(56, 139, 253, .25); }
+.pdt-chip-live { color: var(--blue); background: rgba(79, 127, 255, .15); }
 .pdt-chip-closed { color: var(--text2); background: transparent; border-color: var(--border2); }
-.pdt-chip-upcoming { color: #d29922; background: rgba(210, 153, 34, .10); border-color: rgba(210, 153, 34, .22); }
 .pdt-sess-upcoming .pdt-text { color: var(--text3); font-style: italic; }
 
 .pdt-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
