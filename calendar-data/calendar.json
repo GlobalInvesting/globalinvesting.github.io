@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-24T06:45:17Z",
-  "generatedAt": "2026-09-24T06:45:17Z",
+  "lastUpdate": "2026-09-24T06:47:14Z",
+  "generatedAt": "2026-09-24T06:47:14Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1587,6 +1587,11 @@
       "n": 2,
       "mean": 0.3,
       "std": 0.282843
+    },
+    "EUR/france consumer confidence index": {
+      "n": 2,
+      "mean": -2.5,
+      "std": 2.12132
     },
     "EUR/spain ppi yoy": {
       "n": 2,
@@ -64877,7 +64882,7 @@
       "flag": "🇪🇺",
       "event": "France Consumer Confidence Index",
       "impact": "low",
-      "actual": null,
+      "actual": "86",
       "forecast": "90",
       "previous": "86"
     },
@@ -64890,7 +64895,7 @@
       "flag": "🇪🇺",
       "event": "France Business Climate",
       "impact": "low",
-      "actual": null,
+      "actual": "101",
       "forecast": "102",
       "previous": "103"
     },
