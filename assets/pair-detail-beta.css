@@ -201,8 +201,12 @@
    price (20px, was 22px) frees a little extra horizontal room for the chips on mid widths. */
 .pdt-hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; column-gap: 16px; row-gap: 6px; }
 .pdt-hero-main { flex: 0 1 auto; min-width: 0; }
-.pdt-hero .pd-inline-price { display: grid; grid-template-columns: auto auto auto; column-gap: 10px; row-gap: 2px; align-items: baseline; }
-.pdt-hero .pd-inline-meta { grid-column: 1 / -1; white-space: nowrap; }
+/* Sym, price, change and H/L all flow as one flex row (reverting the grid attempt above, which
+   forced H/L onto its own full-width row via grid-column:1/-1 — that split "EUR/CAD 1.60895
+   +0.23%" from "H .../L ..." into two lines even when there was room for one, the exact
+   regression reported live). Flex wrap still lets H/L drop to its own line only once the row
+   genuinely runs out of width, same fallback behavior as the chips row below. */
+.pdt-hero .pd-inline-price { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
 .pdt-hero .pd-inline-rate { font-size: 20px; }
 .pdt-badges { flex: 0 1 auto; margin-left: 0; width: auto; justify-content: flex-start; }
 @container (max-width: 439px) {
