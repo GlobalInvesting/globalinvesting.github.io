@@ -156,39 +156,46 @@
       return block('SESSION CONTEXT', [note('Market closed. Session context resumes Sunday 21:00 UTC.')]);
     }
     var h = new Date().getUTCHours();
-    var cols = [p.base, p.quote].map(function (c) {
-      var notes = sc.sessions[c];
-      var s = block(c + ' \u00b7 SESSION CONTEXT', []);
-      if (!notes) { s.appendChild(note('No session notes for ' + c + '.')); return s; }
-      SESSIONS.forEach(function (sess) {
-        var st = sessionState(sess, h);
-        var row = el('div', 'pdt-sess' + (st === 'live' ? ' pdt-sess-live' : ''));
-        var head = el('div', 'pdt-sess-head');
-        head.appendChild(el('span', 'pdt-sess-name', sess.name.toUpperCase()));
-        head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : 'CLOSED'));
-        row.appendChild(head);
-        row.appendChild(el('p', 'pdt-text', notes[sess.name] || '\u2014'));
-        s.appendChild(row);
+    var wrap = el('div', 'pdt-stack');
+    SESSIONS.forEach(function (sess) {
+      var st = sessionState(sess, h);
+      var row = el('section', 'pdt-sess' + (st === 'live' ? ' pdt-sess-live' : ''));
+      var head = el('div', 'pdt-sess-head');
+      head.appendChild(el('h3', 'pdt-sess-name', sess.name.toUpperCase()));
+      head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : 'CLOSED'));
+      row.appendChild(head);
+      [p.base, p.quote].forEach(function (c) {
+        var t = sc.sessions[c] && sc.sessions[c][sess.name];
+        var line = el('div', 'pdt-line');
+        line.appendChild(el('span', 'pdt-tag', c));
+        line.appendChild(el('p', 'pdt-text', t || '\u2014'));
+        row.appendChild(line);
       });
-      return s;
+      wrap.appendChild(row);
     });
-    var wrap = twoCol(cols[0], cols[1]);
     wrap.appendChild(footer('AI Analytics \u00b7 session windows in UTC', sc.generated_at));
     return wrap;
   }
 
   function renderStrength(p, d) {
     var dr = d.drivers;
-    var cols = [p.base, p.quote].map(function (c) {
-      var s = block(c + ' STRENGTH DRIVERS \u00b7 ' + p.label, []);
+    var wrap = el('div', 'pdt-stack');
+    var any = false;
+    [p.base, p.quote].forEach(function (c) {
       var notes = dr && dr.drivers && dr.drivers[c];
       var txt = notes && (notes[p.base + '/' + p.quote] || notes[p.quote + '/' + p.base]);
-      if (!txt) { s.appendChild(note('No strength-driver note for this pair from the ' + c + ' side today.')); return s; }
-      s.appendChild(el('p', 'pdt-text', txt));
-      s.appendChild(sourcesLine(dr.driver_sources && dr.driver_sources[c]));
-      return s;
+      if (!txt) return;
+      any = true;
+      var sec = el('section', 'pdt-note');
+      var head = el('div', 'pdt-sess-head');
+      head.appendChild(el('span', 'pdt-tag', c));
+      head.appendChild(el('h3', 'pdt-sess-name', c + ' SIDE \u00b7 ' + p.label));
+      sec.appendChild(head);
+      sec.appendChild(el('p', 'pdt-text', txt));
+      sec.appendChild(sourcesLine(dr.driver_sources && dr.driver_sources[c]));
+      wrap.appendChild(sec);
     });
-    var wrap = twoCol(cols[0], cols[1]);
+    if (!any) wrap.appendChild(note('No strength-driver note for ' + p.label + ' today.'));
     if (dr) wrap.appendChild(footer('AI Analytics', dr.generated_at));
     return wrap;
   }
