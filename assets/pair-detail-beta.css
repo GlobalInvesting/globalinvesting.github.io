@@ -180,14 +180,25 @@
 .pdt-seg button:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
 @media (max-width: 720px) { .pdt-seg button { min-height: 32px; padding: 0 12px; } }
 
-/* LIVE chip and hero status chips (previous look) */
+/* LIVE chip and hero status stats */
 .pdt-livesec .pdt-chip { margin-left: 2px; }
 .pdt-hero-main { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; }
-.pdt-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
-.pdt-badge { padding: 5px 7px; border: 1px solid var(--border); border-radius: 3px; font: 600 9px/1 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--text2); white-space: nowrap; }
-.pdt-badge b { margin-left: 4px; font: inherit; text-transform: none; color: inherit; }
-.pdt-badge-dn { color: var(--down); border-color: rgba(239, 83, 80, .4); }
-.pdt-badge-up { color: var(--up); border-color: rgba(38, 166, 154, .4); }
+/* Plain-text header stats (replaces the earlier bordered "chip"/pill style, reported as looking
+   AI-generated) — a muted label plus a bold colored value, matching this panel's own .pdt-kv
+   convention elsewhere (e.g. FX Fair Value's Model/Spot/Fit rows), separated by a thin rule
+   instead of individual boxes. `flex-wrap: nowrap` here is deliberate: the two stats must never
+   split from each other onto their own extra line — either both fit next to the price, or (once
+   the row below moves them under it via the @container rule further down) both sit together on
+   their own full-width line. Wrapping WITHIN this row (one stat left behind, one dropping alone)
+   was the "queda abajo" bug reported live on longer-text pairs; nowrap plus the parent's own
+   wrap-as-one-unit behavior is what keeps them a single visual line at every width that has room
+   for them, and moves them as a pair, never split, at the widths that don't. */
+.pdt-badges { display: flex; flex-wrap: nowrap; align-items: baseline; gap: 0 12px; margin-left: auto; }
+.pdt-hstat { display: inline-flex; align-items: baseline; gap: 5px; font: 400 10.5px/1 var(--font-ui); color: var(--text3); white-space: nowrap; cursor: help; }
+.pdt-hstat + .pdt-hstat { padding-left: 12px; border-left: 1px solid var(--border); }
+.pdt-hstat b { font: 700 11px/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text); }
+.pdt-hstat b.pdt-up { color: var(--up); }
+.pdt-hstat b.pdt-down { color: var(--down); }
 
 /* Hero header: quote block (symbol, price, change; H/L as a caption line) and status chips are
    both sized to their own content and packed together on the left, with only the row's regular

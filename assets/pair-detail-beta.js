@@ -241,10 +241,16 @@
     return wrap;
   }
 
-  function statCell(label, value, cls) {
+  // tip: optional {title, body} — wires the same fx-tip hover tooltip the legacy Overview
+  // metrics already carry (dashboard.js's _fxTTAttach), which the Fair Value tab previously had
+  // none of despite being the one tab built entirely fresh here rather than via the legacy
+  // renderer.
+  function statCell(label, value, cls, tip) {
     var c = el('div', 'pdt-stat');
-    c.appendChild(el('div', 'pdt-stat-l', label));
+    var l = el('div', 'pdt-stat-l', label);
+    c.appendChild(l);
     c.appendChild(el('div', 'pdt-stat-v' + (cls ? ' ' + cls : ''), value));
+    if (tip && typeof _fxTTAttach === 'function') _fxTTAttach(l, tip.title, tip.body);
     return c;
   }
   function fvNumbers(p, d) {
@@ -275,10 +281,22 @@
       ]);
     }
     var grid = el('div', 'pdt-stats');
-    grid.appendChild(statCell('Spot', fv.spot.toFixed(dec)));
-    grid.appendChild(statCell('Model fair value', fv.fairValue.toFixed(dec)));
-    grid.appendChild(statCell('Deviation', signed(fv.z, 2) + '\u03c3', zClass(fv.z)));
-    grid.appendChild(statCell('Rate diff', fv.rate_diff != null ? signed(fv.rate_diff, 2) : '\u2014', fv.rate_diff != null ? (fv.rate_diff >= 0 ? 'pdt-up' : 'pdt-down') : ''));
+    grid.appendChild(statCell('Spot', fv.spot.toFixed(dec), '', {
+      title: 'Spot',
+      body: 'Current live market price for this pair.'
+    }));
+    grid.appendChild(statCell('Model fair value', fv.fairValue.toFixed(dec), '', {
+      title: 'Model Fair Value',
+      body: 'Ridge-regression BEER-model estimate of this pair\u2019s fundamental value, fit on rate, current-account and productivity differentials over a rolling ' + d.fair.rolling_window + '-day window.'
+    }));
+    grid.appendChild(statCell('Deviation', signed(fv.z, 2) + '\u03c3', zClass(fv.z), {
+      title: 'Deviation',
+      body: 'Spot vs. model fair value, in standard deviations of the fit\u2019s residuals. Descriptive, not a price forecast.'
+    }));
+    grid.appendChild(statCell('Rate diff', fv.rate_diff != null ? signed(fv.rate_diff, 2) : '\u2014', fv.rate_diff != null ? (fv.rate_diff >= 0 ? 'pdt-up' : 'pdt-down') : '', {
+      title: 'Rate Differential',
+      body: 'OIS/overnight rate differential between the pair\u2019s two legs \u2014 one of the model\u2019s regression inputs, shown standalone for reference.'
+    }));
     var meta = el('p', 'pdt-text pdt-muted',
       'Fit: ' + (fv.identifiable ? 'Solid' : 'Regularized') +
       ' \u00b7 ' + fv.usableRows + ' of ' + fv.totalRows + ' rows usable' +
@@ -297,10 +315,15 @@
     r.appendChild(el('b', cls || '', value));
     return r;
   }
-  function badge(text, val, cls) {
-    var b = el('span', 'pdt-badge' + (cls ? ' ' + cls : ''));
+  // Plain-text header stat (replaces the earlier bordered "chip"/pill), matching this panel's
+  // own .pdt-kv convention elsewhere. `tip` is an optional {title, body} pair wired through the
+  // shared fx-tip tooltip widget (dashboard.js's _fxTTAttach) so these stats get the same hover
+  // tooltip as every other metric in the panel, instead of being the one area with none.
+  function badge(text, val, cls, tip) {
+    var b = el('span', 'pdt-hstat');
     b.appendChild(document.createTextNode(text));
-    if (val) b.appendChild(el('b', null, val));
+    if (val) b.appendChild(el('b', cls || null, val));
+    if (tip && typeof _fxTTAttach === 'function') _fxTTAttach(b, tip.title, tip.body);
     return b;
   }
   function clearNode(n) { while (n.firstChild) n.removeChild(n.firstChild); }
@@ -377,7 +400,10 @@
     retailRows(groups[3]);
     S.s3.appendChild(groups[3]);
     if (S.bRet && S.bRet.parentNode) S.bRet.parentNode.removeChild(S.bRet);
-    S.bRet = skew ? badge('Retail ' + skew, null, '') : null;
+    S.bRet = skew ? badge('Retail ', skew, '', {
+      title: 'Retail Positioning',
+      body: 'Aggregate retail trader long/short skew for this pair. Contrarian signal: retail crowds have historically tended to be positioned against the prevailing trend at extremes.'
+    }) : null;
     if (S.bRet) S.badges.appendChild(S.bRet);
     var t = cotTable(groups[2], state.pair);
     if (t) S.cot.appendChild(t);
@@ -472,7 +498,10 @@
     var r = fvNumbers(p, d);
     if (r.ok) {
       var z = r.fv.z, lbl = z >= 1 ? 'Above model ' : (z <= -1 ? 'Below model ' : 'In line with model ');
-      S.badges.appendChild(badge(lbl, signed(z, 2) + '\u03c3', Math.abs(z) < 1 ? '' : (z > 0 ? 'pdt-badge-dn' : 'pdt-badge-up')));
+      S.badges.appendChild(badge(lbl, signed(z, 2) + '\u03c3', Math.abs(z) < 1 ? '' : (z > 0 ? 'pdt-down' : 'pdt-up'), {
+        title: 'Deviation from Fair Value Model',
+        body: 'Spot vs. the model\u2019s fair-value estimate, in standard deviations. Descriptive, not a price forecast \u2014 see the Fair Value tab for the full model.'
+      }));
     }
     var grid = append(el('div', 'pdt-grid'), S.s1, S.s2, S.s3, fvSection(p, d));
     var right = sessionSection(p, d, S);
