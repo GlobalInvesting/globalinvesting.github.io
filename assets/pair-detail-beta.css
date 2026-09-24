@@ -1,4 +1,4 @@
-/* pair-detail-beta.css v0.6.0 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
+/* pair-detail-beta.css v0.7.0 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
 #pdt-panel { --pdt-card: color-mix(in srgb, var(--bg2) 35%, var(--bg)); border-top: 1px solid var(--border); background: var(--bg); }
 
 #pdt-tabs {
@@ -189,18 +189,23 @@
 .pdt-badge-dn { color: var(--down); border-color: rgba(239, 83, 80, .4); }
 .pdt-badge-up { color: var(--up); border-color: rgba(38, 166, 154, .4); }
 
-/* Hero header: quote block (symbol, price, change; H/L as a caption line) on the left and status
-   chips on the right, always on the same row. Chips go side by side when there is room, stacked
-   beside the quote block on mid widths, and only drop below the quote on very narrow panels. */
-.pdt-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 16px; }
-.pdt-hero-main { display: block; min-width: 0; }
-.pdt-hero .pd-inline-price { display: grid; grid-template-columns: auto auto 1fr; column-gap: 14px; row-gap: 2px; align-items: baseline; }
+/* Hero header: quote block (symbol, price, change; H/L as a caption line) and status chips are
+   both sized to their own content and packed together on the left, with only the row's regular
+   gap between them — neither is stretched to fill leftover width, so there is never a dead gap
+   between the price and the chips. The `justify-content: flex-start` below is required: the
+   earlier .pdt-hero rule (Compact Overview, above) sets `justify-content: space-between`, and
+   since this rule never overrode it, the two blocks landed side-by-side with `space-between`
+   still forcing them to opposite edges — the exact "hueco en el medio" this override closes.
+   Any leftover width simply trails after the chips, the same as any other left-aligned toolbar
+   row. Chips wrap below the quote only once the row genuinely runs out of room. A smaller hero
+   price (20px, was 22px) frees a little extra horizontal room for the chips on mid widths. */
+.pdt-hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; column-gap: 16px; row-gap: 6px; }
+.pdt-hero-main { flex: 0 1 auto; min-width: 0; }
+.pdt-hero .pd-inline-price { display: grid; grid-template-columns: auto auto auto; column-gap: 10px; row-gap: 2px; align-items: baseline; }
 .pdt-hero .pd-inline-meta { grid-column: 1 / -1; white-space: nowrap; }
-.pdt-badges { margin-left: 0; width: auto; justify-content: flex-end; }
-@container (max-width: 589px) {
-  .pdt-badges { flex-direction: column; align-items: flex-end; gap: 4px; }
-}
+.pdt-hero .pd-inline-rate { font-size: 20px; }
+.pdt-badges { flex: 0 1 auto; margin-left: 0; width: auto; justify-content: flex-start; }
 @container (max-width: 439px) {
   .pdt-hero { grid-template-columns: minmax(0, 1fr); }
-  .pdt-badges { flex-direction: row; align-items: center; justify-content: flex-start; }
+  .pdt-badges { flex-direction: column; align-items: flex-start; gap: 4px; }
 }

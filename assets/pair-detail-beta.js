@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.6.0
+ * pair-detail-beta.js v0.7.0
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -395,6 +395,28 @@
     state.legacyAt = Date.now();
     runLegacy(state.legacyEl);
   }
+
+  // Live websocket price patch: the 30s refreshLegacy() cadence above covers Price & Spreads,
+  // Volatility, COT and Retail (all slower-moving), but the hero price/change must track the
+  // websocket tick stream at the same speed as the quote bar (fx-websocket.js's own
+  // _updateQuoteBarPriceElement) — a full runLegacy() rebuild on every tick would be wasteful
+  // and would drop any open tooltip, so this only patches the two text nodes directly, the same
+  // cheap-DOM-write pattern fx-websocket.js already uses for the quote bar. Called from
+  // fx-websocket.js's _applyTick() for every tick; a mismatched/closed pair is a no-op.
+  function applyTick(pairId, price, chg, pct) {
+    if (!state.open || state.tab !== 'overview' || !state.pair || state.pair.key !== pairId) return;
+    if (typeof price !== 'number' || isNaN(price)) return;
+    var rateEl = contentEl && contentEl.querySelector('.pdt-hero .pd-inline-rate');
+    var chgEl = contentEl && contentEl.querySelector('.pdt-hero .pd-inline-chg');
+    if (!rateEl && !chgEl) return;
+    if (rateEl) rateEl.textContent = price.toFixed(decimals(state.pair));
+    if (chgEl) {
+      var dirCls = chg > 0 ? 'pd-up' : chg < 0 ? 'pd-dn' : '';
+      chgEl.textContent = typeof pctStr === 'function' ? pctStr(pct) : '\u2014';
+      chgEl.className = ('pd-inline-chg ' + dirCls).trim();
+    }
+  }
+  window.giPairDetailApplyTick = applyTick;
 
   function fvSection(p, d) {
     var r = fvNumbers(p, d), dec = decimals(p);

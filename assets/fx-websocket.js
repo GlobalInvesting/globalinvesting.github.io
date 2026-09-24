@@ -182,6 +182,10 @@ function _applyTick(msg) {
   if (typeof _lwUpdateTodayBar === "function") {
     _lwUpdateTodayBar();
   }
+
+  if (typeof window.giPairDetailApplyTick === "function") {
+    window.giPairDetailApplyTick(pairId, price, cached.chg, cached.pct);
+  }
 }
 
 
