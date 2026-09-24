@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-24T08:56:13.258Z",
-  "generatedAt": "2026-09-24T08:56:13.258Z",
+  "lastUpdate": "2026-09-24T08:57:14Z",
+  "generatedAt": "2026-09-24T08:57:14Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -86,7 +86,7 @@
     "EUR/spain retail sales mom": {
       "n": 3,
       "mean": -0.4,
-      "std": 1
+      "std": 1.0
     },
     "EUR/spain inflation rate mom": {
       "n": 3,
@@ -385,7 +385,7 @@
     },
     "EUR/unemployment rate": {
       "n": 3,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.1
     },
     "USD/continuing jobless claims": {
@@ -405,7 +405,7 @@
     },
     "USD/nonfarm payrolls private": {
       "n": 3,
-      "mean": -9,
+      "mean": -9.0,
       "std": 79.075913
     },
     "USD/participation rate": {
@@ -510,12 +510,12 @@
     },
     "GBP/halifax house price index mom": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.141421
     },
     "GBP/halifax house price index yoy": {
       "n": 2,
-      "mean": 0,
+      "mean": -0.0,
       "std": 0.424264
     },
     "EUR/france balance of trade": {
@@ -560,8 +560,8 @@
     },
     "NZD/rbnz interest rate decision": {
       "n": 3,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "SEK/cpif mom": {
       "n": 4,
@@ -570,7 +570,7 @@
     },
     "SEK/cpif yoy": {
       "n": 4,
-      "mean": 0,
+      "mean": -0.0,
       "std": 0.11547
     },
     "EUR/france current account": {
@@ -585,7 +585,7 @@
     },
     "GBP/rics house price balance": {
       "n": 2,
-      "mean": -1,
+      "mean": -1.0,
       "std": 2.828427
     },
     "EUR/germany balance of trade": {
@@ -615,7 +615,7 @@
     },
     "NOK/inflation rate mom": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.707107
     },
     "NOK/core inflation rate mom": {
@@ -630,8 +630,8 @@
     },
     "CHF/consumer confidence": {
       "n": 2,
-      "mean": -1,
-      "std": 0
+      "mean": -1.0,
+      "std": 0.0
     },
     "EUR/italy industrial production mom": {
       "n": 3,
@@ -745,7 +745,7 @@
     },
     "USD/net long-term tic flows": {
       "n": 2,
-      "mean": 63,
+      "mean": 63.0,
       "std": 58.972706
     },
     "JPY/machinery orders mom": {
@@ -765,7 +765,7 @@
     },
     "EUR/industrial production mom": {
       "n": 4,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.391578
     },
     "CAD/manufacturing sales mom": {
@@ -790,8 +790,8 @@
     },
     "CAD/boc interest rate decision": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "AUD/consumer inflation expectations": {
       "n": 2,
@@ -900,7 +900,7 @@
     },
     "EUR/current account s.a": {
       "n": 2,
-      "mean": 10,
+      "mean": 10.0,
       "std": 4.242641
     },
     "EUR/current account": {
@@ -970,7 +970,7 @@
     },
     "CAD/core inflation rate yoy": {
       "n": 2,
-      "mean": 0,
+      "mean": -0.0,
       "std": 0.141421
     },
     "CAD/cpi trimmed-mean yoy": {
@@ -1030,7 +1030,7 @@
     },
     "EUR/zew economic sentiment index": {
       "n": 3,
-      "mean": 2,
+      "mean": 2.0,
       "std": 12.682271
     },
     "EUR/germany zew economic sentiment index": {
@@ -1055,8 +1055,8 @@
     },
     "GBP/inflation rate mom": {
       "n": 4,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "GBP/inflation rate yoy": {
       "n": 4,
@@ -1070,7 +1070,7 @@
     },
     "GBP/ppi output mom": {
       "n": 4,
-      "mean": 0,
+      "mean": -0.0,
       "std": 0.326599
     },
     "AUD/unemployment rate": {
@@ -1090,7 +1090,7 @@
     },
     "EUR/france business confidence": {
       "n": 2,
-      "mean": 1,
+      "mean": 1.0,
       "std": 1.414214
     },
     "GBP/cbi industrial trends orders": {
@@ -1120,8 +1120,8 @@
     },
     "GBP/gfk consumer confidence": {
       "n": 2,
-      "mean": 4,
-      "std": 0
+      "mean": 4.0,
+      "std": 0.0
     },
     "JPY/inflation rate yoy": {
       "n": 4,
@@ -1170,7 +1170,7 @@
     },
     "CAD/new housing price index mom": {
       "n": 5,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.1
     },
     "USD/new home sales mom": {
@@ -1185,7 +1185,7 @@
     },
     "EUR/germany ifo business climate": {
       "n": 3,
-      "mean": 2,
+      "mean": 2.0,
       "std": 1.852026
     },
     "GBP/cbi distributive trades": {
@@ -1206,11 +1206,11 @@
     "USD/durable goods orders ex transp mom": {
       "n": 2,
       "mean": -0.2,
-      "std": 0
+      "std": 0.0
     },
     "EUR/france consumer confidence": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 1.414214
     },
     "AUD/rba trimmed mean cpi mom": {
@@ -1220,7 +1220,7 @@
     },
     "AUD/rba trimmed mean cpi yoy": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.141421
     },
     "AUD/inflation rate mom": {
@@ -1235,12 +1235,12 @@
     },
     "AUD/rba weighted median cpi yoy": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "AUD/inflation rate yoy": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.282843
     },
     "AUD/cpi": {
@@ -1255,8 +1255,8 @@
     },
     "USD/fed interest rate decision": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "SEK/consumer inflation expectations": {
       "n": 2,
@@ -1266,7 +1266,7 @@
     "EUR/gdp growth rate qoq": {
       "n": 3,
       "mean": 0.2,
-      "std": 0
+      "std": 0.0
     },
     "EUR/gdp growth rate yoy": {
       "n": 2,
@@ -1275,28 +1275,28 @@
     },
     "GBP/boe mpc vote unchanged": {
       "n": 2,
-      "mean": -5,
+      "mean": -5.0,
       "std": 7.071068
     },
     "GBP/boe mpc vote hike": {
       "n": 2,
-      "mean": 5,
+      "mean": 5.0,
       "std": 7.071068
     },
     "GBP/boe mpc vote cut": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "GBP/boe interest rate decision": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "USD/core pce price index yoy": {
       "n": 3,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "USD/personal income mom": {
       "n": 3,
@@ -1310,7 +1310,7 @@
     },
     "USD/gdp price index qoq": {
       "n": 3,
-      "mean": 1,
+      "mean": 1.0,
       "std": 1.473092
     },
     "USD/pce price index yoy": {
@@ -1335,13 +1335,13 @@
     },
     "JPY/boj interest rate decision": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "EUR/netherlands inflation rate yoy": {
       "n": 2,
       "mean": 0.2,
-      "std": 0
+      "std": 0.0
     },
     "CHF/inflation rate mom": {
       "n": 3,
@@ -1390,8 +1390,8 @@
     },
     "EUR/employment change qoq": {
       "n": 3,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "USD/michigan 5 year inflation expectations": {
       "n": 2,
@@ -1435,7 +1435,7 @@
     },
     "GBP/ppi core output mom": {
       "n": 2,
-      "mean": 0,
+      "mean": -0.0,
       "std": 0.141421
     },
     "GBP/ppi input yoy": {
@@ -1470,8 +1470,8 @@
     },
     "CAD/ppi mom": {
       "n": 2,
-      "mean": 1,
-      "std": 0
+      "mean": 1.0,
+      "std": 0.0
     },
     "USD/philadelphia fed employment": {
       "n": 2,
@@ -1520,7 +1520,7 @@
     },
     "EUR/s&p global manufacturing pmi": {
       "n": 3,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.360555
     },
     "EUR/s&p global services pmi": {
@@ -1555,7 +1555,7 @@
     },
     "EUR/finland ppi yoy": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 0.141421
     },
     "EUR/finland import prices yoy": {
@@ -1600,7 +1600,7 @@
     },
     "EUR/slovenia business confidence": {
       "n": 2,
-      "mean": 0,
+      "mean": 0.0,
       "std": 1.414214
     },
     "EUR/germany ifo business expectations": {
@@ -1745,7 +1745,7 @@
     },
     "USD/michigan current conditions": {
       "n": 2,
-      "mean": 1,
+      "mean": 1.0,
       "std": 1.272792
     },
     "USD/michigan 5-year inflation expectations": {
@@ -1785,7 +1785,7 @@
     },
     "JPY/capital spending yoy": {
       "n": 2,
-      "mean": 1,
+      "mean": 1.0,
       "std": 0.565685
     },
     "EUR/italy cpi mom": {
@@ -1815,8 +1815,8 @@
     },
     "EUR/core cpi yoy": {
       "n": 2,
-      "mean": 0,
-      "std": 0
+      "mean": 0.0,
+      "std": 0.0
     },
     "EUR/cpi excl. energy and unprocessed food mom": {
       "n": 2,
@@ -1865,7 +1865,7 @@
     },
     "EUR/ppi mom": {
       "n": 2,
-      "mean": 1,
+      "mean": 1.0,
       "std": 0.848528
     },
     "EUR/ppi yoy": {
@@ -64949,7 +64949,7 @@
       "flag": "🇨🇭",
       "event": "SNB Interest Rate Decision",
       "impact": "high",
-      "actual": null,
+      "actual": "0%",
       "forecast": null,
       "previous": "0.00%"
     },
@@ -64975,7 +64975,7 @@
       "flag": "🇨🇭",
       "event": "SNB Interest Rate Decision",
       "impact": "high",
-      "actual": null,
+      "actual": "0%",
       "forecast": null,
       "previous": null
     },
@@ -65016,8 +65016,7 @@
       "impact": "medium",
       "actual": "4.5%",
       "forecast": null,
-      "previous": "4.00%",
-      "released": true
+      "previous": "4.00%"
     },
     {
       "date": "24 Sep",
