@@ -989,11 +989,12 @@
 
   function getBarSessionState(sess) {
     if (isMarketWeekend()) return 'past'; 
-    const h = new Date().getUTCHours();
-    const isActive = getActiveSessions().has(sess.name);
-    if (isActive) return 'active';
-    if (sess.name === 'Sydney') return (h >= 6 && h < 21) ? 'past' : 'upcoming';
-    return h >= sess.utcEnd ? 'past' : 'upcoming';
+    const now = new Date();
+    const elapsed = ((now.getUTCHours() + now.getUTCMinutes() / 60) - 21 + 24) % 24;
+    const off = (sess.utcStart - 21 + 24) % 24;
+    const len = (sess.utcEnd - sess.utcStart + 24) % 24;
+    if (elapsed >= off && elapsed < off + len) return 'active';
+    return elapsed < off ? 'upcoming' : 'past';
   }
 
   function getSessionProgress(sess) {
@@ -1240,7 +1241,7 @@
           : '<span style="font-size:8px;background:rgba(246,148,28,.10);color:var(--orange,#f6941c);border-radius:2px;padding:1px 4px;letter-spacing:.07em;opacity:.8;margin-left:6px;vertical-align:middle">UPCOMING</span>';
 
         const displayNote = state === 'upcoming'
-          ? '<span style="color:var(--text3,#6b7280);font-style:italic">Opens ' + utcHourToLocalStr(sess.utcStart) + ' \u2014 context generated daily at 06:00 UTC</span>'
+          ? '<span style="color:var(--text3,#6b7280);font-style:italic">Opens ' + utcHourToLocalStr(sess.utcStart) + ' ' + localTzAbbr() + '</span>'
           : aiNote;
 
         return (

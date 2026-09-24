@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.7.0
+ * pair-detail-beta.js v0.7.1
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -171,10 +171,22 @@
     return wrap;
   }
 
-  function sessionState(s, h) {
-    var open = s.start < s.end ? (h >= s.start && h < s.end) : (h >= s.start || h < s.end);
-    if (open) return 'live';
-    return 'closed';
+  var CYCLE_ANCHOR_H = 21;
+  function cycleElapsedH(now) {
+    return ((now.getUTCHours() + now.getUTCMinutes() / 60) - CYCLE_ANCHOR_H + 24) % 24;
+  }
+  function sessionOffsetH(s) { return (s.start - CYCLE_ANCHOR_H + 24) % 24; }
+  function sessionLenH(s) { return (s.end - s.start + 24) % 24; }
+  function sessionState(s, now) {
+    var el_ = cycleElapsedH(now), off = sessionOffsetH(s);
+    if (el_ >= off && el_ < off + sessionLenH(s)) return 'live';
+    return el_ < off ? 'upcoming' : 'closed';
+  }
+  function opensInText(s, now) {
+    var mins = Math.max(1, Math.round((sessionOffsetH(s) - cycleElapsedH(now)) * 60));
+    var hh = Math.floor(mins / 60), mm = mins % 60;
+    var when = String(s.start).padStart(2, '0') + ':00 UTC';
+    return 'Opens in ' + (hh ? hh + 'h ' : '') + mm + 'm \u00b7 ' + when;
   }
   // One note per session for the pair. session-context.json is generated per currency, so pick
   // the note that names this pair (either direction); otherwise fall back to the base-currency
@@ -193,19 +205,20 @@
   function renderSession(p, d) {
     var sc = d.session;
     if (!sc || !sc.sessions) return block('SESSION CONTEXT', [note('Session context not available yet.')]);
-    if (sc.market_closed) {
+    var fxClosed = typeof window.isFxMarketClosedNow === 'function' && window.isFxMarketClosedNow();
+    if (sc.market_closed || fxClosed) {
       return block('SESSION CONTEXT', [note('Market closed. Session context resumes Sunday 21:00 UTC.')]);
     }
-    var h = new Date().getUTCHours();
+    var now = new Date();
     var wrap = el('div', 'pdt-stack');
     SESSIONS.forEach(function (sess) {
-      var st = sessionState(sess, h);
-      var row = el('section', 'pdt-sess' + (st === 'live' ? ' pdt-sess-live' : ''));
+      var st = sessionState(sess, now);
+      var row = el('section', 'pdt-sess' + (st === 'live' ? ' pdt-sess-live' : st === 'upcoming' ? ' pdt-sess-upcoming' : ''));
       var head = el('div', 'pdt-sess-head');
       head.appendChild(el('h3', 'pdt-sess-name', sess.name.toUpperCase()));
-      head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : 'CLOSED'));
+      head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : st === 'upcoming' ? 'UPCOMING' : 'CLOSED'));
       row.appendChild(head);
-      row.appendChild(el('p', 'pdt-text', sessionNote(p, sc, sess.name) || '\u2014'));
+      row.appendChild(el('p', 'pdt-text', st === 'upcoming' ? opensInText(sess, now) : (sessionNote(p, sc, sess.name) || '\u2014')));
       wrap.appendChild(row);
     });
     wrap.appendChild(footer('AI Analytics \u00b7 session windows in UTC', sc.generated_at));
@@ -485,8 +498,8 @@
 
   function sessionSection(p, d, S) {
     var sec = el('div', 'pdt-livesec');
-    var h = new Date().getUTCHours();
-    var live = SESSIONS.filter(function (x) { return sessionState(x, h) === 'live'; }).pop();
+    var nowS = new Date();
+    var live = SESSIONS.filter(function (x) { return sessionState(x, nowS) === 'live'; }).pop();
     var sc = d.session && d.session.sessions && !d.session.market_closed;
     var head = el('h3', 'pdt-sh', 'Live session' + (live ? ' \u00b7 ' + live.name : ''));
     if (live && sc) head.appendChild(el('span', 'pdt-chip pdt-chip-live', 'LIVE'));
