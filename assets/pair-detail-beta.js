@@ -309,10 +309,12 @@
    * The per-row detail (price, Price & Spreads, Volatility, COT, Retail) is still produced by the
    * legacy renderer into a hidden host; its nodes (tooltips included) are then moved into the
    * compact layout. Fair Value and Live Session are rendered here. */
-  function kv(label, value, cls) {
+  function kv(label, value, cls, tip) {
     var r = el('div', 'pdt-kv');
-    r.appendChild(el('i', null, label));
+    var l = el('i', null, label);
+    r.appendChild(l);
     r.appendChild(el('b', cls || '', value));
+    if (tip && typeof _fxTTAttach === 'function') _fxTTAttach(l, tip.title, tip.body);
     return r;
   }
   // Plain-text header stat (replaces the earlier bordered "chip"/pill), matching this panel's
@@ -396,13 +398,20 @@
     S.s2.appendChild(groups[1]);
     var skewEl = groups[3].querySelector('.pd-inline-retail-skew');
     var skew = skewEl ? skewEl.textContent.trim() : '';
+    // Mirrors dashboard.js's own retSkewCls contrarian convention (pd-up/pd-dn on the legacy
+    // node this was built from): retail majority/heavily LONG renders as the bearish class and
+    // majority/heavily SHORT as the bullish class, since retail crowds have historically tended
+    // to be positioned against the prevailing trend at extremes. 'Mixed' (dashboard.js's pd-dim)
+    // stays neutral.
+    var skewCls = skewEl && skewEl.classList.contains('pd-up') ? 'pdt-up'
+      : skewEl && skewEl.classList.contains('pd-dn') ? 'pdt-down' : '';
     if (skewEl) skewEl.parentNode.removeChild(skewEl);
     retailRows(groups[3]);
     S.s3.appendChild(groups[3]);
     if (S.bRet && S.bRet.parentNode) S.bRet.parentNode.removeChild(S.bRet);
-    S.bRet = skew ? badge('Retail ', skew, '', {
+    S.bRet = skew ? badge('Retail ', skew, skewCls, {
       title: 'Retail Positioning',
-      body: 'Aggregate retail trader long/short skew for this pair. Contrarian signal: retail crowds have historically tended to be positioned against the prevailing trend at extremes.'
+      body: 'Aggregate retail trader long/short skew for this pair. Contrarian signal: retail crowds have historically tended to be positioned against the prevailing trend at extremes \u2014 colored by that contrarian read (majority/heavily long shown as bearish, majority/heavily short as bullish; Mixed stays neutral).'
     }) : null;
     if (S.bRet) S.badges.appendChild(S.bRet);
     var t = cotTable(groups[2], state.pair);
@@ -449,10 +458,24 @@
     var sec = el('section', 'pdt-sec');
     sec.appendChild(el('h3', 'pdt-sh', 'FX Fair Value'));
     if (!r.ok) { sec.appendChild(note('Model output not available for this pair yet.')); return sec; }
-    sec.appendChild(kv('Model', r.fv.fairValue.toFixed(dec)));
-    sec.appendChild(kv('Spot @ run', r.fv.spot.toFixed(dec)));
-    sec.appendChild(kv('Deviation', signed(r.fv.z, 2) + '\u03c3', zClass(r.fv.z)));
-    sec.appendChild(kv('Fit', r.fv.identifiable ? 'Solid' : 'Regularized'));
+    sec.appendChild(kv('Model', r.fv.fairValue.toFixed(dec), '', {
+      title: 'Model Fair Value',
+      body: 'Ridge-regression BEER-model estimate of this pair\u2019s fundamental value, fit on rate, current-account and productivity differentials over a rolling ' + d.fair.rolling_window + '-day window.'
+    }));
+    sec.appendChild(kv('Spot @ run', r.fv.spot.toFixed(dec), '', {
+      title: 'Spot',
+      body: 'Live market price for this pair at the time the model last ran.'
+    }));
+    sec.appendChild(kv('Deviation', signed(r.fv.z, 2) + '\u03c3', zClass(r.fv.z), {
+      title: 'Deviation',
+      body: 'Spot vs. model fair value, in standard deviations of the fit\u2019s residuals. Descriptive, not a price forecast.'
+    }));
+    sec.appendChild(kv('Fit', r.fv.identifiable ? 'Solid' : 'Regularized', '', {
+      title: 'Model Fit',
+      body: r.fv.identifiable
+        ? 'The regression solves directly (OLS) for this pair \u2014 its regressors carry enough independent variation to identify the model without shrinkage.'
+        : 'This pair\u2019s regressors are collinear enough that a plain regression can\u2019t solve uniquely, so the model falls back to ridge regularization (shrinkage across all coefficients, \u03bb selected by cross-validation). Still a valid fit, just less directly identified.'
+    }));
     sec.appendChild(gauge(r.fv.z));
     var sc = el('div', 'pdt-scale');
     ['-3\u03c3', '0', '+3\u03c3'].forEach(function (t) { sc.appendChild(el('span', null, t)); });
