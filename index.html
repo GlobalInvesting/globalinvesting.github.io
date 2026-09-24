@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-pair-detail="unified">
 <head>
 
 <script>
@@ -479,6 +479,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="assets/dashboard.css?v=8.540.3">
 <link rel="stylesheet" href="assets/command-bar.css?v=8.491.5">
+<link rel="stylesheet" href="assets/pair-detail-beta.css?v=0.3.4">
 
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css">
@@ -984,6 +985,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           
         </div>
       </div>
+
+      
+      <section class="panel" id="pdt-panel" aria-labelledby="pdt-title">
+        <div class="panel-head pdt-head">
+          <h2 class="panel-title" id="pdt-title">
+            <button type="button" class="pdt-toggle" id="pdt-toggle" aria-expanded="true" aria-controls="pdt-content">
+              <span class="pdt-chev" aria-hidden="true"></span>Pair Detail
+            </button>
+          </h2>
+          <span class="panel-sub" id="pdt-sub" aria-live="polite">&mdash;</span>
+        </div>
+        <div class="pdt-collapsible" id="pdt-content" data-open="true">
+          <div class="pdt-collapsible-inner">
+            <div id="pdt-tabs" role="tablist" aria-label="Pair detail sections">
+              <button class="pdt-tab on" id="pdt-t-overview"  role="tab" aria-selected="true"  aria-controls="pdt-p-overview"  data-pdt-tab="overview">Overview</button>
+              <button class="pdt-tab"    id="pdt-t-macro"     role="tab" aria-selected="false" aria-controls="pdt-p-macro"     data-pdt-tab="macro"     tabindex="-1">Macro Drivers</button>
+              <button class="pdt-tab"    id="pdt-t-session"   role="tab" aria-selected="false" aria-controls="pdt-p-session"   data-pdt-tab="session"   tabindex="-1">Session Context</button>
+              <button class="pdt-tab"    id="pdt-t-strength"  role="tab" aria-selected="false" aria-controls="pdt-p-strength"  data-pdt-tab="strength"  tabindex="-1">Strength Drivers</button>
+              <button class="pdt-tab"    id="pdt-t-fairvalue" role="tab" aria-selected="false" aria-controls="pdt-p-fairvalue" data-pdt-tab="fairvalue" tabindex="-1">Fair Value</button>
+            </div>
+            <div class="pdt-panel" id="pdt-p-overview"  role="tabpanel" aria-labelledby="pdt-t-overview"></div>
+            <div class="pdt-panel" id="pdt-p-macro"     role="tabpanel" aria-labelledby="pdt-t-macro"     hidden></div>
+            <div class="pdt-panel" id="pdt-p-session"   role="tabpanel" aria-labelledby="pdt-t-session"   hidden></div>
+            <div class="pdt-panel" id="pdt-p-strength"  role="tabpanel" aria-labelledby="pdt-t-strength"  hidden></div>
+            <div class="pdt-panel" id="pdt-p-fairvalue" role="tabpanel" aria-labelledby="pdt-t-fairvalue" hidden></div>
+          </div>
+        </div>
+      </section>
     </div>
 
     
@@ -2148,11 +2177,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 
 <script src="assets/gi-auth.js?v=1.7.8" defer></script>
-<script src="assets/dashboard.js?v=8.540.3" defer></script>
+<script src="assets/dashboard.js?v=8.541.0" defer></script>
+<script src="assets/pair-detail-beta.js?v=0.3.4" defer></script>
 <script src="assets/command-bar.js?v=8.491.4" defer></script>
 <script src="assets/gi-overview.js?v=2.0.1" defer></script>
 
-<script src="assets/fx-websocket.js?v=1.0.4" defer></script>
+<script src="assets/fx-websocket.js?v=1.0.5" defer></script>
 <script src="assets/cot-modal-chart.js?v=7.99.1" defer></script>
 <script src="assets/cb-rates-modal.js?v=8.0.8" defer></script>
 <script src="assets/real-carry-modal.js?v=2.7.11" defer></script>
