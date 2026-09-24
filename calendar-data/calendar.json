@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-24T08:41:33Z",
-  "generatedAt": "2026-09-24T08:41:33Z",
+  "lastUpdate": "2026-09-24T08:43:04Z",
+  "generatedAt": "2026-09-24T08:43:04Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1184,9 +1184,9 @@
       "std": 0.036062
     },
     "EUR/germany ifo business climate": {
-      "n": 2,
-      "mean": 2.35,
-      "std": 2.474874
+      "n": 3,
+      "mean": 2.0,
+      "std": 1.852026
     },
     "GBP/cbi distributive trades": {
       "n": 2,
@@ -1602,6 +1602,16 @@
       "n": 2,
       "mean": 0.0,
       "std": 1.414214
+    },
+    "EUR/germany ifo business expectations": {
+      "n": 2,
+      "mean": 2.35,
+      "std": 4.454773
+    },
+    "EUR/germany ifo current business situation": {
+      "n": 2,
+      "mean": 1.85,
+      "std": 0.919239
     },
     "USD/richmond fed services revenues": {
       "n": 2,
@@ -65056,7 +65066,7 @@
       "flag": "🇪🇺",
       "event": "Germany Ifo Business Expectations",
       "impact": "medium",
-      "actual": null,
+      "actual": "90.4",
       "forecast": "91.2",
       "previous": "89.1"
     },
@@ -65069,7 +65079,7 @@
       "flag": "🇪🇺",
       "event": "Germany Ifo Current Business Situation",
       "impact": "medium",
-      "actual": null,
+      "actual": "89.5",
       "forecast": "88.3",
       "previous": "88.5"
     },
@@ -65082,7 +65092,7 @@
       "flag": "🇪🇺",
       "event": "Germany Ifo Business Climate",
       "impact": "medium",
-      "actual": null,
+      "actual": "89.9",
       "forecast": "88.6",
       "previous": "88.8"
     },
