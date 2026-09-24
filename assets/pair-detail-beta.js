@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.3.0
+ * pair-detail-beta.js v0.4.0
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -266,45 +266,138 @@
     return block('FX FAIR VALUE \u00b7 ' + p.label, [grid, gauge(fv.z), meta, footer('Fair Value model', d.fair.generated_at)]);
   }
 
-  function legacyDetail() {
-    var host = el('div', 'pdt-legacy');
-    state.legacyEl = host;
-    if (typeof window.buildInlineDetail === 'function' && state.sym) {
-      host.appendChild(el('div', 'pdt-empty', 'Loading\u2026'));
-      state.legacyAt = Date.now();
-      try { Promise.resolve(window.buildInlineDetail(state.sym, host)).catch(function () {}); } catch (e) { /* legacy renderer unavailable */ }
-    }
-    return host;
+  /* ---------- Overview (compact layout) ----------
+   * The per-row detail (price, Price & Spreads, Volatility, COT, Retail) is still produced by the
+   * legacy renderer into a hidden host; its nodes (tooltips included) are then moved into the
+   * compact layout. Fair Value and Live Session are rendered here. */
+  function kv(label, value, cls) {
+    var r = el('div', 'pdt-kv');
+    r.appendChild(el('i', null, label));
+    r.appendChild(el('b', cls || '', value));
+    return r;
+  }
+  function clearNode(n) { while (n.firstChild) n.removeChild(n.firstChild); }
+
+  function cotTable(group, p) {
+    var kids = Array.prototype.slice.call(group.children), blocks = [], cur = null;
+    kids.forEach(function (k) {
+      var t = (k.textContent || '').trim();
+      if (/^COT [A-Z]{3}$/.test(t)) { cur = { ccy: t.slice(4), metrics: null, summary: null }; blocks.push(cur); return; }
+      if (!cur) { if (k.classList.contains('pd-inline-metrics')) { cur = { ccy: p.base !== 'USD' ? p.base : p.quote, metrics: null, summary: null }; blocks.push(cur); } else return; }
+      if (k.classList.contains('pd-inline-metrics')) cur.metrics = k; else cur.summary = k;
+    });
+    var wrap = el('div', 'pdt-tblwrap'), tbl = el('table', 'pdt-tbl');
+    tbl.appendChild(el('caption', null, 'COT \u00b7 Leveraged Funds (LF) / Asset Managers (AM)'));
+    var thead = el('thead'), hr = el('tr');
+    ['CCY', 'LF net', 'LF WoW \u0394', 'AM net', 'LF % OI', 'Bias'].forEach(function (h) {
+      var th = el('th', null, h); th.scope = 'col'; hr.appendChild(th);
+    });
+    thead.appendChild(hr); tbl.appendChild(thead);
+    var tb = el('tbody');
+    blocks.forEach(function (bk) {
+      if (!bk.metrics) return;
+      var tr = el('tr');
+      tr.appendChild(el('td', null, bk.ccy));
+      Array.prototype.slice.call(bk.metrics.children).forEach(function (m) {
+        var td = el('td'); td.appendChild(m); tr.appendChild(td);
+      });
+      var tdb = el('td', 'pdt-bias');
+      if (bk.summary) tdb.appendChild(bk.summary); else tdb.textContent = '\u2014';
+      tr.appendChild(tdb);
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb); wrap.appendChild(tbl);
+    return blocks.length ? wrap : null;
+  }
+
+  function composeOverview(host) {
+    var S = state.ov;
+    if (!S || S.host !== host || !S.hero.isConnected) return;
+    var price = host.querySelector('.pd-inline-price');
+    var groups = host.querySelectorAll('.pd-inline-group');
+    if (!price || groups.length < 4) return;
+    var foot = host.querySelector('.pd-inline-footer');
+    [S.hero, S.s1, S.s2, S.cot].forEach(clearNode);
+    S.hero.appendChild(price);
+    S.s1.appendChild(groups[0]);
+    S.s2.appendChild(groups[1]);
+    groups[3].classList.add('pdt-split');
+    S.s2.appendChild(groups[3]);
+    var t = cotTable(groups[2], state.pair);
+    if (t) S.cot.appendChild(t);
+    S.foot.textContent = foot ? foot.textContent.trim() : '';
+  }
+  function runLegacy(host) {
+    try {
+      Promise.resolve(window.buildInlineDetail(state.sym, host))
+        .then(function () { composeOverview(host); }, function () {});
+    } catch (e) { /* legacy renderer unavailable */ }
   }
   function refreshLegacy() {
     if (!state.open || state.tab !== 'overview' || !state.legacyEl || !state.legacyEl.isConnected) return;
     if (Date.now() - state.legacyAt < LEGACY_REFRESH_MS) return;
     state.legacyAt = Date.now();
-    try { Promise.resolve(window.buildInlineDetail(state.sym, state.legacyEl)).catch(function () {}); } catch (e) { /* keep last render */ }
+    runLegacy(state.legacyEl);
+  }
+
+  function fvSection(p, d) {
+    var r = fvNumbers(p, d), dec = decimals(p);
+    var sec = el('section', 'pdt-sec');
+    sec.appendChild(el('h3', 'pdt-sh', 'FX Fair Value'));
+    if (!r.ok) { sec.appendChild(note('Model output not available for this pair yet.')); return sec; }
+    sec.appendChild(kv('Model', r.fv.fairValue.toFixed(dec)));
+    sec.appendChild(kv('Spot @ run', r.fv.spot.toFixed(dec)));
+    sec.appendChild(kv('Deviation', signed(r.fv.z, 2) + '\u03c3', zClass(r.fv.z)));
+    sec.appendChild(kv('Fit', r.fv.identifiable ? 'Solid' : 'Regularized'));
+    sec.appendChild(gauge(r.fv.z));
+    var sc = el('div', 'pdt-scale');
+    ['-3\u03c3', '0', '+3\u03c3'].forEach(function (t) { sc.appendChild(el('span', null, t)); });
+    sec.appendChild(sc);
+    return sec;
+  }
+
+  function sessionSection(p, d, S) {
+    var sec = el('div', 'pdt-livesec');
+    var h = new Date().getUTCHours();
+    var live = SESSIONS.filter(function (x) { return sessionState(x, h) === 'live'; }).pop();
+    var sc = d.session && d.session.sessions && !d.session.market_closed;
+    var head = el('h3', 'pdt-sh', 'Live session' + (live ? ' \u00b7 ' + live.name : ''));
+    if (live && sc) head.appendChild(el('span', 'pdt-chip pdt-chip-live', 'LIVE'));
+    sec.appendChild(head);
+    var t = sc && live ? sessionNote(p, d.session, live.name) : null;
+    sec.appendChild(t ? el('p', 'pdt-text', t) : note('No live-session note available.'));
+    var f = el('div', 'pdt-foot pdt-srcs');
+    S.foot = el('span');
+    f.appendChild(S.foot);
+    var r = fvNumbers(p, d), ft = r.ok && d.fair ? fmtUtc(d.fair.generated_at) : null;
+    if (ft) f.appendChild(el('span', null, 'Fair value model run ' + ft + ' (estimate, not a forecast)'));
+    var at = t && fmtUtc(d.session.generated_at);
+    if (at) {
+      var ai = el('span', null, 'AI Analytics ' + at);
+      var age = ageHours(d.session.generated_at);
+      if (age != null && age > STALE_HOURS) ai.appendChild(el('span', 'pdt-stale', ' \u00b7 data older than ' + STALE_HOURS + 'h'));
+      f.appendChild(ai);
+    }
+    sec.appendChild(f);
+    return sec;
   }
 
   function renderOverview(p, d) {
-    var r = fvNumbers(p, d), dec = decimals(p);
-    var fvNode;
-    if (r.ok) {
-      var grid = el('div', 'pdt-stats');
-      grid.appendChild(statCell('Spot @ run', r.fv.spot.toFixed(dec)));
-      grid.appendChild(statCell('Fair value', r.fv.fairValue.toFixed(dec)));
-      grid.appendChild(statCell('Deviation', signed(r.fv.z, 2) + '\u03c3', zClass(r.fv.z)));
-      grid.appendChild(statCell('Fit', r.fv.identifiable ? 'Solid' : 'Regularized'));
-      fvNode = block('FX FAIR VALUE', [grid, gauge(r.fv.z), footer('Fair Value model \u00b7 estimate, not a forecast', d.fair.generated_at)]);
-    } else {
-      fvNode = block('FX FAIR VALUE', [note('Model output not available for this pair yet.')]);
+    var S = { host: el('div', 'pdt-src') };
+    S.host.hidden = true;
+    S.hero = el('div', 'pdt-hero');
+    S.s1 = el('section', 'pdt-sec'); S.s2 = el('section', 'pdt-sec'); S.cot = el('div', 'pdt-cotbox');
+    var grid = append(el('div', 'pdt-grid'), S.s1, S.s2, fvSection(p, d));
+    var left = append(el('div', 'pdt-ov-left'), grid, S.cot);
+    var right = sessionSection(p, d, S);
+    var wrap = append(el('div', 'pdt-ov'), S.hero, append(el('div', 'pdt-ov-body'), left, right), S.host);
+    S.hero.appendChild(el('span', 'pdt-empty', 'Loading\u2026'));
+    state.ov = S;
+    state.legacyEl = S.host;
+    if (typeof window.buildInlineDetail === 'function' && state.sym) {
+      state.legacyAt = Date.now();
+      runLegacy(S.host);
     }
-    var h = new Date().getUTCHours();
-    var live = SESSIONS.filter(function (s) { return sessionState(s, h) === 'live'; }).pop();
-    var sc = d.session && d.session.sessions && !d.session.market_closed;
-    var t = sc && live ? sessionNote(p, d.session, live.name) : null;
-    var sessNode = block(live ? 'LIVE SESSION \u00b7 ' + live.name.toUpperCase() : 'LIVE SESSION',
-      t ? [el('p', 'pdt-text', t), footer('AI Analytics', d.session.generated_at)] : [note('No live-session note available.')]);
-    var wrap = el('div', 'pdt-overview');
-    wrap.appendChild(legacyDetail());
-    wrap.appendChild(append(el('div', 'pdt-cols pdt-ov-foot'), fvNode, sessNode));
     return wrap;
   }
 
