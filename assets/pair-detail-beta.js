@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.4.0
+ * pair-detail-beta.js v0.5.0
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -39,7 +39,7 @@
   })();
 
   var root, tabsEl, subEl, toggleBtn, contentEl;
-  var state = { pair: null, sym: null, tab: 'overview', open: true, data: null, loadedAt: 0, loading: null, legacyEl: null, legacyAt: 0 };
+  var state = { pair: null, sym: null, tab: 'overview', open: true, data: null, loadedAt: 0, loading: null, legacyEl: null, legacyAt: 0, macroCcy: null };
 
   /* ---------- helpers ---------- */
   function el(tag, cls, text) {
@@ -140,14 +140,35 @@
   /* ---------- tab renderers ---------- */
   function renderMacro(p, d) {
     var cat = d.catalysts;
-    var nodes = [p.base, p.quote].map(function (c) {
-      var e = cat && cat.currencies && cat.currencies[c];
-      if (!e || !e.catalyst) return block(c + ' MACRO DRIVERS', [note('No macro driver data available yet.')]);
-      return block(c + ' MACRO DRIVERS', [
-        el('p', 'pdt-text', e.catalyst), sourcesLine(e.sources), footer('AI Analytics', e.updated)
-      ]);
+    var c = (state.macroCcy === p.base || state.macroCcy === p.quote) ? state.macroCcy : p.base;
+    var wrap = el('div', 'pdt-stack');
+    var head = el('div', 'pdt-macro-head');
+    head.appendChild(el('h3', 'pdt-sh', c + ' MACRO DRIVERS'));
+    var seg = el('div', 'pdt-seg');
+    seg.setAttribute('role', 'group');
+    seg.setAttribute('aria-label', 'Currency');
+    [p.base, p.quote].forEach(function (x) {
+      var btn = el('button', null, x);
+      btn.type = 'button';
+      btn.setAttribute('aria-pressed', x === c ? 'true' : 'false');
+      btn.addEventListener('click', function () {
+        if (state.macroCcy === x) return;
+        state.macroCcy = x;
+        renderTab('macro');
+      });
+      seg.appendChild(btn);
     });
-    return twoCol(nodes[0], nodes[1]);
+    head.appendChild(seg);
+    wrap.appendChild(head);
+    var e = cat && cat.currencies && cat.currencies[c];
+    if (!e || !e.catalyst) {
+      wrap.appendChild(note('No macro driver data available yet.'));
+    } else {
+      wrap.appendChild(el('p', 'pdt-text', e.catalyst));
+      wrap.appendChild(sourcesLine(e.sources));
+      wrap.appendChild(footer('AI Analytics', e.updated));
+    }
+    return wrap;
   }
 
   function sessionState(s, h) {
@@ -276,6 +297,13 @@
     r.appendChild(el('b', cls || '', value));
     return r;
   }
+  function badge(text, val, dot) {
+    var b = el('span', 'pdt-badge');
+    if (dot != null) b.appendChild(el('i', 'pdt-dot' + (dot ? ' ' + dot : '')));
+    b.appendChild(document.createTextNode(text));
+    if (val) b.appendChild(el('b', null, val));
+    return b;
+  }
   function clearNode(n) { while (n.firstChild) n.removeChild(n.firstChild); }
 
   function cotTable(group, p) {
@@ -317,12 +345,17 @@
     var groups = host.querySelectorAll('.pd-inline-group');
     if (!price || groups.length < 4) return;
     var foot = host.querySelector('.pd-inline-footer');
-    [S.hero, S.s1, S.s2, S.cot].forEach(clearNode);
-    S.hero.appendChild(price);
+    [S.main, S.s1, S.s2, S.s3, S.cot].forEach(clearNode);
+    S.main.appendChild(price);
     S.s1.appendChild(groups[0]);
     S.s2.appendChild(groups[1]);
-    groups[3].classList.add('pdt-split');
-    S.s2.appendChild(groups[3]);
+    var skewEl = groups[3].querySelector('.pd-inline-retail-skew');
+    var skew = skewEl ? skewEl.textContent.trim() : '';
+    if (skewEl) skewEl.parentNode.removeChild(skewEl);
+    S.s3.appendChild(groups[3]);
+    if (S.bRet && S.bRet.parentNode) S.bRet.parentNode.removeChild(S.bRet);
+    S.bRet = skew ? badge('Retail ' + skew.toLowerCase(), null, '') : null;
+    if (S.bRet) S.badges.appendChild(S.bRet);
     var t = cotTable(groups[2], state.pair);
     if (t) S.cot.appendChild(t);
     S.foot.textContent = foot ? foot.textContent.trim() : '';
@@ -386,12 +419,20 @@
     var S = { host: el('div', 'pdt-src') };
     S.host.hidden = true;
     S.hero = el('div', 'pdt-hero');
-    S.s1 = el('section', 'pdt-sec'); S.s2 = el('section', 'pdt-sec'); S.cot = el('div', 'pdt-cotbox');
-    var grid = append(el('div', 'pdt-grid'), S.s1, S.s2, fvSection(p, d));
-    var left = append(el('div', 'pdt-ov-left'), grid, S.cot);
+    S.main = el('div', 'pdt-hero-main');
+    S.badges = el('div', 'pdt-badges');
+    append(S.hero, S.main, S.badges);
+    S.s1 = el('section', 'pdt-sec'); S.s2 = el('section', 'pdt-sec'); S.s3 = el('section', 'pdt-sec');
+    S.cot = el('div', 'pdt-cotbox');
+    var r = fvNumbers(p, d);
+    if (r.ok) {
+      var z = r.fv.z, lbl = z >= 1 ? 'Above model ' : (z <= -1 ? 'Below model ' : 'In line with model ');
+      S.badges.appendChild(badge(lbl, signed(z, 2) + '\u03c3', Math.abs(z) < 1 ? '' : (z > 0 ? 'pdt-down' : 'pdt-up')));
+    }
+    var grid = append(el('div', 'pdt-grid'), S.s1, S.s2, S.s3, fvSection(p, d));
     var right = sessionSection(p, d, S);
-    var wrap = append(el('div', 'pdt-ov'), S.hero, append(el('div', 'pdt-ov-body'), left, right), S.host);
-    S.hero.appendChild(el('span', 'pdt-empty', 'Loading\u2026'));
+    var wrap = append(el('div', 'pdt-ov'), S.hero, append(el('div', 'pdt-ov-body'), grid, S.cot, right), S.host);
+    S.main.appendChild(el('span', 'pdt-empty', 'Loading\u2026'));
     state.ov = S;
     state.legacyEl = S.host;
     if (typeof window.buildInlineDetail === 'function' && state.sym) {
