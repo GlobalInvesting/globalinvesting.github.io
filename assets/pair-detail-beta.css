@@ -189,12 +189,18 @@
 .pdt-badge-dn { color: var(--down); border-color: rgba(239, 83, 80, .4); }
 .pdt-badge-up { color: var(--up); border-color: rgba(38, 166, 154, .4); }
 
-/* Hero header: two fixed zones (quote left, status chips right) on one row; when the panel is too
-   narrow for both, chips drop to their own row, left-aligned with the content edge. */
+/* Hero header: quote block (symbol, price, change; H/L as a caption line) on the left and status
+   chips on the right, always on the same row. Chips go side by side when there is room, stacked
+   beside the quote block on mid widths, and only drop below the quote on very narrow panels. */
 .pdt-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 16px; }
-.pdt-hero-main { gap: 2px 14px; }
+.pdt-hero-main { display: block; min-width: 0; }
+.pdt-hero .pd-inline-price { display: grid; grid-template-columns: auto auto 1fr; column-gap: 14px; row-gap: 2px; align-items: baseline; }
+.pdt-hero .pd-inline-meta { grid-column: 1 / -1; white-space: nowrap; }
 .pdt-badges { margin-left: 0; width: auto; justify-content: flex-end; }
-@container (max-width: 700px) {
+@container (max-width: 589px) {
+  .pdt-badges { flex-direction: column; align-items: flex-end; gap: 4px; }
+}
+@container (max-width: 439px) {
   .pdt-hero { grid-template-columns: minmax(0, 1fr); }
-  .pdt-badges { justify-content: flex-start; }
+  .pdt-badges { flex-direction: row; align-items: center; justify-content: flex-start; }
 }
