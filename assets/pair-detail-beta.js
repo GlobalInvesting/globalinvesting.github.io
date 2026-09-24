@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.2.0
+ * pair-detail-beta.js v0.3.0
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -155,6 +155,20 @@
     if (open) return 'live';
     return 'closed';
   }
+  // One note per session for the pair. session-context.json is generated per currency, so pick
+  // the note that names this pair (either direction); otherwise fall back to the base-currency
+  // note, then the quote-currency note. Never concatenates the two.
+  function sessionNote(p, sc, sessName) {
+    var lines = [p.base, p.quote].map(function (c) {
+      return sc.sessions && sc.sessions[c] && sc.sessions[c][sessName];
+    }).filter(function (t) { return typeof t === 'string' && t; });
+    if (!lines.length) return null;
+    var fwd = p.base + '/' + p.quote, inv = p.quote + '/' + p.base;
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].indexOf(fwd) >= 0 || lines[i].indexOf(inv) >= 0) return lines[i];
+    }
+    return lines[0];
+  }
   function renderSession(p, d) {
     var sc = d.session;
     if (!sc || !sc.sessions) return block('SESSION CONTEXT', [note('Session context not available yet.')]);
@@ -170,54 +184,38 @@
       head.appendChild(el('h3', 'pdt-sess-name', sess.name.toUpperCase()));
       head.appendChild(el('span', 'pdt-chip pdt-chip-' + st, st === 'live' ? 'LIVE' : 'CLOSED'));
       row.appendChild(head);
-      [p.base, p.quote].forEach(function (c) {
-        var t = sc.sessions[c] && sc.sessions[c][sess.name];
-        var line = el('div', 'pdt-line');
-        line.appendChild(el('span', 'pdt-tag', c));
-        line.appendChild(el('p', 'pdt-text', t || '\u2014'));
-        row.appendChild(line);
-      });
+      row.appendChild(el('p', 'pdt-text', sessionNote(p, sc, sess.name) || '\u2014'));
       wrap.appendChild(row);
     });
     wrap.appendChild(footer('AI Analytics \u00b7 session windows in UTC', sc.generated_at));
     return wrap;
   }
 
-  function renderStrength(p, d) {
-    var dr = d.drivers;
-    var wrap = el('div', 'pdt-stack');
-    var label = p.base + '/' + p.quote;
-    var inv = p.quote + '/' + p.base;
-    // v8.542.0: one note per pair (schema_version 2, `pairs`). Legacy per-currency
-    // notes are only used while an old currency-drivers.json is still deployed.
-    var txt = dr && dr.pairs && (dr.pairs[label] || dr.pairs[inv]);
-    if (txt) {
-      var sec = el('section', 'pdt-note');
-      var head = el('div', 'pdt-sess-head');
-      head.appendChild(el('span', 'pdt-tag', p.base));
-      head.appendChild(el('span', 'pdt-tag', p.quote));
-      head.appendChild(el('h3', 'pdt-sess-name', label));
-      sec.appendChild(head);
-      sec.appendChild(el('p', 'pdt-text', txt));
-      sec.appendChild(sourcesLine(dr.pair_sources && (dr.pair_sources[label] || dr.pair_sources[inv])));
-      wrap.appendChild(sec);
-    } else {
-      [p.base, p.quote].forEach(function (c) {
-        var notes = dr && dr.drivers && dr.drivers[c];
-        var t = notes && (notes[label] || notes[inv]);
-        if (!t) return;
-        txt = txt || t;
-        var s2 = el('section', 'pdt-note');
-        var h2 = el('div', 'pdt-sess-head');
-        h2.appendChild(el('span', 'pdt-tag', c));
-        h2.appendChild(el('h3', 'pdt-sess-name', c + ' SIDE \u00b7 ' + label));
-        s2.appendChild(h2);
-        s2.appendChild(el('p', 'pdt-text', t));
-        s2.appendChild(sourcesLine(dr.driver_sources && dr.driver_sources[c]));
-        wrap.appendChild(s2);
-      });
+  // One note per pair (schema_version 2, `pairs`). While an old currency-drivers.json is still
+  // deployed, fall back to the first per-currency note available for the pair (never both).
+  function strengthNote(p, dr) {
+    if (!dr) return null;
+    var label = p.base + '/' + p.quote, inv = p.quote + '/' + p.base;
+    var t = dr.pairs && (dr.pairs[label] || dr.pairs[inv]);
+    if (t) return { txt: t, src: dr.pair_sources && (dr.pair_sources[label] || dr.pair_sources[inv]) };
+    var ccys = [p.base, p.quote];
+    for (var i = 0; i < ccys.length; i++) {
+      var notes = dr.drivers && dr.drivers[ccys[i]];
+      var n = notes && (notes[label] || notes[inv]);
+      if (n) return { txt: n, src: dr.driver_sources && dr.driver_sources[ccys[i]] };
     }
-    if (!txt) wrap.appendChild(note('No strength-driver note for ' + label + ' today.'));
+    return null;
+  }
+  function renderStrength(p, d) {
+    var dr = d.drivers, label = p.base + '/' + p.quote;
+    var wrap = el('div', 'pdt-stack');
+    var n = strengthNote(p, dr);
+    if (n) {
+      wrap.appendChild(el('p', 'pdt-text', n.txt));
+      wrap.appendChild(sourcesLine(n.src));
+    } else {
+      wrap.appendChild(note('No strength-driver note for ' + label + ' today.'));
+    }
     if (dr) wrap.appendChild(footer('AI Analytics', dr.generated_at));
     return wrap;
   }
@@ -287,28 +285,26 @@
 
   function renderOverview(p, d) {
     var r = fvNumbers(p, d), dec = decimals(p);
-    var nodes = [];
+    var fvNode;
     if (r.ok) {
       var grid = el('div', 'pdt-stats');
-      grid.appendChild(statCell('Spot', r.fv.spot.toFixed(dec)));
-      grid.appendChild(statCell('Model fair value', r.fv.fairValue.toFixed(dec)));
+      grid.appendChild(statCell('Spot @ run', r.fv.spot.toFixed(dec)));
+      grid.appendChild(statCell('Fair value', r.fv.fairValue.toFixed(dec)));
       grid.appendChild(statCell('Deviation', signed(r.fv.z, 2) + '\u03c3', zClass(r.fv.z)));
       grid.appendChild(statCell('Fit', r.fv.identifiable ? 'Solid' : 'Regularized'));
-      nodes.push(block('FX FAIR VALUE \u00b7 SNAPSHOT', [grid, gauge(r.fv.z), footer('Fair Value model', d.fair.generated_at)]));
+      fvNode = block('FX FAIR VALUE', [grid, gauge(r.fv.z), footer('Fair Value model \u00b7 estimate, not a forecast', d.fair.generated_at)]);
     } else {
-      nodes.push(block('FX FAIR VALUE \u00b7 SNAPSHOT', [note('Model output not available for this pair yet.')]));
+      fvNode = block('FX FAIR VALUE', [note('Model output not available for this pair yet.')]);
     }
     var h = new Date().getUTCHours();
     var live = SESSIONS.filter(function (s) { return sessionState(s, h) === 'live'; }).pop();
     var sc = d.session && d.session.sessions && !d.session.market_closed;
-    var sessNodes = [p.base, p.quote].map(function (c) {
-      var t = sc && live && d.session.sessions[c] && d.session.sessions[c][live.name];
-      return t ? el('p', 'pdt-text', c + ' \u00b7 ' + live.name + ': ' + t) : null;
-    }).filter(Boolean);
-    nodes.push(block('LIVE SESSION', sessNodes.length ? sessNodes.concat([footer('AI Analytics', d.session.generated_at)]) : [note('No live-session note available.')]));
+    var t = sc && live ? sessionNote(p, d.session, live.name) : null;
+    var sessNode = block(live ? 'LIVE SESSION \u00b7 ' + live.name.toUpperCase() : 'LIVE SESSION',
+      t ? [el('p', 'pdt-text', t), footer('AI Analytics', d.session.generated_at)] : [note('No live-session note available.')]);
     var wrap = el('div', 'pdt-overview');
     wrap.appendChild(legacyDetail());
-    wrap.appendChild(twoCol(nodes[0], nodes[1]));
+    wrap.appendChild(append(el('div', 'pdt-cols pdt-ov-foot'), fvNode, sessNode));
     return wrap;
   }
 
