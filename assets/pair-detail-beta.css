@@ -188,3 +188,13 @@
 .pdt-badge b { margin-left: 4px; font: inherit; text-transform: none; color: inherit; }
 .pdt-badge-dn { color: var(--down); border-color: rgba(239, 83, 80, .4); }
 .pdt-badge-up { color: var(--up); border-color: rgba(38, 166, 154, .4); }
+
+/* Hero header: two fixed zones (quote left, status chips right) on one row; when the panel is too
+   narrow for both, chips drop to their own row, left-aligned with the content edge. */
+.pdt-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px 16px; }
+.pdt-hero-main { gap: 2px 14px; }
+.pdt-badges { margin-left: 0; width: auto; justify-content: flex-end; }
+@container (max-width: 700px) {
+  .pdt-hero { grid-template-columns: minmax(0, 1fr); }
+  .pdt-badges { justify-content: flex-start; }
+}
