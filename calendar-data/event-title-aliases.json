@@ -1,67 +1,10 @@
 {
-  "generatedAt": "2026-09-23T23:53:58Z",
+  "generatedAt": "2026-09-24T12:04:34Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 200,
+  "aliasCount": 189,
   "aliases": [
-    {
-      "currency": "AUD",
-      "primary_title": "Australia GDP q/q",
-      "secondary_title": "Australia GDP Growth Rate QoQ",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": 0.5,
-          "forecast_secondary": 0.2,
-          "actual_primary": 0.4,
-          "actual_secondary": 0.4,
-          "previous_primary": 0.3,
-          "previous_secondary": 0.3,
-          "actual_secondary_raw": "0.4%",
-          "forecast_secondary_raw": "0.2%",
-          "previous_secondary_raw": "0.3%"
-        }
-      }
-    },
-    {
-      "currency": "AUD",
-      "primary_title": "Australia GDP y/y",
-      "secondary_title": "Australia GDP Growth Rate YoY",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": -21.5,
-          "forecast_secondary": 1.6,
-          "actual_primary": 2.1,
-          "actual_secondary": 2.1,
-          "previous_primary": 2.5,
-          "previous_secondary": 2.5,
-          "actual_secondary_raw": "2.1%",
-          "forecast_secondary_raw": "1.6%",
-          "previous_secondary_raw": "2.5%"
-        }
-      }
-    },
-    {
-      "currency": "NZD",
-      "primary_title": "RBNZ Interest Rate Decision",
-      "secondary_title": "New Zealand RBNZ Interest Rate Decision",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": null,
-          "forecast_secondary": 2.75,
-          "actual_primary": 2.75,
-          "actual_secondary": 2.75,
-          "previous_primary": 2.5,
-          "previous_secondary": 2.5,
-          "actual_secondary_raw": "2.75%",
-          "forecast_secondary_raw": "2.75%",
-          "previous_secondary_raw": "2.5%"
-        }
-      }
-    },
     {
       "currency": "GBP",
       "primary_title": "United Kingdom S&P Global/CIPS Construction PMI",
@@ -344,51 +287,38 @@
     {
       "currency": "JPY",
       "primary_title": "Japan Industrial Production m/m",
-      "secondary_title": "Japan Industrial Production MoM Final",
+      "secondary_title": "Japan Industrial Production MoM Prel",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 0.1,
-          "forecast_secondary": 0.1,
-          "actual_primary": -0.2,
-          "actual_secondary": -0.2,
-          "previous_primary": 0.1,
-          "previous_secondary": 1.9,
-          "actual_secondary_raw": "-0.2%",
-          "forecast_secondary_raw": "0.1%",
-          "previous_secondary_raw": "1.9%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 0.1,
-          "forecast_yahoo": null,
-          "actual_primary": -0.2,
-          "actual_yahoo": -0.2,
-          "previous_primary": 0.1,
-          "previous_yahoo": 0.1,
-          "actual_yahoo_raw": "-0.2",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.1"
+          "dateISO": "2026-09-29",
+          "forecast_primary": -0.5,
+          "forecast_secondary": 0.3,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": -0.2,
+          "previous_secondary": -0.2,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "0.3%",
+          "previous_secondary_raw": "-0.2%"
         }
-      },
-      "yahoo_title": "Industrial O/P Rev MM SA *"
+      }
     },
     {
       "currency": "JPY",
       "primary_title": "Japan Industrial Production y/y",
-      "secondary_title": "Japan Industrial Production YoY Final",
+      "secondary_title": "Japan Industrial Production YoY Prel",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 4.1,
-          "forecast_secondary": 4.1,
-          "actual_primary": 3.9,
-          "actual_secondary": 3.9,
-          "previous_primary": 4.1,
-          "previous_secondary": 4.9,
-          "actual_secondary_raw": "3.9%",
-          "forecast_secondary_raw": "4.1%",
-          "previous_secondary_raw": "4.9%"
+          "dateISO": "2026-09-29",
+          "forecast_primary": 0.8,
+          "forecast_secondary": 3.7,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 3.9,
+          "previous_secondary": 3.9,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "3.7%",
+          "previous_secondary_raw": "3.9%"
         }
       }
     },
@@ -408,21 +338,8 @@
           "actual_secondary_raw": "0.5%",
           "forecast_secondary_raw": "-1.3%",
           "previous_secondary_raw": "4.1%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-14",
-          "forecast_primary": 1.8,
-          "forecast_yahoo": null,
-          "actual_primary": 0.5,
-          "actual_yahoo": 0.5,
-          "previous_primary": 4.1,
-          "previous_yahoo": 4.1,
-          "actual_yahoo_raw": "0.5",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "4.1"
         }
-      },
-      "yahoo_title": "Capacity Utilization MM SA*"
+      }
     },
     {
       "currency": "JPY",
@@ -2100,13 +2017,13 @@
         "secondary": {
           "dateISO": "2026-09-29",
           "forecast_primary": 0.3,
-          "forecast_secondary": null,
+          "forecast_secondary": -0.1,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": -0.3,
           "previous_secondary": -0.3,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": null,
+          "forecast_secondary_raw": "-0.1%",
           "previous_secondary_raw": "-0.3%"
         }
       }
@@ -3126,101 +3043,6 @@
       }
     },
     {
-      "currency": "CAD",
-      "primary_title": "BoC Interest Rate Decision",
-      "yahoo_title": "BoC Rate Decision",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": 2.25,
-          "actual_yahoo": 2.25,
-          "previous_primary": 2.25,
-          "previous_yahoo": 2.25,
-          "actual_yahoo_raw": "2.25",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "2.25"
-        }
-      }
-    },
-    {
-      "currency": "NZD",
-      "primary_title": "New Zealand Export Price Index q/q",
-      "yahoo_title": "Export Prices SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": -4.0,
-          "forecast_yahoo": null,
-          "actual_primary": 3.5,
-          "actual_yahoo": 3.5,
-          "previous_primary": -2.7,
-          "previous_yahoo": -2.7,
-          "actual_yahoo_raw": "3.5",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-2.7"
-        }
-      }
-    },
-    {
-      "currency": "NZD",
-      "primary_title": "New Zealand Import Price Index q/q",
-      "yahoo_title": "Import Prices SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": -0.1,
-          "forecast_yahoo": null,
-          "actual_primary": 13.8,
-          "actual_yahoo": 13.8,
-          "previous_primary": -0.7,
-          "previous_yahoo": -0.7,
-          "actual_yahoo_raw": "13.8",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.7"
-        }
-      }
-    },
-    {
-      "currency": "NZD",
-      "primary_title": "New Zealand Terms of Trade Index q/q",
-      "yahoo_title": "Terms of Trade QQ",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": -0.9,
-          "forecast_yahoo": null,
-          "actual_primary": -9.0,
-          "actual_yahoo": -9.0,
-          "previous_primary": -2.0,
-          "previous_yahoo": -2.0,
-          "actual_yahoo_raw": "-9",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-2"
-        }
-      }
-    },
-    {
-      "currency": "NZD",
-      "primary_title": "New Zealand Export Volume Index q/q",
-      "yahoo_title": "Export Volumes SA",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-02",
-          "forecast_primary": -4.8,
-          "forecast_yahoo": null,
-          "actual_primary": 6.4,
-          "actual_yahoo": 6.4,
-          "previous_primary": 2.7,
-          "previous_yahoo": 2.7,
-          "actual_yahoo_raw": "6.4",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "2.7"
-        }
-      }
-    },
-    {
       "currency": "CHF",
       "primary_title": "Switzerland GDP q/q",
       "yahoo_title": "GDP QQ",
@@ -3468,120 +3290,6 @@
       }
     },
     {
-      "currency": "GBP",
-      "primary_title": "United Kingdom Construction Output m/m",
-      "yahoo_title": "Construction O/P Vol MM",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": -0.3,
-          "forecast_yahoo": null,
-          "actual_primary": 0.1,
-          "actual_yahoo": 0.1,
-          "previous_primary": -0.1,
-          "previous_yahoo": -0.1,
-          "actual_yahoo_raw": "0.1",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.1"
-        }
-      }
-    },
-    {
-      "currency": "GBP",
-      "primary_title": "United Kingdom Construction Output y/y",
-      "yahoo_title": "Construction O/P Vol YY",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": -1.4,
-          "forecast_yahoo": null,
-          "actual_primary": -2.5,
-          "actual_yahoo": -2.5,
-          "previous_primary": -2.3,
-          "previous_yahoo": -2.3,
-          "actual_yahoo_raw": "-2.5",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-2.3"
-        }
-      }
-    },
-    {
-      "currency": "GBP",
-      "primary_title": "United Kingdom Manufacturing Production m/m",
-      "yahoo_title": "Manufacturing Output MM",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": -0.2,
-          "forecast_yahoo": null,
-          "actual_primary": 0.9,
-          "actual_yahoo": 0.9,
-          "previous_primary": -0.5,
-          "previous_yahoo": -0.5,
-          "actual_yahoo_raw": "0.9",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.5"
-        }
-      }
-    },
-    {
-      "currency": "GBP",
-      "primary_title": "United Kingdom Manufacturing Production y/y",
-      "yahoo_title": "Manufacturing Output YY",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": 0.0,
-          "forecast_yahoo": null,
-          "actual_primary": 2.6,
-          "actual_yahoo": 2.6,
-          "previous_primary": 0.5,
-          "previous_yahoo": 0.5,
-          "actual_yahoo_raw": "2.6",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.5"
-        }
-      }
-    },
-    {
-      "currency": "GBP",
-      "primary_title": "United Kingdom Trade Balance",
-      "yahoo_title": "Goods Trade Balance GBP",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": -20.97,
-          "actual_yahoo": -20.97,
-          "previous_primary": null,
-          "previous_yahoo": -23.01,
-          "actual_yahoo_raw": "-20.97",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-23.01"
-        }
-      }
-    },
-    {
-      "currency": "GBP",
-      "primary_title": "United Kingdom Trade Balance Non-EU",
-      "yahoo_title": "Goods Trade Bal. Non-EU",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-11",
-          "forecast_primary": null,
-          "forecast_yahoo": null,
-          "actual_primary": -9.66,
-          "actual_yahoo": -9.66,
-          "previous_primary": null,
-          "previous_yahoo": -10.45,
-          "actual_yahoo_raw": "-9.66",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-10.45"
-        }
-      }
-    },
-    {
       "currency": "CAD",
       "primary_title": "Canada CPI m/m",
       "yahoo_title": "CPI Inflation MM",
@@ -3787,44 +3495,6 @@
           "actual_yahoo_raw": "19.3",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "23.2"
-        }
-      }
-    },
-    {
-      "currency": "JPY",
-      "primary_title": "Japan Core Machinery Orders m/m",
-      "yahoo_title": "Machinery Orders MM *",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-15",
-          "forecast_primary": -7.8,
-          "forecast_yahoo": null,
-          "actual_primary": -3.7,
-          "actual_yahoo": -3.7,
-          "previous_primary": 9.7,
-          "previous_yahoo": 9.7,
-          "actual_yahoo_raw": "-3.7",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "9.7"
-        }
-      }
-    },
-    {
-      "currency": "JPY",
-      "primary_title": "Japan Core Machinery Orders y/y",
-      "yahoo_title": "Machinery Orders YY *",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-15",
-          "forecast_primary": 3.6,
-          "forecast_yahoo": null,
-          "actual_primary": 11.2,
-          "actual_yahoo": 11.2,
-          "previous_primary": 16.9,
-          "previous_yahoo": 16.9,
-          "actual_yahoo_raw": "11.2",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "16.9"
         }
       }
     },
@@ -4152,6 +3822,25 @@
       }
     },
     {
+      "currency": "NOK",
+      "primary_title": "Norway Unemployment Rate",
+      "yahoo_title": "Key Policy Rate",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-23",
+          "forecast_primary": 4.1,
+          "forecast_yahoo": null,
+          "actual_primary": 4.5,
+          "actual_yahoo": 4.5,
+          "previous_primary": 4.2,
+          "previous_yahoo": 4.25,
+          "actual_yahoo_raw": "4.5",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "4.25"
+        }
+      }
+    },
+    {
       "currency": "USD",
       "primary_title": "United States EIA Refinery Utilization Rate Change",
       "yahoo_title": "EIA Wkly Refn Util*",
@@ -4167,6 +3856,82 @@
           "actual_yahoo_raw": "-2.8",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "-1"
+        }
+      }
+    },
+    {
+      "currency": "AUD",
+      "primary_title": "Australia Participation Rate",
+      "yahoo_title": "Participation Rate",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-24",
+          "forecast_primary": 66.8,
+          "forecast_yahoo": null,
+          "actual_primary": 67.1,
+          "actual_yahoo": 67.1,
+          "previous_primary": 66.9,
+          "previous_yahoo": 66.9,
+          "actual_yahoo_raw": "67.1",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "66.9"
+        }
+      }
+    },
+    {
+      "currency": "AUD",
+      "primary_title": "Australia Unemployment Rate",
+      "yahoo_title": "Unemployment Rate",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-24",
+          "forecast_primary": 4.5,
+          "forecast_yahoo": null,
+          "actual_primary": 4.6,
+          "actual_yahoo": 4.6,
+          "previous_primary": 4.5,
+          "previous_yahoo": 4.5,
+          "actual_yahoo_raw": "4.6",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "4.5"
+        }
+      }
+    },
+    {
+      "currency": "CHF",
+      "primary_title": "SNB Interest Rate Decision",
+      "yahoo_title": "SNB Policy Rate",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-24",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": 0.0,
+          "actual_yahoo": 0.0,
+          "previous_primary": 0.0,
+          "previous_yahoo": 0.0,
+          "actual_yahoo_raw": "0",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "0"
+        }
+      }
+    },
+    {
+      "currency": "NOK",
+      "primary_title": "Norges Bank Interest Rate Decision",
+      "yahoo_title": "Key Policy Rate",
+      "evidence": {
+        "yahoo": {
+          "dateISO": "2026-09-24",
+          "forecast_primary": null,
+          "forecast_yahoo": null,
+          "actual_primary": 4.5,
+          "actual_yahoo": 4.5,
+          "previous_primary": 4.0,
+          "previous_yahoo": 4.25,
+          "actual_yahoo_raw": "4.5",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "4.25"
         }
       }
     },
