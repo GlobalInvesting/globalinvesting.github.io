@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-24T05:05:10Z",
-  "generatedAt": "2026-09-24T05:05:10Z",
+  "lastUpdate": "2026-09-24T05:07:21Z",
+  "generatedAt": "2026-09-24T05:07:21Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1552,6 +1552,21 @@
       "n": 2,
       "mean": -0.55,
       "std": 0.919239
+    },
+    "EUR/finland ppi yoy": {
+      "n": 2,
+      "mean": 0.0,
+      "std": 0.141421
+    },
+    "EUR/finland import prices yoy": {
+      "n": 2,
+      "mean": 0.3,
+      "std": 0.424264
+    },
+    "EUR/finland export prices yoy": {
+      "n": 2,
+      "mean": 1.3,
+      "std": 1.697056
     },
     "EUR/finland unemployment rate": {
       "n": 2,
@@ -64779,7 +64794,7 @@
       "flag": "🇪🇺",
       "event": "Finland PPI YoY",
       "impact": "low",
-      "actual": null,
+      "actual": "7.3%",
       "forecast": "7.4%",
       "previous": "6.9%"
     },
@@ -64792,7 +64807,7 @@
       "flag": "🇪🇺",
       "event": "Finland Export Prices YoY",
       "impact": "low",
-      "actual": null,
+      "actual": "8.7%",
       "forecast": "8.6%",
       "previous": "8.5%"
     },
@@ -64805,7 +64820,7 @@
       "flag": "🇪🇺",
       "event": "Finland Import Prices YoY",
       "impact": "low",
-      "actual": null,
+      "actual": "7.6%",
       "forecast": "7.6%",
       "previous": "7.3%"
     },
