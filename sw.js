@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = 'gi-v8.540.4';
+const CACHE_VERSION = 'gi-v8.542.6';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -16,7 +16,7 @@ const STATIC_PRECACHE = [
   '/assets/real-carry-modal.js?v=2.7.11',
   '/assets/corr-modal.js?v=2.7.0',
   '/assets/yc-modal.js?v=8.8.7',
-  '/assets/heatmap-modal.js?v=2.6.7',
+  '/assets/heatmap-modal.js?v=2.6.8',
   '/assets/econ-surprises-modal.js?v=1.3.12',
   '/assets/onboarding.js?v=7.89.12',
   '/assets/layout-resizer.js?v=1.0.2',
