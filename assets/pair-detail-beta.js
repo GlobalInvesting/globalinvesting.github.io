@@ -6,7 +6,7 @@
  * Data sources (all already published by the engine, no new endpoints):
  *   ./ai-analysis/currency-catalysts.json  -> Macro Drivers   (per currency)
  *   ./ai-analysis/session-context.json     -> Session Context (per currency x session)
- *   ./ai-analysis/currency-drivers.json    -> Strength Drivers (per currency x pair note)
+ *   ./ai-analysis/currency-drivers.json    -> Strength Drivers (one note per pair, `pairs`)
  *   ./fair-value-data/summary.json         -> Fair Value / Overview (per pair)
  *
  * Overview embeds the legacy per-row detail (dashboard.js buildInlineDetail: price, Price & Spreads,
@@ -30,7 +30,13 @@
   var REFRESH_MS = 5 * 60 * 1000;
   var LEGACY_REFRESH_MS = 30 * 1000;
   var OPEN_KEY = 'gi.pairDetail.open';
-  var STALE_HOURS = 26;
+  // Weekday freshness bound matches the generator TTL contract (20h + buffer). Weekends
+  // and Monday before the first run use the wider window: the generator skips on
+  // market_closed, so Friday's file is legitimately ~72h old until Monday 06:00 UTC.
+  var STALE_HOURS = (function () {
+    var n = new Date(), wd = n.getUTCDay(), h = n.getUTCHours();
+    return (wd === 0 || wd === 6 || (wd === 1 && h < 9)) ? 76 : 26;
+  })();
 
   var root, tabsEl, subEl, toggleBtn, contentEl;
   var state = { pair: null, sym: null, tab: 'overview', open: true, data: null, loadedAt: 0, loading: null, legacyEl: null, legacyAt: 0 };
@@ -180,22 +186,38 @@
   function renderStrength(p, d) {
     var dr = d.drivers;
     var wrap = el('div', 'pdt-stack');
-    var any = false;
-    [p.base, p.quote].forEach(function (c) {
-      var notes = dr && dr.drivers && dr.drivers[c];
-      var txt = notes && (notes[p.base + '/' + p.quote] || notes[p.quote + '/' + p.base]);
-      if (!txt) return;
-      any = true;
+    var label = p.base + '/' + p.quote;
+    var inv = p.quote + '/' + p.base;
+    // v8.542.0: one note per pair (schema_version 2, `pairs`). Legacy per-currency
+    // notes are only used while an old currency-drivers.json is still deployed.
+    var txt = dr && dr.pairs && (dr.pairs[label] || dr.pairs[inv]);
+    if (txt) {
       var sec = el('section', 'pdt-note');
       var head = el('div', 'pdt-sess-head');
-      head.appendChild(el('span', 'pdt-tag', c));
-      head.appendChild(el('h3', 'pdt-sess-name', c + ' SIDE \u00b7 ' + p.label));
+      head.appendChild(el('span', 'pdt-tag', p.base));
+      head.appendChild(el('span', 'pdt-tag', p.quote));
+      head.appendChild(el('h3', 'pdt-sess-name', label));
       sec.appendChild(head);
       sec.appendChild(el('p', 'pdt-text', txt));
-      sec.appendChild(sourcesLine(dr.driver_sources && dr.driver_sources[c]));
+      sec.appendChild(sourcesLine(dr.pair_sources && (dr.pair_sources[label] || dr.pair_sources[inv])));
       wrap.appendChild(sec);
-    });
-    if (!any) wrap.appendChild(note('No strength-driver note for ' + p.label + ' today.'));
+    } else {
+      [p.base, p.quote].forEach(function (c) {
+        var notes = dr && dr.drivers && dr.drivers[c];
+        var t = notes && (notes[label] || notes[inv]);
+        if (!t) return;
+        txt = txt || t;
+        var s2 = el('section', 'pdt-note');
+        var h2 = el('div', 'pdt-sess-head');
+        h2.appendChild(el('span', 'pdt-tag', c));
+        h2.appendChild(el('h3', 'pdt-sess-name', c + ' SIDE \u00b7 ' + label));
+        s2.appendChild(h2);
+        s2.appendChild(el('p', 'pdt-text', t));
+        s2.appendChild(sourcesLine(dr.driver_sources && dr.driver_sources[c]));
+        wrap.appendChild(s2);
+      });
+    }
+    if (!txt) wrap.appendChild(note('No strength-driver note for ' + label + ' today.'));
     if (dr) wrap.appendChild(footer('AI Analytics', dr.generated_at));
     return wrap;
   }
