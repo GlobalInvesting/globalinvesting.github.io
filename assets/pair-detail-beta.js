@@ -1,5 +1,5 @@
 /*
- * pair-detail-beta.js v0.5.0
+ * pair-detail-beta.js v0.6.0
  * Unified Pair Detail panel (beta) — rendered below the main chart for the active pair.
  * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
  *
@@ -297,9 +297,8 @@
     r.appendChild(el('b', cls || '', value));
     return r;
   }
-  function badge(text, val, dot) {
-    var b = el('span', 'pdt-badge');
-    if (dot != null) b.appendChild(el('i', 'pdt-dot' + (dot ? ' ' + dot : '')));
+  function badge(text, val, cls) {
+    var b = el('span', 'pdt-badge' + (cls ? ' ' + cls : ''));
     b.appendChild(document.createTextNode(text));
     if (val) b.appendChild(el('b', null, val));
     return b;
@@ -338,6 +337,29 @@
     return blocks.length ? wrap : null;
   }
 
+  // Retail block as in the mock: "Long / Short" row, split bar, "Avg long/short" rows.
+  function retailRows(g) {
+    var lbl = g.querySelector('.pd-inline-group-lbl'), bar = g.querySelector('.pd-inline-retail-bar');
+    var row = g.querySelector('.pd-inline-retail-row'), avg = g.querySelector('.pd-inline-retail-avg');
+    var nums = row ? (row.textContent.match(/\d+(?=%)/g) || []) : [];
+    var pairs = [];
+    if (avg) {
+      var l = avg.querySelectorAll('.pd-inline-lbl'), v = avg.querySelectorAll('.pd-inline-val');
+      for (var i = 0; i < l.length && i < v.length; i++) {
+        pairs.push([/L/.test(l[i].textContent) ? 'Avg long' : 'Avg short', v[i]]);
+      }
+    }
+    clearNode(g);
+    if (lbl) g.appendChild(lbl);
+    g.appendChild(kv('Long / Short', nums.length >= 2 ? nums[0] + '% / ' + nums[1] + '%' : '\u2014'));
+    if (bar) g.appendChild(bar);
+    pairs.forEach(function (pr) {
+      var r = el('div', 'pdt-kv');
+      r.appendChild(el('i', null, pr[0]));
+      r.appendChild(pr[1]);
+      g.appendChild(r);
+    });
+  }
   function composeOverview(host) {
     var S = state.ov;
     if (!S || S.host !== host || !S.hero.isConnected) return;
@@ -352,9 +374,10 @@
     var skewEl = groups[3].querySelector('.pd-inline-retail-skew');
     var skew = skewEl ? skewEl.textContent.trim() : '';
     if (skewEl) skewEl.parentNode.removeChild(skewEl);
+    retailRows(groups[3]);
     S.s3.appendChild(groups[3]);
     if (S.bRet && S.bRet.parentNode) S.bRet.parentNode.removeChild(S.bRet);
-    S.bRet = skew ? badge('Retail ' + skew.toLowerCase(), null, '') : null;
+    S.bRet = skew ? badge('Retail ' + skew, null, '') : null;
     if (S.bRet) S.badges.appendChild(S.bRet);
     var t = cotTable(groups[2], state.pair);
     if (t) S.cot.appendChild(t);
@@ -427,7 +450,7 @@
     var r = fvNumbers(p, d);
     if (r.ok) {
       var z = r.fv.z, lbl = z >= 1 ? 'Above model ' : (z <= -1 ? 'Below model ' : 'In line with model ');
-      S.badges.appendChild(badge(lbl, signed(z, 2) + '\u03c3', Math.abs(z) < 1 ? '' : (z > 0 ? 'pdt-down' : 'pdt-up')));
+      S.badges.appendChild(badge(lbl, signed(z, 2) + '\u03c3', Math.abs(z) < 1 ? '' : (z > 0 ? 'pdt-badge-dn' : 'pdt-badge-up')));
     }
     var grid = append(el('div', 'pdt-grid'), S.s1, S.s2, S.s3, fvSection(p, d));
     var right = sessionSection(p, d, S);

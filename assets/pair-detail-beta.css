@@ -1,5 +1,5 @@
-/* pair-detail-beta.css v0.5.0 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
-#pdt-panel { border-top: 1px solid var(--border); background: var(--bg); }
+/* pair-detail-beta.css v0.6.0 — Unified Pair Detail panel (beta). Uses theme tokens from dashboard.css. */
+#pdt-panel { --pdt-card: color-mix(in srgb, var(--bg2) 35%, var(--bg)); border-top: 1px solid var(--border); background: var(--bg); }
 
 #pdt-tabs {
   display: flex; gap: 0; overflow-x: auto; overflow-y: hidden;
@@ -105,7 +105,7 @@
 .pdt-hero .pd-inline-chg { font-size: 12px; }
 .pdt-hero .pd-inline-meta { font-size: 10px; }
 .pdt-ov-body { display: block; }
-.pdt-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: 3px; background: var(--bg2); }
+.pdt-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--border); border-radius: 3px; background: var(--pdt-card); }
 .pdt-sec { padding: 8px 10px; min-width: 0; }
 .pdt-sec + .pdt-sec { border-left: 1px solid var(--border); }
 .pdt-sh { margin: 0 0 5px; font: 600 9px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--text3); white-space: nowrap; }
@@ -117,7 +117,8 @@
 .pdt-sec .pd-inline-val, .pdt-kv b { font: 600 11px/1 var(--font-mono); font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
 .pdt-kv b.pdt-up, .pdt-sec .pd-inline-val.pd-up { color: var(--up); }
 .pdt-kv b.pdt-down, .pdt-sec .pd-inline-val.pd-dn { color: var(--down); }
-.pdt-sec .pd-inline-retail-bar { max-width: none; margin: 2px 0 6px; }
+.pdt-sec .pd-inline-retail-bar { max-width: none; height: 4px; margin: 3px 0 5px; background: var(--down); }
+.pdt-sec .pd-inline-retail-fill { background: var(--up); opacity: 1; }
 .pdt-sec .pd-inline-retail-row { font-size: 11px; justify-content: flex-start; }
 .pdt-sec .pd-inline-retail-avg { flex-direction: row; justify-content: space-between; align-items: baseline; margin: 2px 0 0; }
 .pdt-sec .pd-inline-retail-skew { color: var(--text3) !important; }
@@ -126,7 +127,7 @@
 .pdt-scale { display: flex; justify-content: space-between; font: 400 8.5px var(--font-mono); color: var(--text3); }
 
 .pdt-cotbox { margin-top: 0; }
-.pdt-tblwrap { overflow-x: auto; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 3px 3px; background: var(--bg2); padding: 8px 10px; }
+.pdt-tblwrap { overflow-x: auto; border: 1px solid var(--border); border-top: 0; border-radius: 0 0 3px 3px; background: var(--pdt-card); padding: 8px 10px; }
 .pdt-tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
 .pdt-tbl caption { text-align: left; font: 600 9px/1 var(--font-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--text3); padding-bottom: 5px; }
 .pdt-tbl th { font: 600 8.5px var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--text3); text-align: right; padding: 0 0 3px; white-space: nowrap; }
@@ -158,19 +159,7 @@
 /* No dotted underline on tooltip cells (tooltips still open on hover) */
 #pdt-panel .fx-tip { border-bottom: 0 !important; text-decoration: none; cursor: help; }
 
-/* Discreet LIVE marker: small dot + muted caps, no fill */
-.pdt-chip-live { display: inline-flex; align-items: center; gap: 4px; padding: 0; background: none; color: var(--text3); font: 600 8px/1 var(--font-ui); letter-spacing: .1em; }
-.pdt-chip-live::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--up); }
-.pdt-sess-live .pdt-sess-name { color: var(--text2); }
 
-/* Hero status badges: neutral outline, colored dot only */
-.pdt-hero-main { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; }
-.pdt-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
-.pdt-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 8px; border: 1px solid var(--border); border-radius: 2px; background: var(--bg2); font: 500 10px/1.2 var(--font-ui); letter-spacing: .02em; color: var(--text2); white-space: nowrap; }
-.pdt-badge b { font: 600 10px/1.2 var(--font-mono); color: var(--text); }
-.pdt-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text3); }
-.pdt-dot.pdt-up { background: var(--up); }
-.pdt-dot.pdt-down { background: var(--down); }
 
 /* Four balanced columns; two rows of two on narrow panels */
 @container (max-width: 560px) {
@@ -190,3 +179,12 @@
 .pdt-seg button[aria-pressed="true"] { background: var(--bg2); color: var(--text); }
 .pdt-seg button:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
 @media (max-width: 720px) { .pdt-seg button { min-height: 32px; padding: 0 12px; } }
+
+/* LIVE chip and hero status chips (previous look) */
+.pdt-livesec .pdt-chip { margin-left: 2px; }
+.pdt-hero-main { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; }
+.pdt-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+.pdt-badge { padding: 5px 7px; border: 1px solid var(--border); border-radius: 3px; font: 600 9px/1 var(--font-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--text2); white-space: nowrap; }
+.pdt-badge b { margin-left: 4px; font: inherit; text-transform: none; color: inherit; }
+.pdt-badge-dn { color: var(--down); border-color: rgba(239, 83, 80, .4); }
+.pdt-badge-up { color: var(--up); border-color: rgba(38, 166, 154, .4); }
