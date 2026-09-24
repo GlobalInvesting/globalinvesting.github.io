@@ -45,6 +45,8 @@
 .pdt-chip { font: 700 8px/1 var(--font-ui); letter-spacing: .07em; padding: 2px 4px; border-radius: 2px; }
 .pdt-chip-live { color: var(--blue); background: rgba(79, 127, 255, .15); }
 .pdt-chip-closed { color: var(--text3); opacity: .7; }
+.pdt-chip-upcoming { color: var(--orange, #f6941c); background: rgba(246, 148, 28, .10); }
+.pdt-sess-upcoming .pdt-text { color: var(--text3); font-style: italic; }
 
 .pdt-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 10px; }
 .pdt-stat { padding: 8px 10px; border: 1px solid var(--border); border-radius: 3px; background: var(--bg2); }
