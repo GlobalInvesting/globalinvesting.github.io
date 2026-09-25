@@ -173,10 +173,246 @@ function checkNoScriptsInWorkflowsDir() {
   }
 }
 
+function scanJsComments(src) {
+  const comments = [];
+  let i = 0;
+  const n = src.length;
+  let lastSignificant = '';
+  while (i < n) {
+    const c = src[i];
+    const c2 = src[i + 1];
+    if (c === '/' && c2 === '/') {
+      const start = i;
+      let j = i + 2;
+      while (j < n && src[j] !== '\n') j++;
+      comments.push({ start, line: src.slice(0, i).split('\n').length });
+      i = j;
+      continue;
+    }
+    if (c === '/' && c2 === '*') {
+      const start = i;
+      let j = src.indexOf('*/', i + 2);
+      j = j === -1 ? n : j + 2;
+      comments.push({ start, line: src.slice(0, i).split('\n').length });
+      i = j;
+      continue;
+    }
+    if (c === '"' || c === "'") {
+      const quote = c;
+      let j = i + 1;
+      while (j < n) {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src[j] === quote) { j++; break; }
+        if (src[j] === '\n') break;
+        j++;
+      }
+      i = j;
+      lastSignificant = quote;
+      continue;
+    }
+    if (c === '`') {
+      let j = i + 1;
+      let depth = 0;
+      while (j < n) {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src[j] === '`' && depth === 0) { j++; break; }
+        if (src[j] === '$' && src[j + 1] === '{') { depth++; j += 2; continue; }
+        if (src[j] === '}' && depth > 0) { depth--; j++; continue; }
+        j++;
+      }
+      i = j;
+      lastSignificant = '`';
+      continue;
+    }
+    if (c === '/') {
+      const kw = ['return', 'typeof', 'case', 'in', 'of', 'instanceof', 'new', 'delete', 'void', 'throw', 'yield', 'do', 'else'];
+      const regexAllowed = !/[\w)\]]/.test(lastSignificant) || kw.includes(lastSignificant);
+      if (regexAllowed) {
+        let j = i + 1;
+        let inClass = false;
+        let ok = false;
+        while (j < n) {
+          if (src[j] === '\\') { j += 2; continue; }
+          if (src[j] === '[') { inClass = true; j++; continue; }
+          if (src[j] === ']') { inClass = false; j++; continue; }
+          if (src[j] === '/' && !inClass) { ok = true; j++; break; }
+          if (src[j] === '\n') break;
+          j++;
+        }
+        if (ok) {
+          while (j < n && /[a-z]/i.test(src[j])) j++;
+          i = j;
+          lastSignificant = '/';
+          continue;
+        }
+      }
+    }
+    if (!/\s/.test(c)) lastSignificant = c;
+    i++;
+  }
+  return comments;
+}
+
+function scanCssComments(src) {
+  const comments = [];
+  let i = 0;
+  const n = src.length;
+  while (i < n) {
+    if (src[i] === '/' && src[i + 1] === '*') {
+      const start = i;
+      let j = src.indexOf('*/', i + 2);
+      j = j === -1 ? n : j + 2;
+      comments.push({ start, line: src.slice(0, i).split('\n').length });
+      i = j;
+      continue;
+    }
+    if (src[i] === '"' || src[i] === "'") {
+      const quote = src[i];
+      let j = i + 1;
+      while (j < n) {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src[j] === quote) { j++; break; }
+        j++;
+      }
+      i = j;
+      continue;
+    }
+    i++;
+  }
+  return comments;
+}
+
+function scanPyComments(src) {
+  const comments = [];
+  let i = 0;
+  const n = src.length;
+  while (i < n) {
+    if (src[i] === '#') {
+      const start = i;
+      let j = i + 1;
+      while (j < n && src[j] !== '\n') j++;
+      comments.push({ start, line: src.slice(0, i).split('\n').length });
+      i = j;
+      continue;
+    }
+    if (src[i] === '"' || src[i] === "'") {
+      const triple = src.substr(i, 3) === src[i].repeat(3);
+      const quote = triple ? src[i].repeat(3) : src[i];
+      let j = i + quote.length;
+      while (j < n) {
+        if (src[j] === '\\') { j += 2; continue; }
+        if (src.substr(j, quote.length) === quote) { j += quote.length; break; }
+        if (!triple && src[j] === '\n') break;
+        j++;
+      }
+      i = j;
+      continue;
+    }
+    i++;
+  }
+  return comments;
+}
+
+function scanYamlCommentCandidates(src) {
+  const comments = [];
+  let i = 0;
+  const n = src.length;
+  let inSingle = false, inDouble = false;
+  while (i < n) {
+    const c = src[i];
+    if (inSingle) {
+      if (c === "'" && src[i + 1] === "'") { i += 2; continue; }
+      if (c === "'") { inSingle = false; i++; continue; }
+      i++; continue;
+    }
+    if (inDouble) {
+      if (c === '\\') { i += 2; continue; }
+      if (c === '"') { inDouble = false; i++; continue; }
+      i++; continue;
+    }
+    if (c === "'") { inSingle = true; i++; continue; }
+    if (c === '"') { inDouble = true; i++; continue; }
+    if (c === '#') {
+      const prev = i === 0 ? '\n' : src[i - 1];
+      if (/\s/.test(prev)) {
+        comments.push({ start: i, line: src.slice(0, i).split('\n').length });
+        let j = i + 1;
+        while (j < n && src[j] !== '\n') j++;
+        i = j;
+        continue;
+      }
+    }
+    i++;
+  }
+  return comments;
+}
+
+function checkNoCommentsInPublicRepo() {
+  let ok = true;
+  let filesChecked = 0;
+
+  const jsDirs = ['assets', 'scripts'];
+  for (const dir of jsDirs) {
+    const full = path.join(ROOT, dir);
+    if (!fs.existsSync(full)) continue;
+    for (const f of fs.readdirSync(full).filter((x) => x.endsWith('.js'))) {
+      filesChecked++;
+      const src = fs.readFileSync(path.join(full, f), 'utf8');
+      const hits = scanJsComments(src);
+      if (hits.length > 0) {
+        fail(`zero-comments (public repo, v8.412.0): ${dir}/${f} has ${hits.length} real comment(s) — first at line ${hits[0].line}. Public-repo code files may carry zero comments of any kind.`);
+        ok = false;
+      }
+    }
+  }
+
+  const assetsDir = path.join(ROOT, 'assets');
+  if (fs.existsSync(assetsDir)) {
+    for (const f of fs.readdirSync(assetsDir).filter((x) => x.endsWith('.css'))) {
+      filesChecked++;
+      const src = fs.readFileSync(path.join(assetsDir, f), 'utf8');
+      const hits = scanCssComments(src);
+      if (hits.length > 0) {
+        fail(`zero-comments (public repo, v8.412.0): assets/${f} has ${hits.length} real comment(s) — first at line ${hits[0].line}.`);
+        ok = false;
+      }
+    }
+  }
+
+  const scriptsDir = path.join(ROOT, 'scripts');
+  if (fs.existsSync(scriptsDir)) {
+    for (const f of fs.readdirSync(scriptsDir).filter((x) => x.endsWith('.py'))) {
+      filesChecked++;
+      const src = fs.readFileSync(path.join(scriptsDir, f), 'utf8');
+      const hits = scanPyComments(src);
+      if (hits.length > 0) {
+        fail(`zero-comments (public repo, v8.412.0): scripts/${f} has ${hits.length} real comment(s) — first at line ${hits[0].line}.`);
+        ok = false;
+      }
+    }
+  }
+
+  const workflowsDir = path.join(ROOT, '.github', 'workflows');
+  if (fs.existsSync(workflowsDir)) {
+    for (const f of fs.readdirSync(workflowsDir).filter((x) => x.endsWith('.yml') || x.endsWith('.yaml'))) {
+      filesChecked++;
+      const src = fs.readFileSync(path.join(workflowsDir, f), 'utf8');
+      const hits = scanYamlCommentCandidates(src);
+      if (hits.length > 0) {
+        fail(`zero-comments (public repo, v8.412.0): .github/workflows/${f} has ${hits.length} likely comment(s) — first at line ${hits[0].line}. YAML detection is heuristic (whitespace-preceded '#'); confirm by eye before dismissing as a false positive (e.g. bash '\${VAR#pattern}' or '10#$N' base-conversion are correctly excluded, but a rare quoted-string edge case could still slip through).`);
+        ok = false;
+      }
+    }
+  }
+
+  if (ok) pass(`zero-comments (public repo, v8.412.0): 0 comments found across ${filesChecked} checked files (assets/*.js, assets/*.css, scripts/*.js, scripts/*.py, .github/workflows/*.yml)`);
+}
+
 checkCacheBusterSync();
 checkDataPathCoverage();
 checkFaqJsonLdSync();
 checkNoScriptsInWorkflowsDir();
+checkNoCommentsInPublicRepo();
 
 console.log('');
 if (failures > 0) {
