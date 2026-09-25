@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-25T14:59:14Z",
-  "generatedAt": "2026-09-25T14:59:14Z",
+  "lastUpdate": "2026-09-25T15:01:21Z",
+  "generatedAt": "2026-09-25T15:01:21Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1827,6 +1827,16 @@
       "n": 3,
       "mean": 0.066667,
       "std": 0.11547
+    },
+    "CAD/budget balance": {
+      "n": 2,
+      "mean": 0.137,
+      "std": 3.146625
+    },
+    "CAD/budget balance, fiscal year": {
+      "n": 2,
+      "mean": 14.9215,
+      "std": 3.311381
     },
     "JPY/retail sales mom": {
       "n": 2,
@@ -66057,7 +66067,7 @@
       "flag": "🇨🇦",
       "event": "Canada Budget Balance",
       "impact": "low",
-      "actual": null,
+      "actual": "-4.768B",
       "forecast": "-2.680B",
       "previous": "0.989B"
     },
@@ -66070,7 +66080,7 @@
       "flag": "🇨🇦",
       "event": "Canada Budget Balance, Fiscal Year",
       "impact": "low",
-      "actual": null,
+      "actual": "-5.138B",
       "forecast": "-17.718B",
       "previous": "-0.370B"
     },
