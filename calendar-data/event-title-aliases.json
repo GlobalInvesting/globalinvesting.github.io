@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-25T12:05:02Z",
+  "generatedAt": "2026-09-25T15:25:02Z",
   "scriptVersion": "1.6",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 181,
+  "aliasCount": 190,
   "aliases": [
     {
       "currency": "GBP",
@@ -726,21 +726,8 @@
           "actual_secondary_raw": "0.7%",
           "forecast_secondary_raw": "0.3%",
           "previous_secondary_raw": "-0.3%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-16",
-          "forecast_primary": -0.5,
-          "forecast_yahoo": null,
-          "actual_primary": 0.7,
-          "actual_yahoo": 0.7,
-          "previous_primary": -0.4,
-          "previous_yahoo": -0.4,
-          "actual_yahoo_raw": "0.7",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-0.4"
         }
-      },
-      "yahoo_title": "Import Prices MM"
+      }
     },
     {
       "currency": "USD",
@@ -777,21 +764,8 @@
           "actual_secondary_raw": "0.6%",
           "forecast_secondary_raw": "0.4%",
           "previous_secondary_raw": "-1.4%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-16",
-          "forecast_primary": -1.2,
-          "forecast_yahoo": null,
-          "actual_primary": 0.6,
-          "actual_yahoo": 0.6,
-          "previous_primary": -1.3,
-          "previous_yahoo": -1.3,
-          "actual_yahoo_raw": "0.6",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "-1.3"
         }
-      },
-      "yahoo_title": "Export Prices MM"
+      }
     },
     {
       "currency": "USD",
@@ -1350,21 +1324,8 @@
           "actual_secondary_raw": "76.3%",
           "forecast_secondary_raw": "76.4%",
           "previous_secondary_raw": "76.3%"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-18",
-          "forecast_primary": 76.1,
-          "forecast_yahoo": null,
-          "actual_primary": 76.3,
-          "actual_yahoo": 76.3,
-          "previous_primary": 76.3,
-          "previous_yahoo": 76.3,
-          "actual_yahoo_raw": "76.3",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "76.3"
         }
-      },
-      "yahoo_title": "Capacity Utilization SA*"
+      }
     },
     {
       "currency": "USD",
@@ -1744,15 +1705,28 @@
           "dateISO": "2026-09-25",
           "forecast_primary": -3.4,
           "forecast_secondary": -0.4,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 0.0,
+          "actual_secondary": 0.0,
           "previous_primary": 1.1,
-          "previous_secondary": 1.1,
-          "actual_secondary_raw": null,
+          "previous_secondary": 0.9,
+          "actual_secondary_raw": "0%",
           "forecast_secondary_raw": "-0.4%",
-          "previous_secondary_raw": "1.1%"
+          "previous_secondary_raw": "0.9%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": -3.4,
+          "forecast_yahoo": null,
+          "actual_primary": 0.0,
+          "actual_yahoo": 0.0,
+          "previous_primary": 1.1,
+          "previous_yahoo": 1.1,
+          "actual_yahoo_raw": "0",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "1.1"
         }
-      }
+      },
+      "yahoo_title": "Durable Goods *"
     },
     {
       "currency": "USD",
@@ -1763,13 +1737,13 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 0.9,
           "forecast_secondary": 0.4,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 0.3,
+          "actual_secondary": 0.3,
           "previous_primary": 0.4,
-          "previous_secondary": 0.4,
-          "actual_secondary_raw": null,
+          "previous_secondary": 0.7,
+          "actual_secondary_raw": "0.3%",
           "forecast_secondary_raw": "0.4%",
-          "previous_secondary_raw": "0.4%"
+          "previous_secondary_raw": "0.7%"
         }
       }
     },
@@ -1782,15 +1756,28 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 0.1,
           "forecast_secondary": -0.6,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 0.1,
+          "actual_secondary": 0.1,
           "previous_primary": 1.3,
-          "previous_secondary": 1.3,
-          "actual_secondary_raw": null,
+          "previous_secondary": 1.4,
+          "actual_secondary_raw": "0.1%",
           "forecast_secondary_raw": "-0.6%",
-          "previous_secondary_raw": "1.3%"
+          "previous_secondary_raw": "1.4%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 0.1,
+          "forecast_yahoo": null,
+          "actual_primary": 0.1,
+          "actual_yahoo": 0.1,
+          "previous_primary": 1.3,
+          "previous_yahoo": 1.3,
+          "actual_yahoo_raw": "0.1",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "1.3"
         }
-      }
+      },
+      "yahoo_title": "Durables Ex-Defense MM *"
     },
     {
       "currency": "USD",
@@ -1801,13 +1788,13 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 1.3,
           "forecast_secondary": 0.3,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 1.6,
+          "actual_secondary": 1.6,
           "previous_primary": 0.2,
-          "previous_secondary": 0.2,
-          "actual_secondary_raw": null,
+          "previous_secondary": 0.6,
+          "actual_secondary_raw": "1.6%",
           "forecast_secondary_raw": "0.3%",
-          "previous_secondary_raw": "0.2%"
+          "previous_secondary_raw": "0.6%"
         }
       }
     },
@@ -1820,13 +1807,13 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 0.4,
           "forecast_secondary": 0.4,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 0.6,
+          "actual_secondary": 0.3,
           "previous_primary": 1.2,
-          "previous_secondary": 0.4,
-          "actual_secondary_raw": null,
+          "previous_secondary": 0.7,
+          "actual_secondary_raw": "0.3%",
           "forecast_secondary_raw": "0.4%",
-          "previous_secondary_raw": "0.4%"
+          "previous_secondary_raw": "0.7%"
         }
       }
     },
@@ -1839,15 +1826,28 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 47.8,
           "forecast_secondary": 47.8,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 48.1,
+          "actual_secondary": 48.1,
           "previous_primary": 47.8,
           "previous_secondary": 51.7,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "48.1",
           "forecast_secondary_raw": "47.8",
           "previous_secondary_raw": "51.7"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 47.8,
+          "forecast_yahoo": null,
+          "actual_primary": 48.1,
+          "actual_yahoo": 48.1,
+          "previous_primary": 47.8,
+          "previous_yahoo": 47.8,
+          "actual_yahoo_raw": "48.1",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "47.8"
         }
-      }
+      },
+      "yahoo_title": "U Mich Sentiment Final*"
     },
     {
       "currency": "USD",
@@ -1858,15 +1858,60 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 45.8,
           "forecast_secondary": 45.8,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 46.3,
+          "actual_secondary": 46.3,
           "previous_primary": 45.8,
           "previous_secondary": 51.5,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "46.3",
           "forecast_secondary_raw": "45.8",
           "previous_secondary_raw": "51.5"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 45.8,
+          "forecast_yahoo": null,
+          "actual_primary": 46.3,
+          "actual_yahoo": 46.3,
+          "previous_primary": 45.8,
+          "previous_yahoo": 45.8,
+          "actual_yahoo_raw": "46.3",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "45.8"
         }
-      }
+      },
+      "yahoo_title": "U Mich Expectations Final*"
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States Michigan Current Conditions",
+      "secondary_title": "United States Michigan Current Conditions Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 50.9,
+          "forecast_secondary": 50.0,
+          "actual_primary": 50.9,
+          "actual_secondary": 50.9,
+          "previous_primary": 50.9,
+          "previous_secondary": 51.9,
+          "actual_secondary_raw": "50.9",
+          "forecast_secondary_raw": "50",
+          "previous_secondary_raw": "51.9"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 50.9,
+          "forecast_yahoo": null,
+          "actual_primary": 50.9,
+          "actual_yahoo": 50.9,
+          "previous_primary": 50.9,
+          "previous_yahoo": 50.9,
+          "actual_yahoo_raw": "50.9",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "50.9"
+        }
+      },
+      "yahoo_title": "U Mich Conditions Final*"
     },
     {
       "currency": "USD",
@@ -1877,11 +1922,11 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 4.6,
           "forecast_secondary": 4.6,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 4.6,
+          "actual_secondary": 4.6,
           "previous_primary": 4.6,
           "previous_secondary": 4.0,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "4.6%",
           "forecast_secondary_raw": "4.6%",
           "previous_secondary_raw": "4%"
         }
@@ -1896,15 +1941,28 @@
           "dateISO": "2026-09-25",
           "forecast_primary": 3.4,
           "forecast_secondary": 3.4,
-          "actual_primary": null,
-          "actual_secondary": null,
+          "actual_primary": 3.4,
+          "actual_secondary": 3.4,
           "previous_primary": 3.4,
           "previous_secondary": 3.3,
-          "actual_secondary_raw": null,
+          "actual_secondary_raw": "3.4%",
           "forecast_secondary_raw": "3.4%",
           "previous_secondary_raw": "3.3%"
+        },
+        "yahoo": {
+          "dateISO": "2026-09-25",
+          "forecast_primary": 3.4,
+          "forecast_yahoo": null,
+          "actual_primary": 3.4,
+          "actual_yahoo": 3.4,
+          "previous_primary": 3.4,
+          "previous_yahoo": 3.4,
+          "actual_yahoo_raw": "3.4",
+          "forecast_yahoo_raw": "-",
+          "previous_yahoo_raw": "3.4"
         }
-      }
+      },
+      "yahoo_title": "U Mich 5-Yr Inf Final*"
     },
     {
       "currency": "USD",
@@ -2302,6 +2360,44 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": "0.5%",
           "previous_secondary_raw": "0.6%"
+        }
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Construction Orders y/y",
+      "secondary_title": "Japan Construction Orders YoY",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-30",
+          "forecast_primary": 9.0,
+          "forecast_secondary": -12.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": -13.4,
+          "previous_secondary": -13.4,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "-12.0%",
+          "previous_secondary_raw": "-13.4%"
+        }
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Housing Starts y/y",
+      "secondary_title": "Japan Housing Starts YoY",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-30",
+          "forecast_primary": 14.5,
+          "forecast_secondary": 8.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 8.2,
+          "previous_secondary": 8.2,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "8.0%",
+          "previous_secondary_raw": "8.2%"
         }
       }
     },
@@ -2959,13 +3055,13 @@
         "secondary": {
           "dateISO": "2026-10-02",
           "forecast_primary": -0.2,
-          "forecast_secondary": null,
+          "forecast_secondary": 0.0,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": 0.9,
           "previous_secondary": 0.9,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": null,
+          "forecast_secondary_raw": "0.0%",
           "previous_secondary_raw": "0.9%"
         }
       }
@@ -2978,13 +3074,13 @@
         "secondary": {
           "dateISO": "2026-10-02",
           "forecast_primary": -0.1,
-          "forecast_secondary": null,
+          "forecast_secondary": 0.2,
           "actual_primary": null,
           "actual_secondary": null,
           "previous_primary": 0.6,
           "previous_secondary": 0.6,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": null,
+          "forecast_secondary_raw": "0.2%",
           "previous_secondary_raw": "0.6%"
         }
       }
@@ -3024,6 +3120,25 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": "50.8",
           "previous_secondary_raw": "52.7"
+        }
+      }
+    },
+    {
+      "currency": "JPY",
+      "primary_title": "Japan Consumer Confidence Index",
+      "secondary_title": "Japan Consumer Confidence",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 37.0,
+          "forecast_secondary": 34.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 35.5,
+          "previous_secondary": 35.5,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "34",
+          "previous_secondary_raw": "35.5"
         }
       }
     },
@@ -3081,6 +3196,139 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": "7.1%",
           "previous_secondary_raw": "5.8%"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States S&P Global Services PMI",
+      "secondary_title": "United States S&P Global Services PMI Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 58.0,
+          "forecast_secondary": 58.7,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 56.5,
+          "previous_secondary": 56.5,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "58.7",
+          "previous_secondary_raw": "56.5"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States S&P Global Composite PMI",
+      "secondary_title": "United States S&P Global Composite PMI Final",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 56.8,
+          "forecast_secondary": 58.4,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 56.0,
+          "previous_secondary": 56.0,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "58.4",
+          "previous_secondary_raw": "56.0"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States ISM Non-Manufacturing PMI",
+      "secondary_title": "United States ISM Services PMI",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 54.7,
+          "forecast_secondary": 54.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 55.4,
+          "previous_secondary": 55.4,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "54",
+          "previous_secondary_raw": "55.4"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States ISM Non-Manufacturing Employment",
+      "secondary_title": "United States ISM Services Employment",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 48.3,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 47.8,
+          "previous_secondary": 47.8,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "47.8"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States ISM Non-Manufacturing New Orders",
+      "secondary_title": "United States ISM Services New Orders",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 57.7,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 60.9,
+          "previous_secondary": 60.9,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "60.9"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States ISM Non-Manufacturing Prices Paid",
+      "secondary_title": "United States ISM Services Prices",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 76.9,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 72.6,
+          "previous_secondary": 72.6,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "72.6"
+        }
+      }
+    },
+    {
+      "currency": "USD",
+      "primary_title": "United States ISM Non-Manufacturing Business Activity",
+      "secondary_title": "United States ISM Services Business Activity",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-05",
+          "forecast_primary": 58.3,
+          "forecast_secondary": null,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 61.7,
+          "previous_secondary": 61.7,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "61.7"
         }
       }
     },
@@ -3480,44 +3728,6 @@
           "actual_yahoo_raw": "1.7",
           "forecast_yahoo_raw": "-",
           "previous_yahoo_raw": "1.8"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "Fed Industrial Production m/m",
-      "yahoo_title": "Industrial Production MM*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-18",
-          "forecast_primary": 0.0,
-          "forecast_yahoo": null,
-          "actual_primary": 0.0,
-          "actual_yahoo": 0.0,
-          "previous_primary": 0.2,
-          "previous_yahoo": 0.2,
-          "actual_yahoo_raw": "0",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.2"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "Fed Manufacturing Production m/m",
-      "yahoo_title": "Industrial Production MM*",
-      "evidence": {
-        "yahoo": {
-          "dateISO": "2026-09-18",
-          "forecast_primary": 0.0,
-          "forecast_yahoo": null,
-          "actual_primary": -0.3,
-          "actual_yahoo": 0.0,
-          "previous_primary": 0.2,
-          "previous_yahoo": 0.2,
-          "actual_yahoo_raw": "0",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "0.2"
         }
       }
     },
