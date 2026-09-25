@@ -283,6 +283,14 @@ function _themeColorAlpha(cssVar, alpha) {
   const b = parseInt(hex.slice(4,6), 16);
   return `rgba(${r},${g},${b},${alpha})`;
 }
+function _hexAlpha(hex, alpha) {
+  const h = String(hex || '').replace('#', '');
+  if (!h || h.length < 6) return `rgba(144,150,160,${alpha})`;
+  const r = parseInt(h.slice(0,2), 16);
+  const g = parseInt(h.slice(2,4), 16);
+  const b = parseInt(h.slice(4,6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 function fmt(val, dec) {
   if (val == null || isNaN(val)) return '—';
@@ -6607,8 +6615,8 @@ async function _renderLWChart(ohlcId, label) {
               lineWidth: 1,
               lineStyle: 2,
               axisLabelVisible: true,
-              axisLabelColor: _themeColor('--border'),
-              axisLabelTextColor: _themeColor('--text3'),
+              axisLabelColor: _hexAlpha(s.color, 0.16),
+              axisLabelTextColor: s.color,
               title: s.axisTitle || s.label,
             });
             if (!_indPriceLines[id]) _indPriceLines[id] = [];
