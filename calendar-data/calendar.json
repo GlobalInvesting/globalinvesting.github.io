@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-25T09:55:13Z",
-  "generatedAt": "2026-09-25T09:55:13Z",
+  "lastUpdate": "2026-09-25T09:57:14Z",
+  "generatedAt": "2026-09-25T09:57:14Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1837,6 +1837,11 @@
       "n": 2,
       "mean": 1.0,
       "std": 0.565685
+    },
+    "JPY/au jibun bank manufacturing pmi": {
+      "n": 2,
+      "mean": 0.1,
+      "std": 1.979899
     },
     "EUR/italy cpi mom": {
       "n": 2,
@@ -64608,6 +64613,19 @@
       "previous": null
     },
     {
+      "date": "24 Sep",
+      "dateISO": "2026-09-24",
+      "timeUTC": "00:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan au Jibun Bank Manufacturing PMI",
+      "impact": "low",
+      "actual": "54.1",
+      "forecast": "55.4",
+      "previous": "55.1"
+    },
+    {
       "date": "2026-09-24",
       "dateISO": "2026-09-24",
       "timeUTC": "00:30",
@@ -65245,19 +65263,6 @@
       "forecast": "3.9%",
       "previous": "5.2%",
       "source": "secondary-calendar"
-    },
-    {
-      "date": "24 Sep",
-      "dateISO": "2026-09-24",
-      "timeUTC": "12:30",
-      "country": "JPY",
-      "currency": "JPY",
-      "flag": "🇯🇵",
-      "event": "Japan au Jibun Bank Manufacturing PMI",
-      "impact": "low",
-      "actual": null,
-      "forecast": "55.4",
-      "previous": "55.1"
     },
     {
       "date": "24 Sep",
@@ -69035,8 +69040,8 @@
       "event": "Japan au Jibun Bank Manufacturing PMI",
       "impact": "low",
       "actual": null,
-      "forecast": null,
-      "previous": null
+      "forecast": "54.1",
+      "previous": "54.1"
     },
     {
       "date": "1 Oct",
