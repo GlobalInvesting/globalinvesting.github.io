@@ -1,93 +1,14 @@
 name: Generate Structural Context
 
-# Runs 1×/day at 06:00 UTC.
-# MODE: structural — generates currency drivers only (v7.64.6+).
-# Session context moved to generate-ai-narrative.yml (intraday, 12×/day):
-#   session-context.json requires live intraday data to produce accurate CLOSED/ACTIVE/UPCOMING
-#   notes; generating it once at 06:00 UTC left the Session tab stale by up to 15 hours
-#   when Sydney opened at 21:00 UTC (Bloomberg standard: refresh at each session open).
-#
-# v8.542.17: migrated from the private globalinvesting-engine repo to THIS public
-# site repo, same reasoning and pattern as generate-ai-narrative.yml (v8.485.0/
-# v8.494.0) — a workflow's own .yml file consumes Actions minutes from whichever
-# repo it physically lives in, regardless of which repo its steps write to. This
-# workflow always wrote to the public site repo's ai-analysis/ files; keeping the
-# .yml itself in the private engine repo meant every run billed against the
-# private account-wide Actions-minutes budget for no structural reason. The
-# generator script stays in the private engine repo (checked out cross-repo via
-# PAT_TOKEN below) — only the workflow definition moved.
-#
-# MANUAL STEP REQUIRED (cannot be done from this repo, per the standing v8.336.0/
-# v8.494.0 rule — an external clock service's dispatch target must be updated by
-# hand): the external clock service's job that POSTs to
-#   https://api.github.com/repos/GlobalInvesting/globalinvesting-engine/dispatches
-# must be repointed to
-#   https://api.github.com/repos/GlobalInvesting/globalinvesting.github.io/dispatches
-# or its daily trigger will keep firing into the old (now-unlistened) private-repo
-# endpoint and this workflow will silently degrade to the native `schedule` trigger
-# alone (identical failure mode to the v8.494.0 incident).
-#
-# Writes to the PUBLIC site repo:
-#   ai-analysis/currency-drivers.json   ← Driver notes (heatmap modal, Correlations tab)
-#   ai-analysis/currency-catalysts.json ← Sourced per-currency catalyst paragraphs (v8.32.0,
-#                                          Rel. Strength modal, above "TOP 3 PAIRS" table)
-#
-# Why 1×/day remains correct for currency-drivers:
-#   - Structural change detection: only regenerates when COT weekEnding, CB rate lastUpdate,
-#     or OIS bias/biasUpdated actually change — these are weekly/meeting-cadence events.
-#   - Intraday FX price moves do not change the driver narrative.
-#
-# Token budget:
-#   ~8,000 tokens/day (1 run, drivers only — session context removed)
-#   ample headroom (<2% usage of a single key's daily quota).
-#
-# Required secrets (now in THIS public site repo, mirroring generate-ai-narrative.yml —
-# v8.542.17 migration copied these secret VALUES into this repo's own secret store;
-# the private engine repo's copies are unused by this workflow going forward):
-#   AI_PRIMARY_KEY / _2 / _5  — AI provider (primary), rotation pool for structural
-#   AI_FALLBACK_KEY / _2 / _3 / _4 / _6 — AI provider (fallback)
-#   WEB_SEARCH_KEY            — external web search (optional; script degrades gracefully
-#                                to non-grounded generation if absent)
-#   PAT_TOKEN                 — GitHub PAT with repo write access to the private engine
-#                                repo (to check out the generator script cross-repo)
-#
-# v8.342.0: renamed from GEMINI_API_KEY[_N]/GROQ_API_KEY_5/GROQ_API_KEY_6/TAVILY_API_KEY —
-# this workflow was missed when generate_narrative_signals.py's key-loader functions were
-# genericized in v8.340.0 (that session only touched generate-ai-narrative.yml's env block
-# and the shared script itself), so this workflow kept setting env vars under the OLD names
-# while the shared script had already stopped reading them — see CHANGELOG.md v8.342.0.
-#
-# TRIGGER STRATEGY: single daily cron (06:00 UTC), no buffer — a GitHub scheduler
-# skip means currency-drivers.json/catalysts go stale until the next day (or up
-# to 7 days if consecutive skips coincide with frozen change-detection inputs).
-# The external clock service adds a reliable clock for the same slot.
-# Setup: external-clock-service job → POST https://api.github.com/repos/GlobalInvesting/globalinvesting.github.io/dispatches
-# with header Authorization: Bearer <CRONJOB_PAT>, body {"event_type":"trigger-structural-context"}, daily 06:00 UTC.
-# (v8.542.17: URL updated for the private→public repo migration above — the external
-# clock service's own dashboard still needs a matching manual update, and this file now
-# lives in the public repo, so the service name itself is kept generic per the standing
-# "no backend/architecture details in public-repo comments" rule.)
-
 on:
   repository_dispatch:
-    types: [trigger-structural-context]   # ← dispatched by the external clock service, daily (06:00 UTC)
+    types: [trigger-structural-context]
   schedule:
-    - cron: '0 6 * * *'   # Fallback — 06:00 UTC — pre-London open, after overnight data updates
-    # FIX-20: Monday 06:00 UTC force-regeneration — ensures currency-drivers.json
-    # never stays stale >7 days when change detection continually skips (inputs frozen).
-    # The Monday run passes --force automatically via the check below.
+    - cron: '0 6 * * *'
   workflow_dispatch:
 
-# FIX-12b: Node.js 20 deprecation (deadline: 2026-06-02).
-# actions/checkout@v4 and actions/setup-python@v5 target Node.js 20 by default;
-# this env var forces the runner to use Node.js 24 for all JS actions.
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  # v8.343.0: without this, Python's default block-buffering (stdout isn't a TTY
-  # inside a GH Actions run: step) means print()/safe_print() output can sit
-  # unflushed for minutes during a slow network call (e.g. a Gemini timeout),
-  # making the job LOOK hung in the live log even though it's actively retrying
-  # keys in the background. Forces line-by-line flushing instead.
   PYTHONUNBUFFERED: "1"
 
 concurrency:
@@ -100,12 +21,6 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    # v8.36.0: raised from 15 → 30 minutes. The drivers bulk call (up to 180s) plus
-    # Gemini key-cascade retries plus 10 sequential catalysts calls (each with their
-    # own dynamic timeout + 2s pause) can legitimately exceed 15 minutes under normal
-    # conditions now that both paths do real grounded web search — confirmed in
-    # production (run #71, 2026-06-29): job hit the 15-minute ceiling and was
-    # cancelled by GitHub Actions mid-request, not by any code-level failure.
     timeout-minutes: 30
     steps:
       - name: Checkout THIS public site repo
@@ -120,31 +35,7 @@ jobs:
           token: ${{ secrets.PAT_TOKEN }}
           path: engine
 
-      # IDEMPOTENCY GUARD (v8.289.0, widened v8.542.17): same dual-trigger design as
-      # generate-ai-narrative.yml (native `schedule` + external-clock-service `repository_dispatch`,
-      # kept as deliberate defense-in-depth). Keyed on currency-catalysts.json's
-      # `generated_at` rather than currency-drivers.json's — drivers has its own
-      # structural change-detection (only regenerates when COT weekEnding/CB rate/OIS
-      # bias actually change) that correctly leaves its generated_at stale for days at a
-      # time, which would make it an unreliable "did a sibling trigger already run"
-      # signal (false negative on every day nothing structural changed). Catalysts has
-      # no such gate and regenerates on every real run, so its timestamp reliably
-      # reflects "did a run just happen". workflow_dispatch (manual) always bypasses it,
-      # matching the --force behavior below.
-      #
-      # v8.542.17: the original 15-minute window assumed the native `schedule` trigger
-      # and the external-clock-service `repository_dispatch` land close together, both near
-      # 06:00 UTC. Confirmed via real Actions run history that this assumption is
-      # false — GitHub's own scheduled-trigger delay (documented, can run to several
-      # hours under load) let a same-day pair land ~4h49m apart (03:05 UTC dispatch,
-      # 10:54 UTC scheduled), each seeing the other's own run as >15min old and running
-      # the full AI generation twice on the same day — doubling this workflow's real
-      # Actions-minutes cost, not skipping the second trigger as designed. Since this
-      # workflow only ever needs ONE real run per UTC calendar day, the guard now checks
-      # "did catalysts already regenerate today (UTC)" instead of "in the last 15
-      # minutes" — immune to any schedule-trigger delay, however large, while still
-      # letting each new day's first trigger (whichever fires first) run normally.
-      - name: Idempotency guard — skip if a sibling trigger already ran today (UTC)
+      - name: Idempotency guard -- skip if a sibling trigger already ran today (UTC)
         id: guard
         run: |
           SKIP=false
@@ -184,33 +75,22 @@ jobs:
         if: steps.guard.outputs.skip != 'true'
         working-directory: site
         env:
-          # AI provider (fallback) pool — retries here if the primary provider is
-          # exhausted rather than silently writing empty {}.
           AI_FALLBACK_KEY:   ${{ secrets.AI_FALLBACK_KEY }}
           AI_FALLBACK_KEY_2: ${{ secrets.AI_FALLBACK_KEY_2 }}
           AI_FALLBACK_KEY_3: ${{ secrets.AI_FALLBACK_KEY_3 }}
           AI_FALLBACK_KEY_4: ${{ secrets.AI_FALLBACK_KEY_4 }}
+          AI_FALLBACK_KEY_5: ${{ secrets.AI_FALLBACK_KEY_5 }}
           AI_FALLBACK_KEY_6: ${{ secrets.AI_FALLBACK_KEY_6 }}
-          # AI provider (primary): rotation pool for drivers/catalysts grounded search calls.
-          # Drivers (v8.36.0): single bulk call covering all 8 currencies (was 8 serial
-          # per-currency calls in v8.34.0). Catalysts: 10 serial per-currency calls
-          # (kept separate for clean per-currency source attribution, v8.32.0).
-          # On full primary-provider exhaustion, the previous day's drivers/catalysts
-          # are preserved rather than degrading.
           AI_PRIMARY_KEY:   ${{ secrets.AI_PRIMARY_KEY }}
           AI_PRIMARY_KEY_2: ${{ secrets.AI_PRIMARY_KEY_2 }}
+          AI_PRIMARY_KEY_3: ${{ secrets.AI_PRIMARY_KEY_3 }}
+          AI_PRIMARY_KEY_4: ${{ secrets.AI_PRIMARY_KEY_4 }}
           AI_PRIMARY_KEY_5: ${{ secrets.AI_PRIMARY_KEY_5 }}
-          # v8.37.0: external web search (primary search path, ahead of AI-native grounding).
-          # Optional — the script degrades gracefully to non-grounded generation if unset.
+          AI_PRIMARY_KEY_6: ${{ secrets.AI_PRIMARY_KEY_6 }}
+          AI_PRIMARY_KEY_7: ${{ secrets.AI_PRIMARY_KEY_7 }}
           WEB_SEARCH_KEY: ${{ secrets.WEB_SEARCH_KEY }}
         run: |
-          # Manual trigger always regenerates — skip change detection.
-          # Monday scheduled runs also force-regenerate to prevent drivers from going
-          # stale indefinitely when inputs (COT weekEnding, CB rate, OIS bias) are frozen.
-          # v8.542.0: the generator now enforces a 20h freshness TTL on weekdays (in
-          # addition to the structural-input triggers), so daily runs always refresh.
-          # The Monday --force below remains as a belt-and-braces weekly full rebuild.
-          DAY_OF_WEEK=$(date -u +%u)  # 1=Mon … 7=Sun
+          DAY_OF_WEEK=$(date -u +%u)
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "Manual trigger — forcing regeneration (--force)"
             python ../engine/scripts/generate_narrative_signals.py --mode structural --force

@@ -72,10 +72,15 @@ jobs:
           AI_FALLBACK_KEY_2: ${{ secrets.AI_FALLBACK_KEY_2 }}
           AI_FALLBACK_KEY_3: ${{ secrets.AI_FALLBACK_KEY_3 }}
           AI_FALLBACK_KEY_4: ${{ secrets.AI_FALLBACK_KEY_4 }}
+          AI_FALLBACK_KEY_5: ${{ secrets.AI_FALLBACK_KEY_5 }}
           AI_FALLBACK_KEY_6: ${{ secrets.AI_FALLBACK_KEY_6 }}
           AI_PRIMARY_KEY:   ${{ secrets.AI_PRIMARY_KEY }}
           AI_PRIMARY_KEY_2: ${{ secrets.AI_PRIMARY_KEY_2 }}
+          AI_PRIMARY_KEY_3: ${{ secrets.AI_PRIMARY_KEY_3 }}
+          AI_PRIMARY_KEY_4: ${{ secrets.AI_PRIMARY_KEY_4 }}
           AI_PRIMARY_KEY_5: ${{ secrets.AI_PRIMARY_KEY_5 }}
+          AI_PRIMARY_KEY_6: ${{ secrets.AI_PRIMARY_KEY_6 }}
+          AI_PRIMARY_KEY_7: ${{ secrets.AI_PRIMARY_KEY_7 }}
           WEB_SEARCH_KEY: ${{ secrets.WEB_SEARCH_KEY }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
