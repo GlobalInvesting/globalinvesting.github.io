@@ -1,21 +1,21 @@
 {
-  "netPosition": -9385,
-  "longPositions": 47397,
-  "shortPositions": 56782,
+  "netPosition": -29995,
+  "longPositions": 54026,
+  "shortPositions": 84021,
   "positionCategory": "Leveraged Funds (speculative)",
   "secondaryCategory": "Asset Manager/Institutional",
   "tertiaryCategory": "Dealer/Intermediary",
   "assetClass": "equityIndex",
   "displayName": "Nasdaq-100",
-  "openInterestTotal": 383520,
+  "openInterestTotal": 342141,
   "contractMultiplier": 20,
   "contractUnit": "USD",
-  "assetManagerNet": 66879,
-  "assetManagerLong": 105814,
-  "assetManagerShort": 38935,
-  "dealerNet": -71692,
-  "dealerLong": 52197,
-  "dealerShort": 123889,
+  "assetManagerNet": 71264,
+  "assetManagerLong": 105666,
+  "assetManagerShort": 34402,
+  "dealerNet": -57651,
+  "dealerLong": 57754,
+  "dealerShort": 115405,
   "history": [
     {
       "weekEnding": "2022-02-08",
@@ -1944,12 +1944,20 @@
       "levShort": 56782,
       "assetManagerNet": 66879,
       "dealerNet": -71692
+    },
+    {
+      "weekEnding": "2026-09-22",
+      "levNet": -29995,
+      "levLong": 54026,
+      "levShort": 84021,
+      "assetManagerNet": 71264,
+      "dealerNet": -57651
     }
   ],
   "sourceType": "options_futures_combined",
   "source": "CFTC Official",
   "sourceUrl": "https://www.cftc.gov/dea/options/financial_lof.htm",
-  "reportDate": "2026-09-22",
-  "lastUpdate": "2026-09-22",
-  "weekEnding": "2026-09-15"
+  "reportDate": "2026-09-25",
+  "lastUpdate": "2026-09-25",
+  "weekEnding": "2026-09-22"
 }
