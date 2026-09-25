@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-25T06:01:18Z",
-  "generatedAt": "2026-09-25T06:01:18Z",
+  "lastUpdate": "2026-09-25T06:03:18Z",
+  "generatedAt": "2026-09-25T06:03:18Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1629,14 +1629,14 @@
       "std": 0.212132
     },
     "SEK/ppi mom": {
-      "n": 2,
-      "mean": -0.7,
-      "std": 0.282843
+      "n": 3,
+      "mean": -0.466667,
+      "std": 0.450925
     },
     "SEK/ppi yoy": {
-      "n": 2,
-      "mean": -0.25,
-      "std": 0.353553
+      "n": 3,
+      "mean": 0.2,
+      "std": 0.818535
     },
     "USD/nondefense capital goods shipments excl. aircraft mom": {
       "n": 2,
@@ -1682,6 +1682,11 @@
       "n": 2,
       "mean": 0.45,
       "std": 0.353553
+    },
+    "SEK/households loans yoy": {
+      "n": 2,
+      "mean": 24.5,
+      "std": 34.648232
     },
     "EUR/france ppi mom": {
       "n": 2,
@@ -65567,7 +65572,7 @@
       "flag": "🇸🇪",
       "event": "Sweden PPI m/m",
       "impact": "low",
-      "actual": null,
+      "actual": "0.9%",
       "forecast": "0.9%",
       "previous": "0.1%"
     },
@@ -65580,7 +65585,7 @@
       "flag": "🇸🇪",
       "event": "Sweden PPI y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "6.8%",
       "forecast": "5.7%",
       "previous": "6.4%"
     },
@@ -65593,7 +65598,7 @@
       "flag": "🇸🇪",
       "event": "Sweden Households Loans y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.3%",
       "forecast": "3.3%",
       "previous": "3.3%"
     },
@@ -65606,7 +65611,7 @@
       "flag": "🇸🇪",
       "event": "Sweden Non-Financial Corporations Loans y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.9%",
       "forecast": null,
       "previous": "3.5%"
     },
@@ -65619,7 +65624,7 @@
       "flag": "🇸🇪",
       "event": "Sweden M3 Money Supply y/y",
       "impact": "low",
-      "actual": null,
+      "actual": "3.3%",
       "forecast": null,
       "previous": "3.2%"
     },
