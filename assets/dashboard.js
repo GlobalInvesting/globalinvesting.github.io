@@ -352,11 +352,6 @@ function localHourToUTC(timeZone, localHour, now) {
   return ((localHour - offset) % 24 + 24) % 24;
 }
 
-// Single source of truth for the FX weekend-closed boundary (Fri 21:00 UTC
-// -> Sun 21:00 UTC), matching the session-status/liquidity-chart convention
-// used everywhere else in this file. Exposed on window so other deferred
-// scripts loaded after this one (e.g. fx-websocket.js) can reuse the exact
-// same boundary instead of leaving a delay/live label unaware of it.
 function isFxMarketClosedNow() {
   const now = new Date();
   const utcDay = now.getUTCDay();
@@ -407,14 +402,6 @@ function updateSessions(h) {
     if (open) activeLabel = s.id.toUpperCase().replace('NEWYORK','NEW YORK');
   });
 
-  // v8.537.0: 'INTER-SESSION' already contains the word "SESSION" — appending
-  // ' SESSION' unconditionally (the pre-fix behavior) produced a literal
-  // "INTER-SESSION SESSION" in the topbar during the gap between sessions,
-  // and "INTER-SESSION · ACTIVE" in the sidebar (nothing is actually active
-  // during that gap). A real session name ('TOKYO', 'LONDON', etc.) and the
-  // weekend label ('MARKET CLOSED') don't have this problem — only the
-  // inter-session default does, since it's the one label that already
-  // spells out "SESSION" on its own.
   const isInterSession = !isWeekend && activeLabel === 'INTER-SESSION';
   setEl('session-label', activeLabel + ((isWeekend || isInterSession) ? '' : ' SESSION'));
   setEl('session-status', (isWeekend || isInterSession) ? activeLabel : (activeLabel + ' · ACTIVE'));
@@ -998,12 +985,6 @@ function _diffByDate(seriesByDate) {
   return out;
 }
 
-// Factor 2Y Diff — correlates each pair's own daily FX return against the
-// day-over-day change in its (base 2Y - quote 2Y) yield spread, joined by
-// calendar date (v8.180.0/v8.273.0 join rule), zero new fetch beyond
-// bond2y-data/ already accumulated daily since v8.507.0. Daily cadence
-// only — bond2y-data has no 4h/1h granularity, so this factor is not
-// computed for those tabs rather than blended across mismatched cadences.
 function _pairs2YDiffTag(base, quote, fxRetsByDate, bond2yByCcy) {
   const baseHist = bond2yByCcy[base], quoteHist = bond2yByCcy[quote];
   if (!baseHist || !quoteHist || !fxRetsByDate) return { r: null, n: 0 };
@@ -1014,7 +995,7 @@ function _pairs2YDiffTag(base, quote, fxRetsByDate, bond2yByCcy) {
   const spreadChangeByDate = _diffByDate(spreadByDate);
   if (!spreadChangeByDate) return { r: null, n: 0 };
   const jointDates = _sortDateKeys(Object.keys(fxRetsByDate).filter(d => Object.prototype.hasOwnProperty.call(spreadChangeByDate, d)));
-  const MIN_OBS = 6; // same accumulation floor as the Momentum screener (v8.507.0)
+  const MIN_OBS = 6; 
   if (jointDates.length < MIN_OBS) return { r: null, n: jointDates.length };
   const a = jointDates.map(d => fxRetsByDate[d]), b = jointDates.map(d => spreadChangeByDate[d]);
   return { r: _pearsonCorr(a, b), n: jointDates.length };
@@ -7615,9 +7596,6 @@ document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
   if (_lwActiveOhlcId) _renderLWChart(_lwActiveOhlcId);
 });
 
-// Unified Pair Detail (beta feature flag): when <html data-pair-detail="unified"> is set, the per-row
-// accordions below delegate to the single panel under the chart (assets/pair-detail.js).
-// Inert in production — the attribute is absent there.
 function _giUnifiedPairDetail(row) {
   if (document.documentElement.dataset.pairDetail !== 'unified') return false;
   document.dispatchEvent(new CustomEvent('gi:pairDetailToggle', { detail: { sym: row.dataset.sym } }));
@@ -9314,7 +9292,7 @@ async function fetchFedExpectations() {
       const sorted = [...hist].sort((a, b) => a.date < b.date ? -1 : 1);
       const last = sorted[sorted.length - 1]?.value;
       const prior = sorted[sorted.length - 6]?.value;
-      bond2yDelta5d[c] = (last != null && prior != null) ? Math.round((last - prior) * 100) : null; // bp
+      bond2yDelta5d[c] = (last != null && prior != null) ? Math.round((last - prior) * 100) : null; 
     });
     const _validDeltas = currencies.map(c => bond2yDelta5d[c]).filter(v => v != null);
     let _deltaMean = null, _deltaStd = null;
@@ -9369,14 +9347,7 @@ async function fetchFedExpectations() {
       const hikeProb = meetings?.hikeProb ?? null;  
       const probSrc  = biasSource || 'OIS/futures';
       const _haveProbData = cutProb !== null || hikeProb !== null;
-      // Conviction tiering (WIRP/FedWatch-style): the bias field itself is a
-      // threshold-crossing binary (any move past the fwd/policy threshold gets
-      // labeled 'hike'/'cut'), so a 40%-priced lean and a 100%-priced call both
-      // render as the same word/color with only an 8px trailing % to tell them
-      // apart. Below CONVICTION_THRESHOLD, prefix "Lean " and mute the main
-      // label so a weak signal doesn't visually read as equal-conviction to a
-      // fully-priced one.
-      const CONVICTION_THRESHOLD = 60; // %
+      const CONVICTION_THRESHOLD = 60; 
       let probSuffix = '';
       let leanPrefix = '';
       let convictionNote = '';
@@ -12760,11 +12731,7 @@ async function renderG8YieldPane(cty) {
   try {
     const [ext, hist2y, hist10y] = await Promise.all([
       fetch('./extended-data/' + cfg.file + '.json').then(r => r.ok ? r.json() : null).catch(() => null),
-      // bond2y-data/ already accumulates daily history for the Momentum screener (v8.507.0) —
-      // reused here to derive a real day-over-day 2Y change instead of a hardcoded "—".
       fetch('./bond2y-data/' + cfg.file + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
-      // bond10y-data/ (v8.516.0) mirrors bond2y-data/'s daily accumulation for the 10Y tenor,
-      // written by log_10y_yield_history.py — same day-over-day derivation as 2Y below.
       fetch('./bond10y-data/' + cfg.file + '.json', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).catch(() => null),
     ]);
     if (!ext) { contentEl.textContent = 'Data unavailable — extended-data/' + cfg.file + '.json'; return; }
@@ -12821,9 +12788,6 @@ async function renderG8YieldPane(cty) {
   }
 }
 
-// All 10 G10 rates currencies — shared by the country tabs, the Spreads base
-// selector, and the Momentum base selector, so a base/comparison currency
-// list only needs updating in one place.
 const G10_RATE_CCYS = [
   { code: 'us', ccy: 'USD', label: 'United States' },
   { code: 'de', ccy: 'EUR', label: 'Germany' },
@@ -12838,7 +12802,7 @@ const G10_RATE_CCYS = [
 ];
 
 let _spreadsBaseCcy = 'USD';
-const _spreadsRowsCache = {}; // base ccy -> rendered tbody HTML, avoids refetching on toggle-back
+const _spreadsRowsCache = {}; 
 
 async function renderSovereignSpreads(base) {
   base = base || _spreadsBaseCcy;
@@ -12904,7 +12868,7 @@ async function renderSovereignSpreads(base) {
 }
 
 let _momentumBaseCcy = 'USD';
-const _momentumRowsCache = {}; // base ccy -> rendered tbody HTML
+const _momentumRowsCache = {}; 
 
 async function renderMomentumScreener(base) {
   base = base || _momentumBaseCcy;
@@ -12959,11 +12923,6 @@ async function renderMomentumScreener(base) {
 
   const fmtBp = v => v == null ? '—' : (v >= 0 ? '+' : '') + Math.round(v) + ' bp';
   const colorBp = v => v == null ? 'var(--text2)' : v > 20 ? 'var(--up)' : v < -20 ? 'var(--down)' : 'var(--text2)';
-  // Bar direction is the 20D change in the (country − base) 2Y yield spread — the same
-  // rate-differential-momentum convention used industry-wide (e.g. Bloomberg WIRP-style
-  // 2s spread momentum): a widening spread in the country's favor (positive) signals that
-  // country's rate momentum outpacing the base; a narrowing/inverting spread (negative)
-  // signals the base's momentum is stronger.
   const momBarHtml = (v, ccy, baseCcy) => {
     if (v == null) return '<span class="mom-bar-wrap"><span class="mom-bar-tick"></span></span>';
     const pct = Math.min(Math.abs(v) * 2, 50);
@@ -12997,10 +12956,6 @@ async function renderMomentumScreener(base) {
       if (typeof _lwEnterYieldSpreadView === 'function') {
         _lwEnterYieldSpreadView(_momentumBaseCcy, row.dataset.ccy);
       }
-      // Scroll the Price Chart panel into view on both mobile and desktop —
-      // the row lives in the Rates & Yield Curve panel, which can sit well
-      // below (mobile, single-column) or simply out of the current scroll
-      // position (desktop, #main) from where the chart itself renders.
       document.getElementById('section-fxpairs')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
   }
@@ -13010,12 +12965,6 @@ let _lwYieldViewActive = false;
 let _lwYieldSeriesA = null;
 let _lwYieldSeriesB = null;
 let _lwYieldResizeObs = null;
-// _destroyLWChart() resets _lwActiveOhlcId to null as part of its normal
-// candle-chart teardown, so the symbol to return to on exit must be saved
-// separately before that call, not read back from _lwActiveOhlcId later —
-// reading it back left it permanently null and silently skipped the
-// re-render entirely, leaving #tv-chart-wrap empty (blank/black) after
-// closing the yield-spread view.
 let _lwYieldReturnOhlcId = null;
 
 function _lwCcyFlagCode(ccy) {
@@ -13023,10 +12972,6 @@ function _lwCcyFlagCode(ccy) {
   return m ? m.code : ccy.slice(0, 2).toLowerCase();
 }
 
-// Tears down the dedicated yield-spread chart instance and its banner only —
-// no re-render of the normal chart. Used internally when switching directly
-// from one yield-spread pair to another (Enter calls this instead of Exit, to
-// avoid rebuilding the candlestick chart just to immediately destroy it again).
 function _lwTeardownYieldView() {
   if (_lwYieldResizeObs) { try { _lwYieldResizeObs.disconnect(); } catch(_e) {} _lwYieldResizeObs = null; }
   if (_lwChart) { try { _lwChart.remove(); } catch(_e) {} _lwChart = null; }
@@ -13036,13 +12981,6 @@ function _lwTeardownYieldView() {
   if (banner) banner.remove();
 }
 
-// Reverts the Price Chart from the dedicated 2Y-yield comparison view back to its
-// normal candlestick display. Destroys the temporary yield-spread chart outright
-// and re-runs the same chart-build path a symbol switch already uses
-// (_renderLWChart) instead of selectively re-showing state scattered across
-// several independent closures (moving averages, pane indicators, drawings, CB
-// markers) — that path already knows how to rebuild all of it correctly for the
-// active symbol. Safe to call even if the view isn't active.
 function _lwExitYieldSpreadView() {
   if (!_lwYieldViewActive) return;
   _lwYieldViewActive = false;
@@ -13054,15 +12992,6 @@ function _lwExitYieldSpreadView() {
   }
 }
 
-// Replaces the main Price Chart entirely with a dedicated 2Y sovereign-yield
-// comparison chart — destroying the active candlestick chart and everything tied
-// to it (moving averages, pane indicators, user drawings, CB-meeting markers),
-// the same destroy/recreate mechanism a symbol switch (e.g. Gold/WTI) already
-// uses, rather than hiding series on top of the existing chart instance — then
-// building a fresh chart holding only the two yield legs as distinctly-colored
-// lines on their own right-axis scale (%), fit to the chart's full width.
-// Triggered by clicking a row in the Rates & Yield Curve panel's Spread &
-// Momentum table.
 async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
   const wrap = document.getElementById('tv-chart-wrap');
   if (!wrap) return;
@@ -13072,10 +13001,6 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
 
   if (_lwYieldViewActive) { _lwTeardownYieldView(); }
   else {
-    // Capture the symbol to return to BEFORE destroying the candle chart —
-    // _destroyLWChart() itself resets _lwActiveOhlcId to null, so reading it
-    // after this call (as the exit path used to) always finds nothing to
-    // re-render.
     _lwYieldReturnOhlcId = _lwActiveOhlcId;
     _destroyLWChart();
   }
@@ -13084,12 +13009,6 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
   wrap.style.pointerEvents = 'auto';
   _lwYieldViewActive = true;
 
-  // The candlestick chart's own OHLC header (#lw-chart-header, e.g. "Euro /
-  // U.S. Dollar") lives outside #tv-chart-wrap and is untouched by destroying
-  // the chart instance above — it must be hidden explicitly here, the same
-  // way _renderLWChart() re-shows it on exit, or the prior symbol's name and
-  // OHLC readout keep showing above a chart that no longer has anything to
-  // do with that symbol.
   const _yieldHdrEl = document.getElementById('lw-chart-header');
   if (_yieldHdrEl) _yieldHdrEl.style.display = 'none';
 
@@ -13125,7 +13044,7 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
     _lwYieldResizeObs.observe(chartDiv);
   }
 
-  const YIELD_COLORS = ['#42a5f5', '#ffa726']; // fixed, distinct hues — never the same palette index for both legs
+  const YIELD_COLORS = ['#42a5f5', '#ffa726']; 
   const legs = [
     { ccy: baseCcy, color: YIELD_COLORS[0] },
     { ccy: rowCcy,  color: YIELD_COLORS[1] },
@@ -13134,11 +13053,6 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
 
   const banner = document.createElement('div');
   banner.id = 'lw-yield-banner';
-  // Base (desktop) sizing is inline here; the <=900px breakpoint overrides
-  // padding/gap/font-size/offsets via #lw-yield-banner rules in index.html's
-  // mobile media block, the same !important-over-inline convention already
-  // used there for #split-layout-btn etc. — a fixed-position overlay banner
-  // at desktop density was covering chart content on narrow viewports.
   banner.style.cssText = 'position:absolute;top:8px;left:8px;z-index:5;display:flex;align-items:center;gap:14px;padding:6px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:4px;font-family:var(--font-mono,monospace);font-size:11px;box-shadow:0 2px 8px rgba(0,0,0,.25);';
   banner.innerHTML = legs.map(function (l) {
     return `<span class="lw-yield-leg" data-ccy="${l.ccy}" style="display:flex;align-items:center;gap:5px;">` +
@@ -13157,11 +13071,6 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
 
   try {
     const [seriesA, seriesB] = await Promise.all(legs.map(async function (l) {
-      // AreaSeries with a gradient fill under each line — same visual
-      // language as the COT modal's charts (cot-modal-chart.js) — rather
-      // than a bare LineSeries; lineColor stays each leg's own fixed hue,
-      // topColor/bottomColor are that same hue at low alpha so the two
-      // gradients stay visually distinct instead of blending into one wash.
       const seriesOpts = {
         lineColor: l.color, topColor: l.color + '26', bottomColor: l.color + '02',
         lineWidth: 2, priceScaleId: 'right', priceFormat,
@@ -13183,7 +13092,7 @@ async function _lwEnterYieldSpreadView(baseCcy, rowCcy) {
       return { series: mk, data: seriesData, ccy: l.ccy };
     }));
 
-    if (!_lwYieldViewActive || !_lwChart) return; // view was closed/replaced while fetching
+    if (!_lwYieldViewActive || !_lwChart) return; 
 
     _lwYieldSeriesA = seriesA.series;
     _lwYieldSeriesB = seriesB.series;
@@ -14368,11 +14277,6 @@ async function _lwLoadCompare(cmpId, cmpLabel, cmpType = 'ohlc', fromRestore) {
   const sameTypeCount = Object.keys(_lwCompareSeriesMap)
     .filter(function (k) { return k.indexOf(cmpType + ':') === 0; }).length;
   const CMP_COLOR = palette[sameTypeCount % palette.length];
-  // Reserve this uid's slot synchronously, before the first await below: two calls
-  // fired back-to-back with no await between them (e.g. the compare-list restore loop)
-  // would otherwise both compute sameTypeCount from an as-yet-unpopulated
-  // _lwCompareSeriesMap and pick the same palette color, since the real entry is only
-  // written after each fetch resolves.
   _lwCompareSeriesMap[uid] = 'pending';
 
   try {

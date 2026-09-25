@@ -691,13 +691,6 @@ function openCOTModal(ccy,data,opts){
   const total=long_+short_,lPct=total>0?Math.round(long_/total*100):50;
   const amNet=data.assetManagerNet,ddNet=data.dealerNet,weekEnd=data.weekEnding||'',nWks=history.length;
   const amLong_=data.assetManagerLong,amShort_=data.assetManagerShort,ddLong_=data.dealerLong,ddShort_=data.dealerShort;
-  // Positioning Z-Score/percentile are computed against a trailing 52-week
-  // window, not the full stored history (which has held up to 522 weeks/
-  // ~10y since the 2026-08-26 depth increase) — matches this project's
-  // standing "COT z-score vs. 52-week history" convention (also documented
-  // in guide-cot.html's FAQ schema and mirrored by the MT5 EA) and the
-  // sibling "52-Week Range" section in this same tab, which already slices
-  // to history.slice(-52).
   const zHist=history.slice(-52),zWindow=zHist.length;
   const zScore=_calcZ(zHist),pctHist=_calcPct(zHist),zInfo=_posLabel(zScore),isCrowded=Math.abs(zScore||0)>=1.5;
   let wow=null,amWow=null,ddWow=null;

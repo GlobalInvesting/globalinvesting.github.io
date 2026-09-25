@@ -1,21 +1,3 @@
-/*
- * pair-detail.js v1.0.0
- * Unified Pair Detail panel — rendered below the main chart for the active pair.
- * Tabs: Overview · Macro Drivers · Session Context · Strength Drivers · Fair Value.
- *
- * Data sources (all already published by the engine, no new endpoints):
- *   ./ai-analysis/currency-catalysts.json  -> Macro Drivers   (per currency)
- *   ./ai-analysis/session-context.json     -> Session Context (per currency x session)
- *   ./ai-analysis/currency-drivers.json    -> Strength Drivers (one note per pair, `pairs`)
- *   ./fair-value-data/summary.json         -> Fair Value / Overview (per pair)
- *
- * Overview embeds the legacy per-row detail (dashboard.js buildInlineDetail: price, Price & Spreads,
- * Volatility, COT, Retail) so nothing from the old accordion is lost, plus the new snapshots.
- * Row clicks in FX Pairs / Crosses reach this panel through the 'gi:pairDetailToggle' event.
- *
- * Rules: no inline handlers, no innerHTML with data (text is set via textContent),
- * external URLs limited to http(s), ARIA tabs pattern (roving tabindex, arrow keys).
- */
 (function () {
   'use strict';
 
@@ -29,9 +11,6 @@
   ];
   var REFRESH_MS = 5 * 60 * 1000;
   var LEGACY_REFRESH_MS = 30 * 1000;
-  // Weekday freshness bound matches the generator TTL contract (20h + buffer). Weekends
-  // and Monday before the first run use the wider window: the generator skips on
-  // market_closed, so Friday's file is legitimately ~72h old until Monday 06:00 UTC.
   var STALE_HOURS = (function () {
     var n = new Date(), wd = n.getUTCDay(), h = n.getUTCHours();
     return (wd === 0 || wd === 6 || (wd === 1 && h < 9)) ? 76 : 26;
@@ -40,7 +19,6 @@
   var root, tabsEl, subEl, toggleBtn, contentEl;
   var state = { pair: null, sym: null, tab: 'overview', open: true, data: null, loadedAt: 0, loading: null, legacyEl: null, legacyAt: 0, macroCcy: null };
 
-  /* ---------- helpers ---------- */
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) n.className = cls;
@@ -108,7 +86,6 @@
   }
   function twoCol(a, b) { return append(el('div', 'pdt-cols'), a, b); }
 
-  /* ---------- data ---------- */
   function fetchJson(url) {
     return fetch(url, { cache: 'no-cache' }).then(function (r) {
       if (!r.ok) throw new Error(url + ' ' + r.status);
@@ -136,7 +113,6 @@
     return state.loading;
   }
 
-  /* ---------- tab renderers ---------- */
   function renderMacro(p, d) {
     var cat = d.catalysts;
     var c = (state.macroCcy === p.base || state.macroCcy === p.quote) ? state.macroCcy : p.base;
@@ -187,9 +163,6 @@
     var when = String(s.start).padStart(2, '0') + ':00 UTC';
     return 'Opens in ' + (hh ? hh + 'h ' : '') + mm + 'm \u00b7 ' + when;
   }
-  // One note per session for the pair. session-context.json is generated per currency, so pick
-  // the note that names this pair (either direction); otherwise fall back to the base-currency
-  // note, then the quote-currency note. Never concatenates the two.
   function sessionNote(p, sc, sessName) {
     var lines = [p.base, p.quote].map(function (c) {
       return sc.sessions && sc.sessions[c] && sc.sessions[c][sessName];
@@ -224,8 +197,6 @@
     return wrap;
   }
 
-  // One note per pair (schema_version 2, `pairs`). While an old currency-drivers.json is still
-  // deployed, fall back to the first per-currency note available for the pair (never both).
   function strengthNote(p, dr) {
     if (!dr) return null;
     var label = p.base + '/' + p.quote, inv = p.quote + '/' + p.base;
@@ -253,10 +224,6 @@
     return wrap;
   }
 
-  // tip: optional {title, body} — wires the same fx-tip hover tooltip the legacy Overview
-  // metrics already carry (dashboard.js's _fxTTAttach), which the Fair Value tab previously had
-  // none of despite being the one tab built entirely fresh here rather than via the legacy
-  // renderer.
   function statCell(label, value, cls, tip) {
     var c = el('div', 'pdt-stat');
     var l = el('div', 'pdt-stat-l', label);
@@ -317,10 +284,6 @@
     return block('FX FAIR VALUE \u00b7 ' + p.label, [grid, gauge(fv.z), meta, footer('Fair Value model', d.fair.generated_at)]);
   }
 
-  /* ---------- Overview (compact layout) ----------
-   * The per-row detail (price, Price & Spreads, Volatility, COT, Retail) is still produced by the
-   * legacy renderer into a hidden host; its nodes (tooltips included) are then moved into the
-   * compact layout. Fair Value and Live Session are rendered here. */
   function kv(label, value, cls, tip) {
     var r = el('div', 'pdt-kv');
     var l = el('i', null, label);
@@ -329,10 +292,6 @@
     if (tip && typeof _fxTTAttach === 'function') _fxTTAttach(l, tip.title, tip.body);
     return r;
   }
-  // Plain-text header stat (replaces the earlier bordered "chip"/pill), matching this panel's
-  // own .pdt-kv convention elsewhere. `tip` is an optional {title, body} pair wired through the
-  // shared fx-tip tooltip widget (dashboard.js's _fxTTAttach) so these stats get the same hover
-  // tooltip as every other metric in the panel, instead of being the one area with none.
   function badge(text, val, cls, tip) {
     var b = el('span', 'pdt-hstat');
     b.appendChild(document.createTextNode(text));
@@ -374,7 +333,6 @@
     return blocks.length ? wrap : null;
   }
 
-  // Retail block as in the mock: "Long / Short" row, split bar, "Avg long/short" rows.
   function retailRows(g) {
     var lbl = g.querySelector('.pd-inline-group-lbl'), bar = g.querySelector('.pd-inline-retail-bar');
     var row = g.querySelector('.pd-inline-retail-row'), avg = g.querySelector('.pd-inline-retail-avg');
@@ -410,11 +368,6 @@
     S.s2.appendChild(groups[1]);
     var skewEl = groups[3].querySelector('.pd-inline-retail-skew');
     var skew = skewEl ? skewEl.textContent.trim() : '';
-    // Mirrors dashboard.js's own retSkewCls contrarian convention (pd-up/pd-dn on the legacy
-    // node this was built from): retail majority/heavily LONG renders as the bearish class and
-    // majority/heavily SHORT as the bullish class, since retail crowds have historically tended
-    // to be positioned against the prevailing trend at extremes. 'Mixed' (dashboard.js's pd-dim)
-    // stays neutral.
     var skewCls = skewEl && skewEl.classList.contains('pd-up') ? 'pdt-up'
       : skewEl && skewEl.classList.contains('pd-dn') ? 'pdt-down' : '';
     if (skewEl) skewEl.parentNode.removeChild(skewEl);
@@ -434,7 +387,7 @@
     try {
       Promise.resolve(window.buildInlineDetail(state.sym, host))
         .then(function () { composeOverview(host); }, function () {});
-    } catch (e) { /* legacy renderer unavailable */ }
+    } catch (e) {  }
   }
   function refreshLegacy() {
     if (!state.open || state.tab !== 'overview' || !state.legacyEl || !state.legacyEl.isConnected) return;
@@ -443,13 +396,6 @@
     runLegacy(state.legacyEl);
   }
 
-  // Live websocket price patch: the 30s refreshLegacy() cadence above covers Price & Spreads,
-  // Volatility, COT and Retail (all slower-moving), but the hero price/change must track the
-  // websocket tick stream at the same speed as the quote bar (fx-websocket.js's own
-  // _updateQuoteBarPriceElement) — a full runLegacy() rebuild on every tick would be wasteful
-  // and would drop any open tooltip, so this only patches the two text nodes directly, the same
-  // cheap-DOM-write pattern fx-websocket.js already uses for the quote bar. Called from
-  // fx-websocket.js's _applyTick() for every tick; a mismatched/closed pair is a no-op.
   function applyTick(pairId, price, chg, pct) {
     if (!state.open || state.tab !== 'overview' || !state.pair || state.pair.key !== pairId) return;
     if (typeof price !== 'number' || isNaN(price)) return;
@@ -553,7 +499,6 @@
 
   var RENDER = { overview: renderOverview, macro: renderMacro, session: renderSession, strength: renderStrength, fairvalue: renderFairValue };
 
-  /* ---------- panel plumbing ---------- */
   function panelEl(tab) { return document.getElementById('pdt-p-' + tab); }
 
   function renderTab(tab) {

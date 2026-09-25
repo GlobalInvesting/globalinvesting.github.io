@@ -83,16 +83,8 @@
     closeOtherOpenDetails(row);
     row.click();
     if (majorRow) {
-      // Majors table has no scroll container of its own — scrolling the row
-      // into view legitimately scrolls the page, which is the only option.
       row.scrollIntoView({ behavior: 'smooth', block: 'start' });
     } else {
-      // A cross row's real scroll container isn't #sidebar (which stacks every
-      // panel — FX Liquidity, Crosses, Carry Trade Ranking, Watchlist — into
-      // one shared scroll) but the Crosses list's OWN inner overflow-y:auto
-      // box. Walk up from the row to find that nearest genuinely-scrollable
-      // ancestor and scroll only it, so opening a detail never drags the rest
-      // of the sidebar's panels along with it.
       var container = _nearestScrollableAncestor(row);
       if (container) {
         var delta = row.getBoundingClientRect().top - container.getBoundingClientRect().top;

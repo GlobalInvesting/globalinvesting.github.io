@@ -1,4 +1,3 @@
-/* pair-detail.css v1.0.0 — Unified Pair Detail panel. Uses theme tokens from dashboard.css. */
 #pdt-panel { --pdt-card: color-mix(in srgb, var(--bg2) 35%, var(--bg)); border-top: 1px solid var(--border); background: var(--bg); }
 
 #pdt-tabs {
@@ -67,7 +66,6 @@
   .pdt-tab { min-height: 44px; }
 }
 
-/* Collapsible container (grid-rows trick: animates to/from content height without JS measuring) */
 .pdt-head { display: flex; align-items: center; }
 .pdt-toggle {
   display: inline-flex; align-items: center; gap: 8px; padding: 0; margin: 0;
@@ -87,16 +85,13 @@
   .pdt-collapsible, .pdt-collapsible[data-open="false"], .pdt-chev { transition: none; }
 }
 
-/* Legacy detail (buildInlineDetail output) embedded in Overview */
 
-/* Single-column stacks (Session Context, Strength Drivers) */
 .pdt-stack { max-width: 78ch; }
 .pdt-sess-name { margin: 0; }
 
 .pdt-panel { padding: 10px 12px 12px; }
 .pdt-sess-name { margin: 0; }
 
-/* Compact Overview (container-driven: 3 columns -> 2 on narrow panels; session beside on wide) */
 .pdt-ov { container-type: inline-size; }
 .pdt-hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 2px 14px; padding-bottom: 8px; margin-bottom: 8px; border-bottom: 1px solid var(--border); min-height: 24px; }
 .pdt-hero .pd-inline-price { display: flex; flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; padding: 0; border: 0; min-width: 0; }
@@ -157,12 +152,10 @@
   .pdt-bias > div { white-space: normal; }
 }
 
-/* No dotted underline on tooltip cells (tooltips still open on hover) */
 #pdt-panel .fx-tip { border-bottom: 0 !important; text-decoration: none; cursor: help; }
 
 
 
-/* Four balanced columns; two rows of two on narrow panels */
 @container (max-width: 560px) {
   .pdt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .pdt-grid > .pdt-sec:nth-child(odd) { border-left: 0; }
@@ -170,7 +163,6 @@
   .pdt-badges { margin-left: 0; width: 100%; }
 }
 
-/* Macro Drivers: single column with a discreet currency switch */
 .pdt-macro-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
 .pdt-macro-head .pdt-sh { margin: 0; }
 .pdt-seg { display: inline-flex; border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
@@ -181,19 +173,8 @@
 .pdt-seg button:focus-visible { outline: 2px solid var(--blue); outline-offset: -2px; }
 @media (max-width: 720px) { .pdt-seg button { min-height: 32px; padding: 0 12px; } }
 
-/* LIVE chip and hero status stats */
 .pdt-livesec .pdt-chip { margin-left: 2px; }
 .pdt-hero-main { display: flex; flex-wrap: wrap; align-items: baseline; min-width: 0; }
-/* Plain-text header stats (replaces the earlier bordered "chip"/pill style, reported as looking
-   AI-generated) — a muted label plus a bold colored value, matching this panel's own .pdt-kv
-   convention elsewhere (e.g. FX Fair Value's Model/Spot/Fit rows), separated by a thin rule
-   instead of individual boxes. `flex-wrap: nowrap` here is deliberate: the two stats must never
-   split from each other onto their own extra line — either both fit next to the price, or (once
-   the row below moves them under it via the @container rule further down) both sit together on
-   their own full-width line. Wrapping WITHIN this row (one stat left behind, one dropping alone)
-   was the "queda abajo" bug reported live on longer-text pairs; nowrap plus the parent's own
-   wrap-as-one-unit behavior is what keeps them a single visual line at every width that has room
-   for them, and moves them as a pair, never split, at the widths that don't. */
 .pdt-badges { display: flex; flex-wrap: nowrap; align-items: baseline; gap: 0 12px; margin-left: auto; }
 .pdt-hstat { display: inline-flex; align-items: baseline; gap: 5px; font: 400 10.5px/1 var(--font-ui); color: var(--text3); white-space: nowrap; cursor: help; }
 .pdt-hstat + .pdt-hstat { padding-left: 12px; border-left: 1px solid var(--border); }
@@ -201,23 +182,8 @@
 .pdt-hstat b.pdt-up { color: var(--up); }
 .pdt-hstat b.pdt-down { color: var(--down); }
 
-/* Hero header: quote block (symbol, price, change; H/L as a caption line) and status chips are
-   both sized to their own content and packed together on the left, with only the row's regular
-   gap between them — neither is stretched to fill leftover width, so there is never a dead gap
-   between the price and the chips. The `justify-content: flex-start` below is required: the
-   earlier .pdt-hero rule (Compact Overview, above) sets `justify-content: space-between`, and
-   since this rule never overrode it, the two blocks landed side-by-side with `space-between`
-   still forcing them to opposite edges — the exact "hueco en el medio" this override closes.
-   Any leftover width simply trails after the chips, the same as any other left-aligned toolbar
-   row. Chips wrap below the quote only once the row genuinely runs out of room. A smaller hero
-   price (20px, was 22px) frees a little extra horizontal room for the chips on mid widths. */
 .pdt-hero { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-start; column-gap: 16px; row-gap: 6px; }
 .pdt-hero-main { flex: 0 1 auto; min-width: 0; }
-/* Sym, price, change and H/L all flow as one flex row (reverting the grid attempt above, which
-   forced H/L onto its own full-width row via grid-column:1/-1 — that split "EUR/CAD 1.60895
-   +0.23%" from "H .../L ..." into two lines even when there was room for one, the exact
-   regression reported live). Flex wrap still lets H/L drop to its own line only once the row
-   genuinely runs out of width, same fallback behavior as the chips row below. */
 .pdt-hero .pd-inline-price { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
 .pdt-hero .pd-inline-rate { font-size: 20px; }
 .pdt-badges { flex: 0 1 auto; margin-left: 0; width: auto; justify-content: flex-start; }
