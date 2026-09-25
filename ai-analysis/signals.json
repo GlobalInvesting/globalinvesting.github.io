@@ -1,39 +1,39 @@
 {
-  "generated_at": "2026-09-25T17:20:50Z",
+  "generated_at": "2026-09-25T21:01:08Z",
   "signals": [
     {
-      "time": "17:15",
+      "time": "20:00",
       "priority": "warning",
-      "title": "USD/JPY — Options Skew + Volatility Disconnect",
-      "text": "USD/JPY trades at 157.32, holding comfortably above its SMA20, SMA50, and SMA200 cluster at 156.54, 158.70, and 158.45. Front-end rate divergence remains supportive for the pair, with Fed 4.00% vs BoJ 1.25% offering a +275bp policy gap and SOFR vs TONA yielding a +289bp carry advantage. However, options pricing reflects strong downside hedging demand, with the 1-month 25-delta risk reversal printing at -2.28 alongside EUR/JPY risk reversals at -2.38. Implied volatility sits at 8.7% against 30-day realized volatility of 9.9%, producing a negative volatility risk premium of -1.3% that underscores unusual complacency in vanilla options while skew pays heavily for downside protection. Headline risk remains active around the Strait of Hormuz, yet VIX at 15.1 reflects normal volatility, keeping carry trades dominant below the 160.00 watch level. Trade bias: Long USD/JPY, carry support intact while downside protection remains heavily bid in options. Catalyst: BoJ meeting 30 Oct — market bias hold. Risk: Confirmed geopolitical escalation spikes VIX above 25, triggering a disorderly carry liquidation toward the 156.54 SMA20.",
+      "title": "USD/JPY — Yield Spread Expansion vs Options Downside Skew",
+      "text": "USD/JPY closed Friday at 157.28, supported by an expanding US-Japan 10Y sovereign yield gap of 209bp and a +289bp OIS carry advantage in favor of USD. However, JPY COT LF positioning surged by +73.3k contracts to net +20.1k (95th percentile, z=+1.57), while 1M 25-delta risk reversals reflect heavy downside protection demand at -2.28 put skew. The BoJ meeting on 30 Oct is the catalyst that decides if Japanese monetary tightening can overcome the Fed's 4.00% terminal rate anchor. Trade bias: Bullish USD/JPY on carry resilience, though options demand warns of abrupt pullbacks. Catalyst: BoJ meeting on 30 Oct. Risk: Coordinated verbal or physical currency intervention pushes spot below the 20-day SMA at 156.54.",
       "evidence": [
-        "USD/JPY 25d RR: -2.28 (strong put skew)",
-        "USD/JPY VRP: -1.3% (IV 8.7% vs HV30 9.9%)",
-        "Fed 4.00% vs BoJ 1.25% — 275bp"
+        "USD/JPY OIS carry: +289bp (USD advantage)",
+        "JPY COT LF net: +20,069 (95th percentile, z=+1.57)",
+        "USD/JPY 25d RR: -2.28 put skew"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "17:12",
+      "time": "18:54",
       "priority": "warning",
-      "title": "USD/CAD — Retail Divergence + Technical Cluster",
-      "text": "USD/CAD trades at 1.4151, maintaining an established uptrend above its SMA20, SMA50, and SMA200 stack at 1.3915, 1.3945, and 1.3839. Macro fundamentals support the pair via a +175bp policy differential with Fed at 4.00% against BoC at 2.25%, mirrored in overnight OIS where SOFR 3.87% exceeds CORRA 2.29% by +158bp. Retail sentiment shows an extreme imbalance with Retail sentiment data positioning recording 86% short against 14% long. This retail short stance directly fades institutional CFTC Leveraged Funds positioning, where CAD contracts sit net short -41,404, marking a pronounced retail-versus-institutional divergence. With WTI crude oil falling -2.61% to $92.1, terms-of-trade degradation reinforces the upward drift despite the one-sided retail exposure. Trade bias: Bullish USD/CAD, structural carry advantage supported by retail short squeeze pressure. Catalyst: BoC meeting 28 Oct — hike bias priced. Risk: Sharp rebound in WTI crude oil above $98 invalidates the Canadian dollar terms-of-trade drag.",
+      "title": "EUR/USD — Bearish Real Rate Divergence & Technical Breakdown",
+      "text": "EUR COT LF net short stands at -51.4k contracts (38.4% long) as EUR/USD closed Friday at 1.1395, trapped below all major moving averages (SMA20 at 1.1548, SMA200 at 1.1626). The Fed-ECB policy stance favors the dollar via a +137bp real policy rate spread (+1.68% US vs +0.31% Eurozone) and a +143bp OIS carry advantage for USD. The ECB meeting on 29 Oct is the catalyst that tests whether Governing Council inflation warnings can halt the persistent 2Y sovereign yield spread compression (-158bp vs US). Trade bias: Bearish EUR/USD targeting deeper retracement below 1.1350. Catalyst: ECB meeting on 29 Oct. Risk: Preliminary Eurozone CPI prints well above expectations, forcing front-end yields to reprice ECB hike odds.",
       "evidence": [
-        "Retail sentiment: 86% short / 14% long",
-        "Fed 4.00% vs BoC 2.25% — 175bp",
-        "CAD COT LF net: -41,404 (pctl 26)"
+        "EUR COT LF net: -51,355 (38.4% long)",
+        "EUR/USD OIS carry: +143bp (USD advantage)",
+        "EUR/USD technicals: below SMA20 (1.1548) and SMA200 (1.1626)"
       ],
       "_source": "engine-ai-primary"
     },
     {
-      "time": "17:05",
+      "time": "17:43",
       "priority": "info",
-      "title": "EUR/USD — Bear Steepener + Curve Divergence",
-      "text": "EUR/USD trades at 1.1393, pinned below its entire moving average structure with SMA20 at 1.1548, SMA50 at 1.1539, and SMA200 at 1.1626. Widening rate differentials weigh on the pair, as Fed 4.00% vs ECB 2.65% establishes a 135bp nominal policy advantage and SOFR at 3.87% vs €STR at 2.44% provides a 143bp carry edge to the dollar. The US yield curve sits in a bear-steepener regime with 2s10s at +34.2bp and US 10-year yields holding at 5.192%, stretching the 10-year sovereign spread to -160bp against German Bunds at 3.60%. Real interest rates reinforce the divergence, with US real policy rates restrictive at +1.68% compared to the Eurozone real rate of +0.31%. Options implied volatility sits at 5.2% against HV30 of 4.5%, showing a contained vol risk premium of +0.6% that reflects steady trend persistence rather than balance-sheet stress. Trade bias: Bearish EUR/USD, constrained by sovereign yield deficits and US yield curve dynamics. Catalyst: ECB meeting 29 Oct — hike bias priced. Risk: Eurozone flash CPI acceleration widens ECB tightening expectations, narrowing the 2-year yield spread from -158bp.",
+      "title": "USD/CHF — Negative Real Carry Compression vs Depressed Volatility",
+      "text": "CHF COT LF net short rests at -16.7k (7th percentile, z=-1.36), reflecting substantial institutional short exposure as USD/CHF closed Friday at 0.8284. A 400bp nominal central bank policy gap and negative Swiss real rates (-1.24% vs +1.68% US) maintain steady structural upward drift above the 200-day SMA at 0.7945, while 1M implied volatility trades below 30-day realized volatility at 6.2% vs 7.4% (VRP -1.1%). The SNB meeting on 10 Dec is the catalyst that determines whether negative interest rates remain entrenched or policy normalization begins. Trade bias: Bullish USD/CHF riding wide carry differentials. Catalyst: SNB meeting on 10 Dec. Risk: Escalating Middle East shipping conflict triggers safe-haven flows into the Swiss Franc, breaking spot below the 20-day SMA at 0.8158.",
       "evidence": [
-        "Fed 4.00% vs ECB 2.65% — 135bp",
-        "US-DE 10Y spread: -160bp (DE 3.60% vs US 5.20%)",
-        "Real rate gap: USD +1.68% vs EUR +0.31%"
+        "CHF COT LF net: -16,664 (7th percentile, z=-1.36)",
+        "USD/CHF CB rate spread: +400bp (USD advantage)",
+        "USD/CHF VRP: -1.1% (IV 6.2% vs HV30 7.4%)"
       ],
       "_source": "engine-ai-primary"
     }
