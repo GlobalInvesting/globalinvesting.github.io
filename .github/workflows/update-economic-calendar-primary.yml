@@ -181,14 +181,6 @@ jobs:
             echo "--- Attempt $i ---"
             git fetch origin main
             git reset --hard origin/main
-            # v1.7 fix: re-merge against the state we just fetched, instead of
-            # blindly overwriting it with the pre-computed fresh file. Between
-            # this run's own checkout and this retry, calendar-watcher.js (or
-            # any other writer) may have committed a stale-actuals recovery
-            # straight to origin/main -- a blind cp here would silently
-            # discard it. --remerge re-runs _merge_preserve_actual() against
-            # the just-reset file so a mid-run recovery survives the retry.
-            # See fetch_economic_calendar_primary.py v1.7 and CHANGELOG.md.
             python3 private-scripts/fetch_economic_calendar_primary.py --remerge \
               /tmp/ff_calendar_fresh.json calendar-data/economic-events.json calendar-data/economic-events.json
             git add calendar-data/economic-events.json
@@ -247,22 +239,6 @@ jobs:
           echo "Fresh actual(s) detected: ${NEW_ACTUAL}"
           NOW="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
-          # v8.494.0 FIX (2026-09-15): update-economic-calendar.yml (the
-          # listener for this dispatch) moved to this same repo
-          # (GlobalInvesting/globalinvesting.github.io) so it runs on free
-          # public-repo Actions minutes instead of the private repo's
-          # budgeted minutes. This dispatch step was left pointing at the
-          # OLD location (globalinvesting-scripts), which no longer has
-          # that workflow file at all -- GitHub's dispatches endpoint
-          # still returns 204 for a POST naming a real repo even when no
-          # workflow there listens for the event_type, so this was failing
-          # silently: the fast (near-instant) refresh path degraded to
-          # calendar.json's own 4x/day schedule fallback with no error
-          # anywhere in the logs. Fixed by pointing the dispatch at this
-          # repo instead -- repository_dispatch always needs an explicit
-          # POST to the target repo's own /dispatches endpoint, even when
-          # the sender and listener live in the same repo; GitHub does not
-          # auto-chain same-repo workflows on this event type.
           echo "Firing repository_dispatch[calendar-actual-changed] -> GlobalInvesting/globalinvesting.github.io (update-economic-calendar.yml)"
           HTTP_CODE=$(curl -s -o /tmp/dispatch3.json -w "%{http_code}" -X POST \
             -H "Accept: application/vnd.github+json" \
@@ -289,26 +265,6 @@ jobs:
             exit 0
           fi
 
-          # v8.521.0 FIX: this step's gate was "did economic-events.json
-          # change at all this run" + "is there a released, high-impact
-          # rate-decision actual within the last 3 days" -- with no check
-          # for whether THIS specific decision had already been dispatched.
-          # Any unrelated field changing elsewhere in the file (a forecast
-          # update on a different currency, for example) re-set CHANGED=1
-          # on a normal 5-minute cron tick, and the RATE_DEC scan then
-          # re-matched the SAME already-dispatched decision again, every
-          # time, for up to 3 days after every G10 rate decision -- firing
-          # repository_dispatch[cb-rate-decision] into both private repos
-          # (globalinvesting-scripts' update-rates.yml AND
-          # globalinvesting-engine's workflow_meetings.yml) roughly every
-          # 5 minutes for days, confirmed live via both repos' Actions run
-          # history. Fixed with a small persisted dedup log
-          # (calendar-data/cb-rate-dispatch-log.json, keyed on
-          # currency|dateISO|actual) committed alongside the calendar data:
-          # a decision is only dispatched once per distinct
-          # currency+date+actual-value combination; a later revision to
-          # the same event's actual (rare, but has happened for this
-          # project) still dispatches once, since the key changes with it.
           printf '%s\n' \
             'import json,os' \
             'from datetime import datetime,timezone,timedelta' \
