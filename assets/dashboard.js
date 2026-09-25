@@ -4431,6 +4431,14 @@ async function _renderLWChart(ohlcId, label) {
 
   await _ensureLWLib();
 
+  if (typeof window._lwFvSummaryReq === 'undefined') {
+    window._lwFvSummary = null;
+    window._lwFvSummaryReq = _fetchWithRetry('./fair-value-data/summary.json')
+      .then(res => res && res.ok ? res.json() : null)
+      .then(d => { window._lwFvSummary = (d && d.pairs) ? d.pairs : {}; })
+      .catch(() => { window._lwFvSummary = {}; });
+  }
+
   const _activeTf = _lwActiveTf;
   const _isIntradayTf = (_activeTf === 'H1' || _activeTf === 'H4');
   let _jsonPath;
@@ -6005,6 +6013,8 @@ async function _renderLWChart(ohlcId, label) {
     { id:'psar',     group:'Overlays',        label:'Parabolic SAR',     desc:'Parabolic SAR',                                          type:'overlay',    defaultParams:{ step:0.02, max:0.2 },          paramDefs:[{key:'step',label:'Step',type:'float',min:0.001,max:0.1,step:0.001},{key:'max',label:'Max AF',type:'float',min:0.01,max:0.5,step:0.01}], colors:['#f44336'] },
     { id:'ichimoku', group:'Overlays',        label:'Ichimoku Cloud',    desc:'Ichimoku Kinko Hyo · 9/26/52',                          type:'overlay',    defaultParams:{},                              paramDefs:[], colors:['#26a69a','#ef5350','rgba(38,166,154,0.3)','rgba(239,83,80,0.3)','rgba(120,123,134,0.4)'] },
     { id:'supertrend', group:'Overlays',      label:'Supertrend',       desc:'ATR-based trend-following overlay — flips support/resistance on trend change', type:'overlay', defaultParams:{ period:10, mult:3 }, paramDefs:[{key:'period',label:'ATR Period',type:'int',min:1,max:100,step:1},{key:'mult',label:'Multiplier',type:'float',min:0.5,max:10,step:0.1}], colors:['#26a69a','#ef5350'] },
+    { id:'fxfv',     group:'Overlays',        label:'FX Fair Value',     desc:'Model fair value from the rate-differential + risk regression (60-day rolling)', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ba68c8'] },
+    { id:'retailavg', group:'Overlays',       label:'Retail Avg Entry',  desc:'Myfxbook average entry price for the dominant retail long/short side', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ffca28'] },
     { id:'pivotd',   group:'Overlays',        label:'Pivot Points (Daily)',   desc:'Classic pivot, R1-R3 / S1-S3 — computed from the prior day\'s H/L/C', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ef5350','#ff7043','#ffab91','#9e9e9e','#a5d6a7','#66bb6a','#26a69a'] },
     { id:'pivotw',   group:'Overlays',        label:'Pivot Points (Weekly)',  desc:'Classic pivot, R1-R3 / S1-S3 — computed from the prior week\'s H/L/C', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ef5350','#ff7043','#ffab91','#9e9e9e','#a5d6a7','#66bb6a','#26a69a'] },
     { id:'pivotm',   group:'Overlays',        label:'Pivot Points (Monthly)', desc:'Classic pivot, R1-R3 / S1-S3 — computed from the prior month\'s H/L/C', type:'overlay', defaultParams:{}, paramDefs:[], colors:['#ef5350','#ff7043','#ffab91','#9e9e9e','#a5d6a7','#66bb6a','#26a69a'] },
@@ -6173,6 +6183,22 @@ async function _renderLWChart(ohlcId, label) {
           data.push({time:bars[i].time,value:parseFloat(sar.toFixed(dec))});
         }
         return [{ data, color:_iC(id,0), lineWidth:0, label:'PSAR', markers:true }];
+      }
+      case 'fxfv': {
+        const fv = (window._lwFvSummary || {})[ohlcId];
+        if (!fv || fv.accumulating || fv.fairValue == null) return [];
+        const val = fv.fairValue;
+        return [{ data: bars.map(b => ({ time: b.time, value: val })), color:_iC(id,0), lineWidth:1, dashed:true, label:'FX Fair Value' }];
+      }
+      case 'retailavg': {
+        const pm = (window.PAIRS || []).find(pp => pp.id === ohlcId);
+        const key = pm ? (pm.label || (pm.base + '/' + pm.quote)).toUpperCase() : null;
+        const ret = key ? RETAIL_SENTIMENT_CACHE[key] : null;
+        if (!ret) return [];
+        const dominant = (ret.longPct ?? 0) >= (ret.shortPct ?? 0) ? 'long' : 'short';
+        const val = dominant === 'long' ? ret.avgL : ret.avgS;
+        if (!val) return [];
+        return [{ data: bars.map(b => ({ time: b.time, value: val })), color:_iC(id,0), lineWidth:1, dashed:true, label:'Retail Avg ' + (dominant === 'long' ? 'Long' : 'Short') }];
       }
       case 'ichimoku': {
         function tenkan(i,n){const s=bars.slice(Math.max(0,i-n+1),i+1);return(Math.max(...s.map(b=>b.high))+Math.min(...s.map(b=>b.low)))/2;}
@@ -6666,6 +6692,7 @@ async function _renderLWChart(ohlcId, label) {
     _lwLoadCompare(entry.cmpId, entry.cmpLabel, entry.cmpType, true);
   });
 
+  await window._lwFvSummaryReq;
   _IND_CATALOGUE.forEach(cfg => {
     if (window._lwIndState[cfg.id]) _buildIndicatorPane(cfg.id);
   });

@@ -29,7 +29,6 @@
   ];
   var REFRESH_MS = 5 * 60 * 1000;
   var LEGACY_REFRESH_MS = 30 * 1000;
-  var OPEN_KEY = 'gi.pairDetail.open';
   // Weekday freshness bound matches the generator TTL contract (20h + buffer). Weekends
   // and Monday before the first run use the wider window: the generator skips on
   // market_closed, so Friday's file is legitimately ~72h old until Monday 06:00 UTC.
@@ -581,15 +580,12 @@
     renderTab(tab);
   }
 
-  function setOpen(open, persist) {
+  function setOpen(open) {
     var was = state.open;
     state.open = !!open;
     toggleBtn.setAttribute('aria-expanded', state.open ? 'true' : 'false');
     contentEl.setAttribute('data-open', state.open ? 'true' : 'false');
     if (state.open) contentEl.removeAttribute('inert'); else contentEl.setAttribute('inert', '');
-    if (persist !== false) {
-      try { localStorage.setItem(OPEN_KEY, state.open ? 'true' : 'false'); } catch (e) { /* storage unavailable */ }
-    }
     if (state.open && !was) renderTab(state.tab);
   }
 
@@ -657,9 +653,7 @@
     }
     document.addEventListener('gi:quotesLoaded', function () { if (!state.pair) setPair(currentSym()); else refreshLegacy(); });
 
-    var stored = null;
-    try { stored = localStorage.getItem(OPEN_KEY); } catch (e) { /* storage unavailable */ }
-    setOpen(stored !== 'false', false);
+    setOpen(false);
     selectTab('overview', false);
     setPair(currentSym());
   }
