@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-25T12:29:47Z",
-  "generatedAt": "2026-09-25T12:29:47Z",
+  "lastUpdate": "2026-09-25T12:31:20Z",
+  "generatedAt": "2026-09-25T12:31:20Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -1169,9 +1169,9 @@
       "std": 2.05061
     },
     "USD/durable goods orders mom": {
-      "n": 3,
-      "mean": -0.433333,
-      "std": 1.537314
+      "n": 4,
+      "mean": 0.525,
+      "std": 2.291106
     },
     "USD/durable goods orders ex transp mom": {
       "n": 2,
@@ -1647,6 +1647,11 @@
       "n": 3,
       "mean": 0.2,
       "std": 0.818535
+    },
+    "USD/core durable goods orders mom": {
+      "n": 2,
+      "mean": -0.6,
+      "std": 0.0
     },
     "USD/nondefense capital goods shipments excl. aircraft mom": {
       "n": 2,
@@ -65912,7 +65917,7 @@
       "flag": "🇺🇸",
       "event": "United States Durable Goods Orders m/m",
       "impact": "high",
-      "actual": null,
+      "actual": "0.0%",
       "forecast": "-3.4%",
       "previous": "1.1%"
     },
@@ -65925,7 +65930,7 @@
       "flag": "🇺🇸",
       "event": "United States Core Durable Goods Orders m/m",
       "impact": "medium",
-      "actual": null,
+      "actual": "0.3%",
       "forecast": "0.9%",
       "previous": "0.4%"
     },
