@@ -6607,8 +6607,8 @@ async function _renderLWChart(ohlcId, label) {
               lineWidth: 1,
               lineStyle: 2,
               axisLabelVisible: true,
-              axisLabelColor: s.color,
-              axisLabelTextColor: '#0b0e14',
+              axisLabelColor: _themeColor('--border'),
+              axisLabelTextColor: _themeColor('--text3'),
               title: s.axisTitle || s.label,
             });
             if (!_indPriceLines[id]) _indPriceLines[id] = [];
