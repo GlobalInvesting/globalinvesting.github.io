@@ -6085,6 +6085,7 @@ async function _renderLWChart(ohlcId, label) {
   window._indPaneIndex = _indPaneIndex;
   window._indSeries = {}; const _indSeries = window._indSeries;
   const _indRefSeries = {}; 
+  const _indPriceLines = {}; 
 
   function _iP(id) {
     const cfg = _IND_CATALOGUE.find(c => c.id === id);
@@ -6188,7 +6189,7 @@ async function _renderLWChart(ohlcId, label) {
         const fv = (window._lwFvSummary || {})[ohlcId];
         if (!fv || fv.accumulating || fv.fairValue == null) return [];
         const val = fv.fairValue;
-        return [{ data: bars.map(b => ({ time: b.time, value: val })), color:_iC(id,0), lineWidth:1, dashed:true, label:'FX Fair Value' }];
+        return [{ level:true, value: val, color:_iC(id,0), axisTitle:'FV', label:'FX Fair Value' }];
       }
       case 'retailavg': {
         const pm = (window.PAIRS || []).find(pp => pp.id === ohlcId);
@@ -6198,7 +6199,7 @@ async function _renderLWChart(ohlcId, label) {
         const dominant = (ret.longPct ?? 0) >= (ret.shortPct ?? 0) ? 'long' : 'short';
         const val = dominant === 'long' ? ret.avgL : ret.avgS;
         if (!val) return [];
-        return [{ data: bars.map(b => ({ time: b.time, value: val })), color:_iC(id,0), lineWidth:1, dashed:true, label:'Retail Avg ' + (dominant === 'long' ? 'Long' : 'Short') }];
+        return [{ level:true, value: val, color:_iC(id,0), axisTitle:'Retail Avg', label:'Retail Avg ' + (dominant === 'long' ? 'Long' : 'Short') }];
       }
       case 'ichimoku': {
         function tenkan(i,n){const s=bars.slice(Math.max(0,i-n+1),i+1);return(Math.max(...s.map(b=>b.high))+Math.min(...s.map(b=>b.low)))/2;}
@@ -6599,6 +6600,21 @@ async function _renderLWChart(ohlcId, label) {
 
       seriesList.forEach((s, si) => {
         try {
+          if (s.level) {
+            const pl = candleSeries.createPriceLine({
+              price: s.value,
+              color: s.color,
+              lineWidth: 1,
+              lineStyle: 2,
+              axisLabelVisible: true,
+              axisLabelColor: s.color,
+              axisLabelTextColor: '#0b0e14',
+              title: s.axisTitle || s.label,
+            });
+            if (!_indPriceLines[id]) _indPriceLines[id] = [];
+            _indPriceLines[id].push(pl);
+            return;
+          }
           let series;
           if (s.histogram) {
             series = _lwChart.addSeries(LWC.HistogramSeries, {
@@ -6663,6 +6679,13 @@ async function _renderLWChart(ohlcId, label) {
         try { _lwChart.removeSeries(s); } catch(_) {}
       });
       _indSeries[id] = null;
+    }
+
+    if (_indPriceLines[id]) {
+      _indPriceLines[id].forEach(pl => {
+        try { candleSeries.removePriceLine(pl); } catch(_) {}
+      });
+      _indPriceLines[id] = null;
     }
 
     if (!isOverlay && _indPaneIndex[id] != null) {
