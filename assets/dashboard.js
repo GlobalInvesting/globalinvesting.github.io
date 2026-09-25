@@ -6615,7 +6615,7 @@ async function _renderLWChart(ohlcId, label) {
               lineWidth: 1,
               lineStyle: 2,
               axisLabelVisible: true,
-              axisLabelColor: 'rgba(0,0,0,0)',
+              axisLabelColor: _themeColor('--bg'),
               axisLabelTextColor: s.color,
               title: s.axisTitle || s.label,
             });
