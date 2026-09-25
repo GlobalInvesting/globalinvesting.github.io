@@ -7558,7 +7558,7 @@ document.getElementById('lw-range-bar')?.addEventListener('click', function(e) {
 });
 
 // Unified Pair Detail (beta feature flag): when <html data-pair-detail="unified"> is set, the per-row
-// accordions below delegate to the single panel under the chart (assets/pair-detail-beta.js).
+// accordions below delegate to the single panel under the chart (assets/pair-detail.js).
 // Inert in production — the attribute is absent there.
 function _giUnifiedPairDetail(row) {
   if (document.documentElement.dataset.pairDetail !== 'unified') return false;
