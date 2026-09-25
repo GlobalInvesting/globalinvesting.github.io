@@ -1,6 +1,6 @@
 {
-  "lastUpdate": "2026-09-25T09:51:19Z",
-  "generatedAt": "2026-09-25T09:51:19Z",
+  "lastUpdate": "2026-09-25T09:53:16Z",
+  "generatedAt": "2026-09-25T09:53:16Z",
   "fetchMode": "Calendar feed, backfilled",
   "timezoneNote": "All times UTC",
   "status": "ok",
@@ -9,14 +9,14 @@
   "fetchErrors": [],
   "rangeFrom": "2025-09-25",
   "rangeTo": "2026-10-09",
-  "totalEvents": 5694,
+  "totalEvents": 5695,
   "currencyCounts": {
     "EUR": 1640,
     "CHF": 164,
     "GBP": 554,
     "USD": 1749,
     "CAD": 340,
-    "JPY": 384,
+    "JPY": 385,
     "NZD": 144,
     "AUD": 333,
     "SEK": 235,
@@ -25,7 +25,7 @@
   "impactCounts": {
     "medium": 2397,
     "high": 1712,
-    "low": 1585
+    "low": 1586
   },
   "surpriseStats": {
     "JPY/retail sales yoy": {
@@ -65269,8 +65269,21 @@
       "event": "Japan au Jibun Bank Services PMI",
       "impact": "medium",
       "actual": null,
-      "forecast": null,
+      "forecast": "51.7",
       "previous": "52.5"
+    },
+    {
+      "date": "24 Sep",
+      "dateISO": "2026-09-24",
+      "timeUTC": "12:30",
+      "country": "JPY",
+      "currency": "JPY",
+      "flag": "🇯🇵",
+      "event": "Japan au Jibun Bank Composite PMI",
+      "impact": "low",
+      "actual": null,
+      "forecast": null,
+      "previous": "53.5"
     },
     {
       "date": "24 Sep",
