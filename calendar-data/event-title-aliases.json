@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-26T11:41:10Z",
+  "generatedAt": "2026-09-26T14:38:48Z",
   "scriptVersion": "1.7",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 187,
+  "aliasCount": 188,
   "aliases": [
     {
       "currency": "AUD",
@@ -3259,6 +3259,25 @@
           "actual_secondary_raw": null,
           "forecast_secondary_raw": null,
           "previous_secondary_raw": "0.6%"
+        }
+      }
+    },
+    {
+      "currency": "CAD",
+      "primary_title": "Canada Ivey PMI",
+      "secondary_title": "Canada Ivey PMI s.a",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-10-06",
+          "forecast_primary": 56.2,
+          "forecast_secondary": 53.0,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 64.3,
+          "previous_secondary": 64.3,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "53",
+          "previous_secondary_raw": "64.3"
         }
       }
     },
