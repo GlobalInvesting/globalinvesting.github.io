@@ -444,13 +444,15 @@
   function sessionSection(p, d, S) {
     var sec = el('div', 'pdt-livesec');
     var nowS = new Date();
-    var live = SESSIONS.filter(function (x) { return sessionState(x, nowS) === 'live'; }).pop();
-    var sc = d.session && d.session.sessions && !d.session.market_closed;
-    var head = el('h3', 'pdt-sh', 'Live session' + (live ? ' \u00b7 ' + live.name : ''));
+    var fxClosed = typeof window.isFxMarketClosedNow === 'function' && window.isFxMarketClosedNow();
+    var marketClosed = fxClosed || (d.session && d.session.market_closed);
+    var live = marketClosed ? null : SESSIONS.filter(function (x) { return sessionState(x, nowS) === 'live'; }).pop();
+    var sc = !marketClosed && d.session && d.session.sessions;
+    var head = el('h3', 'pdt-sh', marketClosed ? 'Market closed' : ('Live session' + (live ? ' \u00b7 ' + live.name : '')));
     if (live && sc) head.appendChild(el('span', 'pdt-chip pdt-chip-live', 'LIVE'));
     sec.appendChild(head);
     var t = sc && live ? sessionNote(p, d.session, live.name) : null;
-    sec.appendChild(t ? el('p', 'pdt-text', t) : note('No live-session note available.'));
+    sec.appendChild(t ? el('p', 'pdt-text', t) : note(marketClosed ? 'Market closed. Resumes Sunday 21:00 UTC.' : 'No live-session note available.'));
     var f = el('div', 'pdt-foot pdt-srcs');
     S.foot = el('span');
     f.appendChild(S.foot);
