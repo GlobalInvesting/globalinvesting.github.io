@@ -179,7 +179,19 @@
     if (!sc || !sc.sessions) return block('SESSION CONTEXT', [note('Session context not available yet.')]);
     var fxClosed = typeof window.isFxMarketClosedNow === 'function' && window.isFxMarketClosedNow();
     if (sc.market_closed || fxClosed) {
-      return block('SESSION CONTEXT', [note('Market closed. Session context resumes Sunday 21:00 UTC.')]);
+      var wrap0 = el('div', 'pdt-stack');
+      wrap0.appendChild(note('Market closed. Showing last session recap \u00b7 resumes Sunday 21:00 UTC.'));
+      SESSIONS.forEach(function (sess) {
+        var row0 = el('section', 'pdt-sess');
+        var head0 = el('div', 'pdt-sess-head');
+        head0.appendChild(el('h3', 'pdt-sess-name', sess.name.toUpperCase()));
+        head0.appendChild(el('span', 'pdt-chip pdt-chip-closed', 'CLOSED'));
+        row0.appendChild(head0);
+        row0.appendChild(el('p', 'pdt-text', sessionNote(p, sc, sess.name) || '\u2014'));
+        wrap0.appendChild(row0);
+      });
+      wrap0.appendChild(footer('AI Analytics \u00b7 last session recap', sc.generated_at));
+      return wrap0;
     }
     var now = new Date();
     var wrap = el('div', 'pdt-stack');
