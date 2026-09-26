@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-09-26T00:02:16Z",
-  "scriptVersion": "1.6",
+  "generatedAt": "2026-09-26T11:41:10Z",
+  "scriptVersion": "1.7",
   "matchTolerance": 0.05,
   "dateWindowDays": 1,
-  "aliasCount": 189,
+  "aliasCount": 187,
   "aliases": [
     {
       "currency": "AUD",
@@ -11,16 +11,16 @@
       "secondary_title": "Australia ANZ-Indeed Job Ads MoM",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-09-07",
-          "forecast_primary": -0.7,
-          "forecast_secondary": 0.5,
-          "actual_primary": 2.5,
-          "actual_secondary": 2.5,
-          "previous_primary": 2.0,
-          "previous_secondary": 1.9,
-          "actual_secondary_raw": "2.5%",
-          "forecast_secondary_raw": "0.5%",
-          "previous_secondary_raw": "1.9%"
+          "dateISO": "2026-10-06",
+          "forecast_primary": -0.5,
+          "forecast_secondary": -1.3,
+          "actual_primary": null,
+          "actual_secondary": null,
+          "previous_primary": 2.5,
+          "previous_secondary": 2.5,
+          "actual_secondary_raw": null,
+          "forecast_secondary_raw": "-1.3%",
+          "previous_secondary_raw": "2.5%"
         }
       }
     },
@@ -1525,6 +1525,44 @@
       }
     },
     {
+      "currency": "GBP",
+      "primary_title": "United Kingdom S&P Global/CIPS Services PMI",
+      "secondary_title": "United Kingdom S&P Global Services PMI Flash",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-23",
+          "forecast_primary": 53.2,
+          "forecast_secondary": 52.3,
+          "actual_primary": 51.7,
+          "actual_secondary": 51.7,
+          "previous_primary": 52.5,
+          "previous_secondary": 52.5,
+          "actual_secondary_raw": "51.7",
+          "forecast_secondary_raw": "52.3",
+          "previous_secondary_raw": "52.5"
+        }
+      }
+    },
+    {
+      "currency": "GBP",
+      "primary_title": "United Kingdom S&P Global/CIPS Composite PMI",
+      "secondary_title": "United Kingdom S&P Global Composite PMI Flash",
+      "evidence": {
+        "secondary": {
+          "dateISO": "2026-09-23",
+          "forecast_primary": null,
+          "forecast_secondary": 52.3,
+          "actual_primary": 51.7,
+          "actual_secondary": 51.7,
+          "previous_primary": 52.5,
+          "previous_secondary": 52.5,
+          "actual_secondary_raw": "51.7",
+          "forecast_secondary_raw": "52.3",
+          "previous_secondary_raw": "52.5"
+        }
+      }
+    },
+    {
       "currency": "JPY",
       "primary_title": "Japan au Jibun Bank Manufacturing PMI",
       "secondary_title": "Japan S&P Global Manufacturing PMI Flash",
@@ -1612,38 +1650,6 @@
         }
       },
       "yahoo_title": "New Home Sales Chg MM"
-    },
-    {
-      "currency": "USD",
-      "primary_title": "Kansas City Fed Manufacturing Composite Index",
-      "secondary_title": "United States Kansas Fed Composite Index",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-09-24",
-          "forecast_primary": 8.0,
-          "forecast_secondary": 5.0,
-          "actual_primary": 14.0,
-          "actual_secondary": 14.0,
-          "previous_primary": 10.0,
-          "previous_secondary": 10.0,
-          "actual_secondary_raw": "14",
-          "forecast_secondary_raw": "5",
-          "previous_secondary_raw": "10"
-        },
-        "yahoo": {
-          "dateISO": "2026-09-24",
-          "forecast_primary": 8.0,
-          "forecast_yahoo": null,
-          "actual_primary": 14.0,
-          "actual_yahoo": 14.0,
-          "previous_primary": 10.0,
-          "previous_yahoo": 10.0,
-          "actual_yahoo_raw": "14",
-          "forecast_yahoo_raw": "-",
-          "previous_yahoo_raw": "10"
-        }
-      },
-      "yahoo_title": "KC Fed Composite Index*"
     },
     {
       "currency": "USD",
@@ -3219,97 +3225,40 @@
       }
     },
     {
-      "currency": "USD",
-      "primary_title": "United States ISM Non-Manufacturing PMI",
-      "secondary_title": "United States ISM Services PMI",
+      "currency": "EUR",
+      "primary_title": "Euro Area Retail Sales m/m",
+      "secondary_title": "Euro Area Retail Sales MoM",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-10-05",
-          "forecast_primary": 54.7,
-          "forecast_secondary": 54.0,
+          "dateISO": "2026-10-06",
+          "forecast_primary": -0.1,
+          "forecast_secondary": null,
           "actual_primary": null,
           "actual_secondary": null,
-          "previous_primary": 55.4,
-          "previous_secondary": 55.4,
+          "previous_primary": -0.6,
+          "previous_secondary": -0.6,
           "actual_secondary_raw": null,
-          "forecast_secondary_raw": "54",
-          "previous_secondary_raw": "55.4"
+          "forecast_secondary_raw": null,
+          "previous_secondary_raw": "-0.6%"
         }
       }
     },
     {
-      "currency": "USD",
-      "primary_title": "United States ISM Non-Manufacturing Employment",
-      "secondary_title": "United States ISM Services Employment",
+      "currency": "EUR",
+      "primary_title": "Euro Area Retail Sales y/y",
+      "secondary_title": "Euro Area Retail Sales YoY",
       "evidence": {
         "secondary": {
-          "dateISO": "2026-10-05",
-          "forecast_primary": 48.3,
+          "dateISO": "2026-10-06",
+          "forecast_primary": 1.2,
           "forecast_secondary": null,
           "actual_primary": null,
           "actual_secondary": null,
-          "previous_primary": 47.8,
-          "previous_secondary": 47.8,
+          "previous_primary": 0.6,
+          "previous_secondary": 0.6,
           "actual_secondary_raw": null,
           "forecast_secondary_raw": null,
-          "previous_secondary_raw": "47.8"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States ISM Non-Manufacturing New Orders",
-      "secondary_title": "United States ISM Services New Orders",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-10-05",
-          "forecast_primary": 57.7,
-          "forecast_secondary": null,
-          "actual_primary": null,
-          "actual_secondary": null,
-          "previous_primary": 60.9,
-          "previous_secondary": 60.9,
-          "actual_secondary_raw": null,
-          "forecast_secondary_raw": null,
-          "previous_secondary_raw": "60.9"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States ISM Non-Manufacturing Prices Paid",
-      "secondary_title": "United States ISM Services Prices",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-10-05",
-          "forecast_primary": 76.9,
-          "forecast_secondary": null,
-          "actual_primary": null,
-          "actual_secondary": null,
-          "previous_primary": 72.6,
-          "previous_secondary": 72.6,
-          "actual_secondary_raw": null,
-          "forecast_secondary_raw": null,
-          "previous_secondary_raw": "72.6"
-        }
-      }
-    },
-    {
-      "currency": "USD",
-      "primary_title": "United States ISM Non-Manufacturing Business Activity",
-      "secondary_title": "United States ISM Services Business Activity",
-      "evidence": {
-        "secondary": {
-          "dateISO": "2026-10-05",
-          "forecast_primary": 58.3,
-          "forecast_secondary": null,
-          "actual_primary": null,
-          "actual_secondary": null,
-          "previous_primary": 61.7,
-          "previous_secondary": 61.7,
-          "actual_secondary_raw": null,
-          "forecast_secondary_raw": null,
-          "previous_secondary_raw": "61.7"
+          "previous_secondary_raw": "0.6%"
         }
       }
     },
