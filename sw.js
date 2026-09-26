@@ -1,5 +1,5 @@
 
-const CACHE_VERSION = 'gi-v8.542.24';
+const CACHE_VERSION = 'gi-v8.542.26';
 const CACHE_STATIC  = `${CACHE_VERSION}-static`;
 const CACHE_DATA    = `${CACHE_VERSION}-data`;
 
@@ -7,8 +7,8 @@ const STATIC_PRECACHE = [
   '/assets/dashboard.css?v=8.540.3',
   '/assets/command-bar.css?v=8.491.5',
   '/assets/pair-detail.css?v=1.0.0',
-  '/assets/dashboard.js?v=8.542.24',
-  '/assets/pair-detail.js?v=1.0.0',
+  '/assets/dashboard.js?v=8.542.26',
+  '/assets/pair-detail.js?v=1.0.1',
   '/assets/command-bar.js?v=8.491.4',
   '/assets/gi-auth.js?v=1.7.8',
   '/assets/gi-overview.js?v=2.0.1',
