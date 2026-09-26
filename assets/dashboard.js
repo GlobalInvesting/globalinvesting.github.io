@@ -7685,6 +7685,10 @@ async function buildInlineDetail(tvSym, container) {
   if (hv30 != null && price != null) {
     adr = Math.round(price * (hv30 / 100) / Math.sqrt(252) / pipVal);
   }
+  let adrPct = null;
+  if (adr != null && adr > 0 && sessH != null && sessL != null) {
+    adrPct = Math.round(((sessH - sessL) / pipVal / adr) * 100);
+  }
 
   const CROSS_IV_RHO = {
     'eurgbp':0.65,'eurjpy':0.55,'eurchf':0.60,'eurcad':0.40,'euraud':0.35,'eurnzd':0.30,
@@ -7860,8 +7864,8 @@ async function buildInlineDetail(tvSym, container) {
           <div class="pd-inline-metric fx-tip" data-tip-title="${bondTenor || '2Y'} Sovereign Bond Spread" data-tip-body="ΔY = Yield(${base || 'base'}) − Yield(${quote || 'quote'}) at the ${bondTenor || '2Y'} tenor. Short-end (2Y) yield differentials are the primary driver of sustained FX direction — they track near-term rate-expectations divergence more closely than 10Y, which reflects longer-run growth/inflation premia and duration flows.${bondTenor === '10Y' ? ' 2Y unavailable for one or both legs — showing 10Y as fallback.' : ''} Source: extended-data sovereign yield pipeline (FRED/ECB/BOE/BOC/SNB/DBnomics)." data-tip-ex="A rising ${bondTenor || '2Y'} spread in the base currency's favour has historically preceded sustained appreciation — it signals the market pricing in a widening policy-rate gap before central banks act.">
             <div class="pd-inline-lbl">${bondTenor || '2Y'} Spread</div><div class="pd-inline-val ${clsI(bondDiff)}">${bondDiff != null ? (bondDiff >= 0 ? '+' : '') + (bondDiff * 100).toFixed(0) + ' bp' : '—'}</div>
           </div>
-          <div class="pd-inline-metric fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated avg daily range in pips from HV 30d. Useful for stop/target sizing.">
-            <div class="pd-inline-lbl">ADR</div><div class="pd-inline-val">${adr != null ? adr + ' pip' : '—'}</div>
+          <div class="pd-inline-metric fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated avg daily range in pips from HV 30d, plus % of ADR already covered by today's session range (H−L). Useful for stop/target sizing and gauging how much of the day's typical move is left." data-tip-ex="ADR 85 pip (62%) means today's range has already covered 62% of the pair's average daily range.">
+            <div class="pd-inline-lbl">ADR</div><div class="pd-inline-val ${adrPct != null && adrPct >= 100 ? 'pd-dn' : ''}">${adr != null ? adr + ' pip' : '—'}${adrPct != null ? ` <span style="color:var(--text3);font-size:9px;">(${adrPct}%)</span>` : ''}</div>
           </div>
           <div class="pd-inline-metric fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised).">
             <div class="pd-inline-lbl">${base || 'Base'} Rate</div><div class="pd-inline-val">${cbBase != null ? cbBase.toFixed(2) + '%' : '—'}</div>
@@ -8297,9 +8301,13 @@ async function updatePairDetail(tvSym) {
   const spreadPips = pairId ? TYPICAL_SPREADS[pairId] : null;
 
   let adr = null;
+  const pipSize = dec === 3 ? 0.01 : 0.0001;
   if (hv30 != null && price != null) {
-    const pipSize = dec === 3 ? 0.01 : 0.0001; 
     adr = Math.round(price * (hv30 / 100) / Math.sqrt(252) / pipSize);
+  }
+  let adrPct = null;
+  if (adr != null && adr > 0 && sessH != null && sessL != null) {
+    adrPct = Math.round(((sessH - sessL) / pipSize / adr) * 100);
   }
 
   const retKey = label.replace('/', '/').toUpperCase();
@@ -8350,7 +8358,7 @@ async function updatePairDetail(tvSym) {
         <span class="${cls(pct1d)} pd-chg">${fmtPct(pct1d)}</span>
       </div>
       ${sessH != null && sessL != null ? `<div class="pd-range">H ${sessH.toFixed(dec)} · L ${sessL.toFixed(dec)}</div>` : ''}
-      <div class="pd-spread-row">${spreadPips != null ? 'Spread ' + spreadPips.toFixed(1) + ' pip' : ''}${spreadPips != null && adr != null ? ' · ' : ''}${adr != null ? 'ADR ' + adr + ' pip' : ''}</div>
+      <div class="pd-spread-row">${spreadPips != null ? 'Spread ' + spreadPips.toFixed(1) + ' pip' : ''}${spreadPips != null && adr != null ? ' · ' : ''}${adr != null ? 'ADR ' + adr + ' pip' + (adrPct != null ? ' (' + adrPct + '%)' : '') : ''}</div>
     </div>
 
     <div class="pd-section">
@@ -8359,7 +8367,7 @@ async function updatePairDetail(tvSym) {
         <div class="pd-cell fx-tip" data-tip-title="1-Week Change" data-tip-body="Weekly % change vs prior Friday close. Source: FX performance cache."><div class="pd-lbl">1W Chg</div><div class="pd-val ${cls(pct1w)}">${fmtPct(pct1w)}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="Carry Differential" data-tip-body="OIS overnight rate differential (SOFR/€STR/SONIA/TONA/CORRA/SARON — institutional overnight benchmarks). Falls back to CB policy rate when OIS data unavailable. Positive = base currency yields more, carry favours long." data-tip-ex="Positive carry = the long leg earns more than it costs to fund the short. OIS reflects actual overnight funding cost — more accurate than CB policy rate for carry calculations. Carry is most reliable as a persistent trend signal; it can reverse quickly on policy surprises."><div class="pd-lbl">Carry</div><div class="pd-val ${cls(carryDiff)}">${carryDiff != null ? (carryDiff >= 0 ? '+' : '') + carryDiff.toFixed(2)+'%' : '—'}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="${bondTenor || '2Y'} Sovereign Bond Spread" data-tip-body="ΔY = Yield(${base || 'base'}) − Yield(${quote || 'quote'}) at the ${bondTenor || '2Y'} tenor. Short-end (2Y) yield differentials are the primary driver of sustained FX direction — they track near-term rate-expectations divergence more closely than 10Y, which reflects longer-run growth/inflation premia and duration flows.${bondTenor === '10Y' ? ' 2Y unavailable for one or both legs — showing 10Y as fallback.' : ''} Source: extended-data sovereign yield pipeline (FRED/ECB/BOE/BOC/SNB/DBnomics)." data-tip-ex="A rising ${bondTenor || '2Y'} spread in the base currency's favour has historically preceded sustained appreciation — it signals the market pricing in a widening policy-rate gap before central banks act."><div class="pd-lbl">${bondTenor || '2Y'} Spread</div><div class="pd-val ${cls(bondDiff)}">${bondDiff != null ? (bondDiff >= 0 ? '+' : '') + (bondDiff * 100).toFixed(0)+' bp' : '—'}</div></div>
-        <div class="pd-cell fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated average daily range in pips, derived from HV 30d: close × (HV / √252). Indicates typical intraday movement — useful for stop and target sizing." data-tip-ex="ADR of 85 pip on EUR/USD means the pair moves ~85 pip on an average day."><div class="pd-lbl">ADR</div><div class="pd-val">${adr != null ? adr + ' pip' : '—'}</div></div>
+        <div class="pd-cell fx-tip" data-tip-title="Average Daily Range" data-tip-body="Estimated average daily range in pips, derived from HV 30d: close × (HV / √252). Also shows % of ADR already covered by today's session range (H−L) — useful for stop/target sizing and gauging how much of the day's typical move is left." data-tip-ex="ADR of 85 pip (62%) on EUR/USD means the pair moves ~85 pip on an average day, and today's range has already covered 62% of that."><div class="pd-lbl">ADR</div><div class="pd-val ${adrPct != null && adrPct >= 100 ? 'pd-dn' : ''}">${adr != null ? adr + ' pip' : '—'}${adrPct != null ? ` <span style="color:var(--text3);font-size:9px;">(${adrPct}%)</span>` : ''}</div></div>
         <div class="pd-cell fx-tip" data-tip-title="${base || 'Base'} Policy Rate" data-tip-body="${base || 'Base'} central bank policy rate (annualised). Source: CB rates cache."><div class="pd-lbl">${base || 'Base'} Rate</div><div class="pd-val">${cbBase != null ? cbBase.toFixed(2)+'%' : '—'}</div></div>
       </div>
     </div>
